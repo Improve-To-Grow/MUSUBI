@@ -38,18 +38,19 @@ const HEALTH_STATUS = {
 };
 
 /**
- * Constitutional articles
+ * Constitutional articles (steering/rules/constitution.md v1.1), keyed like
+ * ARTICLES[...].key in src/constitutional/articles.js
  */
 const CONSTITUTIONAL_ARTICLES = {
-  SINGLE_SOURCE_OF_TRUTH: 'article-1',
-  EXPLICIT_CONTRACTS: 'article-2',
-  TRACEABILITY: 'article-3',
-  AUTOMATED_VALIDATION: 'article-4',
-  MACHINE_READABLE: 'article-5',
-  INCREMENTAL_ADOPTION: 'article-6',
-  SEPARATION_OF_CONCERNS: 'article-7',
-  FEEDBACK_LOOPS: 'article-8',
-  GOVERNANCE: 'article-9',
+  TESTABLE_CORE: 'article-1',
+  AUTOMATION_INTERFACE: 'article-2',
+  TEST_FIRST: 'article-3',
+  EARS_FORMAT: 'article-4',
+  TRACEABILITY: 'article-5',
+  PROJECT_MEMORY: 'article-6',
+  SIMPLICITY_GATE: 'article-7',
+  ANTI_ABSTRACTION: 'article-8',
+  INTEGRATION_FIRST: 'article-9',
 };
 
 /**

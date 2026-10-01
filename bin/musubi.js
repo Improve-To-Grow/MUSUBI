@@ -73,6 +73,7 @@ const {
   getAgentDefinition,
   getAllAliasFlags,
 } = require('../src/agents/registry');
+const { printProfileArticles } = require('../src/cli/validate-articles');
 
 const program = new Command();
 
@@ -246,50 +247,8 @@ program
 
     console.log(chalk.white('📋 Validation Checklist:\n'));
 
-    // Article I: Library-First
-    console.log(chalk.white('Article I: Library-First Principle'));
-    const libDir = path.join(cwd, 'lib');
-    if (fs.existsSync(libDir)) {
-      const libraries = fs.readdirSync(libDir).filter(f => {
-        return fs.statSync(path.join(libDir, f)).isDirectory();
-      });
-      if (libraries.length > 0) {
-        console.log(chalk.green(`   ✅ ${libraries.length} libraries found in lib/`));
-        if (options.verbose) {
-          libraries.forEach(lib => console.log(chalk.gray(`      - ${lib}`)));
-        }
-      } else {
-        console.log(chalk.yellow('   ⚠️  No libraries found in lib/'));
-      }
-    } else {
-      console.log(chalk.yellow('   ⚠️  lib/ directory not found'));
-    }
-
-    // Article II: CLI Interface
-    console.log(chalk.white('\nArticle II: CLI Interface Mandate'));
-    if (fs.existsSync(libDir)) {
-      const libraries = fs.readdirSync(libDir).filter(f => {
-        return fs.statSync(path.join(libDir, f)).isDirectory();
-      });
-      let cliCount = 0;
-      libraries.forEach(lib => {
-        const cliPath = path.join(libDir, lib, 'cli.ts');
-        const cliJsPath = path.join(libDir, lib, 'cli.js');
-        if (fs.existsSync(cliPath) || fs.existsSync(cliJsPath)) {
-          cliCount++;
-          if (options.verbose) {
-            console.log(chalk.green(`   ✅ ${lib}/cli.ts`));
-          }
-        } else if (options.verbose) {
-          console.log(chalk.red(`   ❌ ${lib}/cli.ts (missing)`));
-        }
-      });
-      if (cliCount === libraries.length && libraries.length > 0) {
-        console.log(chalk.green(`   ✅ All ${libraries.length} libraries have CLI interfaces`));
-      } else {
-        console.log(chalk.yellow(`   ⚠️  ${cliCount}/${libraries.length} libraries have CLI`));
-      }
-    }
+    // Articles I and II follow the project profile (constitution v1.1)
+    await printProfileArticles({ cwd, verbose: options.verbose, chalk });
 
     // Article IV: EARS Format
     console.log(chalk.white('\nArticle IV: EARS Requirements Format'));

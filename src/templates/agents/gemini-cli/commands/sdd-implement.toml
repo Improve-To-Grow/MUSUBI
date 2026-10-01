@@ -24,6 +24,7 @@ Implement the feature by executing tasks in the task breakdown document, followi
    - `steering/structure.md` - Architecture patterns
    - `steering/tech.md` - Technology stack
    - `steering/product.md` - Product context
+   - `steering/project.yml` - `constitution.profile` (library | cli | application; `library` when absent)
 
 2. **Requirements**:
    - `storage/specs/{{feature-name}}-requirements.md`
@@ -38,19 +39,19 @@ Implement the feature by executing tasks in the task breakdown document, followi
 
 ## Constitutional Article III: Test-First Imperative
 
-Follow RED-GREEN-BLUE cycle for EVERY task:
+Follow RED-GREEN-BLUE cycle for EVERY task. The developer SHALL write each test before the production code that makes it pass (III-1).
 
-### 🔴 RED Phase
+### 🔴 RED Phase (III-2)
 1. Write test that fails
 2. Run test to confirm failure
 3. Commit: "test: add failing test for [feature]"
 
-### 🟢 GREEN Phase
+### 🟢 GREEN Phase (III-3)
 1. Write minimal code to pass test
 2. Run test to confirm pass
 3. Commit: "feat: implement [feature]"
 
-### 🔵 BLUE Phase
+### 🔵 BLUE Phase (III-4)
 1. Refactor and improve code
 2. Run tests to ensure still passing
 3. Commit: "refactor: improve [feature]"
@@ -59,8 +60,8 @@ Follow RED-GREEN-BLUE cycle for EVERY task:
 
 Execute tasks in order based on dependency graph from tasks.md:
 1. Setup & Infrastructure tasks first
-2. Core library implementation (Article I: Library-First)
-3. CLI interface (Article II)
+2. Core module implementation (Article I: Testable Core)
+3. Automation interface (Article II): CLI (`library`, `cli`) or route handlers / server actions (`application`)
 4. API integration
 5. Testing & quality
 6. Documentation
@@ -78,8 +79,9 @@ Execute tasks in order based on dependency graph from tasks.md:
 
 2. **Clean Code**:
    - Meaningful names
-   - Small functions
-   - Clear comments
+   - Small functions: at most 50 lines of code each (VII-5)
+   - Source files: at most 500 lines of code (VII-4) and at most 10 imports, `index` files exempt (VII-6)
+   - Clear comments; a doc comment (`/** … */`) directly above each exported function and class of a core module (I-5, advisory)
    - DRY (Don't Repeat Yourself)
    - Error handling
 
@@ -93,43 +95,81 @@ Execute tasks in order based on dependency graph from tasks.md:
 
 Ensure implementation follows all Constitutional Articles:
 
-### Article I: Library-First Principle
-- Implement core logic in `lib/{{feature-name}}/`
-- Library is framework-agnostic
-- No framework coupling in lib/
+### Article I: Testable-Core Principle
+Read `constitution.profile` from `steering/project.yml` (`library` when absent) and use the matching structure:
+- All profiles: core logic in a core module with tests that run without the app, a browser or a CLI (I-1, I-2); core never imports from delivery paths (I-3); direct framework or SDK use in core is fine (I-4)
+- All profiles: each exported function and class of a core module SHALL have a doc comment (`/** … */`) directly above its declaration (I-5, advisory)
+- `library` / `cli`: Implement core logic in `lib/{{feature-name}}/` with its own tests and public API; no application imports (I-L1–I-L3, I-L6)
+- `application`: Implement core logic in a core module folder such as `src/lib/{{feature-name}}/` with co-located `*.test.ts`, no own `package.json`; route handlers and server actions delegate to it; no UI-only code (components, hooks, providers) in core paths (I-A1–I-A4)
 
-### Article II: CLI Interface Mandate
-- Create `lib/{{feature-name}}/cli.ts`
-- Expose all major functions via CLI
-- Use commander.js or similar
+### Article II: Automation Interface Mandate
+- `library` / `cli`: Create `lib/{{feature-name}}/cli.ts`, expose all major functions via CLI with `--help`, use commander.js or similar (II-L1, II-L2)
+- `application`: No CLI (II-A3). Route handlers are the automation interface (II-A1); machine-facing endpoints validate input against a schema and return documented status and error codes (II-A4, II-A5); ops tasks go in `scripts/` with `--help` and `--dry-run` (II-A6–II-A9, advisory)
+
+Example route handler (`application`):
+
+```typescript
+// src/app/api/auth/login/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { authService, InvalidCredentialsError } from '@/lib/auth'; // core module
+
+const LoginSchema = z.object({ email: z.string().email(), password: z.string().min(1) });
+
+export async function POST(request: NextRequest) {
+  const parsed = LoginSchema.safeParse(await request.json()); // II-A4
+  if (!parsed.success) {
+    return NextResponse.json({ error: { code: 'VALIDATION_FAILED' } }, { status: 400 });
+  }
+  try {
+    const token = await authService.login(parsed.data.email, parsed.data.password); // I-A3
+    return NextResponse.json(token, { status: 200 });
+  } catch (error) {
+    if (error instanceof InvalidCredentialsError) {
+      return NextResponse.json({ error: { code: 'INVALID_CREDENTIALS' } }, { status: 401 });
+    }
+    return NextResponse.json({ error: { code: 'INTERNAL_ERROR' } }, { status: 500 });
+  }
+}
+```
 
 ### Article III: Test-First Imperative
-- Tests written BEFORE implementation
-- RED-GREEN-BLUE for every component
-- No code without tests
+- Tests written BEFORE implementation (III-1)
+- RED-GREEN-BLUE for every component (III-2 to III-4)
+- No code without tests (III-1)
+- Every EARS requirement tested, coverage at or above the configured threshold, default 80% (III-5, III-6)
 
 ### Article IV: EARS Requirements Format
-- Every function maps to EARS requirement
+- Implement against the EARS requirements; each requirement stays traceable to design and tests (IV-4)
 - Traceability maintained
 
 ### Article V: Traceability Mandate
-- Comment requirement IDs in code
+- Comment requirement IDs in code (V-2)
+- Reference requirement IDs in tests (V-4)
 - Update traceability matrix
 
 ### Article VI: Project Memory
-- Follow patterns from steering/structure.md
-- Use stack from steering/tech.md
-- Align with steering/product.md
+- Follow patterns from steering/structure.md (VI-1)
+- Use stack from steering/tech.md (VI-2)
+- Align with steering/product.md (VI-3)
+
+### Article VII: Simplicity Gate (code size)
+- Each function SHALL contain at most 50 lines of code (VII-5)
+- Each source file SHALL contain at most 500 lines of code (VII-4)
+- Each source file other than an `index` file SHALL import at most 10 distinct modules (VII-6)
+- These are the defaults: `code_limits` in `steering/rules/constitution-levels.yml` sets them, and `constitution.overrides.code_limits` in `steering/project.yml` overrides them per project
+- A line of code is a line with something other than whitespace and comments; source files are the JavaScript and TypeScript files in core and delivery paths, without tests, type declarations and generated, vendored or template files
+- The code-size limits are not Phase -1 Gate items: violations are reported at Article VII's level (CONST-007), as warnings by default
 
 ### Article VIII: Anti-Abstraction Gate
-- Use framework features directly
-- No custom wrappers without justification
-- Document why if abstraction needed
+- Use framework features directly (VIII-1)
+- No custom wrappers without Phase -1 Gate approval (VIII-2)
+- Document why if abstraction needed: multi-framework support justification, team expertise analysis, migration path (VIII-3); or the runtime constraint in design.md (VIII-4, VIII-5)
 
 ### Article IX: Integration-First Testing
-- Use real services in tests
-- Minimize mocks
-- Test with actual database
+- Use real databases, APIs and services in integration tests (IX-1)
+- Mock a service only if it is unavailable in the test environment, has usage limits or costs, or has no test environment, and justify the mock (IX-4, IX-5)
+- Test with an actual, isolated database (IX-2)
 
 # Step 4: Implementation Process
 
@@ -318,8 +358,8 @@ Mark task as complete in tasks.md:
 ## Test Coverage
 
 Minimum requirements:
-- **Unit Tests**: 80%+ code coverage
-- **Integration Tests**: All API endpoints
+- **Unit Tests**: Coverage at or above the configured threshold, default 80% (III-6)
+- **Integration Tests**: All API endpoints, against real services (IX-1)
 - **E2E Tests**: Critical user flows
 
 ## Test Types
@@ -379,13 +419,13 @@ Examples:
 ## Code Documentation
 
 1. **JSDoc Comments**:
-   - Every public function
+   - Every public function, and every exported function and class of a core module (I-5, advisory)
    - Include requirement IDs
    - Parameter descriptions
    - Return value description
 
 2. **README Updates**:
-   - Update lib/{{feature-name}}/README.md
+   - Update lib/{{feature-name}}/README.md (`library`, `cli`)
    - Usage examples
    - API documentation
 
@@ -403,10 +443,11 @@ Before marking implementation complete:
    - E2E tests: Critical flows work
 
 2. **Constitutional Compliance**:
-   - Library-first: Code in lib/
-   - CLI interface: cli.ts exists
-   - Test-first: RED-GREEN-BLUE followed
-   - Requirements mapped: IDs in code
+   - Testable core: code in a core module (`lib/` or e.g. `src/lib/`), core tests run without the app (I-1, I-2)
+   - Automation interface: cli.ts exists (`library`, `cli`), or machine-facing route handlers validate input against a schema (`application`, II-A4)
+   - Test-first: RED-GREEN-BLUE followed (III-1 to III-4)
+   - Requirements mapped: IDs in code (V-2)
+   - Code size: functions <= 50 lines of code, source files <= 500, imports <= 10 outside `index` files, or the configured limits (VII-4 to VII-6)
 
 3. **Code Quality**:
    - No linting errors
@@ -431,7 +472,7 @@ After completing all tasks, create summary:
 - ✅ TASK-002: Environment configuration
 - ✅ TASK-003: PasswordValidator library
 - ✅ TASK-004: AuthService library
-- ✅ TASK-005: CLI interface
+- ✅ TASK-005: CLI interface (`library`, `cli` only)
 - ✅ TASK-006: Register API endpoint
 - ✅ TASK-007: Login API endpoint
 - ✅ TASK-008: Integration tests
@@ -449,16 +490,17 @@ After completing all tasks, create summary:
 - E2E Tests: Critical flows covered
 
 ### Constitutional Compliance
-- ✅ Article I: Library-first (lib/auth/)
-- ✅ Article II: CLI interface (lib/auth/cli.ts)
+- ✅ Article I: Testable core (lib/auth/, or src/lib/auth/ for `application`)
+- ✅ Article II: Automation interface (lib/auth/cli.ts, or the HTTP API for `application`)
 - ✅ Article III: Test-first (RED-GREEN-BLUE followed)
 - ✅ Article IV: EARS requirements mapped
 - ✅ Article V: Traceability maintained
+- ✅ Article VII: Code within the size limits (VII-4 to VII-6)
 
 ### Files Created/Modified
 - lib/auth/password-validator.ts
 - lib/auth/auth-service.ts
-- lib/auth/cli.ts
+- lib/auth/cli.ts (`library`, `cli`)
 - app/api/auth/register/route.ts
 - app/api/auth/login/route.ts
 - (+ 15 test files)

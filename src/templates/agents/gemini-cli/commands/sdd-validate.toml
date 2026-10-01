@@ -26,6 +26,7 @@ Validate that the implementation follows all Constitutional Articles and meets r
 2. **Steering Context**:
    - `steering/structure.md` - Architecture patterns
    - `steering/tech.md` - Technology stack
+   - `steering/project.yml` - Constitution profile (`constitution.profile`, core and delivery paths)
 
 3. **Feature Documentation**:
    - `storage/specs/{{feature-name}}-requirements.md`
@@ -33,64 +34,105 @@ Validate that the implementation follows all Constitutional Articles and meets r
    - `storage/tasks/{{feature-name}}-tasks.md`
 
 4. **Implementation**:
-   - Read lib/{{feature-name}}/ directory
+   - Read the core module: lib/{{feature-name}}/ (library / cli profile) or src/lib/{{feature-name}}/ (application profile)
    - Read app/api/{{feature-name}}/ directory (if applicable)
    - Read test files
 
 # Step 2: Validation Checklist
 
-## Article I: Library-First Principle
+**Project Profile**: Read `constitution.profile` from `steering/project.yml`. IF no profile is declared, THEN apply `library` (P-2). Article levels follow the profile (P-5) unless `constitution.levels` overrides them (P-6):
 
-**Rule**: Features start as libraries in lib/ directory
+| Article | library | cli | application |
+|---------|---------|-----|-------------|
+| I (CONST-001) | critical | critical | advisory |
+| II (CONST-002) | advisory | critical | advisory |
+
+A violation in a critical article fails validation; a violation in an advisory article, or of a requirement tagged (advisory), is a warning.
+
+## Article I: Testable-Core Principle
+
+**Rule** (EARS, see constitution):
+- I-1: The project SHALL place feature logic under a core path.
+- I-2: Each core module SHALL have tests that run without starting the app, a browser or a CLI.
+- I-3: A core module SHALL NOT import from a delivery path.
+- I-5: Each exported function and class of a core module SHALL have a doc comment (`/** … */`) directly above its declaration. (advisory)
+- I-L1: WHERE the project profile is `library` or `cli`, each feature SHALL start as a standalone library under a core path (by default `lib/<feature>/` or `packages/<feature>/`).
+- I-A4: WHERE the project profile is `application`, a core path SHALL NOT contain UI-only code (components, React hooks, providers).
 
 **Validation**:
-- [ ] Core implementation in `lib/{{feature-name}}/`
-- [ ] Library is framework-agnostic
-- [ ] No framework coupling in lib/
-- [ ] Exports clean public API
+- [ ] Core module tests run without the app, a browser or a CLI (I-2)
+- [ ] No imports from delivery paths into core paths (I-3)
+- [ ] Each exported function and class in a core path has a doc comment (`/** … */`) directly above its declaration (I-5, advisory: a warning, never a block)
+- [ ] library / cli: core implementation in `lib/{{feature-name}}/` with its own tests and a clean public API (I-L1 to I-L3), no application imports (I-L6)
+- [ ] application: core module in `src/lib/{{feature-name}}/` (I-A1), no UI-only code in core (I-A4), route handlers delegate to core (I-A3, advisory)
+- Direct framework or SDK use in core is not a violation (I-4)
 
 **Evidence to Check**:
 ```bash
-# Directory structure
+# library / cli profile
 ls lib/{{feature-name}}/
+grep -rE "from '@/(app|pages)/" lib/{{feature-name}}/
 
-# Check for framework imports in lib/
-grep -r "from 'next" lib/{{feature-name}}/
-grep -r "from 'react" lib/{{feature-name}}/
+# application profile (delivery paths from steering/project.yml)
+ls src/lib/{{feature-name}}/
+grep -rE "from '@/(app|components|hooks|contexts)/" src/lib/{{feature-name}}/
+grep -rl "from 'react'" src/lib/{{feature-name}}/
 ```
 
-**Pass Criteria**: No framework dependencies in lib/
+**Pass Criteria**: Core module tested without the delivery mechanism and no delivery-path imports in core (plus library structure for library / cli, no UI-only code in core for application)
 
-## Article II: CLI Interface Mandate
+## Article II: Automation Interface Mandate
 
-**Rule**: All libraries expose CLI interfaces
+**Rule** (EARS, see constitution):
+- II-1: The project SHALL make each feature's primary operations callable without the UI.
+- II-L1: WHERE the project profile is `library` or `cli`, each library SHALL provide a CLI that exposes its primary functionality.
+- II-A1: WHERE the project profile is `application`, the project SHALL provide its automation interface as an HTTP API (route handlers).
+- II-A4: WHERE the project profile is `application`, WHEN a machine-facing endpoint (webhook, n8n flow, integration) receives a request, the endpoint SHALL validate the input against a schema.
+- II-A10: WHERE the project profile is `application`, each `package.json` script SHALL reference a file that exists.
 
 **Validation**:
-- [ ] `lib/{{feature-name}}/cli.ts` exists
-- [ ] CLI exposes major functions
-- [ ] Help text provided
-- [ ] Can be invoked from command line
+- library / cli profile:
+  - [ ] `lib/{{feature-name}}/cli.ts` exists (II-L1)
+  - [ ] CLI exposes major functions
+  - [ ] Help text provided (II-L2)
+  - [ ] Can be invoked from command line, exit code 0 on success and non-zero on failure (II-L4, II-L5)
+- application profile (no CLI required, II-A3):
+  - [ ] Route handlers expose the primary operations (II-A1)
+  - [ ] Machine-facing endpoints validate input against a schema and return documented status and error codes (II-A4, II-A5)
+  - [ ] Every `package.json` script references an existing file (II-A10)
 
 **Evidence to Check**:
 ```bash
-# CLI file exists
+# library / cli profile: CLI file exists
 ls lib/{{feature-name}}/cli.ts
 
-# CLI can be invoked
+# library / cli profile: CLI can be invoked
 node lib/{{feature-name}}/cli.ts --help
+
+# application profile: schema validation in route handlers, package.json scripts
+grep -r "safeParse" src/app/api/{{feature-name}}/
+npm pkg get scripts
 ```
 
-**Pass Criteria**: CLI interface complete and functional
+**Pass Criteria**: library / cli: CLI interface complete and functional. application: schema-validated machine-facing endpoints and resolvable `package.json` scripts
 
 ## Article III: Test-First Imperative
 
-**Rule**: Tests before code (RED-GREEN-BLUE)
+**Rule** (EARS, see constitution):
+- III-1: The developer SHALL write each test before the production code that makes it pass.
+- III-2: WHEN the developer starts a new behavior, the developer SHALL first write a test that fails (Red).
+- III-3: WHEN a failing test exists, the developer SHALL write the minimal code that makes it pass (Green).
+- III-4: WHEN the test passes, the developer SHALL refactor while keeping all tests passing (Blue).
+- III-5: The test suite SHALL cover every EARS requirement of the feature.
+- III-6: The test suite SHALL reach the configured coverage threshold (`coverage_threshold` in `steering/rules/constitution-levels.yml`, default 80%).
+- III-7: Integration tests SHALL use real services, as Article IX defines.
 
 **Validation**:
 - [ ] Test files exist for all modules
-- [ ] Test coverage >= 80%
-- [ ] Tests written before implementation (check git history)
-- [ ] RED-GREEN-BLUE pattern followed
+- [ ] Every EARS requirement has at least one test (III-5)
+- [ ] Test coverage >= configured threshold, default 80% (III-6)
+- [ ] Tests written before implementation (check git history) (III-1)
+- [ ] RED-GREEN-BLUE pattern followed (III-2 to III-4)
 
 **Evidence to Check**:
 ```bash
@@ -104,17 +146,27 @@ npm test -- --coverage
 git log --oneline lib/{{feature-name}}/ | grep "test:"
 ```
 
-**Pass Criteria**: 80%+ coverage, test-first followed
+**Pass Criteria**: Coverage at or above the configured threshold (default 80%), every EARS requirement tested, test-first followed (III-1 to III-6)
 
 ## Article IV: EARS Requirements Format
 
-**Rule**: All requirements use EARS patterns
+**Rule** (EARS, see constitution):
+- IV-1: Each requirement SHALL use one of the 5 EARS patterns:
+  - Event-driven: `WHEN [event], the [system] SHALL [response]`
+  - State-driven: `WHILE [state], the [system] SHALL [response]`
+  - Unwanted behavior: `IF [error], THEN the [system] SHALL [response]`
+  - Optional features: `WHERE [feature enabled], the [system] SHALL [response]`
+  - Ubiquitous: `The [system] SHALL [requirement]`
+- IV-2: Each requirement SHALL have a single interpretation.
+- IV-3: Each requirement SHALL include acceptance criteria.
+- IV-4: Each requirement SHALL be traceable to design and tests (see Article V).
 
 **Validation**:
-- [ ] All requirements in requirements.md use EARS
+- [ ] All requirements in requirements.md use one of the 5 EARS patterns (IV-1)
 - [ ] Keywords present: WHEN, SHALL, IF, THEN, WHERE, WHILE
-- [ ] Requirements are unambiguous
-- [ ] Each requirement testable
+- [ ] Requirements are unambiguous (IV-2)
+- [ ] Each requirement has acceptance criteria and is testable (IV-3)
+- [ ] Each requirement traceable to design and tests (IV-4, see Article V)
 
 **Evidence to Check**:
 ```bash
@@ -122,16 +174,23 @@ git log --oneline lib/{{feature-name}}/ | grep "test:"
 grep -E "(WHEN|SHALL|IF|THEN|WHERE|WHILE)" storage/specs/{{feature-name}}-requirements.md
 ```
 
-**Pass Criteria**: All requirements use EARS format
+**Pass Criteria**: All requirements use EARS format, are unambiguous and have acceptance criteria (IV-1 to IV-3)
 
 ## Article V: Traceability Mandate
 
-**Rule**: 100% requirements → design → code → tests traceability
+**Rule** (EARS, see constitution):
+- V-1: Each requirement SHALL map to at least one design decision (architecture, API, database).
+- V-2: Each requirement SHALL map to its implementation (source files, functions).
+- V-3: Each requirement SHALL map to at least one test (test case, scenario).
+- V-4: Each test SHALL reference the ID of the requirement it verifies.
+- V-5: Each design document SHALL include a requirements coverage matrix.
+- V-6: Each task breakdown SHALL map its tasks to requirements.
 
 **Validation**:
-- [ ] Every requirement has design
-- [ ] Every design has code
-- [ ] Every code has tests
+- [ ] Every requirement has design (V-1); design.md has a requirements coverage matrix (V-5)
+- [ ] Every requirement has tasks in tasks.md (V-6)
+- [ ] Every requirement has code (V-2)
+- [ ] Every requirement has tests, and the tests reference the requirement IDs (V-3, V-4)
 - [ ] Requirement IDs in code comments
 - [ ] Traceability matrix complete
 
@@ -144,7 +203,7 @@ grep -r "REQ-" lib/{{feature-name}}/
 grep -r "REQ-" lib/{{feature-name}}/__tests__/
 ```
 
-**Pass Criteria**: All requirements traceable to code and tests
+**Pass Criteria**: All requirements traceable to design, tasks, code and tests (V-1 to V-6)
 
 ### Traceability Matrix Verification
 
@@ -158,13 +217,20 @@ Create matrix:
 
 ## Article VI: Project Memory
 
-**Rule**: All agents consult steering before decisions
+**Rule** (EARS, see constitution):
+- VI-1: `steering/structure.md` SHALL define the architecture patterns.
+- VI-2: `steering/tech.md` SHALL define the technology stack.
+- VI-3: `steering/product.md` SHALL define the business context.
+- VI-4: WHEN a skill starts executing, the skill SHALL read the steering files first.
+- VI-5: WHEN the architecture, technology stack or business context changes, the project SHALL update the affected steering files.
+- VI-6: WHEN a change to a steering file is proposed, the project SHALL obtain stakeholder approval before applying it.
 
 **Validation**:
-- [ ] Implementation follows steering/structure.md patterns
-- [ ] Uses tech stack from steering/tech.md
-- [ ] Aligns with steering/product.md goals
-- [ ] Steering consulted during development
+- [ ] Implementation follows steering/structure.md patterns (VI-1)
+- [ ] Uses tech stack from steering/tech.md (VI-2)
+- [ ] Aligns with steering/product.md goals (VI-3)
+- [ ] Steering consulted during development (VI-4)
+- [ ] Steering files are current (VI-5), and changes to them were approved (VI-6)
 
 **Evidence to Check**:
 - Directory structure matches steering/structure.md
@@ -175,30 +241,56 @@ Create matrix:
 
 ## Article VII: Simplicity Gate
 
-**Rule**: Start with max 3 libraries initially
+**Rule** (EARS, see constitution; a project is an independently deployable unit):
+- VII-1: The initial architecture SHALL NOT exceed 3 projects.
+- VII-2: IF a design needs more than 3 projects, THEN implementation of the additional projects SHALL NOT begin before Phase -1 Gate approval.
+- VII-3: IF a design needs more than 3 projects, THEN design.md SHALL justify each additional project with business requirements, technical constraints and a team capacity analysis.
+- VII-4: Each source file SHALL contain at most the configured maximum of lines of code (`code_limits.max_file_lines` in `steering/rules/constitution-levels.yml`, default 500).
+- VII-5: Each function SHALL contain at most the configured maximum of lines of code (`code_limits.max_function_lines`, default 50).
+- VII-6: Each source file other than an `index` file SHALL import at most the configured maximum of distinct modules (`code_limits.max_imports`, default 10).
+
+**Level**: Article VII (CONST-007) is flexible. Only the project limit needs a Phase -1 Gate (VII-2). The code-size limits (VII-4 to VII-6) are not Phase -1 Gate items: a violation is reported at Article VII's level, as a warning unless the project promotes CONST-007 in `constitution.levels` (P-6).
 
 **Validation**:
-- [ ] Feature count reasonable
-- [ ] No premature complexity
-- [ ] Dependencies justified
+- [ ] Project count (independently deployable units) <= 3 (VII-1)
+- [ ] IF more than 3 projects: Phase -1 Gate approval before the additional projects were implemented (VII-2), and a justification for each additional project in design.md (VII-3)
+- [ ] Each source file in core and delivery paths has at most 500 lines of code (VII-4)
+- [ ] Each function has at most 50 lines of code, nested functions included (VII-5)
+- [ ] Each source file other than an `index` file imports at most 10 distinct modules (VII-6)
+- The numbers are the defaults. Use the configured limits when set: `code_limits` in `steering/rules/constitution-levels.yml`, overridden per project by `constitution.overrides.code_limits` in `steering/project.yml` (e.g. `max_function_lines: 80`)
+- A line of code is a line with something other than whitespace and comments; tests, type declarations and generated, vendored or template files are not source files
 
 **Evidence to Check**:
 ```bash
-# Count libraries
-ls -d lib/*/ | wc -l
+# List independently deployable units (apps, services, workers)
+ls -d apps/*/ services/*/ 2>/dev/null
+find . -name Dockerfile -not -path "./node_modules/*"
+
+# Check for Phase -1 Gate approval and justification
+grep -n "Phase -1" storage/design/{{feature-name}}-design.md
+
+# Code-size limits (VII-4 to VII-6): reports source files, functions and import lists over the configured limits
+npx musubi-validate project
 ```
 
-**Pass Criteria**: Complexity justified
+**Pass Criteria**: At most 3 projects (VII-1), or Phase -1 Gate approval and a justification in design.md for each additional project (VII-2, VII-3). Code over the size limits (VII-4 to VII-6) needs no Phase -1 Gate; it is reported at Article VII's level
 
 ## Article VIII: Anti-Abstraction Gate
 
-**Rule**: Use framework features directly, no unnecessary wrappers
+**Rule** (EARS, see constitution):
+- VIII-1: The project SHALL call framework APIs directly.
+- VIII-2: The project SHALL NOT build a custom abstraction layer or wrapper library over a framework without Phase -1 Gate approval, except for a runtime-constraint client (VIII-4).
+- VIII-3: IF a design proposes an abstraction over a framework, THEN its Phase -1 Gate request SHALL include a multi-framework support justification, a team expertise analysis and a migration path.
+- VIII-4: IF the vendor SDK cannot run on the target runtime (e.g. `firebase-admin` on Cloudflare Workers), THEN the `constitution-enforcer` SHALL accept a project-owned client for that service as a valid abstraction.
+- VIII-5: WHERE a project-owned client exists because of a runtime constraint, design.md SHALL document that constraint.
 
 **Validation**:
-- [ ] No custom ORM wrapper (use Prisma directly)
-- [ ] No custom React wrapper
-- [ ] No custom Next.js wrapper
-- [ ] Abstractions have documented justification
+- [ ] Framework APIs called directly (VIII-1)
+- [ ] No custom ORM wrapper (use Prisma directly) (VIII-2)
+- [ ] No custom React wrapper (VIII-2)
+- [ ] No custom Next.js wrapper (VIII-2)
+- [ ] Each abstraction over a framework has Phase -1 Gate approval, with a multi-framework support justification, a team expertise analysis and a migration path (VIII-2, VIII-3)
+- [ ] A project-owned client for a vendor SDK that cannot run on the target runtime (e.g. `firebase-admin` on Cloudflare Workers) is accepted (VIII-4) when design.md documents the constraint (VIII-5)
 
 **Evidence to Check**:
 ```bash
@@ -207,15 +299,21 @@ grep -r "class.*Wrapper" lib/{{feature-name}}/
 grep -r "class.*Adapter" lib/{{feature-name}}/
 ```
 
-**Pass Criteria**: No unnecessary abstractions
+**Pass Criteria**: Framework APIs used directly; every abstraction over a framework is gate-approved (VIII-2, VIII-3) or a runtime-constraint client documented in design.md (VIII-4, VIII-5)
 
 ## Article IX: Integration-First Testing
 
-**Rule**: Use real services, minimize mocks
+**Rule** (EARS, see constitution):
+- IX-1: Integration tests SHALL use real databases, APIs and services.
+- IX-2: Each test database SHALL be isolated (container or test schema).
+- IX-3: Integration tests SHALL call external APIs through their sandbox or test environments.
+- IX-4: Integration tests SHALL NOT mock a service unless the service is unavailable in the test environment, has usage limits or costs, or has no test environment.
+- IX-5: WHERE a test uses a mock, the test documentation SHALL justify that mock.
 
 **Validation**:
-- [ ] Tests use real database (test DB)
-- [ ] Minimal mocking
+- [ ] Tests use real database, an isolated test DB (IX-1, IX-2)
+- [ ] External APIs called through sandbox or test environments (IX-3)
+- [ ] Mocks only where IX-4 allows them, each justified in the test documentation (IX-5)
 - [ ] Integration tests present
 - [ ] E2E tests for critical flows
 
@@ -229,7 +327,7 @@ grep -r "vi.mock" lib/{{feature-name}}/__tests__/
 find tests/integration -name "*{{feature-name}}*.test.ts"
 ```
 
-**Pass Criteria**: Real services used, mocks justified
+**Pass Criteria**: Real services used (IX-1), mocks allowed by IX-4 and justified (IX-5)
 
 # Step 3: Security Validation (OWASP Top 10)
 
@@ -285,15 +383,16 @@ grep -r "query.*+.*params" lib/{{feature-name}}/
 ## Clean Code
 
 - [ ] Meaningful variable names
-- [ ] Functions < 50 lines
-- [ ] Classes < 300 lines
+- [ ] Functions <= 50 lines of code (VII-5)
+- [ ] Source files <= 500 lines of code (VII-4), at most 10 imports per file except `index` files (VII-6)
+- [ ] Classes < 300 lines (a stricter preference; the constitution does not require it)
 - [ ] No code duplication
 - [ ] Proper error handling
 
 **Evidence to Check**:
 ```bash
-# Check function length
-grep -A 50 "function\\|=>" lib/{{feature-name}}/*.ts
+# Check function length, file length and imports against the configured limits (VII-4 to VII-6)
+npx musubi-validate project
 
 # Check for duplication
 npx jscpd lib/{{feature-name}}/
@@ -334,7 +433,7 @@ cat tsconfig.json | grep strict
 # Step 6: Documentation Validation
 
 ## Code Documentation
-- [ ] JSDoc on all public functions
+- [ ] JSDoc on all public functions; a doc comment directly above each exported function and class of a core module (I-5, advisory)
 - [ ] Requirement IDs in comments
 - [ ] README.md in lib/{{feature-name}}/
 
@@ -370,6 +469,7 @@ Generate comprehensive report:
 ## Executive Summary
 
 - **Overall Status**: ✅ PASS / ❌ FAIL / ⚠️ PARTIAL
+- **Project Profile**: library | cli | application (from `steering/project.yml`)
 - **Constitutional Compliance**: X/9 articles
 - **Requirements Coverage**: X% (Y/Z requirements)
 - **Test Coverage**: X%
@@ -377,23 +477,27 @@ Generate comprehensive report:
 
 ## Article-by-Article Validation
 
-### Article I: Library-First Principle
-**Status**: ✅ PASS
+### Article I: Testable-Core Principle
+**Status**: ✅ PASS (profile: library, level: critical)
 
-- ✅ Core implementation in lib/auth/
-- ✅ Framework-agnostic design
-- ✅ Clean public API
+- ✅ Core implementation in lib/auth/ (I-L1)
+- ✅ Tests run without the app, a browser or a CLI (I-2)
+- ✅ Clean public API (I-L3)
+
+(application profile: core module in src/lib/auth/ with co-located tests, no UI-only code in core, I-A1, I-A4)
 
 **Evidence**: [link to code]
 
-### Article II: CLI Interface Mandate
-**Status**: ✅ PASS
+### Article II: Automation Interface Mandate
+**Status**: ✅ PASS (profile: library, level: advisory)
 
-- ✅ CLI interface at lib/auth/cli.ts
+- ✅ CLI interface at lib/auth/cli.ts (II-L1)
 - ✅ Exposes register, login, list-users commands
-- ✅ Help text complete
+- ✅ Help text complete (II-L2)
 
-**Evidence**: [link to CLI file]
+(application profile: route handler src/app/api/auth/login/route.ts validates input with a zod schema and returns status plus error code; no CLI, II-A1, II-A3, II-A4)
+
+**Evidence**: [link to CLI file or route handler]
 
 ### Article III: Test-First Imperative
 **Status**: ✅ PASS
@@ -434,9 +538,9 @@ Generate comprehensive report:
 ### Article VII: Simplicity Gate
 **Status**: ✅ PASS
 
-- ✅ Single focused library (auth)
-- ✅ No premature complexity
-- ✅ Dependencies justified
+- ✅ Project count: 1 deployable unit (VII-1)
+- ✅ Within limit (<= 3), no Phase -1 Gate needed
+- ✅ Code-size limits met: source files <= 500 lines of code, functions <= 50, imports <= 10 (VII-4 to VII-6)
 
 ### Article VIII: Anti-Abstraction Gate
 **Status**: ✅ PASS
@@ -451,7 +555,7 @@ Generate comprehensive report:
 **Status**: ✅ PASS
 
 - ✅ Tests use real PostgreSQL (test DB)
-- ✅ Minimal mocking (0 mocks found)
+- ✅ No unjustified mocks (0 mocks found, IX-4)
 - ✅ Integration tests present
 
 **Evidence**: [test files]

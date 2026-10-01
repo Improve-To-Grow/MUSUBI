@@ -68,12 +68,16 @@ Template for creating comprehensive Quality Assurance plans.
 
 **Test-First (Mandatory - Article III)**:
 
-- All tests written before implementation
-- Red-Green-Refactor cycle followed
+- Each test written before the production code that makes it pass (III-1)
+- Red-Green-Blue cycle followed (III-2–III-4)
+- Every EARS requirement covered by a test; coverage at or above the configured threshold, default 80% (III-5, III-6)
 
 **Integration-First (Article IX)**:
 
-- Integration tests before unit tests
+- Integration tests use real databases, APIs and services (IX-1)
+- Each test database isolated in a container or test schema (IX-2)
+- External APIs called through their sandbox or test environments (IX-3)
+- Mocks only for services that are unavailable in the test environment, have usage limits or costs, or have no test environment; each mock justified (IX-4, IX-5)
 - E2E tests for critical paths
 
 ---

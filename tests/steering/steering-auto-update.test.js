@@ -5,6 +5,9 @@
 
 'use strict';
 
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const {
   SteeringAutoUpdate,
   createSteeringAutoUpdate,
@@ -70,17 +73,22 @@ describe('SteeringAutoUpdate', () => {
         update: async () => ({ section: 'test', changes: ['Test change'] }),
       });
 
-      // Set up mock steering
+      // Set up mock steering in a temp directory: auto-save writes to this path
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'steering-auto-update-'));
       autoUpdate.steering.set(STEERING_TYPE.STRUCTURE, {
-        path: 'steering/structure.md',
+        path: path.join(tmpDir, 'structure.md'),
         content: '# Structure',
         parsed: new Map(),
       });
 
-      const results = await autoUpdate.processTrigger(TRIGGER.MANUAL, { testFlag: true });
-      expect(results.length).toBeGreaterThan(0);
-      expect(results[0].success).toBe(true);
-      expect(results[0].changes).toContain('Test change');
+      try {
+        const results = await autoUpdate.processTrigger(TRIGGER.MANUAL, { testFlag: true });
+        expect(results.length).toBeGreaterThan(0);
+        expect(results[0].success).toBe(true);
+        expect(results[0].changes).toContain('Test change');
+      } finally {
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+      }
     });
 
     it('should emit trigger events', async () => {

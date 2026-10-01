@@ -816,10 +816,12 @@ Let me know if you have any feedback or additional review requests.
 
 - [ ] **Naming conventions**: Variable and function names are clear and consistent
 - [ ] **DRY principle**: No code duplication
-- [ ] **Function length**: Each function has an appropriate length (50 lines or fewer recommended)
+- [ ] **Function length**: Each function has at most 50 lines of code, or the configured limit (Article VII, VII-5)
+- [ ] **File size**: Each source file has at most 500 lines of code and imports at most 10 modules, or the configured limits (Article VII, VII-4, VII-6)
 - [ ] **Nesting depth**: No excessively deep nesting (3 levels or fewer recommended)
 - [ ] **Magic numbers**: Numbers are extracted into constants
 - [ ] **Comments**: Complex logic is explained
+- [ ] **Doc comments**: Exported functions and classes of core modules have a `/** … */` comment (Article I, I-5, advisory)
 - [ ] **Error handling**: Appropriate error handling and log output
 - [ ] **Type safety**: Appropriate use of TypeScript/type hints
 - [ ] **Consistency**: Coding style is uniform

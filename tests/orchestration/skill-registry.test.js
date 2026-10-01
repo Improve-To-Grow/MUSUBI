@@ -12,6 +12,27 @@ const {
 } = require('../../src/orchestration/skill-registry');
 
 describe('SkillMetadata', () => {
+  test('should record the artifact type the skill produces', () => {
+    const metadata = new SkillMetadata({
+      id: 'write-code',
+      name: 'Write Code',
+      contentType: 'code',
+    });
+
+    expect(metadata.contentType).toBe('code');
+    expect(metadata.toJSON().contentType).toBe('code');
+    expect(metadata.validate().valid).toBe(true);
+    expect(new SkillMetadata({ id: 'plain', name: 'Plain' }).contentType).toBeNull();
+  });
+
+  test('should reject an unknown content type', () => {
+    const metadata = new SkillMetadata({ id: 'chat', name: 'Chat', contentType: 'chat' });
+
+    expect(metadata.validate().errors).toContain(
+      'Content type must be code, test, requirements or design'
+    );
+  });
+
   test('should create valid skill metadata', () => {
     const metadata = new SkillMetadata({
       id: 'test-skill',

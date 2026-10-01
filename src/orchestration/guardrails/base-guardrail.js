@@ -38,8 +38,19 @@
  * @property {boolean} [enabled=true] - Whether the guardrail is enabled
  * @property {boolean} [failFast=false] - Stop on first violation
  * @property {string} [severity='error'] - Default severity level
+ * @property {string} [phase='both'] - When the skill executor runs it (GuardrailPhase)
  * @property {Object} [options] - Guardrail-specific options
  */
+
+/**
+ * When a guardrail runs during skill execution: before the skill on its input (pre), after
+ * the skill on its output (post), or both
+ */
+const GuardrailPhase = {
+  PRE: 'pre',
+  POST: 'post',
+  BOTH: 'both',
+};
 
 /**
  * Tripwire exception - thrown when guardrail fails and tripwire is enabled
@@ -77,6 +88,7 @@ class BaseGuardrail {
     this.failFast = config.failFast || false;
     this.defaultSeverity = config.severity || 'error';
     this.options = config.options || {};
+    this.phase = config.phase || GuardrailPhase.BOTH;
 
     // Tripwire: if true, throws exception on failure instead of returning result
     this.tripwireEnabled = config.tripwireEnabled || false;
@@ -356,5 +368,6 @@ class GuardrailChain {
 module.exports = {
   BaseGuardrail,
   GuardrailChain,
+  GuardrailPhase,
   GuardrailTripwireException,
 };

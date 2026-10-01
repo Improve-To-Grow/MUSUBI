@@ -6,6 +6,7 @@
  */
 
 const fs = require('fs-extra');
+const path = require('path');
 
 /**
  * Generate language-specific dependency files for single-package projects
@@ -457,8 +458,67 @@ ${frameworksSection}
 `;
 }
 
+/**
+ * Project profiles offered by `musubi init` (constitution v1.1, "Project Profiles")
+ */
+const CONSTITUTION_PROFILE_CHOICES = [
+  { name: 'Library (packages that are published or shared)', value: 'library' },
+  { name: 'CLI tool', value: 'cli' },
+  { name: 'Application (web app or service deployed as one unit)', value: 'application' },
+];
+
+/**
+ * Pre-filled core and delivery paths for an application, based on the project layout
+ * @param {string} projectRoot - Project root
+ * @returns {{corePaths: string, deliveryPaths: string}} Comma-separated paths
+ */
+function defaultApplicationPaths(projectRoot = process.cwd()) {
+  const hasSrc = fs.existsSync(path.join(projectRoot, 'src'));
+  const hasRootApp = fs.existsSync(path.join(projectRoot, 'app'));
+  const base = !hasSrc && hasRootApp ? '' : 'src/';
+  return {
+    corePaths: `${base}lib`,
+    deliveryPaths: ['app', 'components', 'hooks'].map(dir => `${base}${dir}`).join(', '),
+  };
+}
+
+/**
+ * Build the `constitution:` block of steering/project.yml
+ * @param {object} options - { profile, corePaths, deliveryPaths, adapterPaths } (paths comma-separated)
+ * @returns {string} YAML
+ */
+function buildConstitutionYml({ profile, corePaths, deliveryPaths, adapterPaths } = {}) {
+  const toList = value =>
+    (value || '')
+      .split(',')
+      .map(item => item.trim())
+      .filter(Boolean);
+  const flow = items => `[${items.join(', ')}]`;
+
+  const lines = [
+    '# Constitution profile: decides how Articles I and II apply',
+    '# (see "Project Profiles" in steering/rules/constitution.md)',
+    'constitution:',
+    `  profile: ${profile || 'library'} # library | cli | application`,
+  ];
+  if (profile === 'application') {
+    lines.push(
+      `  core_paths: ${flow(toList(corePaths))} # where feature logic lives`,
+      `  delivery_paths: ${flow(toList(deliveryPaths))} # pages, routes, UI`,
+      `  adapter_paths: ${flow(toList(adapterPaths))} # request-context code`
+    );
+  } else {
+    lines.push('  # core_paths default to [lib, packages] (P-3)');
+  }
+  lines.push('  # levels: # optional per-article override (P-6), e.g. CONST-001: critical');
+  return `${lines.join('\n')}\n`;
+}
+
 module.exports = {
   generateDependencyFiles,
   generateTechMd,
   LANG_INFO,
+  CONSTITUTION_PROFILE_CHOICES,
+  defaultApplicationPaths,
+  buildConstitutionYml,
 };

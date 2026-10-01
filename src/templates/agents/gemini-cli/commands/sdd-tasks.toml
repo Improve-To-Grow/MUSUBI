@@ -23,6 +23,7 @@ Create a detailed implementation task breakdown following test-first development
 1. **Steering Context**:
    - `steering/structure.md` - Architecture patterns
    - `steering/tech.md` - Technology stack
+   - `steering/project.yml` - `constitution.profile` (library | cli | application; `library` when absent)
 
 2. **Requirements**:
    - `storage/specs/{{feature-name}}-requirements.md`
@@ -32,12 +33,12 @@ Create a detailed implementation task breakdown following test-first development
 
 # Step 2: Task Breakdown Methodology
 
-Follow Constitutional Article III: Test-First Imperative (Red-Green-Blue):
+Follow Constitutional Article III: Test-First Imperative (Red-Green-Blue). The developer SHALL write each test before the production code that makes it pass (III-1).
 
 For each component:
-1. **RED**: Write failing test
-2. **GREEN**: Implement minimal code to pass test
-3. **BLUE**: Refactor and improve
+1. **RED**: Write failing test (III-2)
+2. **GREEN**: Implement minimal code to pass test (III-3)
+3. **BLUE**: Refactor and improve while keeping all tests passing (III-4)
 
 # Step 3: Task Document Structure
 
@@ -56,10 +57,10 @@ Group tasks by phase:
 - Environment configuration
 - CI/CD setup
 
-### Phase 2: Core Libraries (Article I: Library-First)
-- Implement feature in lib/ directory
+### Phase 2: Core Modules (Article I: Testable Core)
+- Implement feature in a core module: `lib/<feature>/` (`library`, `cli`) or `src/lib/<feature>/` (`application`)
 - Test-first development
-- CLI interface (Article II)
+- Automation interface (Article II): CLI (`library`, `cli`), or route handlers and server actions that delegate to core (`application`)
 
 ### Phase 3: API Integration
 - API routes
@@ -140,7 +141,9 @@ For each task:
   - `.env.example` (create)
   - `lib/auth/config.ts` (create)
 
-## Phase 2: Core Libraries
+## Phase 2: Core Modules
+
+The examples use the `library` paths. For `application`, use `src/lib/auth/` instead of `lib/auth/` (I-A1).
 
 ### TASK-003: PasswordValidator Library (RED-GREEN-BLUE)
 - **Phase**: Implementation
@@ -231,7 +234,7 @@ For each task:
   - `lib/auth/__tests__/auth-service.test.ts` (create)
   - `lib/auth/types.ts` (create)
 
-### TASK-005: CLI Interface (Article II)
+### TASK-005: CLI Interface (Article II, `library` / `cli` only)
 - **Phase**: Implementation
 - **Type**: Backend
 - **Description**: Create CLI interface for auth library
@@ -239,7 +242,7 @@ For each task:
   1. RED: Write CLI integration tests
   2. GREEN: Implement CLI commands
   3. BLUE: Add help text, improve UX
-- **Requirements**: Article II (CLI Interface Mandate)
+- **Requirements**: Article II (Automation Interface Mandate, II-L1, II-L2)
 - **Design Reference**: Constitutional compliance
 - **Estimated Effort**: M
 - **Dependencies**: TASK-004
@@ -251,6 +254,7 @@ For each task:
 - **Files**:
   - `lib/auth/cli.ts` (create)
   - `lib/auth/__tests__/cli.test.ts` (create)
+- **`application` profile**: No CLI task (II-A3). The route handlers in TASK-006 and TASK-007 are the automation interface (II-A1): they validate input against a schema, call AuthService in `src/lib/auth/` and return documented status and error codes (I-A3, II-A4, II-A5). Add a `scripts/` task with `--help` and `--dry-run` only for operational tasks such as user creation (II-A6–II-A9, advisory).
 
 ## Phase 3: API Integration
 
@@ -310,8 +314,9 @@ For each task:
 - **Acceptance Criteria**:
   - Complete registration → login flow tested
   - Error cases covered
-  - 80%+ overall code coverage
-  - All EARS requirements tested
+  - Real database and services, not mocks (IX-1)
+  - Coverage at or above the configured threshold, default 80% (III-6)
+  - All EARS requirements tested (III-5)
 - **Files**:
   - `tests/integration/auth.test.ts` (create)
 
@@ -350,7 +355,7 @@ For each task:
 
 ## 4. Requirements Coverage Matrix
 
-Map tasks to requirements:
+Map tasks to requirements (V-6):
 
 | Requirement | Tasks | Status |
 |-------------|-------|--------|
@@ -364,7 +369,7 @@ Map tasks to requirements:
 TASK-001 (DB Schema)
   └─> TASK-003 (PasswordValidator)
       └─> TASK-004 (AuthService)
-          ├─> TASK-005 (CLI)
+          ├─> TASK-005 (CLI, library/cli only)
           ├─> TASK-006 (Register API)
           └─> TASK-007 (Login API)
               └─> TASK-008 (Integration Tests)
@@ -392,17 +397,17 @@ Save to: `storage/tasks/{{feature-name}}-tasks.md`
 Before finalizing:
 
 1. **Requirements Coverage**:
-   - All requirements from requirements.md have tasks
+   - All requirements from requirements.md have tasks (V-6)
    - No missing functionality
 
 2. **Test-First Compliance**:
-   - Each task follows RED-GREEN-BLUE
-   - Tests written before implementation
+   - Each task follows RED-GREEN-BLUE (III-2 to III-4)
+   - Tests written before implementation (III-1)
    - Acceptance criteria testable
 
 3. **Constitutional Compliance**:
-   - Library-first: Core logic in lib/
-   - CLI interface: Task for CLI created
+   - Testable core: core logic in a core module, `lib/` (`library`, `cli`) or e.g. `src/lib/` (`application`) (I-1)
+   - Automation interface: task for CLI created (`library`, `cli`), or route handler tasks with schema validation for machine-facing endpoints (`application`, II-A4)
    - Test-first: RED-GREEN-BLUE for all tasks
 
 4. **Dependencies**:

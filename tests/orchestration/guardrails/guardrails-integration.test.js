@@ -117,13 +117,13 @@ describe('Guardrails Integration Tests', () => {
     it('should run constitutional checks when enabled', async () => {
       const guardrail = createSafetyCheckGuardrail('constitutional', { tripwireEnabled: false });
 
-      // Content without spec reference or trace ID
-      const content = 'Just a simple message';
-      const result = await guardrail.run(content);
+      // Generated code without a requirement reference (Article V, V-2)
+      const content = 'const total = price * quantity;';
+      const result = await guardrail.run(content, { contentType: 'code' });
 
       expect(result.passed).toBe(false);
       // Should have constitutional violations
-      expect(result.violations.some(v => v.code.startsWith('CONSTITUTIONAL_'))).toBe(true);
+      expect(result.violations.some(v => v.code === 'CONSTITUTIONAL_V_2')).toBe(true);
     });
 
     it('should pass content with spec and trace references', async () => {

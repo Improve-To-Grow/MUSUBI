@@ -50,7 +50,8 @@ git diff --name-only --diff-filter=A | grep "/" | cut -d'/' -f1 | sort -u
 **Patterns to Watch**:
 
 - `src/` - Source code organization
-- `lib/` - Library modules (Constitutional Article I)
+- `lib/` - Library modules (default core path for the `library` and `cli` profiles, Constitutional Article I)
+- `constitution.core_paths` / `delivery_paths` in `steering/project.yml` - Core and delivery code (Constitutional Article I); record the project profile (default `library`) and these paths in `structure.md`
 - `tests/` - Test organization
 - `docs/` - Documentation structure
 - `config/` - Configuration files

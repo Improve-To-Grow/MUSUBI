@@ -50,6 +50,8 @@ musubi-trace matrix --check-gaps
 - [ ] All requirements are mapped to design components
 - [ ] Architecture complies with `steering/structure.md`
 - [ ] Technology stack complies with `steering/tech.md`
+- [ ] Each feature has a named core module under a core path, per the project profile in `steering/project.yml` (`library` when absent) (Article I: Testable Core, I-1)
+- [ ] The automation interface is specified: a CLI for `library`/`cli`, the HTTP API for `application` (Article II: Automation Interface, II-1)
 - [ ] C4 diagrams are created
 - [ ] ADRs (Architecture Decision Records) are recorded
 - [ ] Security and performance considerations are documented
@@ -89,6 +91,8 @@ musubi-trace coverage --requirements
 - [ ] All tasks are complete
 - [ ] Code review approved
 - [ ] Unit test coverage ≥ 80%
+- [ ] Source files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10, or the configured limits (Article VII: Simplicity Gate, VII-4–VII-6; findings warn, not a Phase -1 Gate item)
+- [ ] Exported functions and classes of core modules have doc comments (Article I: Testable Core, I-5, advisory)
 - [ ] No Lint/Format errors
 - [ ] No critical bugs
 

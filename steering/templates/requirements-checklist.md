@@ -8,7 +8,7 @@ Use this checklist to validate requirements before proceeding to design.
 
 ### Pattern Usage
 
-- [ ] Each requirement uses ONE EARS pattern correctly
+- [ ] Each requirement uses ONE EARS pattern correctly (IV-1)
 - [ ] Event-driven: `WHEN [event], the [System] SHALL [response]`
 - [ ] State-driven: `WHILE [state], the [System] SHALL [behavior]`
 - [ ] Unwanted: `IF [error], THEN the [System] SHALL [handling]`
@@ -31,7 +31,7 @@ Use this checklist to validate requirements before proceeding to design.
 
 | Check | Pass/Fail | Notes |
 |-------|-----------|-------|
-| Single interpretation possible | | |
+| Single interpretation possible (IV-2) | | |
 | Technical terms defined | | |
 | Acronyms expanded first use | | |
 | No assumed knowledge | | |
@@ -51,6 +51,7 @@ Use this checklist to validate requirements before proceeding to design.
 | Check | Pass/Fail | Notes |
 |-------|-----------|-------|
 | Each requirement is testable | | |
+| Acceptance criteria included (IV-3) | | |
 | Test verification defined | | |
 | Success/failure measurable | | |
 | Test data requirements clear | | |
@@ -61,7 +62,7 @@ Use this checklist to validate requirements before proceeding to design.
 |-------|-----------|-------|
 | No contradicting requirements | | |
 | Terminology consistent | | |
-| Aligned with steering files | | |
+| Aligned with steering files (VI-4) | | |
 | Compatible with existing system | | |
 
 ---
@@ -74,7 +75,7 @@ Use this checklist to validate requirements before proceeding to design.
 - [ ] ID format documented
 - [ ] ID registry maintained
 
-### Coverage Matrix Started
+### Coverage Matrix Started (IV-4)
 
 | Requirement ID | Has Design Ref | Has Test Ref | Status |
 |----------------|----------------|--------------|--------|

@@ -16,10 +16,10 @@ Use this checklist during implementation to ensure quality and compliance.
 
 ### Test-First Setup (Article III)
 
-- [ ] Write failing test FIRST (Red)
-- [ ] Test covers requirement
-- [ ] Test file committed before code
-- [ ] Test description includes REQ-ID
+- [ ] Write failing test FIRST (Red, III-2)
+- [ ] Test covers requirement (III-5)
+- [ ] Test file committed before code (III-1)
+- [ ] Test description includes REQ-ID (V-4)
 
 ---
 
@@ -36,13 +36,16 @@ Use this checklist during implementation to ensure quality and compliance.
 
 ### Constitutional Compliance
 
+Read `constitution.profile` from `steering/project.yml` (`library` when absent) to pick the Article I and II check.
+
 | Article | Check | Status |
 |---------|-------|--------|
-| I: Library-First | Code in lib/ if reusable | ☐ |
-| II: CLI Interface | CLI added for functionality | ☐ |
-| III: Test-First | Tests written before code | ☐ |
-| VIII: Anti-Abstraction | Framework used directly | ☐ |
-| IX: Integration-First | Real services in tests | ☐ |
+| I: Testable Core | Feature logic in a core module with tests that run without the app (I-1, I-2); no imports from delivery paths (I-3). `library`/`cli`: library in `lib/` (I-L1); `application`: folder under a core path such as `src/lib/`, no UI-only code there (I-A1, I-A4). Exported functions and classes of core modules have a `/** … */` doc comment (I-5, advisory) | ☐ |
+| II: Automation Interface | `library`/`cli`: CLI added for functionality (II-L1); `application`: route handler or core function, no CLI required (II-A1–II-A3) | ☐ |
+| III: Test-First | Tests written before code (III-1); Red-Green-Blue followed (III-2–III-4) | ☐ |
+| VII: Simplicity | Source files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10 per file except `index` files, or the configured limits (VII-4–VII-6); a warning, not a Phase -1 Gate item | ☐ |
+| VIII: Anti-Abstraction | Framework used directly (VIII-1); no wrapper over a framework without Phase -1 Gate approval (VIII-2); project-owned client because the vendor SDK cannot run on the target runtime (VIII-4) has the constraint documented in design.md (VIII-5) | ☐ |
+| IX: Integration-First | Integration tests use real services (IX-1); each mock justified (IX-4, IX-5) | ☐ |
 
 ---
 

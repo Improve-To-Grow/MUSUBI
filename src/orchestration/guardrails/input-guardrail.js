@@ -10,7 +10,7 @@
 
 'use strict';
 
-const { BaseGuardrail } = require('./base-guardrail');
+const { BaseGuardrail, GuardrailPhase } = require('./base-guardrail');
 const { RuleBuilder, rules, globalRuleRegistry } = require('./guardrail-rules');
 
 /**
@@ -43,7 +43,7 @@ class InputGuardrail extends BaseGuardrail {
   /**
    * @param {InputGuardrailConfig} config - Configuration
    */
-  constructor(config) {
+  constructor(config = {}) {
     super({
       name: config.name || 'InputGuardrail',
       description: config.description || 'Validates agent input',
@@ -52,6 +52,7 @@ class InputGuardrail extends BaseGuardrail {
       severity: config.severity,
       tripwireEnabled: config.tripwireEnabled,
       options: config.options,
+      phase: config.phase || GuardrailPhase.PRE,
     });
 
     // Load rules from config, rule set, or default

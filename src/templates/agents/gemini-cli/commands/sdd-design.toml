@@ -24,6 +24,7 @@ Create a comprehensive technical design for the given feature based on requireme
    - `steering/structure.md` - Architecture patterns
    - `steering/tech.md` - Technology stack
    - `steering/product.md` - Product context
+   - `steering/project.yml` - `constitution.profile` (library | cli | application; `library` when absent)
 
 2. **Requirements**:
    - `storage/specs/{{feature-name}}-requirements.md` - Feature requirements
@@ -176,6 +177,11 @@ CREATE TABLE sessions (
 
 ## 7. Component Design
 
+Choose the variant for `constitution.profile` (Article I: Testable Core). The design SHALL name the core module for each feature (I-1).
+
+- **`library` / `cli`**: each feature is a standalone library, e.g. `lib/auth/` with its own tests, a public API (`index.ts`) and a CLI (`cli.ts`) (I-L1–I-L3, II-L1)
+- **`application`**: each feature is a core module folder, e.g. `src/lib/auth/` with co-located `*.test.ts`, no own `package.json` and no `cli.ts`; route handlers and server actions delegate to it (I-A1–I-A3, II-A3). WHERE the project profile is `application`, the design SHALL list the delivery paths (e.g. `src/app/api/auth/login/route.ts`) and each machine-facing endpoint with its input schema and documented status and error codes (II-A4, II-A5)
+
 ### AuthService
 ```typescript
 class AuthService {
@@ -256,8 +262,8 @@ Based on Constitutional Article (OWASP Top 10):
 - Token validation flow
 
 ### Test Coverage Requirements
-- Minimum 80% code coverage
-- All EARS requirements tested
+- Coverage at or above the configured threshold, default 80% (III-6)
+- All EARS requirements tested (III-5)
 - All error paths tested
 
 ## 13. Deployment
@@ -277,12 +283,15 @@ Based on Constitutional Article (OWASP Top 10):
 
 Verify alignment with Constitutional Articles:
 
-- ✅ **Article I: Library-First**: Implemented in lib/auth/
-- ✅ **Article II: CLI Interface**: CLI tool for user management
+- ✅ **Article I: Testable Core**: Core module named per feature: lib/auth/ (`library`, `cli`) or src/lib/auth/ (`application`) (I-1)
+- ✅ **Article II: Automation Interface**: CLI tool for user management (`library`, `cli`), or HTTP API with schema-validated machine-facing endpoints (`application`)
 - ✅ **Article III: Test-First**: Test strategy defined
 - ✅ **Article IV: EARS Format**: All requirements mapped
-- ✅ **Article V: Traceability**: Requirements → Design mapping complete
-- ✅ **Article VIII: Anti-Abstraction**: Use Prisma directly, no custom ORM wrapper
+- ✅ **Article V: Traceability**: Requirements → Design mapping complete (V-1), requirements coverage matrix included (V-5)
+- ✅ **Article VII: Simplicity Gate**: At most 3 projects (VII-1); more need Phase -1 Gate approval before they are implemented (VII-2) and a justification in design.md: business requirements, technical constraints, team capacity analysis (VII-3)
+- **Code-size limits (VII-4 to VII-6)**: components sized so the code can stay within source files <= 500 lines of code, functions <= 50 and imports <= 10 (`index` files exempt), or the configured `code_limits`; these limits are not Phase -1 Gate items
+- ✅ **Article VIII: Anti-Abstraction**: Use Prisma directly, no custom ORM wrapper (VIII-1, VIII-2); any abstraction over a framework needs Phase -1 Gate approval with a multi-framework support justification, a team expertise analysis and a migration path (VIII-3)
+- **Runtime constraint (VIII-4, VIII-5)**: IF the design adds a project-owned client because the vendor SDK cannot run on the target runtime (e.g. `firebase-admin` on Cloudflare Workers), THEN design.md SHALL document that constraint here
 
 # Step 4: Save Design Document
 
@@ -315,11 +324,12 @@ Before finalizing:
    - Aligns with product goals from steering/product.md
 
 3. **Constitutional Compliance**:
-   - Library-first approach
-   - CLI interface designed
+   - Testable core: core module named for each feature, per the project profile (I-1)
+   - Automation interface designed: CLI (`library`, `cli`), or delivery paths and machine-facing endpoints with schemas (`application`)
    - Test strategy defined
    - EARS requirements mapped
-   - No unnecessary abstractions
+   - At most 3 projects, or gate-approved and justified (VII-1 to VII-3)
+   - Framework APIs used directly (VIII-1); abstractions gate-approved and justified (VIII-2, VIII-3); runtime-constraint clients documented (VIII-5)
 
 4. **Completeness**:
    - All major components designed

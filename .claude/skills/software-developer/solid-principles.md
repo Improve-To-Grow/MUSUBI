@@ -333,8 +333,8 @@ const repository = new UserRepository(new MockDatabase());
 
 | Principle | Constitutional Article |
 |-----------|----------------------|
-| SRP | Article VII: Simplicity Gate |
-| OCP | Article I: Library-First (extensible libraries) |
+| SRP | Article VII: Simplicity Gate (code-size limits, VII-4–VII-6) |
+| OCP | Article I: Testable Core (extensible core modules) |
 | LSP | Article III: Test-First (substitutable mocks) |
 | ISP | Article VIII: Anti-Abstraction (focused interfaces) |
 | DIP | Article IX: Integration-First (testable dependencies) |

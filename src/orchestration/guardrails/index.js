@@ -10,7 +10,12 @@
 
 'use strict';
 
-const { BaseGuardrail, GuardrailChain, GuardrailTripwireException } = require('./base-guardrail');
+const {
+  BaseGuardrail,
+  GuardrailChain,
+  GuardrailPhase,
+  GuardrailTripwireException,
+} = require('./base-guardrail');
 const { InputGuardrail, createInputGuardrail } = require('./input-guardrail');
 const { OutputGuardrail, createOutputGuardrail, SecretPatterns } = require('./output-guardrail');
 const {
@@ -18,6 +23,8 @@ const {
   createSafetyCheckGuardrail,
   SafetyLevel,
   ConstitutionalMapping,
+  CONTENT_TYPES,
+  NOT_APPLICABLE,
 } = require('./safety-check');
 const {
   RuleType,
@@ -33,6 +40,7 @@ module.exports = {
   // Base classes
   BaseGuardrail,
   GuardrailChain,
+  GuardrailPhase,
   GuardrailTripwireException,
 
   // Input guardrails
@@ -49,6 +57,8 @@ module.exports = {
   createSafetyCheckGuardrail,
   SafetyLevel,
   ConstitutionalMapping,
+  CONTENT_TYPES,
+  NOT_APPLICABLE,
 
   // Rules DSL
   RuleType,

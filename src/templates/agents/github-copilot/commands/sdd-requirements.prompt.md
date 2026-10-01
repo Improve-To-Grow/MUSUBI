@@ -300,26 +300,27 @@ Use template from `templates/requirements.md`:
 
 ### 7. Apply EARS Format (Article IV)
 
-**CRITICAL**: All requirements MUST use one of 5 EARS patterns.
+**CRITICAL**: Each requirement SHALL use one of the 5 EARS patterns (IV-1), SHALL have a single interpretation (IV-2), SHALL include acceptance criteria (IV-3) and SHALL be traceable to design and tests (IV-4).
 
 #### Pattern Selection Guide
 
-| Scenario              | EARS Pattern                         | Example                                     |
-| --------------------- | ------------------------------------ | ------------------------------------------- |
-| Always-active feature | **Ubiquitous**: `The [system] SHALL` | The API SHALL authenticate all requests     |
-| User action triggers  | **Event-driven**: `WHEN ... THEN`    | WHEN user clicks Submit, THEN validate form |
-| Continuous condition  | **State-driven**: `WHILE ... SHALL`  | WHILE loading, UI SHALL show spinner        |
-| Error handling        | **Unwanted**: `IF ... THEN`          | IF timeout, THEN return HTTP 504            |
-| Feature flag          | **Optional**: `WHERE ... SHALL`      | WHERE 2FA enabled, SHALL require OTP        |
+| Scenario              | EARS Pattern (IV-1)                                                             | Example                                                            |
+| --------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Always-active feature | **Ubiquitous**: `The [system] SHALL [requirement]`                              | The API SHALL authenticate all requests                            |
+| User action triggers  | **Event-driven**: `WHEN [event], the [system] SHALL [response]`                 | WHEN the user clicks Submit, the form SHALL validate all fields    |
+| Continuous condition  | **State-driven**: `WHILE [state], the [system] SHALL [response]`                | WHILE data is loading, the UI SHALL show a spinner                 |
+| Error handling        | **Unwanted behavior**: `IF [error], THEN the [system] SHALL [response]`         | IF the upstream call times out, THEN the API SHALL return HTTP 504 |
+| Feature flag          | **Optional features**: `WHERE [feature enabled], the [system] SHALL [response]` | WHERE 2FA is enabled, the login flow SHALL require an OTP          |
 
 #### Requirements Quality Checklist
 
-Each requirement MUST have:
+Each requirement SHALL have:
 
 - [ ] Unique ID (REQ-COMPONENT-NNN)
-- [ ] EARS pattern (one of 5)
-- [ ] Clear SHALL/SHALL NOT (not SHOULD/MUST/MAY)
-- [ ] Testable acceptance criteria
+- [ ] EARS pattern (one of 5) (IV-1)
+- [ ] Clear SHALL/SHALL NOT (not SHOULD/MUST/MAY), with a single interpretation (IV-2)
+- [ ] Testable acceptance criteria (IV-3)
+- [ ] Traceability to design and tests, filled in during design and implementation (IV-4)
 - [ ] Priority (P0/P1/P2/P3)
 - [ ] Status (Draft initially)
 - [ ] MECE Category (for traceability)
@@ -445,9 +446,10 @@ Validate requirements against constitutional articles:
 
 #### Article IV: EARS Format
 
-- [ ] All requirements use EARS patterns
-- [ ] No ambiguous keywords (SHOULD, MUST, MAY)
-- [ ] All requirements have SHALL/SHALL NOT
+- [ ] All requirements use EARS patterns (IV-1)
+- [ ] No ambiguous keywords (SHOULD, MUST, MAY) (IV-2)
+- [ ] All requirements have SHALL/SHALL NOT (IV-1)
+- [ ] All requirements have acceptance criteria (IV-3)
 
 #### Article V: Traceability
 
@@ -559,7 +561,7 @@ Present summary to user:
 1. **Read Steering**:
    - `steering/product.md` → Target users: B2B SaaS companies
    - `steering/tech.md` → Stack: Next.js, PostgreSQL, Prisma
-   - `steering/structure.md` → Pattern: Library-first
+   - `steering/structure.md` → Pattern: Library-first (profile `library` in `steering/project.yml`)
 
 2. **Interactive Dialogue (1-on-1)**:
 
@@ -602,7 +604,7 @@ Present summary to user:
    ### REQ-AUTH-001: User Login
 
    WHEN a user provides valid credentials,
-   THEN the authentication system SHALL authenticate the user
+   the authentication system SHALL authenticate the user
    AND the system SHALL create a session
    AND the system SHALL redirect to dashboard.
 

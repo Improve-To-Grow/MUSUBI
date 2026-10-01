@@ -2,7 +2,7 @@
 
 ## Overview
 
-EARS is a structured syntax for writing unambiguous, testable requirements. All MUSUBI requirements MUST follow EARS patterns as mandated by Constitutional Article IV.
+EARS is a structured syntax for writing unambiguous, testable requirements. Constitutional Article IV mandates it: each MUSUBI requirement SHALL use one of the 5 EARS patterns (IV-1), have a single interpretation (IV-2) and include acceptance criteria (IV-3).
 
 ---
 

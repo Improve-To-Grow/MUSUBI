@@ -39,6 +39,7 @@ Read steering files:
 - `steering/structure.md` - Architecture patterns
 - `steering/tech.md` - Technology stack
 - `steering/product.md` - Product context
+- `steering/project.yml` - Constitution profile (library | cli | application)
 
 # Step 3: Set Up Feature Flag
 
@@ -55,32 +56,42 @@ export const FEATURE_FLAGS = {
 } as const;
 ```
 
-# Step 4: Implement ADDED Requirements (Library-First)
+# Step 4: Implement ADDED Requirements (Testable Core - Article I)
+
+Read `constitution.profile` from `steering/project.yml` (default `library` when absent, P-2) and use the matching variant.
 
 For each new requirement:
 
-1. Create library directory: `lib/<feature>/`
+1. Create the core module:
+   - library / cli profile: library directory `lib/<feature>/` (I-L1)
+   - application profile: folder under a core path, e.g. `src/lib/<feature>/`, no own package.json (I-A1, I-A2)
 
 2. Create core files:
-   - `lib/<feature>/index.ts`
-   - `lib/<feature>/types.ts`
-   - `lib/<feature>/<feature>.ts`
-   - `lib/<feature>/<feature>.test.ts`
-   - `lib/<feature>/cli.ts` (Article II)
+   - library / cli profile:
+     - `lib/<feature>/index.ts`
+     - `lib/<feature>/types.ts`
+     - `lib/<feature>/<feature>.ts`
+     - `lib/<feature>/<feature>.test.ts`
+     - `lib/<feature>/cli.ts` (Article II, II-L1)
+   - application profile:
+     - `src/lib/<feature>/index.ts`
+     - `src/lib/<feature>/<feature>.ts`
+     - `src/lib/<feature>/<feature>.test.ts` (runs without the app server, I-2)
 
 3. Write tests FIRST (RED-GREEN-BLUE):
    - RED: Write failing test
    - GREEN: Implement to pass
    - BLUE: Refactor
 
-4. Create CLI interface:
-   - Executable CLI in `lib/<feature>/cli.ts`
-   - Add to package.json bin section
+4. Create the automation interface (Article II):
+   - library / cli profile: executable CLI in `lib/<feature>/cli.ts` with `--help` (II-L1, II-L2), added to package.json bin section
+   - application profile: no CLI (II-A3); the route handler is the automation interface (II-A1). Ops tasks go in `scripts/<task>.ts` with `--help`, explicit target environment and `--dry-run`, registered in package.json (II-A6 to II-A9, advisory); every package.json script must reference an existing file (II-A10)
 
 5. Integration layer (use framework directly):
-   - API route in `app/api/<feature>/route.ts`
+   - API route in `app/api/<feature>/route.ts` (application profile: `src/app/api/<feature>/route.ts`)
    - Use Next.js features directly (no wrappers)
    - Check feature flag before executing
+   - application profile: keep the route handler thin; it validates input against a schema (e.g. zod), authorizes, calls core and returns a status plus an error code (I-A3, II-A4, II-A5)
 
 # Step 5: Modify Existing Code
 
@@ -115,7 +126,7 @@ If schema changes needed:
 
 Required tests:
 - Unit tests for each function
-- Integration tests (use REAL database - Article IX)
+- Integration tests (use REAL database and services instead of mocks - III-7, Article IX: IX-1)
 - E2E tests for user workflows
 
 Integration test example:
@@ -145,20 +156,25 @@ Create/update traceability document:
 
 Verify:
 - All requirements mapped
-- Code coverage >= 80%
+- Code coverage >= configured threshold, default 80% (III-6)
 - All tests passing
 
 # Step 10: Constitutional Validation
 
-Verify compliance:
-- Article I: Code in lib/ ✓
-- Article II: CLI exists ✓
-- Article III: Tests written first ✓
-- Article III: Coverage >= 80% ✓
+Verify compliance (per profile in `steering/project.yml`):
+- Article I: Core module with tests that run without the UI, server or CLI; no delivery-path imports in core (I-2, I-3) ✓
+  - library / cli: code in lib/ (I-L1)
+  - application: code in src/lib/<feature>/, no UI-only code in core (I-A1, I-A4)
+  - all profiles: exported functions and classes of core modules have a doc comment (`/** … */`) directly above them (I-5, advisory)
+- Article II: Automation interface ✓
+  - library / cli: CLI exists, `--help` works (II-L1, II-L2)
+  - application: route handler validates input against a schema (II-A1, II-A4); package.json scripts resolve (II-A10)
+- Article III: Tests written first (III-1) ✓
+- Article III: Coverage >= configured threshold, default 80% (III-6) ✓
 - Article IV: EARS format used ✓
 - Article V: Traceability complete ✓
-- Article VIII: No unnecessary abstractions ✓
-- Article IX: Integration tests exist ✓
+- Article VIII: Framework APIs used directly, no wrappers without Phase -1 Gate approval (VIII-1, VIII-2) ✓
+- Article IX: Integration tests exist and use real services (IX-1) ✓
 
 # Step 11: Update Steering
 
@@ -202,11 +218,13 @@ Before completing:
 - Approval verified
 - Steering context applied
 - Feature flag created
-- Library-first implementation (Article I)
-- CLI interface provided (Article II)
-- Tests written first (Article III)
-- Test coverage >= 80%
-- Integration tests included (Article IX)
+- Project profile read from `steering/project.yml` (default `library`)
+- Testable core implementation (Article I): library in lib/ for library / cli, core module in src/lib/ for application
+- Exported functions and classes of core modules have doc comments (Article I: I-5, advisory)
+- Automation interface provided (Article II): CLI for library / cli, schema-validated HTTP API for application
+- Tests written first (Article III: III-1)
+- Test coverage >= configured threshold, default 80% (III-6)
+- Integration tests included, using real services (Article IX: IX-1)
 - Traceability matrix updated
 - Constitutional compliance verified
 - Steering files updated

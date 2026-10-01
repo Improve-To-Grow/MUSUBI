@@ -3,8 +3,8 @@
  *
  * Validates project compliance with 9 Constitutional Articles:
  *
- * Article I: Library-First Principle
- * Article II: CLI Interface Mandate
+ * Article I: Testable-Core Principle (per project profile)
+ * Article II: Automation Interface Mandate (per project profile)
  * Article III: Test-First Imperative
  * Article IV: EARS Requirements Format
  * Article V: Traceability Mandate
@@ -17,7 +17,13 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { glob } = require('glob');
+const { ConstitutionLevelManager, ProjectProfile } = require('./constitution-level-manager');
+const { ProjectFiles } = require('./project-files');
+const { checkCodeSize } = require('./profile-checks');
 
+/**
+ * Per-article compliance checks used by `musubi-validate`
+ */
 class ConstitutionValidator {
   constructor(projectRoot) {
     this.projectRoot = projectRoot;
@@ -84,48 +90,96 @@ class ConstitutionValidator {
   }
 
   /**
-   * Article I: Library-First Principle
+   * Project profile (constitution v1.1, "Project Profiles")
+   * @private
+   */
+  async _getProfileConfig() {
+    if (!this._profileConfig) {
+      this._profileConfig = await new ConstitutionLevelManager(this.projectRoot).getProfileConfig();
+    }
+    return this._profileConfig;
+  }
+
+  /**
+   * Article I: Testable-Core Principle
    */
   async validateArticle1() {
     const result = {
       article: 1,
-      name: 'Library-First Principle',
+      name: 'Testable-Core Principle',
       passed: true,
       violations: [],
       warnings: [],
       summary: '',
     };
 
-    // Check for lib/ directory
-    const libPath = path.join(this.projectRoot, 'lib');
-    const srcPath = path.join(this.projectRoot, 'src');
-
-    if (await fs.pathExists(libPath)) {
-      result.warnings.push('Article I: lib/ directory found - verify libraries are independent');
-    } else if (await fs.pathExists(srcPath)) {
+    const { profile, declared, corePaths } = await this._getProfileConfig();
+    if (!declared) {
       result.warnings.push(
-        'Article I: src/ directory found - consider separating libraries to lib/'
+        'Article I: No constitution.profile in steering/project.yml - applying the library profile (P-1, P-2)'
       );
     }
 
-    result.summary = 'Article I: Library-First Principle - Manual review recommended';
+    const existingCorePaths = [];
+    let moduleCount = 0;
+    for (const corePath of corePaths) {
+      const fullPath = path.join(this.projectRoot, corePath);
+      if (await fs.pathExists(fullPath)) {
+        existingCorePaths.push(corePath);
+        const entries = await fs.readdir(fullPath, { withFileTypes: true });
+        moduleCount += entries.filter(entry => entry.isDirectory()).length;
+      }
+    }
+
+    if (existingCorePaths.length > 0) {
+      result.warnings.push(
+        `Article I: ${moduleCount} core module(s) in ${existingCorePaths.join(', ')} - verify each has tests that run without the app (I-2) and no imports from delivery paths (I-3)`
+      );
+    } else if (profile === ProjectProfile.APPLICATION) {
+      result.warnings.push(
+        'Article I: No core path found - declare core_paths and delivery_paths in steering/project.yml (P-4)'
+      );
+    } else if (await fs.pathExists(path.join(this.projectRoot, 'src'))) {
+      result.warnings.push(
+        'Article I: src/ directory found - move libraries to lib/ or declare core_paths in steering/project.yml (P-3)'
+      );
+    }
+
+    result.summary = `Article I: Testable-Core Principle (profile: ${profile}) - Manual review recommended`;
     return result;
   }
 
   /**
-   * Article II: CLI Interface Mandate
+   * Article II: Automation Interface Mandate
    */
   async validateArticle2() {
     const result = {
       article: 2,
-      name: 'CLI Interface Mandate',
+      name: 'Automation Interface Mandate',
       passed: true,
       violations: [],
       warnings: [],
       summary: '',
     };
 
-    // Check for bin/ directory or package.json bin entries
+    const { profile } = await this._getProfileConfig();
+
+    if (profile === ProjectProfile.APPLICATION) {
+      // II-A1: the HTTP API (route handlers) is the automation interface; no CLI required (II-A3)
+      const routeFiles = await glob(
+        ['**/route.{js,jsx,ts,tsx,mjs,cjs}', '**/pages/api/**/*.{js,jsx,ts,tsx}'],
+        { cwd: this.projectRoot, ignore: ['**/node_modules/**', '**/.next/**'] }
+      );
+      result.warnings.push(
+        routeFiles.length > 0
+          ? `Article II: ${routeFiles.length} route handler(s) found; no CLI required (II-A1, II-A3)`
+          : 'Article II: No route handlers found - expose primary operations over HTTP (II-A1)'
+      );
+      result.summary = 'Article II: Automation Interface Mandate - HTTP API (application profile)';
+      return result;
+    }
+
+    // II-L1: library and cli projects provide a CLI
     const binPath = path.join(this.projectRoot, 'bin');
     const packageJsonPath = path.join(this.projectRoot, 'package.json');
 
@@ -142,7 +196,7 @@ class ConstitutionValidator {
       }
     }
 
-    result.summary = 'Article II: CLI Interface Mandate - CLI structure detected';
+    result.summary = `Article II: Automation Interface Mandate - CLI structure detected (profile: ${profile})`;
     return result;
   }
 
@@ -416,7 +470,23 @@ class ConstitutionValidator {
           : `Article VII: ${projectCount} sub-project(s) (EXCEEDS LIMIT)`
         : `Article VII: ${projectCount} sub-project(s) (within limit)`;
 
+    await this._addCodeSizeWarnings(result);
     return result;
+  }
+
+  /**
+   * VII-4 to VII-6: code-size findings, reported as warnings (not gated)
+   * @private
+   */
+  async _addCodeSizeWarnings(result) {
+    checkCodeSize({
+      files: new ProjectFiles(this.projectRoot),
+      profile: await this._getProfileConfig(),
+      limits: await new ConstitutionLevelManager(this.projectRoot).getCodeLimits(),
+      record: (passed, message) => {
+        if (!passed) result.warnings.push(`Article VII: ${message}`);
+      },
+    });
   }
 
   /**

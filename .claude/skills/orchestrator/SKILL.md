@@ -108,7 +108,7 @@ The Orchestrator can leverage all MUSUBI CLI commands to execute tasks efficient
 | ------------------------------------------ | -------------------------------- | ------------------------------------------------------------ |
 | `musubi-validate guardrails`               | Input/Output validation          | `musubi-validate guardrails --type input`                    |
 | `musubi-validate guardrails --type output` | Output content validation        | `echo "content" \| musubi-validate guardrails --type output` |
-| `musubi-validate guardrails --type safety` | Safety check with constitutional | `musubi-validate guardrails --type safety --constitutional`  |
+| `musubi-validate guardrails --type safety` | Safety check with constitutional | `musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js`  |
 | `musubi-validate guardrails-chain`         | Chain multiple guardrails        | `musubi-validate guardrails-chain --parallel`                |
 
 ### Detailed Command Options

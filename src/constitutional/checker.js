@@ -1,78 +1,49 @@
 /**
  * Constitutional Checker
  *
- * Validates compliance with Constitutional Articles.
+ * Checks changed files against the nine articles of steering/rules/constitution.md (v1.1).
+ * Severities follow the article levels of the project profile (P-5, P-6):
+ * - a definite finding in a critical article is CRITICAL and blocks the merge
+ * - a heuristic finding in a critical article is HIGH
+ * - Phase -1 Gate findings (VII-2, VIII-2) are HIGH and require a gate
+ * - other findings in advisory and flexible articles (e.g. the code-size limits VII-4 to
+ *   VII-6) are MEDIUM; requirements tagged (advisory) are LOW
  *
  * Requirement: IMP-6.2-005-01
  * Design: Section 5.1
  */
 
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const path = require('path');
+const yaml = require('js-yaml');
+const { ConstitutionLevelManager } = require('../validators/constitution-level-manager');
+const {
+  ARTICLES: ARTICLE_DEFINITIONS,
+  ABSTRACTION_PATTERNS,
+  DEFAULT_REQUIREMENT_PATTERNS,
+  toPosix,
+  isCodeFile,
+  isTestFile,
+  checkTestableCore,
+  checkPublicInterfaceDocs,
+  checkAutomationInterface,
+  checkCodeSize,
+  checkEarsFormat,
+  checkTraceabilityReferences,
+  checkAntiAbstraction,
+  checkIntegrationMocks,
+  checkProjectMemory,
+  checkSimplicityGate,
+  defaultIsMockAllowed,
+} = require('./articles');
 
 /**
- * Constitutional Articles
+ * Constitutional Articles (constitution v1.1)
  */
 const ARTICLES = {
-  I: {
-    id: 'I',
-    name: 'Specification First',
-    description: 'All changes must be traceable to specifications',
-    keywords: ['REQ-', 'IMP-', 'FEAT-', 'specification', 'requirement'],
-  },
-  II: {
-    id: 'II',
-    name: 'Quality Gate',
-    description: 'Code must pass quality gates before merge',
-    keywords: ['test', 'coverage', 'lint', 'quality'],
-  },
-  III: {
-    id: 'III',
-    name: 'Test-First',
-    description: 'Tests should be written before or alongside implementation',
-    keywords: ['test', 'spec', 'describe', 'it('],
-  },
-  IV: {
-    id: 'IV',
-    name: 'Incremental Delivery',
-    description: 'Features should be delivered incrementally',
-    keywords: ['sprint', 'iteration', 'milestone'],
-  },
-  V: {
-    id: 'V',
-    name: 'Consistency',
-    description: 'Code style and patterns must be consistent',
-    keywords: ['eslint', 'prettier', 'style'],
-  },
-  VI: {
-    id: 'VI',
-    name: 'Change Tracking',
-    description: 'All changes must be tracked and documented',
-    keywords: ['changelog', 'commit', 'version'],
-  },
-  VII: {
-    id: 'VII',
-    name: 'Simplicity',
-    description: 'Prefer simple solutions over complex ones',
-    thresholds: {
-      maxFileLines: 500,
-      maxFunctionLines: 50,
-      maxCyclomaticComplexity: 10,
-      maxDependencies: 10,
-    },
-  },
-  VIII: {
-    id: 'VIII',
-    name: 'Anti-Abstraction',
-    description: 'Avoid premature abstraction',
-    patterns: [/abstract\s+class/i, /implements\s+\w+Factory/i, /extends\s+Base\w+/i],
-  },
-  IX: {
-    id: 'IX',
-    name: 'Documentation',
-    description: 'Code must be documented',
-    keywords: ['jsdoc', '@param', '@returns', '@description'],
-  },
+  ...ARTICLE_DEFINITIONS,
+  VIII: { ...ARTICLE_DEFINITIONS.VIII, patterns: ABSTRACTION_PATTERNS },
 };
 
 /**
@@ -85,6 +56,95 @@ const SEVERITY = {
   LOW: 'low',
 };
 
+const PHASE_MINUS_ONE_ARTICLES = ['VII', 'VIII'];
+
+/**
+ * Whether a violation needs Phase -1 Gate approval
+ * @param {Object} violation - Violation
+ * @returns {boolean}
+ */
+function isPhaseMinusOne(violation) {
+  const severe = violation.severity === SEVERITY.HIGH || violation.severity === SEVERITY.CRITICAL;
+  if (typeof violation.gate === 'boolean') return violation.gate && severe;
+  return PHASE_MINUS_ONE_ARTICLES.includes(violation.article) && severe;
+}
+
+const SEVERITY_ICONS = {
+  [SEVERITY.CRITICAL]: '🔴',
+  [SEVERITY.HIGH]: '🟠',
+  [SEVERITY.MEDIUM]: '🟡',
+  [SEVERITY.LOW]: '🟢',
+};
+
+/**
+ * Report section: summary table
+ * @private
+ */
+function reportSummary({ summary }) {
+  return [
+    '## Summary',
+    '',
+    '| Metric | Value |',
+    '|--------|-------|',
+    `| Files Checked | ${summary.filesChecked} |`,
+    `| Files Passed | ${summary.filesPassed} |`,
+    `| Files Failed | ${summary.filesFailed} |`,
+    `| Total Violations | ${summary.totalViolations} |`,
+    '',
+  ];
+}
+
+/**
+ * Report section: merge decision
+ * @private
+ */
+function reportDecision(blockDecision) {
+  if (!blockDecision.shouldBlock) return ['## ✅ Merge Allowed', ''];
+  const lines = ['## ⛔ Merge Blocked', '', `**Reason:** ${blockDecision.reason}`];
+  if (blockDecision.requiresPhaseMinusOne) {
+    lines.push(
+      '',
+      '> Phase -1 Gate review required. Obtain approval from the System Architect (Article VII: Project Manager; Article VIII: Software Developer).'
+    );
+  }
+  return [...lines, ''];
+}
+
+/**
+ * Report section: violation count per article
+ * @private
+ */
+function reportByArticle({ summary }) {
+  const lines = ['## Violations by Article', ''];
+  for (const [article, count] of Object.entries(summary.violationsByArticle)) {
+    lines.push(
+      `- **Article ${article}** (${ARTICLES[article]?.name || 'Unknown'}): ${count} violations`
+    );
+  }
+  return [...lines, ''];
+}
+
+/**
+ * Report section: each violation per file
+ * @private
+ */
+function reportDetails(results) {
+  if (results.summary.totalViolations === 0) return [];
+  const lines = ['## Detailed Violations', ''];
+  for (const result of results.results.filter(r => r.violations.length > 0)) {
+    lines.push(`### ${result.filePath}`, '');
+    for (const v of result.violations) {
+      const name = v.articleName ? `${v.articleName} ` : '';
+      lines.push(
+        `${SEVERITY_ICONS[v.severity] || '🟢'} **Article ${v.article}** ${name}(${v.severity}): ${v.message}`
+      );
+      if (v.line) lines.push(`  - Line: ${v.line}`);
+      lines.push(`  - Suggestion: ${v.suggestion}`, '');
+    }
+  }
+  return lines;
+}
+
 /**
  * ConstitutionalChecker
  *
@@ -93,12 +153,105 @@ const SEVERITY = {
 class ConstitutionalChecker {
   /**
    * @param {Object} config - Configuration options
+   * @param {string} [config.projectRoot=process.cwd()] - Project root (profile, levels, steering)
+   * @param {string} [config.storageDir='storage/constitutional'] - Where results are saved
    */
   constructor(config = {}) {
     this.config = {
-      articleVII: ARTICLES.VII.thresholds,
+      projectRoot: process.cwd(),
+      storageDir: 'storage/constitutional',
       ...config,
     };
+    this._context = null;
+  }
+
+  /**
+   * Load the project profile, article levels and traceability patterns
+   * @returns {Promise<Object>} Check context
+   */
+  async init() {
+    if (this._context) return this._context;
+
+    const { projectRoot } = this.config;
+    const manager = new ConstitutionLevelManager(projectRoot);
+    const profile = await manager.getProfileConfig();
+    const levels = {};
+    for (const article of Object.values(ARTICLES)) {
+      levels[article.id] = await manager.getArticleLevel(article.constId);
+    }
+
+    const levelsConfig = await manager.loadConfig();
+    const mockExceptions = levelsConfig.configurable?.mock_allowed?.exceptions || [];
+    const isMockAllowed = target =>
+      defaultIsMockAllowed(target) || mockExceptions.some(e => target.includes(e));
+
+    this._context = {
+      profile,
+      levels,
+      codeLimits: await manager.getCodeLimits(),
+      isMockAllowed,
+      srcExists: fsSync.existsSync(path.join(projectRoot, 'src')),
+      requirementPatterns: [...DEFAULT_REQUIREMENT_PATTERNS, ...this._loadTraceabilityPatterns()],
+    };
+    return this._context;
+  }
+
+  /**
+   * Requirement ID patterns from steering/project.yml (traceability.patterns)
+   * @private
+   */
+  _loadTraceabilityPatterns() {
+    try {
+      const file = path.join(this.config.projectRoot, 'steering/project.yml');
+      const config = yaml.load(fsSync.readFileSync(file, 'utf8')) || {};
+      return (config.traceability?.patterns || []).map(
+        pattern => new RegExp(String(pattern).replace(/\\\\/g, '\\'))
+      );
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Project-relative path with forward slashes
+   * @private
+   */
+  _rel(filePath) {
+    return toPosix(path.relative(this.config.projectRoot, path.resolve(filePath)));
+  }
+
+  /**
+   * Severity of a finding, from its article's level
+   * @private
+   */
+  _severity(finding) {
+    if (finding.advisory) return SEVERITY.LOW;
+    const level = this._context.levels[finding.article];
+    if (finding.gate) return level === 'advisory' ? SEVERITY.MEDIUM : SEVERITY.HIGH;
+    if (level === 'critical') return finding.definite ? SEVERITY.CRITICAL : SEVERITY.HIGH;
+    return SEVERITY.MEDIUM;
+  }
+
+  /**
+   * Turn rule findings into violations
+   * @private
+   */
+  _toViolations(findings, filePath) {
+    return findings.map(finding => {
+      const article = ARTICLES[finding.article];
+      return {
+        article: finding.article,
+        articleName: article.name,
+        constId: article.constId,
+        requirement: finding.requirement,
+        level: this._context.levels[finding.article],
+        severity: this._severity(finding),
+        gate: Boolean(finding.gate),
+        message: finding.message,
+        filePath,
+        suggestion: finding.suggestion,
+      };
+    });
   }
 
   /**
@@ -107,30 +260,19 @@ class ConstitutionalChecker {
    * @returns {Promise<Object>} Check result
    */
   async checkFile(filePath) {
+    await this.init();
     const content = await fs.readFile(filePath, 'utf-8');
-    const violations = [];
 
-    // Article I: Specification First
-    const specViolation = this.checkArticleI(content, filePath);
-    if (specViolation) violations.push(specViolation);
-
-    // Article III: Test-First (for non-test files)
-    if (!filePath.includes('.test.') && !filePath.includes('.spec.')) {
-      const testViolation = await this.checkArticleIII(filePath);
-      if (testViolation) violations.push(testViolation);
-    }
-
-    // Article VII: Simplicity
-    const simplicityViolations = this.checkArticleVII(content, filePath);
-    violations.push(...simplicityViolations);
-
-    // Article VIII: Anti-Abstraction
-    const abstractionViolations = this.checkArticleVIII(content, filePath);
-    violations.push(...abstractionViolations);
-
-    // Article IX: Documentation
-    const docViolation = this.checkArticleIX(content, filePath);
-    if (docViolation) violations.push(docViolation);
+    const violations = [
+      ...(await this.checkArticleI(content, filePath)),
+      ...(await this.checkArticleII(content, filePath)),
+      ...(await this.checkArticleIII(filePath)),
+      ...(await this.checkArticleIV(content, filePath)),
+      ...(await this.checkArticleV(content, filePath)),
+      ...(await this.checkArticleVII(content, filePath)),
+      ...(await this.checkArticleVIII(content, filePath)),
+      ...(await this.checkArticleIX(content, filePath)),
+    ];
 
     return {
       filePath,
@@ -141,264 +283,193 @@ class ConstitutionalChecker {
   }
 
   /**
-   * Check Article I: Specification First
+   * Article I: Testable-Core Principle (I-3, I-5, I-A4, I-A5)
    * @param {string} content - File content
    * @param {string} filePath - File path
-   * @returns {Object|null} Violation or null
+   * @returns {Promise<Array>} Violations
    */
-  checkArticleI(content, filePath) {
-    // Check if file has requirement reference
-    const hasReqRef = ARTICLES.I.keywords.some(kw => content.includes(kw));
-
-    // Skip check for certain file types
-    const skipPatterns = [/\.test\./, /\.spec\./, /\.config\./, /index\./, /package\.json/];
-
-    if (skipPatterns.some(p => p.test(filePath))) {
-      return null;
-    }
-
-    if (!hasReqRef) {
-      return {
-        article: 'I',
-        articleName: ARTICLES.I.name,
-        severity: SEVERITY.MEDIUM,
-        message: 'File has no requirement references (REQ-XXX, IMP-XXX, etc.)',
-        filePath,
-        suggestion: 'Add the related requirement IDs to code comments or JSDoc',
-      };
-    }
-
-    return null;
+  async checkArticleI(content, filePath) {
+    const { profile, srcExists } = await this.init();
+    const rel = this._rel(filePath);
+    const findings = [
+      ...checkTestableCore({ rel, content, profile, srcExists }),
+      ...checkPublicInterfaceDocs({ rel, content, profile }),
+    ];
+    return this._toViolations(findings, filePath);
   }
 
   /**
-   * Check Article III: Test-First
+   * Article II: Automation Interface Mandate (II-A4)
+   * @param {string} content - File content
+   * @param {string} filePath - File path
+   * @returns {Promise<Array>} Violations
+   */
+  async checkArticleII(content, filePath) {
+    const { profile } = await this.init();
+    const findings = checkAutomationInterface({ rel: this._rel(filePath), content, profile });
+    return this._toViolations(findings, filePath);
+  }
+
+  /**
+   * Article III: Test-First Imperative (III-1): a source file has a test
    * @param {string} filePath - Source file path
-   * @returns {Promise<Object|null>} Violation or null
+   * @returns {Promise<Array>} Violations
    */
   async checkArticleIII(filePath) {
-    // Derive test file path
-    const dir = path.dirname(filePath);
-    const ext = path.extname(filePath);
-    const base = path.basename(filePath, ext);
+    await this.init();
+    const rel = this._rel(filePath);
+    const base = path.posix.basename(rel);
+    if (!isCodeFile(rel) || isTestFile(rel) || /^index\.|\.config\.|\.d\.ts$/.test(base)) {
+      return [];
+    }
 
-    const testPaths = [
-      path.join(dir, `${base}.test${ext}`),
-      path.join(dir, `${base}.spec${ext}`),
-      path.join(dir, '__tests__', `${base}.test${ext}`),
-      filePath.replace('/src/', '/tests/').replace(ext, `.test${ext}`),
-    ];
-
-    for (const testPath of testPaths) {
+    for (const candidate of this._testCandidates(filePath)) {
       try {
-        await fs.access(testPath);
-        return null; // Test file exists
+        await fs.access(candidate);
+        return [];
       } catch {
         // Continue checking
       }
     }
 
-    return {
-      article: 'III',
-      articleName: ARTICLES.III.name,
-      severity: SEVERITY.HIGH,
-      message: 'No corresponding test file found',
-      filePath,
-      suggestion: `Create a test file (e.g. ${base}.test${ext})`,
-    };
-  }
-
-  /**
-   * Check Article VII: Simplicity
-   * @param {string} content - File content
-   * @param {string} filePath - File path
-   * @returns {Array} Violations
-   */
-  checkArticleVII(content, filePath) {
-    const violations = [];
-    const lines = content.split('\n');
-    const thresholds = this.config.articleVII;
-
-    // Check file length
-    if (lines.length > thresholds.maxFileLines) {
-      violations.push({
-        article: 'VII',
-        articleName: ARTICLES.VII.name,
-        severity: SEVERITY.HIGH,
-        message: `File is too long (${lines.length} lines > ${thresholds.maxFileLines} lines)`,
-        filePath,
-        suggestion: 'Split the file into multiple modules',
-      });
-    }
-
-    // Check function length (simple heuristic)
-    const functionMatches = content.match(
-      /(?:function\s+\w+|(?:async\s+)?(?:\w+\s*=\s*)?(?:async\s+)?(?:function|\([^)]*\)\s*=>|\w+\s*\([^)]*\)\s*{))/g
+    const ext = path.extname(filePath);
+    return this._toViolations(
+      [
+        {
+          article: 'III',
+          requirement: 'III-1',
+          message: 'III-1: No test file found for this source file',
+          suggestion: `Write the test first, e.g. ${path.basename(filePath, ext)}.test${ext}`,
+        },
+      ],
+      filePath
     );
-    if (functionMatches && functionMatches.length > 0) {
-      // Count functions with many lines (rough estimate)
-      const longFunctions = this.findLongFunctions(content, thresholds.maxFunctionLines);
-      for (const fn of longFunctions) {
-        violations.push({
-          article: 'VII',
-          articleName: ARTICLES.VII.name,
-          severity: SEVERITY.MEDIUM,
-          message: `Function "${fn.name}" is too long (~${fn.lines} lines > ${thresholds.maxFunctionLines} lines)`,
-          filePath,
-          line: fn.startLine,
-          suggestion: 'Split the function into smaller functions',
-        });
-      }
-    }
-
-    // Check dependencies (require/import count)
-    const imports = content.match(/(?:require\s*\(|import\s+)/g) || [];
-    if (imports.length > thresholds.maxDependencies) {
-      violations.push({
-        article: 'VII',
-        articleName: ARTICLES.VII.name,
-        severity: SEVERITY.MEDIUM,
-        message: `Too many dependencies (${imports.length} > ${thresholds.maxDependencies})`,
-        filePath,
-        suggestion: 'Review the dependencies and restructure the module if needed',
-      });
-    }
-
-    return violations;
   }
 
   /**
-   * Find functions that exceed line limit
-   * @param {string} content - File content
-   * @param {number} maxLines - Maximum lines
-   * @returns {Array} Long functions
+   * Test files that would cover a source file: next to it, in __tests__, or mirrored
+   * under tests/ or test/
+   * @private
    */
-  findLongFunctions(content, maxLines) {
-    const longFunctions = [];
-    const lines = content.split('\n');
+  _testCandidates(filePath) {
+    const absolute = path.resolve(filePath);
+    const dir = path.dirname(absolute);
+    const ext = path.extname(absolute);
+    const base = path.basename(absolute, ext);
+    const candidates = [
+      path.join(dir, `${base}.test${ext}`),
+      path.join(dir, `${base}.spec${ext}`),
+      path.join(dir, '__tests__', `${base}.test${ext}`),
+    ];
 
-    // Simple bracket matching for function detection
-    const functionPattern =
-      /(?:async\s+)?(?:function\s+(\w+)|(\w+)\s*(?:=|:)\s*(?:async\s+)?(?:function|\([^)]*\)\s*=>))/g;
-    let match;
-
-    while ((match = functionPattern.exec(content)) !== null) {
-      const fnName = match[1] || match[2] || 'anonymous';
-      const startIndex = match.index;
-      const startLine = content.substring(0, startIndex).split('\n').length;
-
-      // Find function end (simple brace counting)
-      let braceCount = 0;
-      let started = false;
-      let endLine = startLine;
-
-      for (let i = startLine - 1; i < lines.length; i++) {
-        const line = lines[i];
-        for (const char of line) {
-          if (char === '{') {
-            braceCount++;
-            started = true;
-          } else if (char === '}') {
-            braceCount--;
-          }
-        }
-        if (started && braceCount === 0) {
-          endLine = i + 1;
-          break;
-        }
-      }
-
-      const lineCount = endLine - startLine + 1;
-      if (lineCount > maxLines) {
-        longFunctions.push({
-          name: fnName,
-          startLine,
-          lines: lineCount,
-        });
+    const segments = this._rel(filePath).split('/');
+    if (['src', 'lib'].includes(segments[0])) {
+      const mirrored = [...segments.slice(1, -1), `${base}.test${ext}`];
+      for (const testDir of ['tests', 'test']) {
+        candidates.push(path.join(this.config.projectRoot, testDir, ...mirrored));
       }
     }
-
-    return longFunctions;
+    return candidates;
   }
 
   /**
-   * Check Article VIII: Anti-Abstraction
+   * Article IV: EARS Requirements Format (IV-1, IV-2) for requirements documents
    * @param {string} content - File content
    * @param {string} filePath - File path
-   * @returns {Array} Violations
+   * @returns {Promise<Array>} Violations
    */
-  checkArticleVIII(content, filePath) {
-    const violations = [];
-
-    for (const pattern of ARTICLES.VIII.patterns) {
-      const match = content.match(pattern);
-      if (match) {
-        violations.push({
-          article: 'VIII',
-          articleName: ARTICLES.VIII.name,
-          severity: SEVERITY.HIGH,
-          message: `Possible premature abstraction: "${match[0]}"`,
-          filePath,
-          suggestion: 'Start with a concrete implementation and abstract later only when needed',
-        });
-      }
-    }
-
-    return violations;
+  async checkArticleIV(content, filePath) {
+    await this.init();
+    return this._toViolations(checkEarsFormat({ rel: this._rel(filePath), content }), filePath);
   }
 
   /**
-   * Check Article IX: Documentation
+   * Article V: Traceability Mandate (V-2, V-4)
    * @param {string} content - File content
    * @param {string} filePath - File path
-   * @returns {Object|null} Violation or null
+   * @returns {Promise<Array>} Violations
    */
-  checkArticleIX(content, filePath) {
-    // Check for JSDoc presence
-    const hasJSDoc = content.includes('/**') && content.includes('*/');
-    const hasDescription = ARTICLES.IX.keywords.some(kw => content.includes(kw));
-
-    // Skip test files
-    if (filePath.includes('.test.') || filePath.includes('.spec.')) {
-      return null;
-    }
-
-    if (!hasJSDoc || !hasDescription) {
-      return {
-        article: 'IX',
-        articleName: ARTICLES.IX.name,
-        severity: SEVERITY.LOW,
-        message: 'Insufficient documentation',
-        filePath,
-        suggestion: 'Add JSDoc comments',
-      };
-    }
-
-    return null;
+  async checkArticleV(content, filePath) {
+    const { requirementPatterns } = await this.init();
+    const findings = checkTraceabilityReferences({
+      rel: this._rel(filePath),
+      content,
+      patterns: requirementPatterns,
+    });
+    return this._toViolations(findings, filePath);
   }
 
   /**
-   * Check multiple files
+   * Article VI: Project Memory (VI-1..VI-3), checked once per project
+   * @returns {Promise<Array>} Violations
+   */
+  async checkArticleVI() {
+    await this.init();
+    return this._toViolations(checkProjectMemory(this.config.projectRoot), 'steering');
+  }
+
+  /**
+   * Article VII: code-size limits of a source file (VII-4 to VII-6)
+   * @param {string} content - File content
+   * @param {string} filePath - File path
+   * @returns {Promise<Array>} Violations
+   */
+  async checkArticleVII(content, filePath) {
+    const { profile, codeLimits } = await this.init();
+    const findings = checkCodeSize({
+      rel: this._rel(filePath),
+      content,
+      limits: codeLimits,
+      profile,
+    });
+    return this._toViolations(findings, filePath);
+  }
+
+  /**
+   * Article VII: Simplicity Gate (VII-1, VII-2), checked once per project
+   * @returns {Promise<Array>} Violations
+   */
+  async checkSimplicityGate() {
+    await this.init();
+    return this._toViolations(checkSimplicityGate(this.config.projectRoot), '.');
+  }
+
+  /**
+   * Article VIII: Anti-Abstraction Gate (VIII-2)
+   * @param {string} content - File content
+   * @param {string} filePath - File path
+   * @returns {Promise<Array>} Violations
+   */
+  async checkArticleVIII(content, filePath) {
+    const { profile } = await this.init();
+    const findings = checkAntiAbstraction({ rel: this._rel(filePath), content, profile });
+    return this._toViolations(findings, filePath);
+  }
+
+  /**
+   * Article IX: Integration-First Testing (IX-4, IX-5)
+   * @param {string} content - File content
+   * @param {string} filePath - File path
+   * @returns {Promise<Array>} Violations
+   */
+  async checkArticleIX(content, filePath) {
+    const { isMockAllowed } = await this.init();
+    const findings = checkIntegrationMocks({ rel: this._rel(filePath), content, isMockAllowed });
+    return this._toViolations(findings, filePath);
+  }
+
+  /**
+   * Check multiple files, plus the project-level Articles VI and VII
    * @param {Array} filePaths - File paths to check
    * @returns {Promise<Object>} Check results
    */
   async checkFiles(filePaths) {
+    await this.init();
     const results = [];
-    let totalViolations = 0;
-    const violationsByArticle = {};
 
     for (const filePath of filePaths) {
       try {
-        const result = await this.checkFile(filePath);
-        results.push(result);
-        totalViolations += result.violations.length;
-
-        for (const v of result.violations) {
-          if (!violationsByArticle[v.article]) {
-            violationsByArticle[v.article] = 0;
-          }
-          violationsByArticle[v.article]++;
-        }
+        results.push(await this.checkFile(filePath));
       } catch (error) {
         results.push({
           filePath,
@@ -408,13 +479,34 @@ class ConstitutionalChecker {
         });
       }
     }
+    const fileResults = [...results];
+
+    const projectViolations = [
+      ...(await this.checkArticleVI()),
+      ...(await this.checkSimplicityGate()),
+    ];
+    if (projectViolations.length > 0) {
+      results.push({
+        filePath: '(project)',
+        scope: 'project',
+        violations: projectViolations,
+        passed: false,
+      });
+    }
+
+    const violationsByArticle = {};
+    let totalViolations = 0;
+    for (const v of results.flatMap(r => r.violations)) {
+      violationsByArticle[v.article] = (violationsByArticle[v.article] || 0) + 1;
+      totalViolations++;
+    }
 
     return {
       results,
       summary: {
         filesChecked: filePaths.length,
-        filesPassed: results.filter(r => r.passed).length,
-        filesFailed: results.filter(r => !r.passed).length,
+        filesPassed: fileResults.filter(r => r.passed).length,
+        filesFailed: fileResults.filter(r => !r.passed).length,
         totalViolations,
         violationsByArticle,
       },
@@ -476,22 +568,13 @@ class ConstitutionalChecker {
    * @returns {Object} Block decision
    */
   shouldBlockMerge(results) {
-    const criticalViolations = results.results
-      .flatMap(r => r.violations)
-      .filter(v => v.severity === SEVERITY.CRITICAL);
+    const violations = results.results.flatMap(r => r.violations);
+    const criticalViolations = violations.filter(v => v.severity === SEVERITY.CRITICAL);
+    const highViolations = violations.filter(v => v.severity === SEVERITY.HIGH);
 
-    const highViolations = results.results
-      .flatMap(r => r.violations)
-      .filter(v => v.severity === SEVERITY.HIGH);
-
-    // Block on Article VII or VIII high violations
-    const phaseMinusOneViolations = results.results
-      .flatMap(r => r.violations)
-      .filter(
-        v =>
-          (v.article === 'VII' || v.article === 'VIII') &&
-          (v.severity === SEVERITY.HIGH || v.severity === SEVERITY.CRITICAL)
-      );
+    // Phase -1 Gate findings (VII-2, VIII-2); violations without a gate flag fall back to
+    // their article (VII, VIII)
+    const phaseMinusOneViolations = violations.filter(v => isPhaseMinusOne(v));
 
     return {
       shouldBlock: criticalViolations.length > 0 || phaseMinusOneViolations.length > 0,
@@ -513,80 +596,17 @@ class ConstitutionalChecker {
    * @returns {string} Markdown report
    */
   generateReport(results) {
-    const lines = [];
-    const blockDecision = this.shouldBlockMerge(results);
-
-    lines.push('# Constitutional Compliance Report');
-    lines.push('');
-    lines.push(`**Generated:** ${results.checkedAt}`);
-    lines.push('');
-
-    // Summary
-    lines.push('## Summary');
-    lines.push('');
-    lines.push('| Metric | Value |');
-    lines.push('|--------|-------|');
-    lines.push(`| Files Checked | ${results.summary.filesChecked} |`);
-    lines.push(`| Files Passed | ${results.summary.filesPassed} |`);
-    lines.push(`| Files Failed | ${results.summary.filesFailed} |`);
-    lines.push(`| Total Violations | ${results.summary.totalViolations} |`);
-    lines.push('');
-
-    // Block decision
-    if (blockDecision.shouldBlock) {
-      lines.push('## ⛔ Merge Blocked');
-      lines.push('');
-      lines.push(`**Reason:** ${blockDecision.reason}`);
-      if (blockDecision.requiresPhaseMinusOne) {
-        lines.push('');
-        lines.push('> Phase -1 Gate review required. Obtain approval from the System Architect.');
-      }
-      lines.push('');
-    } else {
-      lines.push('## ✅ Merge Allowed');
-      lines.push('');
+    const lines = ['# Constitutional Compliance Report', '', `**Generated:** ${results.checkedAt}`];
+    if (this._context?.profile) {
+      lines.push(`**Profile:** ${this._context.profile.profile}`);
     }
-
-    // Violations by Article
-    lines.push('## Violations by Article');
-    lines.push('');
-    for (const [article, count] of Object.entries(results.summary.violationsByArticle)) {
-      const articleInfo = ARTICLES[article];
-      lines.push(
-        `- **Article ${article}** (${articleInfo?.name || 'Unknown'}): ${count} violations`
-      );
-    }
-    lines.push('');
-
-    // Detailed violations
-    if (results.summary.totalViolations > 0) {
-      lines.push('## Detailed Violations');
-      lines.push('');
-
-      for (const result of results.results) {
-        if (result.violations.length > 0) {
-          lines.push(`### ${result.filePath}`);
-          lines.push('');
-          for (const v of result.violations) {
-            const emoji =
-              v.severity === SEVERITY.CRITICAL
-                ? '🔴'
-                : v.severity === SEVERITY.HIGH
-                  ? '🟠'
-                  : v.severity === SEVERITY.MEDIUM
-                    ? '🟡'
-                    : '🟢';
-            lines.push(`${emoji} **Article ${v.article}** (${v.severity}): ${v.message}`);
-            if (v.line) {
-              lines.push(`  - Line: ${v.line}`);
-            }
-            lines.push(`  - Suggestion: ${v.suggestion}`);
-            lines.push('');
-          }
-        }
-      }
-    }
-
+    lines.push(
+      '',
+      ...reportSummary(results),
+      ...reportDecision(this.shouldBlockMerge(results)),
+      ...reportByArticle(results),
+      ...reportDetails(results)
+    );
     return lines.join('\n');
   }
 
@@ -632,4 +652,5 @@ module.exports = {
   ConstitutionalChecker,
   ARTICLES,
   SEVERITY,
+  isPhaseMinusOne,
 };

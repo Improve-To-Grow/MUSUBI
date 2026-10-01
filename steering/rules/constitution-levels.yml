@@ -12,8 +12,8 @@ levels:
     enforcement: block
     articles:
       - id: CONST-001
-        name: "Article I - Library-First Principle"
-        description: "Implement every feature as a library first"
+        name: "Article I - Testable-Core Principle"
+        description: "Keep feature logic in core modules that are tested without the delivery mechanism"
         required: true
         
       - id: CONST-003
@@ -31,8 +31,8 @@ levels:
     enforcement: warn
     articles:
       - id: CONST-002
-        name: "Article II - CLI Interface Mandate"
-        description: "Provide a CLI interface"
+        name: "Article II - Automation Interface Mandate"
+        description: "Make primary functionality reachable through a documented interface that does not require the UI"
         reason: "Internal libraries may not need a CLI"
         
       - id: CONST-004
@@ -41,9 +41,9 @@ levels:
         reason: "A simple format is sufficient for small changes"
         
       - id: CONST-006
-        name: "Article VI - Constitution Enforcement"
-        description: "Validation by the Constitution enforcer"
-        reason: "Runs automatically in CI"
+        name: "Article VI - Project Memory"
+        description: "Consult steering files before making decisions"
+        reason: "Steering consultation cannot be fully verified automatically"
         
       - id: CONST-009
         name: "Article IX - Real Service Testing"
@@ -59,12 +59,28 @@ levels:
     enforcement: configurable
     articles:
       - id: CONST-007
-        name: "Article VII - Documentation Requirements"
-        description: "Documentation requirements"
+        name: "Article VII - Simplicity Gate"
+        description: "At most 3 projects initially; more require Phase -1 Gate approval"
         
       - id: CONST-008
-        name: "Article VIII - Code Quality Standards"
-        description: "Code quality standards"
+        name: "Article VIII - Anti-Abstraction Gate"
+        description: "Use framework features directly; abstractions require Phase -1 Gate approval"
+
+# Default levels per project profile (constitution v1.1, "Project Profiles", P-5)
+# The profile is declared in steering/project.yml as constitution.profile.
+# Without a declared profile, `library` applies (P-2).
+# Articles not listed here keep the level assigned under `levels` for every profile.
+# A project overrides single articles with constitution.levels in steering/project.yml (P-6).
+profile_defaults:
+  library:
+    CONST-001: critical
+    CONST-002: advisory
+  cli:
+    CONST-001: critical
+    CONST-002: critical
+  application:
+    CONST-001: advisory  # promote to critical once the core/delivery boundary check is clean
+    CONST-002: advisory
 
 # Configurable settings
 configurable:
@@ -93,6 +109,12 @@ configurable:
       medium: true
       large: true
       
+  code_limits:
+    description: "Code-size limits of Article VII (VII-4 to VII-6), in lines of code (non-blank, non-comment)"
+    max_file_lines: 500      # Clean Code: upper limit for files of significant systems
+    max_function_lines: 50   # ESLint max-lines-per-function default
+    max_imports: 10          # eslint-plugin-import max-dependencies default; index files exempt
+
   adr_required:
     description: "ADR (Architecture Decision Record) required"
     default: false
@@ -143,9 +165,17 @@ validation:
 # Projects can override in steering/project.yml:
 #
 # constitution:
+#   profile: application   # library | cli | application
+#   core_paths: [src/lib]
+#   delivery_paths: [src/app, src/components, src/hooks, src/contexts]
+#   adapter_paths: []
+#   levels:
+#     CONST-001: critical  # per-article level override
 #   level: advisory  # strict | advisory | relaxed
 #   overrides:
 #     coverage_threshold: 70
+#     code_limits:
+#       max_function_lines: 80
 #     mock_allowed:
 #       - "@openai/api"
 #       - "@anthropic/sdk"

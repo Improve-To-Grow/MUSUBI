@@ -148,7 +148,8 @@ describe('MUSUBI CLI', () => {
 
       const output = execSync(`${musubi} validate`, { encoding: 'utf8' });
       expect(output).toContain('MUSUBI Validation');
-      expect(output).toContain('Article I: Library-First');
+      expect(output).toContain('Profile: library');
+      expect(output).toContain('Article I: Testable-Core Principle');
     });
 
     it('should check for lib/ directory (Article I)', () => {
@@ -167,7 +168,25 @@ describe('MUSUBI CLI', () => {
       fs.writeFileSync('lib/auth/cli.ts', '#!/usr/bin/env node');
 
       const output = execSync(`${musubi} validate`, { encoding: 'utf8' });
-      expect(output).toContain('CLI Interface');
+      expect(output).toContain('Article II: Automation Interface Mandate');
+      expect(output).toContain('All 1 libraries have CLI interfaces');
+    });
+
+    it('should check core modules and route handlers for the application profile', () => {
+      fs.mkdirSync('steering/rules', { recursive: true });
+      fs.writeFileSync('steering/rules/constitution.md', '# Constitution');
+      fs.writeFileSync(
+        'steering/project.yml',
+        'constitution:\n  profile: application\n  core_paths: [src/lib]\n  delivery_paths: [src/app]\n'
+      );
+      fs.mkdirSync('src/lib/auth', { recursive: true });
+      fs.mkdirSync('src/app/api/auth/login', { recursive: true });
+      fs.writeFileSync('src/app/api/auth/login/route.ts', 'export async function POST() {}');
+
+      const output = execSync(`${musubi} validate`, { encoding: 'utf8' });
+      expect(output).toContain('Profile: application');
+      expect(output).toContain('1 core module(s) found in src/lib');
+      expect(output).toContain('1 route handler(s) found; no CLI required');
     });
 
     it('should check for EARS format (Article IV)', () => {

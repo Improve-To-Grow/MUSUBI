@@ -203,9 +203,11 @@ musubi-workflow mode --detect "feat: user authentication"
 
 | Level | Articles | Behavior |
 |-------|----------|----------|
-| Critical | CONST-001, 002, 003, 005, 009 | Blocks workflow |
-| Advisory | CONST-004, 006, 007 | Warnings only |
-| Flexible | CONST-008 | Suggestions |
+| Critical | CONST-001\*, 003, 005 | Blocks workflow |
+| Advisory | CONST-002\*, 004, 006, 009 | Warnings only |
+| Flexible | CONST-007, 008 | Suggestions |
+
+\* Default for the `library` profile. The levels of CONST-001 (Article I) and CONST-002 (Article II) depend on the project profile in `steering/project.yml`: `cli` makes both critical, `application` makes both advisory (see [Constitutional Governance](#constitutional-governance)). `constitution.levels` in `steering/project.yml` overrides any article. The source of truth is `steering/rules/constitution-levels.yml`.
 
 #### Project Configuration (Phase 4)
 
@@ -498,15 +500,25 @@ musubi-validate complexity
 
 **9 Articles**:
 
-1. **Library-First Principle** - All features begin as independent libraries
-2. **CLI Interface Mandate** - All libraries expose CLI functionality
+1. **Testable-Core Principle** - Feature logic lives in core modules that are tested without the UI, server or CLI; the project profile (library | cli | application) decides what a core module is
+2. **Automation Interface Mandate** - Primary functionality is reachable without the UI: a CLI for library and cli projects, the HTTP API for applications
 3. **Test-First Imperative** - Tests written before code (80% coverage required)
 4. **EARS Requirements Format** - 5 EARS patterns for unambiguous requirements
 5. **Traceability Mandate** - 100% traceability: Requirements ↔ Design ↔ Code ↔ Tests
 6. **Project Memory** - Steering system maintains project context
-7. **Simplicity Gate** - Maximum 3 sub-projects initially (Phase -1 Gate)
+7. **Simplicity Gate** - Maximum 3 sub-projects initially (Phase -1 Gate); files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10 (not gated)
 8. **Anti-Abstraction Gate** - Use framework APIs directly (Phase -1 Gate)
 9. **Integration-First Testing** - Integration tests use real services (no mocks)
+
+**Project Profiles** (constitution v1.1): Articles I and II apply according to the profile declared as `constitution.profile` in `steering/project.yml`. Without a declared profile, `library` applies, so library projects keep the original rules.
+
+| Profile | Core module (Article I) | Automation interface (Article II) | Default level I / II |
+|---------|-------------------------|-----------------------------------|----------------------|
+| `library` | Standalone library under a core path (default `lib/<feature>/` or `packages/<feature>/`) | CLI per library | critical / advisory |
+| `cli` | Standalone library under a core path (default `lib/<feature>/` or `packages/<feature>/`) | CLI per library | critical / critical |
+| `application` | Folder under a declared core path, e.g. `src/lib/<domain>/` | HTTP API (route handlers); no CLI required | advisory / advisory |
+
+`constitution.levels` in `steering/project.yml` overrides the default level per article.
 
 **Phase -1 Gates**: Pre-implementation validation checkpoints for Articles VII & VIII. See:
 
@@ -1007,12 +1019,13 @@ Shows the current state of your MUSUBI project:
 
 Performs quick constitutional compliance checks:
 
-- **Article I**: Library-First Principle (checks `lib/` directory)
-- **Article II**: CLI Interface Mandate (checks for `cli.ts` files)
+- **Project profile**: reads `constitution.profile` from `steering/project.yml` (`library` when none is declared)
+- **Article I**: Testable-Core Principle (counts core modules in the core paths: `lib/` and `packages/` by default, the declared `core_paths` otherwise)
+- **Article II**: Automation Interface Mandate (`library`/`cli`: a `cli.ts` per library or CLI entry points in `bin/`; `application`: route handlers, no CLI required)
 - **Article IV**: EARS Requirements Format (validates EARS patterns)
 - **Article VI**: Project Memory (checks steering files)
 
-For comprehensive validation, use your agent's `/sdd-validate` (or equivalent) command.
+For comprehensive validation, use your agent's `/sdd-validate` (or equivalent) command, or run `npx musubi-validate project`. For an `application` project the validator also checks core → delivery imports (I-3), UI code in core paths (I-A4), request-context APIs outside adapter paths (I-A5), schema validation on machine-facing endpoints (II-A4) and `package.json` scripts that point to missing files (II-A10). For every profile it also checks the code-size limits of the source files in core and delivery paths (VII-4–VII-6: at most 500 lines of code per file, 50 per function and 10 imports per file; warnings, configurable through `constitution.overrides.code_limits` in `steering/project.yml`) and doc comments on the exported functions and classes of core modules (I-5, advisory).
 
 ### Agent-Specific Commands
 
@@ -1163,15 +1176,17 @@ For comprehensive validation, use your agent's `/sdd-validate` (or equivalent) c
 
 MUSUBI enforces 9 immutable constitutional articles:
 
-1. **Library-First Principle** - Features start as libraries
-2. **CLI Interface Mandate** - All libraries expose CLI
+1. **Testable-Core Principle** - Feature logic lives in core modules that are tested without the UI, server or CLI
+2. **Automation Interface Mandate** - Primary functionality is reachable without the UI: a CLI for library and cli projects, the HTTP API for applications
 3. **Test-First Imperative** - Tests before code (Red-Green-Blue)
 4. **EARS Requirements Format** - Unambiguous requirements
 5. **Traceability Mandate** - 100% coverage required
 6. **Project Memory** - All skills check steering first
-7. **Simplicity Gate** - Maximum 3 projects initially
+7. **Simplicity Gate** - Maximum 3 projects initially; files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10
 8. **Anti-Abstraction Gate** - Use framework features directly
 9. **Integration-First Testing** - Real services over mocks
+
+The project profile (`library | cli | application`) in `steering/project.yml` decides how Articles I and II apply (default: `library`).
 
 ## SDD Workflow (8 Stages)
 

@@ -14,12 +14,65 @@ describe('ConstitutionValidator', () => {
   });
 
   describe('validateArticle1', () => {
-    it('should validate Library-First Principle', async () => {
+    it('should validate Testable-Core Principle', async () => {
       const result = await validator.validateArticle1();
       expect(result.article).toBe(1);
-      expect(result.name).toBe('Library-First Principle');
+      expect(result.name).toBe('Testable-Core Principle');
       expect(result.passed).toBe(true);
-      expect(result.summary).toContain('Library-First');
+      expect(result.summary).toContain('Testable-Core');
+      expect(result.summary).toContain('profile: library');
+    });
+  });
+
+  describe('validateArticle2', () => {
+    it('should validate Automation Interface Mandate', async () => {
+      const result = await validator.validateArticle2();
+      expect(result.article).toBe(2);
+      expect(result.name).toBe('Automation Interface Mandate');
+      expect(result.passed).toBe(true);
+    });
+  });
+
+  describe('application profile (constitution v1.1)', () => {
+    const fs = require('fs-extra');
+    const os = require('os');
+    let appRoot;
+
+    beforeEach(async () => {
+      appRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'musubi-constitution-'));
+      await fs.outputFile(
+        path.join(appRoot, 'steering/project.yml'),
+        'constitution:\n  profile: application\n  core_paths: [src/lib]\n  delivery_paths: [src/app]\n'
+      );
+      await fs.outputFile(path.join(appRoot, 'src/lib/auth/service.ts'), 'export {};');
+      await fs.outputFile(path.join(appRoot, 'src/app/api/auth/login/route.ts'), 'export {};');
+    });
+
+    afterEach(async () => {
+      await fs.remove(appRoot);
+    });
+
+    it('should look for core modules in the declared core paths (Article I)', async () => {
+      const result = await new ConstitutionValidator(appRoot).validateArticle1();
+      expect(result.summary).toContain('profile: application');
+      expect(result.warnings.join('\n')).toContain('1 core module(s) in src/lib');
+    });
+
+    it('should accept route handlers instead of a CLI (Article II, II-A3)', async () => {
+      const result = await new ConstitutionValidator(appRoot).validateArticle2();
+      expect(result.warnings.join('\n')).toContain('1 route handler(s) found; no CLI required');
+    });
+
+    it('should report code-size findings as warnings (Article VII, VII-5)', async () => {
+      await fs.outputFile(
+        path.join(appRoot, 'src/lib/auth/long.ts'),
+        `/** Sums */\nexport function sum() {\n${'  total++;\n'.repeat(60)}}\n`
+      );
+      const result = await new ConstitutionValidator(appRoot).validateArticle7();
+      expect(result.passed).toBe(true);
+      expect(result.warnings.join('\n')).toContain(
+        'Article VII: VII-5: 1 function(s) over 50 lines of code: src/lib/auth/long.ts:2 sum (62)'
+      );
     });
   });
 

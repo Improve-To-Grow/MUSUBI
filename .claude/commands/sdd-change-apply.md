@@ -56,6 +56,7 @@ storage/changes/{{change-name}}-proposal.md
 steering/product.md      # Product context
 steering/structure.md    # Architecture patterns
 steering/tech.md         # Technology stack
+steering/project.yml     # Constitution profile (library | cli | application)
 ```
 
 ---
@@ -98,11 +99,15 @@ export function isFeatureEnabled(flag: keyof typeof FEATURE_FLAGS): boolean {
 
 ---
 
-### 4. Implement Changes (Library-First - Article I)
+### 4. Implement Changes (Testable Core - Article I)
+
+**Choose the variant by project profile**: read `constitution.profile` from `steering/project.yml` (default `library` when absent, P-2).
 
 **For Each ADDED Requirement**:
 
-#### Step 4.1: Create Library Module
+#### Step 4.1: Create Core Module
+
+**`library` / `cli` profile** (I-L1–I-L3):
 
 ```bash
 # Create library directory
@@ -113,14 +118,30 @@ touch lib/{{feature}}/index.ts
 touch lib/{{feature}}/types.ts
 touch lib/{{feature}}/{{feature}}.ts
 touch lib/{{feature}}/{{feature}}.test.ts
-touch lib/{{feature}}/cli.ts  # Article II: CLI Interface Mandate
+touch lib/{{feature}}/cli.ts  # Article II: Automation Interface (II-L1)
+```
+
+**`application` profile** (I-A1, I-A2):
+
+```bash
+# Core module: folder under a core path, no own package.json
+mkdir -p src/lib/{{feature}}/
+touch src/lib/{{feature}}/index.ts
+touch src/lib/{{feature}}/{{feature}}.ts
+touch src/lib/{{feature}}/{{feature}}.test.ts  # Runs without the app server (I-2)
+
+# Delivery: thin route handler (I-A3); no cli.ts (II-A3)
+mkdir -p src/app/api/{{feature}}/
+touch src/app/api/{{feature}}/route.ts
 ```
 
 #### Step 4.2: Implement Core Logic
 
+Paths below use the `library` layout; for the `application` profile, use `src/lib/{{feature}}/`.
+
 **Test-First (Article III)**:
 
-1. **RED**: Write failing test
+1. **RED**: Write failing test (III-2)
 
 ```typescript
 // lib/{{feature}}/{{feature}}.test.ts
@@ -142,7 +163,7 @@ describe('{{FeatureName}}', () => {
 });
 ```
 
-2. **GREEN**: Implement to pass test
+2. **GREEN**: Implement to pass test (III-3)
 
 ```typescript
 // lib/{{feature}}/{{feature}}.ts
@@ -155,9 +176,11 @@ export class {{FeatureName}} {
 }
 ```
 
-3. **BLUE**: Refactor (improve code quality)
+3. **BLUE**: Refactor (improve code quality) while keeping all tests passing (III-4)
 
-#### Step 4.3: Create CLI Interface (Article II)
+#### Step 4.3: Create Automation Interface (Article II)
+
+**`library` / `cli` profile**: CLI with `--help` and conventional exit codes (II-L1–II-L5):
 
 ```typescript
 // lib/{{feature}}/cli.ts
@@ -201,7 +224,19 @@ chmod +x lib/{{feature}}/cli.ts
 }
 ```
 
+**`application` profile**: no CLI (II-A3). The HTTP API (route handlers, Step 4.4) is the automation interface (II-A1). WHEN the change adds an operational task (seeding, backfill), add `scripts/{{task}}.ts` with `--help`, an explicit target environment and `--dry-run` for production writes, registered in `package.json` (II-A6–II-A9, advisory); each script entry SHALL reference an existing file (II-A10):
+
+```json
+{
+  "scripts": {
+    "{{task}}": "tsx scripts/{{task}}.ts"
+  }
+}
+```
+
 #### Step 4.4: Integration Layer (Framework)
+
+**`application` profile**: the route handler stays thin (I-A3). It validates input against a schema (e.g. zod), authorizes, calls core and returns a status plus an error code (II-4, II-A4, II-A5).
 
 **Use Framework Features Directly (Article VIII: Anti-Abstraction)**:
 
@@ -350,7 +385,6 @@ if (process.env.NODE_ENV !== 'production') {
    // ✅ NEW (recommended)
    {{new-code}}
    ```
-````
 
 2. Update imports:
 
@@ -368,7 +402,6 @@ if (process.env.NODE_ENV !== 'production') {
 ### Breaking Changes
 
 {{list-of-breaking-changes}}
-
 ````
 
 ---
@@ -382,7 +415,7 @@ if (process.env.NODE_ENV !== 'production') {
 ```bash
 # Prisma example
 npx prisma migrate dev --name {{change-name}}
-````
+```
 
 #### Step 7.2: Write Migration Script
 
@@ -437,8 +470,8 @@ npm run db:verify
 
 **Test Coverage Requirements**:
 
-- Minimum 80% code coverage
-- Integration tests (Article IX) over unit tests
+- Coverage at or above the configured threshold, default 80% (III-6)
+- Integration tests use real services instead of mocks (III-7, Article IX: IX-1)
 
 #### Unit Tests
 
@@ -557,16 +590,27 @@ test.describe('{{Feature}} E2E Tests', () => {
 **Run Validation** (Article I-IX):
 
 ```bash
-# Article I: Library-First
-ls -la lib/{{feature}}/  # Must exist
+# Profile: constitution.profile in steering/project.yml (default: library)
 
-# Article II: CLI Interface
+# Article I: Testable Core
+# library / cli profile
+ls -la lib/{{feature}}/  # Must exist
+# application profile
+ls -la src/lib/{{feature}}/  # Must exist (I-A1)
+grep -rE "from '@/(app|components|hooks|contexts)/" src/lib/{{feature}}/  # Must be empty (I-3)
+# all profiles: each exported function and class in core has a /** … */ doc comment above it (I-5, advisory)
+
+# Article II: Automation Interface
+# library / cli profile
 ls -la lib/{{feature}}/cli.ts  # Must exist
 ./lib/{{feature}}/cli.ts --help  # Must work
+# application profile (no CLI, II-A3)
+ls -la src/app/api/{{feature}}/route.ts  # Must exist and validate input with a schema (II-A1, II-A4)
+npm pkg get scripts  # Each script SHALL reference an existing file (II-A10)
 
 # Article III: Test-First
-npm test -- lib/{{feature}}/  # Must pass
-npm run coverage  # Must be >= 80%
+npm test -- lib/{{feature}}/  # Must pass (application: src/lib/{{feature}}/)
+npm run coverage  # Must be >= configured threshold, default 80% (III-6)
 
 # Article IV: EARS Format
 grep -E "WHEN|SHALL|IF|WHILE|WHERE" storage/changes/{{change-name}}-proposal.md
@@ -575,10 +619,10 @@ grep -E "WHEN|SHALL|IF|WHILE|WHERE" storage/changes/{{change-name}}-proposal.md
 # Check traceability matrix exists and is complete
 
 # Article VIII: Anti-Abstraction
-# Verify no unnecessary wrappers around framework features
+# Verify framework APIs are called directly (VIII-1); wrappers need Phase -1 Gate approval (VIII-2)
 
 # Article IX: Integration-First Testing
-ls -la lib/{{feature}}/*.integration.test.ts  # Must exist
+ls -la lib/{{feature}}/*.integration.test.ts  # Must exist and use real services (IX-1)
 ```
 
 ---
@@ -630,10 +674,18 @@ ls -la lib/{{feature}}/*.integration.test.ts  # Must exist
 
 ### ADDED
 
+<!-- library / cli profile -->
+
 - [ ] lib/{{feature}}/ - Core library ✅
 - [ ] lib/{{feature}}/cli.ts - CLI interface ✅
 - [ ] lib/{{feature}}/{{feature}}.test.ts - Tests ✅
 - [ ] app/api/{{feature}}/route.ts - API endpoint ✅
+
+<!-- application profile -->
+
+- [ ] src/lib/{{feature}}/ - Core module ✅
+- [ ] src/lib/{{feature}}/{{feature}}.test.ts - Tests ✅
+- [ ] src/app/api/{{feature}}/route.ts - API endpoint (schema-validated) ✅
 
 ### MODIFIED
 
@@ -660,8 +712,9 @@ ls -la lib/{{feature}}/*.integration.test.ts  # Must exist
 
 ## Constitutional Compliance
 
-- ✅ Article I: Library-First
-- ✅ Article II: CLI Interface
+- **Profile**: {{PROFILE}} (from `steering/project.yml`)
+- ✅ Article I: Testable Core
+- ✅ Article II: Automation Interface (CLI for library/cli, HTTP API for application)
 - ✅ Article III: Test-First (RED-GREEN-BLUE)
 - ✅ Article IV: EARS Format
 - ✅ Article V: Traceability Matrix Complete
@@ -744,11 +797,17 @@ Before completing, verify:
 - [ ] Approval status verified
 - [ ] Steering context applied
 - [ ] Feature flag created
-- [ ] Library-first implementation (Article I)
-- [ ] CLI interface provided (Article II)
-- [ ] Tests written first (Article III)
-- [ ] Test coverage >= 80%
-- [ ] Integration tests included (Article IX)
+- [ ] Project profile read from `steering/project.yml` (default `library`)
+- [ ] Feature logic in a core module with tests that run without the UI, server or CLI (Article I: I-1, I-2)
+  - `library` / `cli`: library under `lib/{{feature}}/` (I-L1)
+  - `application`: core module under `src/lib/{{feature}}/`, no UI-only code in core (I-A1, I-A4)
+- [ ] Exported functions and classes of core modules have doc comments (Article I: I-5, advisory)
+- [ ] Automation interface provided (Article II)
+  - `library` / `cli`: CLI with `--help` (II-L1, II-L2)
+  - `application`: route handler with schema validation (II-A1, II-A4); `package.json` scripts resolve (II-A10)
+- [ ] Tests written first (Article III: III-1)
+- [ ] Test coverage >= configured threshold, default 80% (III-6)
+- [ ] Integration tests included, using real services (Article IX: IX-1)
 - [ ] Traceability matrix updated
 - [ ] Constitutional compliance verified
 - [ ] Steering files updated

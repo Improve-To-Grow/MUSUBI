@@ -87,7 +87,25 @@ Steering provides **project memory** for all Claude Code skills. It consists of 
    - Business domain
    - Success metrics (if available)
 
-4. **Create Rules Directory**:
+4. **Record Project Profile** (constitution "Project Profiles", P-1, P-4):
+   - From the architecture pattern, determine the profile:
+     - `library`: packages that are published or shared with other projects
+     - `cli`: command-line tools
+     - `application`: web apps and services deployed as one unit
+   - Determine `core_paths` (where feature logic lives), `delivery_paths` (pages, routes, UI, CLI entry points) and, for `application`, `adapter_paths` (request-context code)
+   - IF `steering/project.yml` has no `constitution:` block, THEN write it (example for an `application`):
+
+     ```yaml
+     constitution:
+       profile: application # library | cli | application
+       core_paths: [src/lib]
+       delivery_paths: [src/app, src/components, src/hooks, src/contexts]
+       adapter_paths: []
+     ```
+
+   - IF the block exists, THEN confirm it with the user, and change it only after the user agrees
+
+5. **Create Rules Directory**:
    - Copy constitutional governance files
    - Copy workflow guide
    - Copy EARS format guide
@@ -104,11 +122,13 @@ Created steering files:
 - steering/structure.md
 - steering/tech.md
 - steering/product.md
+- steering/project.yml (constitution profile)
 - steering/rules/ (constitution, workflow, EARS)
 
 ### Key Findings:
 
 - **Architecture**: [detected pattern]
+- **Profile**: [library | cli | application]
 - **Tech Stack**: [primary technologies]
 - **Product**: [inferred purpose]
 
@@ -130,6 +150,7 @@ Please review the generated files and adjust as needed.
    - Read `steering/structure.md`
    - Read `steering/tech.md`
    - Read `steering/product.md`
+   - Read the `constitution:` block in `steering/project.yml`
 
 2. **Analyze Current Codebase**:
    - Same analysis as Bootstrap mode
@@ -140,11 +161,14 @@ Please review the generated files and adjust as needed.
    - Architecture changed?
    - New components added?
    - Directory structure evolved?
+   - Project profile or core/delivery paths no longer match `steering/project.yml`?
 
-4. **Update Steering Files**:
+4. **Update Steering Files** (after approval, VI-6):
+   - Present the detected changes and apply them only after the user approves
    - Update sections that changed
    - Preserve sections that are still accurate
    - Add changelog entries
+   - Write a missing `constitution:` block; change an existing one only after the user confirms
 
 5. **Generate Sync Report**:
 
@@ -199,7 +223,9 @@ Please review the generated files and adjust as needed.
 
 This command supports **Article VI: Project Memory**:
 
-> All skills SHALL consult project memory (steering files) before making decisions.
+> Each skill SHALL consult project memory (steering files) before making decisions.
+
+It maintains the steering files that Article VI requires: `steering/structure.md` defines the architecture patterns (VI-1), `steering/tech.md` the technology stack (VI-2) and `steering/product.md` the business context (VI-3). WHEN the architecture, technology stack or business context changes, the project SHALL update the affected steering files (VI-5).
 
 By maintaining accurate steering files, all skills can:
 
@@ -226,6 +252,12 @@ By maintaining accurate steering files, all skills can:
   - `lib/` - Reusable libraries
   - `app/` - Next.js application
   - `tests/` - Integration tests
+
+### Constitution Profile (steering/project.yml)
+
+- **Profile**: library (each feature is a standalone library in `lib/`)
+- **Core paths**: `lib/`
+- **Delivery paths**: `app/`
 
 ### Tech Stack (steering/tech.md)
 
@@ -301,6 +333,7 @@ After generating/updating steering:
 
 1. **Completeness Check**:
    - [ ] All 3 core files present
+   - [ ] `constitution:` block in `steering/project.yml` (profile, core_paths, delivery_paths)
    - [ ] Rules directory populated
 
 2. **Accuracy Check**:

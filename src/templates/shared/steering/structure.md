@@ -116,7 +116,7 @@ Domain layer has NO dependencies
 
 ```
 {{PROJECT_NAME}}/
-├── lib/                  # Reusable libraries (Article I: Library-First)
+├── lib/                  # Core modules (Article I: Testable Core)
 ├── app/                  # Application code (Next.js, etc.)
 ├── api/                  # API routes/controllers
 ├── components/           # UI components
@@ -138,13 +138,34 @@ Domain layer has NO dependencies
 
 ---
 
-## Library-First Pattern (Article I)
+## Testable-Core Pattern (Article I)
 
-All features begin as independent libraries in `lib/`.
+Feature logic lives in core modules that are tested without the UI, server or CLI (Article I: Testable-Core Principle). The project profile decides what a core module is.
 
-### Library Structure
+### Profile and Paths
 
-Each library follows this structure:
+Record the values declared under `constitution:` in `steering/project.yml` (see "Project Profiles" in `steering/rules/constitution.md`). Without a declared profile, the `library` profile applies (P-2).
+
+| Setting        | Value                                           | Holds                                                                        |
+| -------------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| Profile        | [library \| cli \| application]                 | What the project builds (P-1)                                                |
+| Core paths     | [e.g. `lib/`, `packages/` or `src/lib/`]        | Feature logic (I-1)                                                          |
+| Delivery paths | [e.g. `bin/` or `src/app/`, `src/components/`]  | Pages, route handlers, server actions, UI components, CLI entry points       |
+| Adapter paths  | [e.g. `src/lib/server/authorization/`, or none] | Request-context code that core logic depends on (`application` profile only) |
+
+Rules for every profile:
+
+- The project SHALL place feature logic under a core path (I-1).
+- Each core module SHALL have tests that run without starting the app, a browser or a CLI (I-2).
+- A core module SHALL NOT import from a delivery path (I-3).
+- Direct use of a framework or platform SDK in a core module is not a violation (I-4).
+- Each exported function and class of a core module SHALL have a doc comment (`/** … */`) directly above its declaration (I-5, advisory).
+
+Keep the layout below that matches the profile and delete the other.
+
+### Library Layout (`library` and `cli` profiles)
+
+Each feature starts as a standalone library in `lib/` (I-L1). Each library follows this structure:
 
 ```
 lib/{{feature}}/
@@ -159,18 +180,44 @@ lib/{{feature}}/
 │   ├── service.test.ts   # Unit tests
 │   ├── repository.test.ts # Integration tests (real DB)
 │   └── integration.test.ts # E2E tests
-├── cli.ts                # CLI interface (Article II)
+├── cli.ts                # CLI interface (Article II, II-L1)
 ├── package.json          # Library metadata
 ├── tsconfig.json         # TypeScript config
 └── README.md             # Library documentation
 ```
 
-### Library Guidelines
+#### Library Guidelines
 
-- **Independence**: Libraries MUST NOT depend on application code
-- **Public API**: All exports via `src/index.ts`
-- **Testing**: Independent test suite
-- **CLI**: All libraries expose CLI interface (Article II)
+- **Independence**: Libraries MUST NOT depend on application code (I-L6)
+- **Public API**: All exports via `src/index.ts` (I-L3)
+- **Testing**: Independent test suite (I-L2)
+- **CLI**: All libraries expose a CLI with `--help` and conventional exit codes (Article II, II-L1–II-L5)
+
+### Application Layout (`application` profile)
+
+Each core module is a folder under a core path, without its own `package.json`, deployment or publication (I-A1, I-A2).
+
+```
+src/
+├── lib/                          # Core path
+│   └── {{feature}}/
+│       ├── index.ts              # Public interface of the core module
+│       ├── service.ts            # Business logic
+│       ├── service.test.ts       # Co-located tests (run without the app)
+│       └── repository.ts         # Data access (direct SDK use is fine, I-4)
+├── app/                          # Delivery path: pages, route handlers, server actions
+│   └── api/{{feature}}/route.ts  # Validates input, calls core, returns status + error code
+└── components/                   # Delivery path: UI components
+scripts/                          # Operational scripts with --help and --dry-run (II-A6–II-A9)
+```
+
+#### Core and Delivery Guidelines
+
+- **Thin delivery**: Route handlers, server actions, pages and components only validate input, authorize, call core and shape the response (I-A3, advisory)
+- **No UI in core**: No components, React hooks or providers under core paths (I-A4)
+- **Request context**: `next/headers` and `next/server` only in delivery or adapter paths (I-A5, advisory)
+- **Extraction**: A core module moves into a package only when a second consumer appears (I-A6, I-A7)
+- **Automation interface**: The HTTP API (route handlers) is the automation interface; no CLI is required (Article II, II-A1, II-A3)
 
 ---
 
@@ -198,9 +245,9 @@ app/
 
 ### Application Guidelines
 
-- **Library Usage**: Applications import from `lib/` modules
-- **Thin Controllers**: API routes delegate to library services
-- **No Business Logic**: Business logic belongs in libraries
+- **Core Usage**: Applications import from core modules (`lib/` or `src/lib/`)
+- **Thin Controllers**: API routes delegate to core module services
+- **No Business Logic**: Business logic belongs in core modules (Article I)
 
 ---
 
@@ -276,9 +323,9 @@ tests/
 
 ### Test Guidelines
 
-- **Test-First**: Tests written BEFORE implementation (Article III)
-- **Real Services**: Integration tests use real DB/cache (Article IX)
-- **Coverage**: Minimum 80% coverage
+- **Test-First**: Tests written BEFORE implementation (Article III, III-1)
+- **Real Services**: Integration tests use real DB/cache (Article IX, IX-1); mocks only where IX-4 allows them, each justified (IX-5)
+- **Coverage**: Configured threshold, default 80% (III-6)
 - **Naming**: `*.test.ts` for unit, `*.integration.test.ts` for integration
 
 ---
@@ -355,10 +402,10 @@ storage/
 
 ## Integration Patterns
 
-### Library → Application Integration
+### Core → Delivery Integration (Article I)
 
 ```typescript
-// ✅ CORRECT: Application imports from library
+// ✅ CORRECT: Delivery code (application, route handler, CLI) imports from a core module
 import { AuthService } from '@/lib/auth';
 
 const authService = new AuthService(repository);
@@ -366,8 +413,8 @@ const result = await authService.login(credentials);
 ```
 
 ```typescript
-// ❌ WRONG: Library imports from application
-// Libraries must NOT depend on application code
+// ❌ WRONG: Core module imports from a delivery path
+// A core module SHALL NOT import from a delivery path (I-3)
 import { AuthContext } from '@/app/contexts/auth'; // Violation!
 ```
 
@@ -405,8 +452,8 @@ export class UserRepository {
 
 1. {{PROJECT_NAME}} - Main application
 
-> ⚠️ **Simplicity Gate (Article VII)**: Maximum 3 projects initially.
-> If adding more projects, document justification in Phase -1 Gate approval.
+> ⚠️ **Simplicity Gate (Article VII)**: The initial architecture SHALL NOT exceed 3 projects (VII-1).
+> Additional projects need Phase -1 Gate approval before implementation (VII-2) and a justification in design.md: business requirements, technical constraints, team capacity analysis (VII-3).
 
 ### Environment Structure
 
@@ -484,10 +531,11 @@ Closes REQ-AUTH-001
 
 This structure enforces:
 
-- **Article I**: Library-first pattern in `lib/`
-- **Article II**: CLI interfaces per library
-- **Article III**: Test structure supports Test-First
+- **Article I**: Testable Core: feature logic in core modules under the declared core paths (libraries in `lib/` for `library`/`cli`, folders such as `src/lib/<domain>/` for `application`)
+- **Article II**: Automation Interface: a CLI per library for `library`/`cli`, the HTTP API for `application`
+- **Article III**: Test structure supports Test-First (III-1)
 - **Article VI**: Steering files maintain project memory
+- **Article VII**: Source files stay within the code-size limits: ≤ 500 lines of code per file, ≤ 50 per function, ≤ 10 imports per file except `index` files, or the configured limits (VII-4–VII-6)
 
 ---
 

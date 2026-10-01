@@ -32,7 +32,13 @@ const {
   recommendLanguages,
 } = require('../src/cli/init-helpers');
 
-const { generateDependencyFiles, generateTechMd } = require('../src/cli/init-generators');
+const {
+  generateDependencyFiles,
+  generateTechMd,
+  CONSTITUTION_PROFILE_CHOICES,
+  defaultApplicationPaths,
+  buildConstitutionYml,
+} = require('../src/cli/init-generators');
 
 const TEMPLATE_DIR = path.join(__dirname, '..', 'src', 'templates');
 const SHARED_TEMPLATE_DIR = path.join(TEMPLATE_DIR, 'shared');
@@ -176,6 +182,27 @@ async function main(agent, agentKey, options = {}) {
       name: 'projectType',
       message: 'Project type:',
       choices: ['Greenfield (0→1)', 'Brownfield (1→n)', 'Both'],
+    },
+    {
+      type: 'list',
+      name: 'constitutionProfile',
+      message: 'What are you building? (decides how constitutional Articles I and II apply)',
+      choices: CONSTITUTION_PROFILE_CHOICES,
+      default: 'library',
+    },
+    {
+      type: 'input',
+      name: 'corePaths',
+      message: 'Core paths, where feature logic lives (comma-separated):',
+      default: () => defaultApplicationPaths().corePaths,
+      when: answers => answers.constitutionProfile === 'application',
+    },
+    {
+      type: 'input',
+      name: 'deliveryPaths',
+      message: 'Delivery paths: pages, routes, UI (comma-separated):',
+      default: () => defaultApplicationPaths().deliveryPaths,
+      when: answers => answers.constitutionProfile === 'application',
     },
     {
       type: 'list',
@@ -665,7 +692,12 @@ tech_stack:
   approach: ${answers.techStackApproach}
   languages:
 ${languages[0] === 'undecided' ? '    - undecided  # To be determined' : languages.map(l => `    - ${l}`).join('\n')}
-${externalSpecYml}`;
+
+${buildConstitutionYml({
+  profile: answers.constitutionProfile,
+  corePaths: answers.corePaths,
+  deliveryPaths: answers.deliveryPaths,
+})}${externalSpecYml}`;
   await fs.writeFile(path.join('steering', 'project.yml'), projectYml);
 
   // Generate workspace structure if applicable
@@ -1032,8 +1064,13 @@ if __name__ == "__main__":
 }
 
 async function createConstitution() {
-  const constitutionTemplate = path.join(SHARED_TEMPLATE_DIR, 'constitution', 'constitution.md');
-  await fs.copy(constitutionTemplate, 'steering/rules/constitution.md');
+  const constitutionDir = path.join(SHARED_TEMPLATE_DIR, 'constitution');
+  await fs.copy(path.join(constitutionDir, 'constitution.md'), 'steering/rules/constitution.md');
+  // Default levels per article and per project profile, read by the validators
+  await fs.copy(
+    path.join(constitutionDir, 'constitution-levels.yml'),
+    'steering/rules/constitution-levels.yml'
+  );
 }
 
 async function createReadme(answers, agent, agentKey) {

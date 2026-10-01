@@ -432,7 +432,7 @@ npx musubi-orchestrate swarm \
   --strategy all
 
 # 6. Validate
-npx musubi-validate guardrails --type safety --constitutional
+npx musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js
 ```
 
 ---

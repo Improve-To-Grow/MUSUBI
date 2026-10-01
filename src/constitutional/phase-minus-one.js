@@ -9,7 +9,7 @@
 
 const fs = require('fs').promises;
 const path = require('path');
-const { ConstitutionalChecker } = require('./checker');
+const { ConstitutionalChecker, isPhaseMinusOne } = require('./checker');
 
 /**
  * Default configuration
@@ -91,7 +91,7 @@ class PhaseMinusOneGate {
     if (blockDecision.requiresPhaseMinusOne) {
       const violations = checkResults.results
         .flatMap(r => r.violations)
-        .filter(v => v.article === 'VII' || v.article === 'VIII');
+        .filter(v => isPhaseMinusOne(v));
 
       const gate = await this.trigger({
         featureId: options.featureId,

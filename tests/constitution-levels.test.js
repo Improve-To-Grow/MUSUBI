@@ -9,6 +9,9 @@ const {
   EnforcementLevel,
   ArticleId,
   DEFAULT_ARTICLE_LEVELS,
+  DEFAULT_PROFILE_LEVELS,
+  DEFAULT_CODE_LIMITS,
+  ProjectProfile,
 } = require('../src/validators/constitution-level-manager');
 const fs = require('fs-extra');
 const path = require('path');
@@ -238,6 +241,169 @@ describe('ConstitutionLevelManager', () => {
   });
 });
 
+describe('ConstitutionLevelManager project profiles (constitution v1.1)', () => {
+  const testDir = '/tmp/test-constitution-profiles';
+  let manager;
+
+  const writeProjectYml = async constitution => {
+    await fs.writeFile(path.join(testDir, 'steering/project.yml'), yaml.dump({ constitution }));
+  };
+
+  beforeEach(async () => {
+    await fs.ensureDir(path.join(testDir, 'steering/rules'));
+    manager = new ConstitutionLevelManager(testDir);
+  });
+
+  afterEach(async () => {
+    await fs.remove(testDir);
+  });
+
+  it('P-2: applies the library profile when project.yml declares none', async () => {
+    const config = await manager.getProfileConfig();
+    expect(config.profile).toBe(ProjectProfile.LIBRARY);
+    expect(config.declared).toBe(false);
+    expect(config.valid).toBe(true);
+  });
+
+  it('P-2: falls back to library and flags an unknown profile', async () => {
+    await writeProjectYml({ profile: 'webapp' });
+    const config = await manager.getProfileConfig();
+    expect(config.profile).toBe(ProjectProfile.LIBRARY);
+    expect(config.declared).toBe(true);
+    expect(config.valid).toBe(false);
+  });
+
+  it('P-3: uses lib/ and packages/ as core paths for library and cli without core_paths', async () => {
+    await writeProjectYml({ profile: 'cli' });
+    const config = await manager.getProfileConfig();
+    expect(config.corePaths).toEqual(['lib', 'packages']);
+    expect(config.corePathsDeclared).toBe(false);
+  });
+
+  it('P-4: returns the declared paths of an application project', async () => {
+    await writeProjectYml({
+      profile: 'application',
+      core_paths: ['src/lib'],
+      delivery_paths: ['src/app', 'src/components'],
+      adapter_paths: ['src/lib/server/authorization'],
+    });
+    const config = await manager.getProfileConfig();
+    expect(config.profile).toBe(ProjectProfile.APPLICATION);
+    expect(config.corePaths).toEqual(['src/lib']);
+    expect(config.corePathsDeclared).toBe(true);
+    expect(config.deliveryPaths).toEqual(['src/app', 'src/components']);
+    expect(config.adapterPaths).toEqual(['src/lib/server/authorization']);
+  });
+
+  it('P-5: keeps the v1.0 levels for the library profile', async () => {
+    expect(await manager.getArticleLevel(ArticleId.TESTABLE_CORE)).toBe('critical');
+    expect(await manager.getArticleLevel(ArticleId.AUTOMATION_INTERFACE)).toBe('advisory');
+  });
+
+  it('P-5: makes Article II critical for the cli profile', async () => {
+    await writeProjectYml({ profile: 'cli' });
+    expect(await manager.getArticleLevel(ArticleId.TESTABLE_CORE)).toBe('critical');
+    expect(await manager.getArticleLevel(ArticleId.AUTOMATION_INTERFACE)).toBe('critical');
+    expect(await manager.isBlocking(ArticleId.AUTOMATION_INTERFACE)).toBe(true);
+  });
+
+  it('P-5: makes Articles I and II advisory for the application profile', async () => {
+    await writeProjectYml({ profile: 'application', core_paths: ['src/lib'] });
+    expect(await manager.getArticleLevel(ArticleId.TESTABLE_CORE)).toBe('advisory');
+    expect(await manager.getArticleLevel(ArticleId.AUTOMATION_INTERFACE)).toBe('advisory');
+    expect(await manager.isBlocking(ArticleId.TESTABLE_CORE)).toBe(false);
+    // Other articles keep their level for every profile
+    expect(await manager.getArticleLevel(ArticleId.TEST_FIRST)).toBe('critical');
+  });
+
+  it('P-5: reads profile_defaults from constitution-levels.yml when present', async () => {
+    await fs.writeFile(
+      path.join(testDir, 'steering/rules/constitution-levels.yml'),
+      yaml.dump({
+        schema_version: '1.0',
+        levels: {
+          critical: { enforcement: 'block', articles: [{ id: 'CONST-001' }] },
+          advisory: { enforcement: 'warn', articles: [{ id: 'CONST-002' }] },
+        },
+        profile_defaults: { application: { 'CONST-001': 'critical' } },
+      })
+    );
+    await writeProjectYml({ profile: 'application', core_paths: ['src/lib'] });
+    expect(await manager.getArticleLevel(ArticleId.TESTABLE_CORE)).toBe('critical');
+  });
+
+  it('P-6: lets constitution.levels override the profile default', async () => {
+    await writeProjectYml({
+      profile: 'application',
+      core_paths: ['src/lib'],
+      levels: { 'CONST-001': 'critical', 'CONST-002': 'not-a-level' },
+    });
+    expect(await manager.getArticleLevel(ArticleId.TESTABLE_CORE)).toBe('critical');
+    expect(await manager.isBlocking(ArticleId.TESTABLE_CORE)).toBe(true);
+    // Invalid override values are ignored
+    expect(await manager.getArticleLevel(ArticleId.AUTOMATION_INTERFACE)).toBe('advisory');
+  });
+
+  it('lists articles by their effective level for the profile', async () => {
+    await writeProjectYml({ profile: 'application', core_paths: ['src/lib'] });
+    const critical = (await manager.getCriticalArticles()).map(a => a.id);
+    const advisory = (await manager.getAdvisoryArticles()).map(a => a.id);
+    expect(critical).not.toContain(ArticleId.TESTABLE_CORE);
+    expect(advisory).toContain(ArticleId.TESTABLE_CORE);
+    expect(critical).toContain(ArticleId.TEST_FIRST);
+  });
+
+  it('uses the v1.1 article names in the default configuration', async () => {
+    const names = (await manager.getCriticalArticles()).map(a => a.name);
+    expect(names).toContain('Article I - Testable-Core Principle');
+    const flexible = (await manager.getFlexibleArticles()).map(a => a.name);
+    expect(flexible).toEqual([
+      'Article VII - Simplicity Gate',
+      'Article VIII - Anti-Abstraction Gate',
+    ]);
+  });
+});
+
+describe('ConstitutionLevelManager code limits (VII-4 to VII-6)', () => {
+  const testDir = '/tmp/test-constitution-code-limits';
+
+  beforeEach(async () => {
+    await fs.ensureDir(path.join(testDir, 'steering/rules'));
+  });
+
+  afterEach(async () => {
+    await fs.remove(testDir);
+  });
+
+  it('should default to 500 lines per file, 50 per function and 10 imports', async () => {
+    const limits = await new ConstitutionLevelManager(testDir).getCodeLimits();
+    expect(limits).toEqual(DEFAULT_CODE_LIMITS);
+    expect(limits).toEqual({ maxFileLines: 500, maxFunctionLines: 50, maxImports: 10 });
+  });
+
+  it('should read code_limits from constitution-levels.yml', async () => {
+    await fs.writeFile(
+      path.join(testDir, 'steering/rules/constitution-levels.yml'),
+      yaml.dump({
+        levels: {},
+        configurable: { code_limits: { max_file_lines: 400, max_imports: 12 } },
+      })
+    );
+    const limits = await new ConstitutionLevelManager(testDir).getCodeLimits();
+    expect(limits).toEqual({ maxFileLines: 400, maxFunctionLines: 50, maxImports: 12 });
+  });
+
+  it('should apply project overrides from steering/project.yml', async () => {
+    await fs.writeFile(
+      path.join(testDir, 'steering/project.yml'),
+      yaml.dump({ constitution: { overrides: { code_limits: { max_function_lines: 80 } } } })
+    );
+    const limits = await new ConstitutionLevelManager(testDir).getCodeLimits();
+    expect(limits.maxFunctionLines).toBe(80);
+    expect(limits.maxFileLines).toBe(500);
+  });
+});
+
 describe('EnforcementLevel', () => {
   it('should have correct values', () => {
     expect(EnforcementLevel.BLOCK).toBe('block');
@@ -252,6 +418,32 @@ describe('ArticleId', () => {
     expect(ArticleId.TEST_FIRST).toBe('CONST-003');
     expect(ArticleId.TRACEABILITY).toBe('CONST-005');
     expect(ArticleId.REAL_SERVICE_TESTING).toBe('CONST-009');
+  });
+
+  it('should provide v1.1 names for the article IDs', () => {
+    expect(ArticleId.TESTABLE_CORE).toBe('CONST-001');
+    expect(ArticleId.AUTOMATION_INTERFACE).toBe('CONST-002');
+    expect(ArticleId.PROJECT_MEMORY).toBe('CONST-006');
+    expect(ArticleId.SIMPLICITY_GATE).toBe('CONST-007');
+    expect(ArticleId.ANTI_ABSTRACTION).toBe('CONST-008');
+    expect(ArticleId.INTEGRATION_FIRST).toBe('CONST-009');
+  });
+});
+
+describe('DEFAULT_PROFILE_LEVELS', () => {
+  it('should define the default levels of Articles I and II per profile (P-5)', () => {
+    expect(DEFAULT_PROFILE_LEVELS.library).toEqual({
+      'CONST-001': 'critical',
+      'CONST-002': 'advisory',
+    });
+    expect(DEFAULT_PROFILE_LEVELS.cli).toEqual({
+      'CONST-001': 'critical',
+      'CONST-002': 'critical',
+    });
+    expect(DEFAULT_PROFILE_LEVELS.application).toEqual({
+      'CONST-001': 'advisory',
+      'CONST-002': 'advisory',
+    });
   });
 });
 

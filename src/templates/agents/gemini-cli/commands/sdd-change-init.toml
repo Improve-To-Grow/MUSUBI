@@ -223,9 +223,11 @@ For each removed requirement:
 
 ## Constitutional Compliance
 
-- Article IV: All new requirements use EARS patterns
+- Article IV: All new requirements use EARS patterns (IV-1)
 - Article V: Change ID assigned, requirements have IDs
-- Article I & II: New features in lib/ with CLI
+- Article I & II (Testable Core + Automation Interface, per profile in `steering/project.yml`, default `library`):
+  - library / cli: new features in lib/ with CLI (I-L1, II-L1)
+  - application: new features in a core module under `src/lib/<domain>/` (I-A1); machine-facing endpoints validate input against a schema (II-A4)
 
 # Step 5: Assign Change ID
 

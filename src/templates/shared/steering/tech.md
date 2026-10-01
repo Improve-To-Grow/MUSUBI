@@ -8,7 +8,7 @@
 
 ## Overview
 
-This document defines the approved technology stack for {{PROJECT_NAME}}. All development MUST use these technologies unless explicitly approved via Phase -1 Gate (Article VIII: Anti-Abstraction).
+This document defines the approved technology stack for {{PROJECT_NAME}} (Article VI, VI-2). Development SHALL use these technologies. A change to this stack SHALL be approved by stakeholders before it is applied (VI-6), and a custom abstraction layer over one of these frameworks SHALL NOT be built without Phase -1 Gate approval (Article VIII, VIII-2).
 
 ---
 
@@ -141,7 +141,7 @@ model User {
 
 **Password Requirements**:
 
-- Hashing: bcrypt with cost factor 12 (Article III: Security)
+- Hashing: bcrypt with cost factor 12
 - Minimum length: 12 characters
 - Complexity: Uppercase, lowercase, number, special char
 
@@ -199,9 +199,11 @@ services:
 
 **Constitutional Compliance (Article IX)**:
 
-- Integration tests MUST use real database
-- Integration tests MUST use real cache
-- Mocks only for external APIs without test environments
+- Integration tests SHALL use a real database, isolated in a container or test schema (IX-1, IX-2)
+- Integration tests SHALL use a real cache (IX-1)
+- Integration tests SHALL call external APIs through their sandbox or test environments (IX-3)
+- Integration tests SHALL NOT mock a service unless the service is unavailable in the test environment, has usage limits or costs, or has no test environment (IX-4)
+- WHERE a test uses a mock, the test documentation SHALL justify that mock (IX-5)
 
 ---
 
@@ -236,6 +238,8 @@ services:
   }
 }
 ```
+
+**Code-size limits** (Article VII, VII-4–VII-6): source files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10 per file (`index` files exempt). The defaults follow established tools: 50 lines per function is ESLint's `max-lines-per-function` default, 10 imports is eslint-plugin-import's `max-dependencies` default, and 500 lines per file is the upper limit Robert C. Martin reports in _Clean Code_. `constitution.overrides.code_limits` in `steering/project.yml` changes them. The constitutional validator reports violations as warnings; they are not Phase -1 Gate items.
 
 ---
 
@@ -344,11 +348,11 @@ services:
 
 ### Code Documentation
 
-| Tool      | Version | Purpose                  |
-| --------- | ------- | ------------------------ |
-| TSDoc     | -       | TypeScript documentation |
-| JSDoc     | -       | JavaScript documentation |
-| Storybook | 7.0+    | Component documentation  |
+| Tool      | Version | Purpose                                                      |
+| --------- | ------- | ------------------------------------------------------------ |
+| TSDoc     | -       | TypeScript documentation                                     |
+| JSDoc     | -       | JavaScript documentation; doc comments on core exports (I-5) |
+| Storybook | 7.0+    | Component documentation                                      |
 
 ---
 
@@ -467,7 +471,7 @@ export default nextConfig;
 
 ## Anti-Abstraction Policy (Article VIII)
 
-**CRITICAL**: Use framework APIs directly. Do NOT create custom abstraction layers.
+**CRITICAL**: The project SHALL call framework APIs directly (VIII-1). The project SHALL NOT build a custom abstraction layer or wrapper library over a framework without Phase -1 Gate approval (VIII-2).
 
 ### ✅ Allowed
 
@@ -496,12 +500,14 @@ class MyHttpClient {
 }
 ```
 
-**Exception**: Multi-framework support or justified architectural need requires Phase -1 Gate approval with:
+**Exception**: Multi-framework support or justified architectural need requires Phase -1 Gate approval with (VIII-3):
 
 1. Multi-framework justification
 2. Team expertise analysis
 3. Migration path documentation
 4. Approval from @system-architect + @software-developer
+
+**Runtime constraint**: A project-owned client is a valid abstraction when the vendor SDK cannot run on the target runtime, e.g. `firebase-admin` on Cloudflare Workers (VIII-4); design.md documents that constraint (VIII-5).
 
 ---
 
@@ -516,7 +522,7 @@ When evaluating new technologies:
 5. **Security**: Regular security updates
 6. **License**: Compatible with project (MIT, Apache 2.0 preferred)
 7. **Team Expertise**: Team familiarity with technology
-8. **Constitutional Alignment**: Supports Library-First, Test-First principles
+8. **Constitutional Alignment**: Supports Testable-Core, Test-First principles
 
 ---
 

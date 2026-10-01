@@ -92,12 +92,11 @@ describe('CIReporter', () => {
 
     it('should return failure exit code for blocked files', async () => {
       const filePath = path.join(testDir, 'bad.js');
-      const longContent = Array(600).fill('// line').join('\n');
-      await fs.writeFile(filePath, longContent, 'utf-8');
+      await fs.writeFile(filePath, '// REQ-001\nclass HttpWrapper {}', 'utf-8');
 
       const result = await reporter.runAndReport([filePath]);
 
-      // Article VII violation triggers phase -1
+      // Article VIII abstraction layer (VIII-2) triggers phase -1
       expect(result.blockDecision.requiresPhaseMinusOne).toBe(true);
     });
 
@@ -260,7 +259,7 @@ describe('CIReporter', () => {
             violations: [
               {
                 article: 'VII',
-                articleName: 'Simplicity',
+                articleName: 'Simplicity Gate',
                 message: 'File too long',
                 severity: SEVERITY.HIGH,
                 line: 100,
@@ -293,7 +292,7 @@ describe('CIReporter', () => {
             violations: [
               {
                 article: 'IX',
-                articleName: 'Documentation',
+                articleName: 'Integration-First Testing',
                 message: 'Missing docs',
                 severity: SEVERITY.LOW,
                 line: 10,
@@ -348,7 +347,7 @@ describe('CIReporter', () => {
             violations: [
               {
                 article: 'VII',
-                articleName: 'Simplicity',
+                articleName: 'Simplicity Gate',
                 message: 'Too long',
                 severity: 'high',
                 suggestion: 'Split file',
@@ -382,7 +381,7 @@ describe('CIReporter', () => {
             violations: [
               {
                 article: 'I',
-                articleName: 'Spec',
+                articleName: 'Testable-Core Principle',
                 message: 'Missing <requirement> & "spec"',
                 severity: 'medium',
                 suggestion: "Use 'REQ-XXX'",

@@ -202,7 +202,7 @@ Agent Work → Validation Gate → Human Review → Continue/Reject
 
 ```
 Before Implementation:
-□ Library-First validated
+□ Testable Core validated (per project profile)
 □ EARS format validated
 □ Test-First confirmed
 □ Traceability checked

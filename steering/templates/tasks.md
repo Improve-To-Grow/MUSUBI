@@ -191,8 +191,10 @@ This implementation plan breaks down the feature into concrete, actionable tasks
 
 **Acceptance Criteria**:
 - All API endpoints SHALL be integration tested
-- External service mocking/stubbing SHALL be implemented
-- Database transactions SHALL be tested end-to-end
+- Integration tests SHALL call external services through their sandbox or test environments (IX-3)
+- Integration tests SHALL NOT mock a service unless it is unavailable in the test environment, has usage limits or costs, or has no test environment (IX-4)
+- WHERE an integration test uses a mock, the test documentation SHALL justify that mock (IX-5)
+- Database transactions SHALL be tested end-to-end against a real, isolated test database (IX-1, IX-2)
 
 **Subtasks**:
 - [ ] API integration tests - covers [REQ-XXX]
@@ -406,7 +408,8 @@ A task is considered "Done" when:
 - [ ] Code reviewed and approved
 - [ ] Unit tests written and passing (80%+ coverage)
 - [ ] Integration tests passing
-- [ ] Documentation updated
+- [ ] Source files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10, or the configured limits (VII-4–VII-6)
+- [ ] Documentation updated; exported functions and classes of core modules have doc comments (I-5, advisory)
 - [ ] EARS requirements verified
 - [ ] No critical bugs
 - [ ] Deployed to staging

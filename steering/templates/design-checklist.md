@@ -28,17 +28,18 @@ Use this checklist to validate design documents before implementation.
 
 ### Article VII: Simplicity Gate
 
-- [ ] Project count ≤ 3 (or exception approved)
-- [ ] No premature complexity
-- [ ] Minimal viable architecture
-- [ ] Future-proofing avoided
+- [ ] Project count ≤ 3 initially, counting independently deployable units (VII-1)
+- [ ] Each project has a clear purpose
+- [ ] Additional projects have Phase -1 Gate approval before implementation (VII-2)
+- [ ] Each additional project justified in design.md: business requirements, technical constraints, team capacity analysis (VII-3)
+- [ ] Module split keeps source files ≤ 500 lines of code, functions ≤ 50 and imports ≤ 10 per file, or the configured limits (VII-4–VII-6; checked on the code, not a Phase -1 Gate item)
 
 ### Article VIII: Anti-Abstraction Gate
 
-- [ ] Framework APIs used directly
-- [ ] No unnecessary wrapper layers
-- [ ] Abstractions justified (if any)
-- [ ] Single model representation
+- [ ] Framework APIs used directly (VIII-1)
+- [ ] No custom abstraction layer or wrapper library over a framework without Phase -1 Gate approval (VIII-2)
+- [ ] Gate request for any abstraction includes multi-framework support justification, team expertise analysis and migration path (VIII-3)
+- [ ] Project-owned client because the vendor SDK cannot run on the target runtime (VIII-4): constraint documented in design.md (VIII-5)
 
 ---
 

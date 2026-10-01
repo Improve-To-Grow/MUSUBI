@@ -34,15 +34,17 @@ One consistent SDD workflow across 7 AI coding agents:
 
 9 immutable articles that ensure quality:
 
-1. **Library-First** - Features as reusable libraries
-2. **CLI Interface** - Everything scriptable
+1. **Testable Core** - Feature logic in core modules, tested without the UI, server or CLI
+2. **Automation Interface** - Everything reachable without the UI: CLI for library and cli projects, HTTP API for applications
 3. **Test-First** - Red-Green-Blue cycle
 4. **EARS Format** - Unambiguous requirements
 5. **Traceability** - 100% coverage mapping
 6. **Project Memory** - Persistent steering context
-7. **Simplicity Gate** - Max 3 projects initially
+7. **Simplicity Gate** - Max 3 projects initially; files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10
 8. **Anti-Abstraction** - Use frameworks directly
 9. **Integration-First** - Real services in tests
+
+The project profile (`library`, `cli` or `application`) in `steering/project.yml` decides how Articles I and II apply. See [Project Profiles](/guide/constitution#project-profiles).
 
 ### 3. 25 Specialized Skills
 
@@ -93,7 +95,7 @@ Persistent project memory that survives between AI sessions:
 
 Quality gates before implementation:
 
-- **Simplicity Gate** - Prevent over-engineering
+- **Simplicity Gate** - At most 3 projects initially; more need Phase -1 Gate approval
 - **Anti-Abstraction Gate** - No unnecessary wrappers
 
 ## Who Should Use MUSUBI?

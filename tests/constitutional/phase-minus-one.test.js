@@ -129,10 +129,9 @@ describe('PhaseMinusOneGate', () => {
       expect(result.gate).toBeNull();
     });
 
-    it('should trigger for Article VII violation', async () => {
-      const filePath = path.join(testDir, 'long-file.js');
-      const longContent = Array(600).fill('// line').join('\n');
-      await fs.writeFile(filePath, longContent, 'utf-8');
+    it('should trigger for an Article VIII abstraction layer (VIII-2)', async () => {
+      const filePath = path.join(testDir, 'wrapper.js');
+      await fs.writeFile(filePath, '// REQ-001\nclass DatabaseWrapper {}', 'utf-8');
 
       const result = await gate.analyzeAndTrigger([filePath], {
         featureId: 'FEAT-008',

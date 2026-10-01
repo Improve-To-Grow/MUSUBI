@@ -2,7 +2,7 @@
 
 ## Overview
 
-Test-First Development (TDD) is a software development practice where tests are written before the implementation code. This is mandated by Constitutional Article III: Test-First Imperative.
+Test-First Development (TDD) is a software development practice where tests are written before the implementation code. Constitutional Article III (Test-First Imperative) mandates it: the developer SHALL write each test before the production code that makes it pass (III-1), in a Red-Green-Blue cycle where Blue is the refactor step (III-2–III-4).
 
 ---
 
@@ -183,6 +183,16 @@ git log --oneline --diff-filter=A -- "src/auth/service.ts" | tail -1
 
 ### Integration-First (Constitutional Article IX)
 
+Article IX governs what integration tests run against, not the order of test types:
+
+- **IX-1** Integration tests SHALL use real databases, APIs and services.
+- **IX-2** Each test database SHALL be isolated (container or test schema).
+- **IX-3** Integration tests SHALL call external APIs through their sandbox or test environments.
+- **IX-4** Integration tests SHALL NOT mock a service unless the service is unavailable in the test environment, has usage limits or costs, or has no test environment.
+- **IX-5** WHERE a test uses a mock, the test documentation SHALL justify that mock.
+
+### Recommended Test Order
+
 ```
 1. Integration tests (happy path) ──▶ Define expected behavior
 2. Integration tests (error paths) ──▶ Define error handling
@@ -344,7 +354,7 @@ describe('[API Endpoint]', () => {
 
 ```
 ❌ Only unit tests with mocks
-✅ Integration tests first, then unit tests for gaps
+✅ Integration tests against real services (IX-1), then unit tests for gaps
 ```
 
 ### Mistake 4: Writing Too Many Tests at Once

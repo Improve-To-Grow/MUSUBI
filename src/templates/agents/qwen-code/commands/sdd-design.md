@@ -33,6 +33,7 @@ Generate a comprehensive technical design that implements the requirements while
 steering/structure.md    # Architecture patterns to follow
 steering/tech.md         # Technology stack to use
 steering/product.md      # Product goals and users
+steering/project.yml     # constitution.profile (library | cli | application)
 
 # Requirements
 storage/specs/{{feature-name}}-requirements.md  # What to implement
@@ -41,6 +42,7 @@ storage/specs/{{feature-name}}-requirements.md  # What to implement
 **Extract**:
 
 - Architecture pattern (monolith, microservices, library-first)
+- Project profile (`constitution.profile`, `core_paths`, `delivery_paths`; `library` when absent)
 - Approved technologies (languages, frameworks, databases)
 - Requirements to implement
 - Non-functional requirements (performance, security, scale)
@@ -97,35 +99,33 @@ Create **3 levels** of C4 diagrams:
 
 **Example**:
 
-```markdown
+````markdown
 ### C4 Model: Container Diagram
-```
 
+```text
 +--------------------------------------+
-| Authentication System |
-| |
-| +-------------+ +-------------+ |
-| | | | | |
-| | Web App +-->+ API Server | |
-| | (Next.js) | | (Node.js) | |
-| | | | | |
-| +-------------+ +------+------+ |
-| | |
+|       Authentication System          |
+|                                      |
+|  +-------------+   +-------------+   |
+|  |             |   |             |   |
+|  |  Web App    +-->+  API Server |   |
+|  |  (Next.js)  |   |  (Node.js)  |   |
+|  |             |   |             |   |
+|  +-------------+   +------+------+   |
+|                           |          |
 +---------------------------+----------+
-|
-| SQL
-v
-+--------+--------+
-| PostgreSQL |
-+-----------------+
-
+                            |
+                            | SQL
+                            v
+                   +--------+--------+
+                   |   PostgreSQL    |
+                   +-----------------+
 ```
-
-```
+````
 
 #### B. Requirements Mapping
 
-**CRITICAL (Article V)**: Map EVERY requirement to design decisions.
+**CRITICAL (Article V)**: Each requirement SHALL map to at least one design decision (V-1), and the design document SHALL include a requirements coverage matrix (V-5).
 
 Create matrix:
 
@@ -170,7 +170,6 @@ Content-Type: application/json
   "password": "secret123"
 }
 ```
-````
 
 **Response (Success)**:
 
@@ -209,10 +208,10 @@ HTTP/1.1 401 Unauthorized
 - ✅ Validates email and password
 - ✅ Returns session cookie
 - ✅ Redirects to dashboard
-
 ````
 
 **Generate OpenAPI Spec** (if REST API):
+
 ```yaml
 openapi: 3.0.0
 info:
@@ -235,7 +234,7 @@ paths:
                 password:
                   type: string
                   minLength: 12
-````
+```
 
 ---
 
@@ -315,52 +314,58 @@ model Session {
 ```
 ````
 
-````
-
 ---
 
-### 6. Component Design (Library-First, Article I)
+### 6. Component Design (Testable Core, Article I)
 
-**CRITICAL**: Design features as libraries first.
+**CRITICAL**: Read `constitution.profile` from `steering/project.yml` before designing components. IF no profile is declared, THEN use `library` (P-2). The profile decides what a core module is and which variant below applies.
 
-```markdown
+- The design SHALL name the core module for each feature (I-1).
+- WHERE the project profile is `application`, the design SHALL list the delivery paths of each feature and each machine-facing endpoint with its input schema and documented status and error codes (II-A4, II-A5).
+
+#### Variant: `library` / `cli` profile
+
+Design features as libraries first (I-L1–I-L3), each with a CLI (II-L1).
+
+````markdown
 ### Authentication Library
 
 **Location**: `lib/auth/`
 
 **Responsibilities**:
+
 - Business logic for authentication
 - Password hashing
 - Session management
 - JWT generation/validation
 
 **Directory Structure**:
-````
 
+```text
 lib/auth/
 ├── src/
-│ ├── index.ts # Public API
-│ ├── service.ts # AuthService class
-│ ├── repository.ts # UserRepository class
-│ ├── password.ts # Password hashing utilities
-│ ├── jwt.ts # JWT utilities
-│ └── types.ts # TypeScript types
+│   ├── index.ts         # Public API
+│   ├── service.ts       # AuthService class
+│   ├── repository.ts    # UserRepository class
+│   ├── password.ts      # Password hashing utilities
+│   ├── jwt.ts           # JWT utilities
+│   └── types.ts         # TypeScript types
 ├── tests/
-│ ├── service.test.ts
-│ ├── repository.test.ts
-│ └── integration.test.ts
-├── cli.ts # CLI interface (Article II)
+│   ├── service.test.ts
+│   ├── repository.test.ts
+│   └── integration.test.ts
+├── cli.ts               # CLI interface (Article II)
 └── package.json
-
-````
+```
 
 **Public API**:
+
 ```typescript
 // lib/auth/src/index.ts
 export { AuthService } from './service';
 export { UserRepository } from './repository';
 export type { User, Session, LoginRequest, LoginResponse } from './types';
-````
+```
 
 **CLI Interface** (Article II):
 
@@ -371,7 +376,39 @@ auth login --email=user@example.com --password=secret
 auth logout --session-id=uuid
 auth validate-session --token=xxx
 ```
+````
 
+#### Variant: `application` profile
+
+Design each feature as a core module folder under a core path, with no own `package.json` (I-A1, I-A2). Route handlers and server actions delegate to it (I-A3). The HTTP API is the automation interface, so there is no `cli.ts` (II-A1, II-A3).
+
+````markdown
+### Authentication Core Module
+
+**Core module**: `src/lib/auth/`
+
+```text
+src/lib/auth/
+├── index.ts             # Public interface
+├── service.ts           # login(), logout(), validateSession()
+├── service.test.ts      # Runs without the app server (I-2)
+├── password.ts
+└── types.ts
+```
+
+**Delivery paths** (delegate to `src/lib/auth/`, I-A3):
+
+- `src/app/api/auth/login/route.ts`: validates input, calls core, returns status and error code
+- `src/app/login/actions.ts`: server action used by `src/app/login/page.tsx`
+
+**Machine-facing endpoints** (II-A4, II-A5):
+
+| Endpoint                 | Caller      | Input schema                | Status and error codes                                  |
+| ------------------------ | ----------- | --------------------------- | ------------------------------------------------------- |
+| POST /api/auth/login     | API clients | `LoginSchema` (zod)         | 200; 400 `VALIDATION_FAILED`; 401 `INVALID_CREDENTIALS` |
+| POST /api/auth/provision | n8n flow    | `ProvisionUserSchema` (zod) | 201; 400 `VALIDATION_FAILED`; 409 `USER_EXISTS`         |
+
+**Operational scripts** (advisory, II-A6–II-A9): `scripts/create-user.ts` with `--help`, `--env` and `--dry-run`, registered in `package.json`
 ````
 
 ---
@@ -382,28 +419,32 @@ Always include security design:
 
 ```markdown
 ### Authentication
+
 - **Method**: JWT tokens
 - **Storage**: HTTP-only cookies
 - **Expiry**: 24 hours
 - **Refresh**: 7-day refresh tokens
 
 ### Authorization
+
 - **Method**: Role-Based Access Control (RBAC)
 - **Roles**: admin, user, guest
 - **Permissions**: Defined per endpoint
 
 ### Data Protection
+
 - **Passwords**: bcrypt hash (cost factor 12)
 - **Tokens**: Cryptographically signed JWT
 - **HTTPS**: TLS 1.3 enforced
 - **Sensitive Data**: PII encrypted at rest
 
 ### Input Validation
+
 - **XSS Prevention**: Output encoding
 - **SQL Injection**: Parameterized queries (ORM)
 - **CSRF**: CSRF tokens on state-changing operations
 - **Rate Limiting**: 5 failed login attempts → account lock
-````
+```
 
 ---
 
@@ -433,46 +474,62 @@ Always include security design:
 
 ### 9. Constitutional Compliance Validation
 
-#### Article I: Library-First
+#### Article I: Testable Core
 
-- [ ] Feature designed as library (`lib/{{feature}}/`)
-- [ ] Library has independent test suite
-- [ ] Library has public API (`index.ts`)
-- [ ] No dependencies on application code
+- [ ] Profile read from `steering/project.yml` (`library` when absent, P-2)
+- [ ] Core module named for each feature (I-1)
+- [ ] Core module has tests that run without the app, a browser or a CLI (I-2)
+- [ ] No imports from delivery paths into core paths (I-3)
+- [ ] (`library`, `cli`) Feature designed as library (`lib/{{feature}}/`) (I-L1)
+- [ ] (`library`, `cli`) Library has independent test suite (I-L2)
+- [ ] (`library`, `cli`) Library has public API (`index.ts`) (I-L3)
+- [ ] (`library`, `cli`) No dependencies on application code (I-L6)
+- [ ] (`application`) Core module is a folder under a core path, e.g. `src/lib/{{feature}}/` (I-A1)
+- [ ] (`application`) Route handlers and server actions delegate to core (I-A3)
+- [ ] (`application`) No UI-only code (components, React hooks, providers) in core paths (I-A4)
 
-#### Article II: CLI Interface
+#### Article II: Automation Interface
 
-- [ ] CLI interface specified (`cli.ts`)
-- [ ] All major operations exposed via CLI
-- [ ] Help text documented
-- [ ] Exit codes defined
+- [ ] All major operations callable without the UI (II-1)
+- [ ] Interface documented: help text or schema (II-2)
+- [ ] Machine-readable errors: exit codes, or status plus error code (II-4)
+- [ ] (`library`, `cli`) CLI interface specified (`cli.ts`) (II-L1)
+- [ ] (`library`, `cli`) Help text documented (II-L2)
+- [ ] (`library`, `cli`) Exit codes defined (II-L4, II-L5)
+- [ ] (`application`) Delivery paths listed for each feature
+- [ ] (`application`) Each machine-facing endpoint listed with input schema and documented status and error codes (II-A4, II-A5)
 
 #### Article VII: Simplicity Gate (Phase -1)
 
-- [ ] Count projects (independently deployable units)
-- [ ] If > 3 projects: Document Phase -1 Gate justification
+- [ ] Count projects (independently deployable units): at most 3 in the initial architecture (VII-1)
+- [ ] If > 3 projects: Phase -1 Gate approval before the additional projects are implemented (VII-2), and design.md justifies each additional project with business requirements, technical constraints and a team capacity analysis (VII-3)
+- [ ] Components sized so the code can stay within the code-size limits: source files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10 (`index` files exempt), or the configured `code_limits` (VII-4–VII-6); these limits are not Phase -1 Gate items
 
 #### Article VIII: Anti-Abstraction Gate (Phase -1)
 
-- [ ] Check for custom abstraction layers
-- [ ] If custom wrappers exist: Document justification
-- [ ] Prefer framework APIs directly
+- [ ] Framework APIs called directly (VIII-1)
+- [ ] Check for custom abstraction layers or wrapper libraries over a framework: each needs Phase -1 Gate approval (VIII-2)
+- [ ] If custom wrappers exist: Phase -1 Gate request with a multi-framework support justification, a team expertise analysis and a migration path (VIII-3)
+- [ ] IF the design introduces a project-owned client because the vendor SDK cannot run on the target runtime (VIII-4), THEN design.md SHALL document that constraint: SDK, runtime and client location (VIII-5)
 
 **Validation Section**:
 
 ```markdown
 ## Constitutional Compliance
 
-### Article I: Library-First ✅
+### Article I: Testable Core ✅
 
-- Authentication implemented as library: `lib/auth/`
-- Independent test suite: `lib/auth/tests/`
-- Public API: `lib/auth/src/index.ts`
+- Profile: `library` (`steering/project.yml`)
+- Authentication implemented as library: `lib/auth/` (I-L1)
+- Independent test suite: `lib/auth/tests/` (I-L2)
+- Public API: `lib/auth/src/index.ts` (I-L3)
+- (`application` instead) Core module `src/lib/auth/` with co-located tests; route handlers delegate to it (I-A1, I-2, I-A3)
 
-### Article II: CLI Interface ✅
+### Article II: Automation Interface ✅
 
-- CLI commands: create-user, login, logout, validate-session
-- Help text: `auth --help`
+- CLI commands: create-user, login, logout, validate-session (II-L1)
+- Help text: `auth --help` (II-L2)
+- (`application` instead) HTTP API, no CLI: `POST /api/auth/login` validates input against `LoginSchema` and returns documented status and error codes (II-A1, II-A3, II-A4, II-A5)
 
 ### Article VII: Simplicity Gate ✅
 
@@ -553,11 +610,11 @@ Run constitutional validation:
 
 **Checks**:
 
-- Article I: Library-First enforced
-- Article II: CLI interfaces specified
-- Article V: All requirements mapped
-- Article VII: Project count ≤ 3 (or justified)
-- Article VIII: No custom abstractions (or justified)
+- Article I: Testable Core: core module named for each feature, per the project profile (I-1)
+- Article II: Automation Interface: CLI specified (`library`, `cli`), or delivery paths and machine-facing endpoints with schemas listed (`application`)
+- Article V: All requirements mapped (V-1), requirements coverage matrix included (V-5)
+- Article VII: Project count ≤ 3 (VII-1), or gate-approved and justified (VII-2, VII-3)
+- Article VIII: No custom abstractions (VIII-1, VIII-2), or gate-approved and justified (VIII-3)
 
 ---
 
@@ -572,8 +629,9 @@ Run constitutional validation:
 ### Architecture Summary:
 
 - **Pattern**: [Library-first / Microservices / Monolith]
+- **Profile**: [library / cli / application]
 - **Components**: [N] components
-- **Libraries**: lib/{{feature}}/
+- **Core Modules**: lib/{{feature}}/ (`library`, `cli`) or src/lib/{{feature}}/ (`application`)
 - **Database Tables**: [N] tables
 
 ### Requirements Coverage:
@@ -599,8 +657,8 @@ Run constitutional validation:
 
 ### Constitutional Compliance:
 
-- ✅ Article I: Library-First structure
-- ✅ Article II: CLI interfaces defined
+- ✅ Article I: Testable Core: core module named for each feature
+- ✅ Article II: Automation Interface defined (CLI, or HTTP API with schemas)
 - ✅ Article V: 100% requirements coverage
 - ✅ Article VI: Aligned with steering context
 - ✅ Article VII: Project count within limit
@@ -642,20 +700,22 @@ If project count > 3:
 
 This design proposes [N] projects (> 3 limit).
 
-**Required Justification**:
+**Required Justification** (VII-3):
 
 1. Business requirements necessitating separation
-2. Team capacity for managing [N] projects
-3. Deployment strategy
+2. Technical constraints
+3. Team capacity analysis for managing [N] projects
 
 Please provide justification or reduce project count.
 
-**Approval Required**: @system-architect + @project-manager
+**Approval Required** before the additional projects are implemented (VII-2): @system-architect + @project-manager
 ```
 
 ### Trigger Anti-Abstraction Gate (Article VIII)
 
 If custom abstraction layers detected:
+
+A project-owned client that exists because the vendor SDK cannot run on the target runtime is a valid abstraction (VIII-4) and does not trigger this gate; document the constraint in design.md instead (VIII-5).
 
 ```markdown
 ⚠️ **Phase -1 Gate: Anti-Abstraction**
@@ -665,15 +725,15 @@ This design includes custom abstraction layers:
 - [Abstraction 1]: Wrapper around [framework]
 - [Abstraction 2]: Custom [pattern]
 
-**Required Justification**:
+**Required Justification** (VIII-3):
 
 1. Multi-framework support needed
 2. Team expertise rationale
 3. Migration path
 
-Please justify or use framework APIs directly.
+Please justify or use framework APIs directly (VIII-1).
 
-**Approval Required**: @system-architect + @software-developer
+**Approval Required** (VIII-2): @system-architect + @software-developer
 ```
 
 ---

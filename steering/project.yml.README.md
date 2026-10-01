@@ -195,6 +195,8 @@ custom_rules:
 
 **Purpose**: Defines project governance rules and enforcement.
 
+**Note**: Articles I (Testable-Core Principle) and II (Automation Interface Mandate) are adapted to the project through the `constitution:` block (section 8), not through `custom_rules`.
+
 **When to update**:
 - New Constitutional Article added
 - Enforcement mechanism changes
@@ -202,7 +204,47 @@ custom_rules:
 
 ---
 
-### 8. Context Overflow Prevention
+### 8. Constitution Profile
+
+```yaml
+constitution:
+  profile: application # library | cli | application
+  core_paths: [src/lib] # where feature logic lives
+  delivery_paths: # pages, routes, UI, CLI entry points
+    [src/app, src/components, src/hooks, src/contexts]
+  adapter_paths: [] # request-context code, e.g. src/lib/server/authorization
+  levels: # optional per-article override
+    CONST-001: advisory
+  overrides: # optional settings override
+    code_limits: # code-size limits of Article VII
+      max_function_lines: 80
+```
+
+**Purpose**: Declares what kind of software the project builds. The profile decides how Articles I (Testable-Core Principle) and II (Automation Interface Mandate) are met. See [Project Profiles](rules/constitution.md#project-profiles) in `steering/rules/constitution.md` for the requirements (P-1 to P-6).
+
+| Key | Meaning |
+|-----|---------|
+| `profile` | `library` (packages that are published or shared), `cli` (command-line tools) or `application` (web apps and services deployed as one unit). Without a declared profile, `library` applies (P-2). |
+| `core_paths` | Folders that hold feature logic (core modules). Defaults to `lib/` and `packages/` for `library` and `cli` (P-3); required for `application` (P-4). |
+| `delivery_paths` | Folders that deliver the features: pages, route handlers, server actions, UI components, CLI entry points. Core modules never import from them (I-3). Required for `application` (P-4). |
+| `adapter_paths` | Optional, `application` only: request-context code that core logic depends on. Request-context APIs such as `next/headers` belong in delivery or adapter paths (I-A5). |
+| `levels` | Optional per-article level (`critical` or `advisory`) keyed by article ID, e.g. `CONST-001` for Article I and `CONST-002` for Article II. Replaces the profile default (P-6). |
+| `overrides.code_limits` | Optional code-size limits of Article VII, in lines of code (lines with something other than whitespace and comments): `max_file_lines` per source file (VII-4, default 500), `max_function_lines` per function (VII-5, default 50) and `max_imports` distinct modules per source file, `index` files exempt (VII-6, default 10). Each key replaces the default from `configurable.code_limits` in `steering/rules/constitution-levels.yml`; keys left out keep it. The limits are not Phase -1 Gate items: findings are reported at Article VII's level (CONST-007). |
+
+**Default levels** (P-5): Article I is `critical` for `library` and `cli` and `advisory` for `application`. Article II is `advisory` for `library`, `critical` for `cli` and `advisory` for `application`. The defaults are listed under `profile_defaults` in `steering/rules/constitution-levels.yml`.
+
+MUSUBI itself declares `profile: cli` with `core_paths: [src]` and `delivery_paths: [bin]`.
+
+**When to update**:
+- Project type changes (e.g. an internal library becomes a deployed application)
+- Feature logic, delivery code or request-context adapters move to other folders
+- The core/delivery boundary check is clean and Article I is promoted to `critical` (`CONST-001: critical`)
+- An article level override is added or removed
+- The project needs other code-size limits than the defaults (`overrides.code_limits`)
+
+---
+
+### 9. Context Overflow Prevention
 
 ```yaml
 context_overflow_prevention:
@@ -225,7 +267,7 @@ context_overflow_prevention:
 
 ---
 
-### 9. SDD Configuration
+### 10. SDD Configuration
 
 ```yaml
 sdd:
@@ -251,7 +293,7 @@ sdd:
 
 ---
 
-### 10. Integration Settings
+### 11. Integration Settings
 
 ```yaml
 integrations:
@@ -273,7 +315,7 @@ integrations:
 
 ---
 
-### 11. Maintenance and Monitoring
+### 12. Maintenance and Monitoring
 
 ```yaml
 maintenance:
@@ -295,7 +337,7 @@ maintenance:
 
 ---
 
-### 12. Experimental Features
+### 13. Experimental Features
 
 ```yaml
 experimental:
@@ -336,6 +378,9 @@ Read configuration to:
 ### Constitution Enforcer
 
 Reads configuration to:
+- Read `constitution.profile` and its paths to choose the Article I and II rules (`library` when no profile is declared, P-2)
+- Apply the article levels from `constitution.levels`, falling back to the profile defaults (P-5, P-6)
+- Apply the code-size limits from `constitution.overrides.code_limits`, falling back to `steering/rules/constitution-levels.yml` (VII-4 to VII-6)
 - Validate custom rules compliance
 - Check quality gates
 - Verify naming conventions
@@ -446,6 +491,7 @@ Expected checks:
 - `version` ↔ `package.json`
 - `frameworks` ↔ `package.json` dependencies
 - `custom_rules` ↔ `steering/rules/constitution.md`
+- `constitution` paths ↔ the actual directory layout and `steering/structure.md`
 - `sdd.stages` ↔ agent SKILL.md files
 
 ### 2. Document Changes

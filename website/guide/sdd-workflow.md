@@ -160,7 +160,7 @@ musubi-workflow reset
 |-----------------|---------------------|
 | 1 → 2 | Article IV (EARS Format) |
 | 2 → 3 | Articles VII, VIII (Phase -1 Gates) |
-| 3 → 4 | Articles I, II (Library-First, CLI) |
+| 3 → 4 | Articles I, II (Testable Core, Automation Interface; per project profile) |
 | 4 → 5 | Article III (Test-First) |
 | 5 → 6 | Code review approval |
 | 6 → 7 | Article V (Traceability) |

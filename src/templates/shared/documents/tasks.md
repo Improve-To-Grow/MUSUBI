@@ -81,10 +81,10 @@ Each task follows this structure:
 
 **Test-First Checklist** (Article III):
 
-- [ ] Tests written BEFORE implementation
-- [ ] Red: Failing test committed
-- [ ] Green: Minimal implementation passes test
-- [ ] Blue: Refactored with confidence
+- [ ] Tests written BEFORE implementation (III-1)
+- [ ] Red: Failing test committed (III-2)
+- [ ] Green: Minimal implementation passes test (III-3)
+- [ ] Blue: Refactored with all tests passing (III-4)
 
 **Implementation Notes**:
 [Technical details, file paths, code snippets]
@@ -98,13 +98,11 @@ npm run lint src/{{component}}.ts
 ```
 ````
 
-````
-
 ---
 
 ## P0 Tasks (Critical - Launch Blockers)
 
-### TASK-001: Set Up Project Structure (Library-First)
+### TASK-001: Set Up Project Structure (Testable Core)
 
 **Priority**: P0
 **Story Points**: 3
@@ -113,25 +111,42 @@ npm run lint src/{{component}}.ts
 **Status**: Not Started
 
 **Description**:
-Create library-first project structure following Article I (Constitutional Governance).
+Create the core module for {{component}} following Article I (Testable-Core Principle). Read `constitution.profile` from `steering/project.yml` (`library` when absent) and keep the matching variant.
 
 **Requirements Coverage**:
+
 - REQ-{{COMPONENT}}-001 (indirectly - foundation for implementation)
 
-**Acceptance Criteria**:
-- [ ] Library created in `lib/{{component}}/`
-- [ ] Independent test suite in `lib/{{component}}/tests/`
-- [ ] CLI interface in `lib/{{component}}/cli.ts`
-- [ ] Library exports in `lib/{{component}}/index.ts`
-- [ ] No dependencies on application code
+**Acceptance Criteria** (all profiles):
+
+- [ ] Core module created under a core path (I-1)
+- [ ] Core tests run without the app, a browser or a CLI (I-2)
+- [ ] No imports from delivery paths (I-3)
+- [ ] Exported functions and classes have a `/** … */` doc comment (I-5, advisory)
+
+**Acceptance Criteria** (variant `library` / `cli`):
+
+- [ ] Library created in `lib/{{component}}/` (I-L1)
+- [ ] Independent test suite in `lib/{{component}}/tests/` (I-L2)
+- [ ] CLI interface in `lib/{{component}}/cli.ts` (II-L1)
+- [ ] Library exports in `lib/{{component}}/index.ts` (I-L3)
+- [ ] No dependencies on application code (I-L6)
+
+**Acceptance Criteria** (variant `application`):
+
+- [ ] Core module created in `src/lib/{{component}}/` with co-located tests (`*.test.ts`) (I-A1)
+- [ ] No UI-only code (components, React hooks, providers) in the core module (I-A4)
+- [ ] No `cli.ts`: the HTTP API is the automation interface (II-A1, II-A3)
 
 **Constitutional Compliance**:
-- ✅ **Article I**: Library-First structure
-- ✅ **Article II**: CLI interface prepared
+
+- ✅ **Article I**: Testable-Core structure for the declared profile
+- ✅ **Article II**: Automation interface prepared (CLI for `library`/`cli`, HTTP API for `application`)
 
 **Implementation Notes**:
+
 ```bash
-# Directory structure
+# Directory structure: variant library / cli
 lib/{{component}}/
 ├── src/
 │   ├── index.ts          # Public API
@@ -143,12 +158,25 @@ lib/{{component}}/
 │   └── repository.test.ts
 ├── cli.ts                # CLI interface
 └── package.json          # Library metadata
-````
+
+# Directory structure: variant application
+src/lib/{{component}}/
+├── index.ts              # Public interface of the core module
+├── service.ts            # Business logic
+├── service.test.ts       # Co-located tests
+├── repository.ts         # Data access
+└── types.ts              # TypeScript types
+src/app/api/{{resource}}/
+└── route.ts              # Delivery: validate input, call core, shape response
+```
+
+The tasks below use the `library` / `cli` paths. For the `application` variant, read `lib/{{component}}/src/` and `lib/{{component}}/tests/` as `src/lib/{{component}}/`.
 
 **Validation**:
 
 ```bash
-@constitution-enforcer validate lib/{{component}}/
+@constitution-enforcer validate lib/{{component}}/      # variant library / cli
+@constitution-enforcer validate src/lib/{{component}}/  # variant application
 ```
 
 ---
@@ -178,8 +206,8 @@ Write failing tests for REQ-{{COMPONENT}}-001 (Test-First / Red phase).
 
 **Constitutional Compliance**:
 
-- ✅ **Article III**: Test-First (Red phase)
-- ✅ **Article V**: Tests reference requirement ID
+- ✅ **Article III**: Test-First (Red phase, III-2)
+- ✅ **Article V**: Tests reference requirement ID (V-4)
 
 **Implementation Notes**:
 
@@ -248,8 +276,8 @@ Implement minimal {{COMPONENT}} service to pass tests (Green phase).
 
 **Constitutional Compliance**:
 
-- ✅ **Article III**: Test-First (Green phase)
-- ✅ **Article V**: Code comments reference REQ-{{COMPONENT}}-001
+- ✅ **Article III**: Test-First (Green phase, III-3)
+- ✅ **Article V**: Code comments reference REQ-{{COMPONENT}}-001 (V-2)
 
 **Implementation Notes**:
 
@@ -329,7 +357,7 @@ Refactor service code for better design (Blue phase).
 
 **Constitutional Compliance**:
 
-- ✅ **Article III**: Test-First (Blue phase)
+- ✅ **Article III**: Test-First (Blue phase, III-4)
 
 **Implementation Notes**:
 
@@ -378,7 +406,7 @@ Implement database repository with Prisma/TypeORM.
 
 **Constitutional Compliance**:
 
-- ✅ **Article IX**: Integration tests use real database (Docker container)
+- ✅ **Article IX**: Integration tests use a real, isolated database in a Docker container (IX-1, IX-2)
 
 **Implementation Notes**:
 
@@ -428,12 +456,12 @@ services:
 ```bash
 docker-compose up -d test-db
 npm test lib/{{component}}/tests/repository.test.ts
-# Should use REAL database (Article IX)
+# Uses a REAL, isolated database (Article IX, IX-1, IX-2)
 ```
 
 ---
 
-### TASK-006: Implement CLI Interface
+### TASK-006: Implement Automation Interface
 
 **Priority**: P0
 **Story Points**: 3
@@ -442,25 +470,32 @@ npm test lib/{{component}}/tests/repository.test.ts
 **Status**: Not Started
 
 **Description**:
-Implement CLI interface for {{component}} library (Article II).
+Make the primary operations of {{component}} callable without the UI (Article II: Automation Interface Mandate, II-1). Read `constitution.profile` from `steering/project.yml` (`library` when absent) and keep the matching variant.
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-001 (CLI exposure)
+- REQ-{{COMPONENT}}-001 (automation interface exposure)
 
-**Acceptance Criteria**:
+**Acceptance Criteria** (variant `library` / `cli`: CLI):
 
-- [ ] CLI entry point: `lib/{{component}}/cli.ts`
+- [ ] CLI entry point: `lib/{{component}}/cli.ts` (II-L1)
 - [ ] Commands: create, get, list, update, delete
-- [ ] Help text with --help flag
-- [ ] Error handling with proper exit codes
+- [ ] Help text with --help flag (II-L2)
+- [ ] Error handling with proper exit codes (II-L4, II-L5)
 - [ ] CLI tests pass
+
+**Acceptance Criteria** (variant `application`: HTTP API and operational scripts):
+
+- [ ] No CLI: the route handlers of TASK-007 are the automation interface (II-A1, II-A3)
+- [ ] Each operational task for {{component}} (seeding, backfills) is a script in `scripts/` registered in `package.json` (II-A6)
+- [ ] Each script provides `--help`, requires an explicit target environment and supports `--dry-run` for production writes (II-A7–II-A9)
+- [ ] Every `package.json` script references an existing file (II-A10)
 
 **Constitutional Compliance**:
 
-- ✅ **Article II**: CLI Interface Mandate
+- ✅ **Article II**: Automation Interface Mandate
 
-**Implementation Notes**:
+**Implementation Notes** (variant `library` / `cli`):
 
 ```typescript
 // lib/{{component}}/cli.ts
@@ -501,8 +536,13 @@ program.parse();
 **Validation**:
 
 ```bash
+# Variant library / cli
 ./lib/{{component}}/cli.ts --help
 ./lib/{{component}}/cli.ts create --field1=test --field2=42
+
+# Variant application
+npm run [task] -- --help
+npm run [task] -- --env=production --dry-run
 ```
 
 ---
@@ -532,6 +572,11 @@ Implement REST API endpoints for {{component}}.
 - [ ] Input validation middleware
 - [ ] Error handling middleware
 - [ ] API tests pass
+
+**Constitutional Compliance**:
+
+- ✅ **Article I**: Route handlers only validate input, authorize, call the core module and shape the response (I-A3)
+- ✅ **Article II**: Errors return an HTTP status plus an error code (II-4); for the `application` profile this API is the automation interface (II-A1)
 
 **Implementation Notes**:
 
@@ -605,12 +650,13 @@ Write integration tests using real database and services.
 - [ ] Integration tests for all API endpoints
 - [ ] Tests use real PostgreSQL (Docker container)
 - [ ] Tests use real Redis cache
-- [ ] No mocks for database/cache (Article IX)
-- [ ] Coverage ≥ 80%
+- [ ] No mocks for database/cache (Article IX, IX-4)
+- [ ] Any remaining mock justified in the test documentation (IX-5)
+- [ ] Coverage ≥ configured threshold, default 80% (III-6)
 
 **Constitutional Compliance**:
 
-- ✅ **Article IX**: Integration-First Testing (real services)
+- ✅ **Article IX**: Integration-First Testing (real services, IX-1)
 
 **Dependencies**:
 
@@ -745,7 +791,7 @@ TASK-001 (Project Structure)
     ├── TASK-002 (Tests)
     │       └── TASK-003 (Implementation)
     │               ├── TASK-004 (Refactor)
-    │               ├── TASK-006 (CLI)
+    │               ├── TASK-006 (Automation Interface)
     │               └── TASK-007 (API)
     │                       └── TASK-008 (Integration Tests)
     │                               ├── TASK-009 (Caching)
@@ -797,11 +843,12 @@ Before marking feature as complete:
 
 ### Constitutional Compliance
 
-- [ ] **Article I**: All features implemented as libraries
-- [ ] **Article II**: CLI interfaces provided
-- [ ] **Article III**: Test-First followed (check git history)
-- [ ] **Article V**: 100% requirements → task → code → test traceability
-- [ ] **Article IX**: Integration tests use real services
+- [ ] **Article I**: Feature logic in core modules with tests that run without the app (I-1, I-2): libraries in `lib/` for `library`/`cli` (I-L1), folders under a core path for `application` (I-A1); exported functions and classes documented (I-5, advisory)
+- [ ] **Article II**: Primary operations callable without the UI (II-1): CLI for `library`/`cli` (II-L1), HTTP API for `application` (II-A1)
+- [ ] **Article III**: Test-First followed, check git history (III-1–III-4); every EARS requirement has a test (III-5)
+- [ ] **Article V**: 100% requirements → task → code → test traceability (V-2, V-3, V-6)
+- [ ] **Article VII**: Source files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10, or the configured limits (VII-4–VII-6)
+- [ ] **Article IX**: Integration tests use real services; mocks only where IX-4 allows them, each justified (IX-1, IX-4, IX-5)
 
 ### Quality Gates
 

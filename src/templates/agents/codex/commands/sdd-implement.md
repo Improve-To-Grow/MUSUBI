@@ -42,6 +42,7 @@ storage/specs/{{feature-name}}-requirements.md
 steering/structure.md
 steering/tech.md
 steering/product.md
+steering/project.yml   # constitution.profile (library | cli | application)
 ```
 
 ---
@@ -84,7 +85,7 @@ Create todos for P0 tasks:
 3. TASK-003: Implement [Component] (GREEN)
 4. TASK-004: Refactor [Component] (BLUE)
 5. TASK-005: Implement Database Repository
-6. TASK-006: Implement CLI Interface
+6. TASK-006: Implement CLI Interface (library, cli) or Route Handlers (application)
 7. TASK-007: Implement API Endpoints
 ```
 
@@ -102,7 +103,9 @@ Follow task dependencies from task breakdown document.
 
 #### TASK-001: Set Up Project Structure
 
-**Create library-first structure** (Article I):
+Read `constitution.profile` from `steering/project.yml` (`library` when absent, P-2) and create the structure for that profile (Article I: Testable Core).
+
+**`library` / `cli` profile: create library structure** (I-L1–I-L5):
 
 ```typescript
 // Create directory structure
@@ -182,13 +185,30 @@ export interface Create{{Resource}}Response {
 }
 ```
 
+**`application` profile: create core module and delivery wiring** (I-A1, I-A2, I-A3):
+
+```typescript
+// Create directory structure (no package.json, no cli.ts)
+src/lib/{{feature}}/          // Core module
+├── index.ts                  // Public interface: service, types, errors
+├── service.ts                // Business logic
+├── service.test.ts           // Co-located tests, run without the app server (I-2)
+├── repository.ts             // Data access
+├── types.ts                  // Same types as above
+└── errors.ts                 // Custom errors
+src/app/api/{{resource}}/
+└── route.ts                  // Delivery: route handler that calls core (TASK-006)
+```
+
+For `application`, read the paths in the examples below as `lib/{{feature}}/src/*` → `src/lib/{{feature}}/*` and `lib/{{feature}}/tests/*` → `src/lib/{{feature}}/*.test.ts`.
+
 **Mark TASK-001 as completed**.
 
 ---
 
 #### TASK-002: Write Tests (RED Phase) 🔴
 
-**CRITICAL (Article III)**: Tests BEFORE implementation.
+**CRITICAL (Article III)**: The developer SHALL write each test before the production code that makes it pass (III-1), starting with a test that fails (III-2).
 
 **Create test file**:
 
@@ -266,7 +286,7 @@ git commit -m "test: add failing tests for REQ-{{COMPONENT}}-001"
 
 #### TASK-003: Implement Code (GREEN Phase) 💚
 
-**Create minimal implementation** to pass tests:
+**Create minimal implementation** to pass tests (III-3):
 
 ```typescript
 // lib/{{feature}}/src/service.ts
@@ -350,7 +370,7 @@ git commit -m "feat: implement REQ-{{COMPONENT}}-001 ([requirement title])"
 
 #### TASK-004: Refactor (BLUE Phase) 💙
 
-**Improve code design** while keeping tests green:
+**Improve code design** while keeping tests green (III-4):
 
 ```typescript
 // lib/{{feature}}/src/service.ts
@@ -406,6 +426,13 @@ export class {{COMPONENT}}Validator {
   }
 }
 ```
+
+**Keep the code within the limits** of `steering/rules/constitution.md` (defaults shown; the configured `code_limits` apply when set, see "Constitutional Compliance" below):
+
+- Functions: at most 50 lines of code each; split longer ones (VII-5)
+- Source files: at most 500 lines of code each (VII-4)
+- Imports: at most 10 distinct modules per source file; `index` files are exempt (VII-6)
+- Doc comments: a `/** … */` comment directly above each exported function and class of the core module (I-5, advisory)
 
 **Run tests** (should STILL PASS):
 
@@ -480,7 +507,7 @@ export class {{COMPONENT}}Repository {
 }
 ```
 
-**Write integration tests** (Article IX: Real database):
+**Write integration tests** (Article IX: real, isolated test database, IX-1, IX-2):
 
 ```typescript
 // lib/{{feature}}/tests/integration.test.ts
@@ -536,7 +563,11 @@ npm test lib/{{feature}}/tests/integration.test.ts
 
 ---
 
-#### TASK-006: Implement CLI Interface (Article II)
+#### TASK-006: Implement Automation Interface (Article II)
+
+Use the variant for the project profile from `steering/project.yml`.
+
+**`library` / `cli` profile: implement CLI interface** (II-L1–II-L6):
 
 ```typescript
 #!/usr/bin/env node
@@ -606,11 +637,53 @@ chmod +x lib/{{feature}}/cli.ts
 ./lib/{{feature}}/cli.ts create --field1=test --field2=42
 ```
 
+**`application` profile: implement route handlers that delegate to core** (I-A3, II-A1, II-A4, II-A5). No CLI is required (II-A3).
+
+```typescript
+// src/app/api/{{resource}}/route.ts
+
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { {{component}}Service, ValidationError } from '@/lib/{{feature}}'; // core module
+
+// II-A4: validate input against a schema
+const Create{{Resource}}Schema = z.object({
+  field1: z.string().min(1),
+  field2: z.number().int().positive(),
+});
+
+export async function POST(request: NextRequest) {
+  const parsed = Create{{Resource}}Schema.safeParse(await request.json());
+  if (!parsed.success) {
+    // II-4, II-A5: documented status plus machine-readable error code
+    return NextResponse.json(
+      { error: { code: 'VALIDATION_FAILED', details: parsed.error.flatten() } },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // I-A3: delegate to core, then shape the response
+    const result = await {{component}}Service.create(parsed.data);
+    return NextResponse.json(result, { status: 201 });
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      return NextResponse.json({ error: { code: 'VALIDATION_FAILED' } }, { status: 400 });
+    }
+    return NextResponse.json({ error: { code: 'INTERNAL_ERROR' } }, { status: 500 });
+  }
+}
+```
+
+Server actions follow the same pattern: validate, authorize, call core, return a result. Operational tasks (seeding, user creation) go in `scripts/*.ts`, registered in `package.json`, with `--help`, an explicit target environment and `--dry-run` for production writes (II-A6–II-A9, advisory).
+
 **Mark TASK-006 as completed**.
 
 ---
 
 #### TASK-007: Implement API Endpoints
+
+For `application`, route handlers are built in TASK-006; use this task only for endpoints not covered there.
 
 ```typescript
 // app/api/{{resource}}/route.ts
@@ -693,6 +766,8 @@ npm audit
 Run comprehensive validation:
 
 ```bash
+# application profile: use src/lib/{{feature}}/ (core) and the delivery paths instead of lib/{{feature}}/
+
 # Traceability validation
 @traceability-auditor validate requirements.md tasks.md lib/{{feature}}/
 
@@ -717,12 +792,12 @@ Run comprehensive validation:
 
 ### Tasks Completed:
 
-- ✅ TASK-001: Project structure (Library-First)
+- ✅ TASK-001: Project structure (Testable Core)
 - ✅ TASK-002: Tests written (RED)
 - ✅ TASK-003: Implementation (GREEN)
 - ✅ TASK-004: Refactoring (BLUE)
 - ✅ TASK-005: Database repository
-- ✅ TASK-006: CLI interface
+- ✅ TASK-006: CLI interface (`library`, `cli`) / route handlers (`application`)
 - ✅ TASK-007: API endpoints
 
 ### Test Results:
@@ -733,10 +808,11 @@ Run comprehensive validation:
 
 ### Constitutional Compliance:
 
-- ✅ Article I: Implemented as library (lib/{{feature}}/)
-- ✅ Article II: CLI interface provided
+- ✅ Article I: Testable Core: core module lib/{{feature}}/ (`library`, `cli`) or src/lib/{{feature}}/ (`application`)
+- ✅ Article II: Automation Interface: CLI (`library`, `cli`) or HTTP API with schema-validated endpoints (`application`)
 - ✅ Article III: Test-First followed (Red-Green-Blue)
 - ✅ Article V: All requirements implemented
+- ✅ Article VII: Code within the size limits (VII-4–VII-6)
 - ✅ Article IX: Integration tests use real database
 
 ### Files Created:
@@ -747,6 +823,7 @@ Run comprehensive validation:
 - lib/{{feature}}/cli.ts
 - lib/{{feature}}/tests/\*.test.ts
 - app/api/{{resource}}/route.ts
+- (`application` instead: src/lib/{{feature}}/\*, src/app/api/{{resource}}/route.ts, no cli.ts)
 
 ### Next Steps:
 
@@ -774,31 +851,49 @@ Run comprehensive validation:
 
 Throughout implementation, ensure:
 
-### Article I: Library-First ✅
+### Article I: Testable Core ✅
 
-- All code in `lib/{{feature}}/`
-- No application dependencies
+- Core module tests run without the app, a browser or a CLI (I-2)
+- No imports from delivery paths into core paths (I-3)
+- Each exported function and class of a core module has a doc comment (`/** … */`) directly above its declaration (I-5, advisory)
+- `library` / `cli`: All code in `lib/{{feature}}/` (I-L1)
+- `library` / `cli`: No application dependencies (I-L6)
+- `application`: Feature logic in `src/lib/{{feature}}/`; route handlers and server actions delegate to it (I-A1, I-A3)
+- `application`: No UI-only code in core paths (I-A4)
 
-### Article II: CLI Interface ✅
+### Article II: Automation Interface ✅
 
-- CLI commands implemented
-- Help text provided
+- `library` / `cli`: CLI commands implemented (II-L1)
+- `library` / `cli`: Help text provided (II-L2)
+- `application`: Machine-facing endpoints validate input against a schema and return documented status and error codes (II-A4, II-A5)
+- `application`: Every `package.json` script references an existing file (II-A10)
 
 ### Article III: Test-First ✅
 
-- Tests written BEFORE code
-- Red-Green-Blue cycle
+- Tests written BEFORE code (III-1)
+- Red-Green-Blue cycle (III-2–III-4)
 - Git history proves it
 
 ### Article V: Traceability ✅
 
-- Code comments reference REQ-IDs
+- Code comments reference REQ-IDs (V-2)
+- Tests reference REQ-IDs (V-4)
 - Commit messages reference REQ-IDs
+
+### Article VII: Simplicity (Code Size) ✅
+
+- Each function SHALL contain at most 50 lines of code (VII-5)
+- Each source file SHALL contain at most 500 lines of code (VII-4)
+- Each source file other than an `index` file SHALL import at most 10 distinct modules (VII-6)
+- These are the defaults: `code_limits` in `steering/rules/constitution-levels.yml` sets them, and `constitution.overrides.code_limits` in `steering/project.yml` overrides them per project
+- A line of code is a line with something other than whitespace and comments; source files are the JavaScript and TypeScript files in core and delivery paths, without tests, type declarations and generated, vendored or template files
+- The code-size limits are not Phase -1 Gate items: violations are reported at Article VII's level (CONST-007), as warnings by default
 
 ### Article IX: Integration Testing ✅
 
-- Integration tests use real database
-- Docker Compose for test DB
+- Integration tests use real database (IX-1)
+- Docker Compose for an isolated test DB (IX-2)
+- Mocks only for services that are unavailable in the test environment, have usage limits or costs, or have no test environment, each justified in the test documentation (IX-4, IX-5)
 
 ---
 

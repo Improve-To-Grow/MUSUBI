@@ -8,7 +8,13 @@
 const EventEmitter = require('events');
 
 /**
- * Skill metadata schema
+ * Artifact types a skill can produce (the constitution governs each type)
+ */
+const SKILL_CONTENT_TYPES = ['code', 'test', 'requirements', 'design'];
+
+/**
+ * Skill metadata schema: identity, inputs and outputs, execution policy and the artifact
+ * type of the output
  */
 class SkillMetadata {
   constructor(options = {}) {
@@ -26,6 +32,9 @@ class SkillMetadata {
     this.retryPolicy = options.retryPolicy || { maxRetries: 3, backoffMs: 1000 };
     this.priority = options.priority || 'P2';
     this.permissions = options.permissions || [];
+    // Artifact type of the skill's output (code | test | requirements | design), used by
+    // constitutional guardrails after execution
+    this.contentType = options.contentType || null;
     this.createdAt = options.createdAt || new Date().toISOString();
     this.updatedAt = options.updatedAt || new Date().toISOString();
   }
@@ -47,6 +56,10 @@ class SkillMetadata {
 
     if (!['P0', 'P1', 'P2', 'P3'].includes(this.priority)) {
       errors.push('Priority must be P0, P1, P2, or P3');
+    }
+
+    if (this.contentType && !SKILL_CONTENT_TYPES.includes(this.contentType)) {
+      errors.push('Content type must be code, test, requirements or design');
     }
 
     // Validate inputs
@@ -88,6 +101,7 @@ class SkillMetadata {
       retryPolicy: this.retryPolicy,
       priority: this.priority,
       permissions: this.permissions,
+      contentType: this.contentType,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };

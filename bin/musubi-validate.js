@@ -8,6 +8,7 @@
  *
  * Usage:
  *   musubi-validate constitution    # Validate all 9 articles
+ *   musubi-validate project         # Full validation: profile, levels, code-size limits
  *   musubi-validate article <1-9>   # Validate specific article
  *   musubi-validate gates           # Validate Phase -1 Gates
  *   musubi-validate complexity      # Validate complexity limits
@@ -18,12 +19,14 @@
 const { Command } = require('commander');
 const chalk = require('chalk');
 const ConstitutionValidator = require('../src/validators/constitution');
+const { ConstitutionalValidator } = require('../src/validators/constitutional-validator');
 const {
   createInputGuardrail,
   createOutputGuardrail,
   createSafetyCheckGuardrail,
   GuardrailChain,
 } = require('../src/orchestration/guardrails');
+const { CONTENT_TYPES, guardrailRunContextOrExit } = require('../src/cli/guardrail-options');
 
 const program = new Command();
 
@@ -45,6 +48,29 @@ program
 
       displayResults('Constitutional Validation', results, options);
       process.exit(results.passed ? 0 : 1);
+    } catch (error) {
+      console.error(chalk.red('✗ Validation error:'), error.message);
+      process.exit(1);
+    }
+  });
+
+// Full project validation: profile-aware Articles I-IX, article levels, code-size limits
+program
+  .command('project')
+  .description(
+    'Validate the whole project: profile-aware articles, levels (P-5, P-6) and code-size limits (VII-4 to VII-6)'
+  )
+  .option('-m, --mode <mode>', 'Workflow mode (small|medium|large)', 'medium')
+  .option('--strict', 'Report every finding as a violation')
+  .action(async options => {
+    try {
+      const validator = new ConstitutionalValidator(process.cwd(), {
+        mode: options.mode,
+        strict: options.strict,
+      });
+      const report = await validator.validateAll();
+      // Only blocking violations of critical articles fail the command
+      process.exit(report.summary.criticalViolations > 0 ? 1 : 0);
     } catch (error) {
       console.error(chalk.red('✗ Validation error:'), error.message);
       process.exit(1);
@@ -122,11 +148,17 @@ program
   .option('--file <path>', 'Read content from file')
   .option('-t, --type <type>', 'Guardrail type (input|output|safety)', 'input')
   .option('-l, --level <level>', 'Safety level (basic|standard|strict|paranoid)', 'standard')
-  .option('--constitutional', 'Enable constitutional compliance checks')
+  .option('--constitutional', 'Enable constitutional compliance checks (needs --content-type)')
+  .option(
+    '--content-type <type>',
+    `Artifact type of the content for --constitutional (${CONTENT_TYPES.join('|')})`
+  )
   .option('--redact', 'Enable redaction for output guardrails')
   .option('-f, --format <type>', 'Output format (console|json)', 'console')
   .action(async (content, options) => {
     try {
+      const runContext = guardrailRunContextOrExit(options, chalk);
+
       // Get content from argument, file, or stdin
       let inputContent = content;
 
@@ -166,6 +198,8 @@ program
         case 'safety':
           guardrail = createSafetyCheckGuardrail(options.level, {
             enforceConstitution: options.constitutional,
+            // Articles follow this project's profile and levels (steering/project.yml)
+            projectRoot: process.cwd(),
           });
           break;
 
@@ -176,7 +210,8 @@ program
 
       console.log(chalk.dim(`\n🛡️  Running ${guardrailType} guardrail validation...\n`));
 
-      const result = await guardrail.run(inputContent);
+      // The constitutional checks need the artifact type, and with --file its path
+      const result = await guardrail.run(inputContent, runContext);
 
       displayGuardrailResults(result, options);
       process.exit(result.passed ? 0 : 1);

@@ -49,6 +49,7 @@ This design implements requirements from: [requirements.md](requirements.md)
 **Key Alignments**:
 
 - Architecture pattern: [e.g., microservices, monolith, library-first]
+- Constitution profile: [library | cli | application] (`constitution.profile` in `steering/project.yml`; `library` when absent)
 - Primary language: [e.g., TypeScript, Python, Go]
 - Framework: [e.g., Next.js, FastAPI, Express]
 - Database: [e.g., PostgreSQL, MongoDB, MySQL]
@@ -175,7 +176,7 @@ This design implements requirements from: [requirements.md](requirements.md)
 
 - ✅ All functional requirements mapped
 - ✅ All non-functional requirements addressed
-- ✅ 100% requirements coverage
+- ✅ 100% requirements coverage (Article V, V-1, V-5)
 
 ---
 
@@ -644,36 +645,75 @@ CMD ["npm", "start"]
 
 ## Constitutional Compliance
 
+Read `constitution.profile` from `steering/project.yml` (`library` when absent) and keep the matching variant for Articles I and II.
+
 This design complies with:
 
-### Article I: Library-First Principle
+### Article I: Testable-Core Principle
 
-- ✅ {{COMPONENT}} implemented as library: `lib/{{component}}/`
-- ✅ Independent test suite: `lib/{{component}}/tests/`
-- ✅ CLI interface: `lib/{{component}}/cli.ts`
+| Feature          | Core module (I-1)                                       | Core tests (I-2)                                                       | Delivery paths                                                   |
+| ---------------- | ------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| {{FEATURE_NAME}} | [e.g. `lib/{{component}}/` or `src/lib/{{component}}/`] | [e.g. `lib/{{component}}/tests/` or `src/lib/{{component}}/*.test.ts`] | [e.g. `lib/{{component}}/cli.ts` or `src/app/api/{{resource}}/`] |
 
-### Article II: CLI Interface Mandate
+- ✅ Core module does not import from delivery paths (I-3)
+- ✅ Exported functions and classes of the core module get a `/** … */` doc comment (I-5, advisory)
+
+**Variant `library` / `cli`**:
+
+- ✅ {{COMPONENT}} implemented as library: `lib/{{component}}/` (I-L1)
+- ✅ Independent test suite: `lib/{{component}}/tests/` (I-L2)
+- ✅ CLI interface: `lib/{{component}}/cli.ts` (II-L1)
+
+**Variant `application`**:
+
+- ✅ Core module: `src/lib/{{component}}/` with co-located tests (`*.test.ts`) (I-A1)
+- ✅ Delivery: `src/app/api/{{resource}}/route.ts` validates input, calls core and shapes the response (I-A3)
+- ✅ No UI-only code (components, React hooks, providers) in core paths (I-A4)
+
+### Article II: Automation Interface Mandate
+
+- ✅ Automation interface (II-1): [CLI | HTTP API]
+- ✅ Documented by (II-2): [`--help` | OpenAPI / schema]
+- ✅ Machine-readable errors (II-4): [exit codes | HTTP status + error code]
+
+**Variant `library` / `cli`** (CLI, II-L1):
 
 - ✅ CLI commands:
   - `{{component}} create --field1=value --field2=value`
   - `{{component}} get --id=uuid`
   - `{{component}} list --user-id=uuid`
 
+**Variant `application`** (HTTP API, II-A1; no CLI required, II-A3):
+
+- ✅ Endpoints: see [API Design](#api-design)
+- ✅ Machine-facing endpoints validate input against a schema and return documented status and error codes (II-A4, II-A5)
+- ✅ Operational scripts: [`scripts/<task>.ts`, registered in `package.json`, with `--help`, explicit target environment, `--dry-run`] (II-A6–II-A9)
+
 ### Article VI: Project Memory
 
-- ✅ Architecture aligns with `steering/structure.md`
-- ✅ Technology stack matches `steering/tech.md`
-- ✅ Product context from `steering/product.md`
+- ✅ Architecture aligns with `steering/structure.md` (VI-1)
+- ✅ Technology stack matches `steering/tech.md` (VI-2)
+- ✅ Product context from `steering/product.md` (VI-3)
 
 ### Article VII: Simplicity Gate
 
-- ✅ Project count: [N] (≤ 3 or Phase -1 Gate approved)
+- ✅ Project count (independently deployable units): [N] (≤ 3, VII-1)
+- OR
+- ⚠️ More than 3 projects: Phase -1 Gate approval before the additional projects are implemented (VII-2); each additional project justified with business requirements, technical constraints and a team capacity analysis (VII-3): [justification]
+
+**Code-size limits** (VII-4–VII-6; checked on the code at Article VII's level, not a Phase -1 Gate item): the module split keeps source files ≤ [500] lines of code, functions ≤ [50] and imports ≤ [10] per file (defaults; `constitution.overrides.code_limits` in `steering/project.yml` changes them).
 
 ### Article VIII: Anti-Abstraction Gate
 
-- ✅ Framework APIs used directly (no custom wrappers)
+- ✅ Framework APIs used directly, no custom wrappers (VIII-1)
 - OR
-- ⚠️ Custom abstraction requires Phase -1 Gate approval: [justification]
+- ⚠️ Custom abstraction requires Phase -1 Gate approval (VIII-2); the gate request includes a multi-framework support justification, a team expertise analysis and a migration path (VIII-3): [justification]
+
+**Runtime-constraint clients** (VIII-4, VIII-5): document each project-owned client that exists because a vendor SDK cannot run on the target runtime.
+
+| Service          | Vendor SDK              | Target runtime            | Constraint                     | Project-owned client                 |
+| ---------------- | ----------------------- | ------------------------- | ------------------------------ | ------------------------------------ |
+| [e.g. Firestore] | [e.g. `firebase-admin`] | [e.g. Cloudflare Workers] | [Why the SDK cannot run there] | [e.g. `src/lib/firestore/client.ts`] |
 
 ---
 

@@ -1,13 +1,16 @@
 /**
  * Constitutional Checker Tests
  *
- * Tests for Article I-IX compliance checking.
+ * File-level checks of the nine articles of steering/rules/constitution.md (v1.1),
+ * with severities that follow the article levels of the project profile.
  *
  * Requirement: IMP-6.2-005-01
  */
 
 const { ConstitutionalChecker, ARTICLES, SEVERITY } = require('../../src/constitutional/checker');
 const fs = require('fs').promises;
+const fsExtra = require('fs-extra');
+const os = require('os');
 const path = require('path');
 
 describe('ConstitutionalChecker', () => {
@@ -31,8 +34,8 @@ describe('ConstitutionalChecker', () => {
   describe('constructor', () => {
     it('should create checker with default config', () => {
       const c = new ConstitutionalChecker();
-      expect(c.config).toBeDefined();
-      expect(c.config.articleVII).toBeDefined();
+      expect(c.config.projectRoot).toBe(process.cwd());
+      expect(c.config.storageDir).toBe('storage/constitutional');
     });
 
     it('should merge custom config', () => {
@@ -42,29 +45,22 @@ describe('ConstitutionalChecker', () => {
   });
 
   describe('ARTICLES', () => {
-    it('should define all 9 articles', () => {
-      expect(ARTICLES.I).toBeDefined();
-      expect(ARTICLES.II).toBeDefined();
-      expect(ARTICLES.III).toBeDefined();
-      expect(ARTICLES.IV).toBeDefined();
-      expect(ARTICLES.V).toBeDefined();
-      expect(ARTICLES.VI).toBeDefined();
-      expect(ARTICLES.VII).toBeDefined();
-      expect(ARTICLES.VIII).toBeDefined();
-      expect(ARTICLES.IX).toBeDefined();
-    });
-
-    it('should have names for each article', () => {
-      expect(ARTICLES.I.name).toBe('Specification First');
-      expect(ARTICLES.VII.name).toBe('Simplicity');
-      expect(ARTICLES.VIII.name).toBe('Anti-Abstraction');
-    });
-
-    it('should have thresholds for Article VII', () => {
-      expect(ARTICLES.VII.thresholds.maxFileLines).toBe(500);
-      expect(ARTICLES.VII.thresholds.maxFunctionLines).toBe(50);
-      expect(ARTICLES.VII.thresholds.maxCyclomaticComplexity).toBe(10);
-      expect(ARTICLES.VII.thresholds.maxDependencies).toBe(10);
+    it('should define the nine articles of the constitution', () => {
+      expect(Object.keys(ARTICLES)).toEqual([
+        'I',
+        'II',
+        'III',
+        'IV',
+        'V',
+        'VI',
+        'VII',
+        'VIII',
+        'IX',
+      ]);
+      expect(ARTICLES.I.name).toBe('Testable-Core Principle');
+      expect(ARTICLES.VII.name).toBe('Simplicity Gate');
+      expect(ARTICLES.VIII.name).toBe('Anti-Abstraction Gate');
+      expect(ARTICLES.IX.name).toBe('Integration-First Testing');
     });
 
     it('should have patterns for Article VIII', () => {
@@ -74,65 +70,39 @@ describe('ConstitutionalChecker', () => {
   });
 
   describe('checkFile', () => {
-    it('should check a simple compliant file', async () => {
+    it('should pass a traced file that has a test', async () => {
       const filePath = path.join(testDir, 'simple.js');
-      await fs.writeFile(
-        filePath,
-        '/** Requirement: REQ-001 */\nfunction simple() { return "hello"; }',
-        'utf-8'
-      );
+      await fs.writeFile(filePath, '/** Requirement: REQ-001 */\nconst simple = 1;', 'utf-8');
+      await fs.writeFile(path.join(testDir, 'simple.test.js'), '// REQ-001', 'utf-8');
 
       const result = await checker.checkFile(filePath);
 
       expect(result.filePath).toBe(filePath);
-      expect(result.violations).toBeDefined();
+      expect(result.violations).toEqual([]);
+      expect(result.passed).toBe(true);
     });
 
-    it('should detect Article VII violation (file too long)', async () => {
-      const filePath = path.join(testDir, 'long-file.js');
-      const longContent = Array(600).fill('// line').join('\n');
-      await fs.writeFile(filePath, longContent, 'utf-8');
+    it('should report Article VIII abstraction layers as Phase -1 Gate findings', async () => {
+      const filePath = path.join(testDir, 'wrapper.js');
+      await fs.writeFile(filePath, '// REQ-001\nclass DatabaseWrapper {}', 'utf-8');
+
+      const result = await checker.checkFile(filePath);
+      const viii = result.violations.find(v => v.article === 'VIII');
+
+      expect(viii.requirement).toBe('VIII-2');
+      expect(viii.severity).toBe(SEVERITY.HIGH);
+      expect(viii.articleName).toBe('Anti-Abstraction Gate');
+    });
+
+    it('should check EARS format in requirements documents (Article IV)', async () => {
+      const filePath = path.join(testDir, 'auth-requirements.md');
+      await fs.writeFile(filePath, 'System SHALL send email.', 'utf-8');
 
       const result = await checker.checkFile(filePath);
 
-      const viiViolation = result.violations.find(v => v.article === 'VII');
-      expect(viiViolation).toBeDefined();
-      expect(viiViolation.severity).toBe(SEVERITY.HIGH);
-      expect(viiViolation.message).toContain('500');
-    });
-
-    it('should detect Article VIII violation (Factory pattern)', async () => {
-      const filePath = path.join(testDir, 'factory.js');
-      await fs.writeFile(
-        filePath,
-        '// REQ-001\nclass Service implements ServiceFactory {}',
-        'utf-8'
-      );
-
-      const result = await checker.checkFile(filePath);
-
-      const viiiViolation = result.violations.find(v => v.article === 'VIII');
-      expect(viiiViolation).toBeDefined();
-    });
-
-    it('should detect Article VIII violation (abstract class)', async () => {
-      const filePath = path.join(testDir, 'abstract.js');
-      await fs.writeFile(filePath, '// REQ-001\nabstract class BaseService {}', 'utf-8');
-
-      const result = await checker.checkFile(filePath);
-
-      const viiiViolation = result.violations.find(v => v.article === 'VIII');
-      expect(viiiViolation).toBeDefined();
-    });
-
-    it('should detect Article VIII violation (Base inheritance)', async () => {
-      const filePath = path.join(testDir, 'base-ext.js');
-      await fs.writeFile(filePath, '// REQ-001\nclass Service extends BaseService {}', 'utf-8');
-
-      const result = await checker.checkFile(filePath);
-
-      const viiiViolation = result.violations.find(v => v.article === 'VIII');
-      expect(viiiViolation).toBeDefined();
+      expect(result.violations.map(v => v.requirement)).toEqual(['IV-1']);
+      // Article IV is advisory
+      expect(result.violations[0].severity).toBe(SEVERITY.MEDIUM);
     });
 
     it('should return timestamp', async () => {
@@ -145,126 +115,220 @@ describe('ConstitutionalChecker', () => {
     });
   });
 
-  describe('checkArticleI', () => {
-    it('should pass when requirement is referenced', () => {
-      const content = '/** Requirement: REQ-001 */\nfunction test() {}';
-      const violation = checker.checkArticleI(content, 'service.js');
-      expect(violation).toBeNull();
-    });
-
-    it('should fail when no requirement reference for source file', () => {
-      const content = 'function test() {}';
-      const violation = checker.checkArticleI(content, 'service.js');
-      expect(violation).not.toBeNull();
-    });
-
-    it('should pass for test files', () => {
-      const content = 'function test() {}';
-      const violation = checker.checkArticleI(content, 'test.test.js');
-      expect(violation).toBeNull();
-    });
-
-    it('should pass for index files', () => {
-      const content = 'module.exports = {}';
-      const violation = checker.checkArticleI(content, 'index.js');
-      expect(violation).toBeNull();
-    });
-  });
-
   describe('checkArticleIII', () => {
-    it('should pass when test file exists', async () => {
-      const testFile = path.join(testDir, 'code.test.js');
-      await fs.writeFile(testFile, 'test("x", () => {})', 'utf-8');
+    it('should pass when a sibling test file exists', async () => {
+      await fs.writeFile(path.join(testDir, 'code.test.js'), 'test("x", () => {})', 'utf-8');
 
-      const filePath = path.join(testDir, 'code.js');
-
-      const violation = await checker.checkArticleIII(filePath);
-      expect(violation).toBeNull();
+      const findings = await checker.checkArticleIII(path.join(testDir, 'code.js'));
+      expect(findings).toEqual([]);
     });
 
-    it('should fail when test file is missing', async () => {
-      const filePath = path.join(testDir, 'no-test.js');
+    it('should pass when a mirrored test exists under tests/', async () => {
+      const findings = await checker.checkArticleIII(
+        path.join('src', 'validators', 'constitutional-validator.js')
+      );
+      expect(findings).toEqual([]);
+    });
 
-      const violation = await checker.checkArticleIII(filePath);
+    it('should report a missing test file as a non-blocking III-1 finding', async () => {
+      const findings = await checker.checkArticleIII(path.join(testDir, 'no-test.js'));
 
-      expect(violation).not.toBeNull();
-      expect(violation.article).toBe('III');
+      expect(findings.map(f => f.requirement)).toEqual(['III-1']);
+      // Article III is critical, but a missing test file is a heuristic signal
+      expect(findings[0].severity).toBe(SEVERITY.HIGH);
     });
   });
 
-  describe('checkArticleVII', () => {
-    it('should pass for simple file', () => {
-      const content = 'function simple() { return 1; }';
-      const violations = checker.checkArticleVII(content, 'test.js');
-      expect(violations.length).toBe(0);
+  describe('checkArticleV', () => {
+    it('should pass when a requirement is referenced', async () => {
+      const findings = await checker.checkArticleV('/** Requirement: REQ-001 */', 'service.js');
+      expect(findings).toEqual([]);
     });
 
-    it('should detect file too long', () => {
-      const content = Array(600).fill('// line').join('\n');
-      const violations = checker.checkArticleVII(content, 'test.js');
-      expect(violations.length).toBeGreaterThan(0);
+    it('should report a source file without requirement references (V-2)', async () => {
+      const findings = await checker.checkArticleV('function test() {}', 'service.js');
+      expect(findings.map(f => f.requirement)).toEqual(['V-2']);
     });
 
-    it('should detect function too long', () => {
-      const longFunction = 'function long() {\n' + Array(60).fill('  x++;').join('\n') + '\n}';
-      const violations = checker.checkArticleVII(longFunction, 'test.js');
-      expect(violations.length).toBeGreaterThan(0);
-    });
-
-    it('should detect too many dependencies', () => {
-      const manyRequires = Array(15)
-        .fill(null)
-        .map((_, i) => 'const m' + i + ' = require("module' + i + '");')
-        .join('\n');
-
-      const violations = checker.checkArticleVII(manyRequires, 'test.js');
-      expect(violations.length).toBeGreaterThan(0);
+    it('should skip index files', async () => {
+      expect(await checker.checkArticleV('module.exports = {}', 'index.js')).toEqual([]);
     });
   });
 
   describe('checkArticleVIII', () => {
-    it('should pass for simple code', () => {
-      const content = 'function simple() { return 1; }';
-      const violations = checker.checkArticleVIII(content, 'test.js');
-      expect(violations.length).toBe(0);
+    it('should pass for simple code', async () => {
+      expect(await checker.checkArticleVIII('function simple() { return 1; }', 'a.js')).toEqual([]);
     });
 
-    it('should detect Factory pattern', () => {
-      const content = 'class Service implements ServiceFactory {}';
-      const violations = checker.checkArticleVIII(content, 'test.js');
-      expect(violations.length).toBeGreaterThan(0);
+    it('should detect abstraction patterns', async () => {
+      for (const content of [
+        'class Service implements ServiceFactory {}',
+        'abstract class BaseService {}',
+        'class Service extends BaseService {}',
+      ]) {
+        const findings = await checker.checkArticleVIII(content, 'a.ts');
+        expect(findings.length).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  describe('checkArticleVII (code-size limits)', () => {
+    const longFunction = `// REQ-1\nfunction long() {\n${'  x++;\n'.repeat(60)}}\n`;
+
+    it('should report a function over 50 lines of code without a Phase -1 Gate (VII-5)', async () => {
+      const filePath = path.join('src', 'long.js');
+      const findings = await checker.checkArticleVII(longFunction, filePath);
+
+      expect(findings.map(f => f.requirement)).toEqual(['VII-5']);
+      // Article VII is flexible: a code-size finding is MEDIUM and not gated
+      expect(findings[0].severity).toBe(SEVERITY.MEDIUM);
+      expect(findings[0].gate).toBe(false);
     });
 
-    it('should detect abstract class pattern', () => {
-      const content = 'abstract class BaseService {}';
-      const violations = checker.checkArticleVIII(content, 'test.js');
-      expect(violations.length).toBeGreaterThan(0);
+    it('should not require Phase -1 for code-size findings', async () => {
+      const filePath = path.join(testDir, 'long.js');
+      await fs.writeFile(filePath, longFunction, 'utf-8');
+      await fs.writeFile(path.join(testDir, 'long.test.js'), '// REQ-1', 'utf-8');
+      const c = new ConstitutionalChecker({ storageDir });
+      // Outside core and delivery paths: not a source file in the sense of Article VII
+      expect((await c.checkFile(filePath)).violations).toEqual([]);
+
+      const results = {
+        results: [
+          {
+            violations: [
+              { article: 'VII', requirement: 'VII-5', severity: SEVERITY.HIGH, gate: false },
+            ],
+          },
+        ],
+      };
+      expect(c.shouldBlockMerge(results).requiresPhaseMinusOne).toBe(false);
     });
 
-    it('should detect Base* inheritance pattern', () => {
-      const content = 'class Service extends BaseService {}';
-      const violations = checker.checkArticleVIII(content, 'test.js');
-      expect(violations.length).toBeGreaterThan(0);
+    it('should use configured code limits', async () => {
+      const root = await fsExtra.mkdtemp(path.join(os.tmpdir(), 'musubi-checker-limits-'));
+      try {
+        await fsExtra.outputFile(
+          path.join(root, 'steering/project.yml'),
+          'constitution:\n  profile: cli\n  core_paths: [src]\n  overrides:\n    code_limits:\n      max_function_lines: 80\n'
+        );
+        const c = new ConstitutionalChecker({ projectRoot: root });
+        expect(await c.checkArticleVII(longFunction, path.join(root, 'src/long.js'))).toEqual([]);
+      } finally {
+        await fsExtra.remove(root);
+      }
     });
   });
 
   describe('checkArticleIX', () => {
-    it('should pass when file has documentation', () => {
-      const content = '/** @description A module */\nfunction documented() {}';
-      const violation = checker.checkArticleIX(content, 'service.js');
-      expect(violation).toBeNull();
+    it('should report unjustified mocks in integration tests', async () => {
+      const findings = await checker.checkArticleIX(
+        "jest.mock('../src/db');",
+        'tests/integration/db.test.js'
+      );
+      expect(findings.map(f => f.requirement)).toEqual(['IX-5']);
+      expect(findings[0].severity).toBe(SEVERITY.MEDIUM);
+    });
+  });
+
+  describe('application profile', () => {
+    let root;
+    let appChecker;
+
+    beforeEach(async () => {
+      root = await fsExtra.mkdtemp(path.join(os.tmpdir(), 'musubi-checker-'));
+      await fsExtra.outputFile(
+        path.join(root, 'steering/project.yml'),
+        'constitution:\n  profile: application\n  core_paths: [src/lib]\n  delivery_paths: [src/app, src/components]\n'
+      );
+      for (const file of ['structure.md', 'tech.md', 'product.md']) {
+        await fsExtra.outputFile(path.join(root, 'steering', file), '#');
+      }
+      appChecker = new ConstitutionalChecker({ projectRoot: root });
     });
 
-    it('should warn when missing documentation for source file', () => {
-      const content = 'function undocumented() {}';
-      const violation = checker.checkArticleIX(content, 'service.js');
-      expect(violation).not.toBeNull();
+    afterEach(async () => {
+      await fsExtra.remove(root);
     });
 
-    it('should pass for test files', () => {
-      const content = 'test("x", () => {})';
-      const violation = checker.checkArticleIX(content, 'test.test.js');
-      expect(violation).toBeNull();
+    it('should report core imports from delivery paths at the article level (I-3)', async () => {
+      const file = path.join(root, 'src/lib/vacancy/rules.ts');
+      await fsExtra.outputFile(file, "// REQ-1\nimport type { W } from '@/components/wizard';");
+      await fsExtra.outputFile(path.join(root, 'src/lib/vacancy/rules.test.ts'), '// REQ-1');
+
+      const result = await appChecker.checkFile(file);
+
+      expect(result.violations.map(v => v.requirement)).toEqual(['I-3']);
+      // Article I is advisory for application
+      expect(result.violations[0].severity).toBe(SEVERITY.MEDIUM);
+    });
+
+    it('should block definite core/delivery violations once CONST-001 is critical (P-6)', async () => {
+      await fsExtra.appendFile(
+        path.join(root, 'steering/project.yml'),
+        "  levels:\n    'CONST-001': critical\n"
+      );
+      const file = path.join(root, 'src/lib/ui/provider.tsx');
+      await fsExtra.outputFile(file, "// REQ-1\nimport { createContext } from 'react';");
+      await fsExtra.outputFile(path.join(root, 'src/lib/ui/provider.test.tsx'), '// REQ-1');
+
+      const results = await new ConstitutionalChecker({ projectRoot: root }).checkFiles([file]);
+      const violation = results.results[0].violations[0];
+
+      expect(violation.requirement).toBe('I-A4');
+      expect(violation.severity).toBe(SEVERITY.CRITICAL);
+      expect(appChecker.shouldBlockMerge(results).shouldBlock).toBe(true);
+    });
+
+    it('should report undocumented core exports as LOW (I-5, advisory)', async () => {
+      const file = path.join(root, 'src/lib/auth/service.ts');
+      await fsExtra.outputFile(file, '// REQ-1\nexport function login() {}');
+      await fsExtra.outputFile(path.join(root, 'src/lib/auth/service.test.ts'), '// REQ-1');
+
+      const result = await appChecker.checkFile(file);
+
+      expect(result.violations.map(v => v.requirement)).toEqual(['I-5']);
+      expect(result.violations[0].severity).toBe(SEVERITY.LOW);
+    });
+
+    it('should check machine-facing endpoints for schema validation (II-A4)', async () => {
+      const file = path.join(root, 'src/app/api/webhooks/n8n/route.ts');
+      await fsExtra.outputFile(file, '// REQ-1\nexport async function POST() {}');
+
+      const result = await appChecker.checkFile(file);
+
+      expect(result.violations.map(v => v.requirement)).toContain('II-A4');
+    });
+  });
+
+  describe('project-level checks', () => {
+    let root;
+
+    beforeEach(async () => {
+      root = await fsExtra.mkdtemp(path.join(os.tmpdir(), 'musubi-checker-project-'));
+    });
+
+    afterEach(async () => {
+      await fsExtra.remove(root);
+    });
+
+    it('should add Article VI and VII findings as a project result', async () => {
+      await fsExtra.outputFile(path.join(root, 'package.json'), '{}');
+      for (const name of ['a', 'b', 'c']) {
+        await fsExtra.outputFile(path.join(root, 'packages', name, 'package.json'), '{}');
+      }
+      const file = path.join(root, 'a.js');
+      await fsExtra.outputFile(file, '// REQ-1');
+      await fsExtra.outputFile(path.join(root, 'a.test.js'), '// REQ-1');
+
+      const c = new ConstitutionalChecker({ projectRoot: root });
+      const results = await c.checkFiles([file]);
+      const project = results.results.find(r => r.scope === 'project');
+
+      expect(results.summary.filesChecked).toBe(1);
+      expect(results.summary.filesPassed).toBe(1);
+      expect(project.violations.map(v => v.requirement)).toEqual(['VI-1', 'VI-2', 'VI-3', 'VII-2']);
+      expect(c.shouldBlockMerge(results).requiresPhaseMinusOne).toBe(true);
     });
   });
 
@@ -281,101 +345,48 @@ describe('ConstitutionalChecker', () => {
       expect(result.summary.totalViolations).toBeDefined();
     });
 
-    it('should summarize violations', async () => {
+    it('should summarize violations by article', async () => {
       const filePath = path.join(testDir, 'violations.js');
-      const longContent = Array(600).fill('// line').join('\n');
-      await fs.writeFile(filePath, longContent, 'utf-8');
+      await fs.writeFile(filePath, 'class HttpWrapper {}', 'utf-8');
 
       const result = await checker.checkFiles([filePath]);
 
       expect(result.summary.totalViolations).toBeGreaterThan(0);
+      expect(result.summary.violationsByArticle.VIII).toBe(1);
     });
   });
 
   describe('shouldBlockMerge', () => {
     it('should not block when no violations', () => {
-      const result = {
-        results: [{ violations: [] }],
-      };
-
-      const decision = checker.shouldBlockMerge(result);
-
+      const decision = checker.shouldBlockMerge({ results: [{ violations: [] }] });
       expect(decision.shouldBlock).toBe(false);
     });
 
     it('should not block for low severity violations', () => {
-      const result = {
-        results: [
-          {
-            violations: [
-              {
-                article: 'IX',
-                severity: SEVERITY.LOW,
-              },
-            ],
-          },
-        ],
-      };
-
-      const decision = checker.shouldBlockMerge(result);
-
+      const decision = checker.shouldBlockMerge({
+        results: [{ violations: [{ article: 'IX', severity: SEVERITY.LOW }] }],
+      });
       expect(decision.shouldBlock).toBe(false);
     });
 
     it('should block for critical violations', () => {
-      const result = {
-        results: [
-          {
-            violations: [
-              {
-                article: 'I',
-                severity: SEVERITY.CRITICAL,
-              },
-            ],
-          },
-        ],
-      };
-
-      const decision = checker.shouldBlockMerge(result);
-
+      const decision = checker.shouldBlockMerge({
+        results: [{ violations: [{ article: 'I', severity: SEVERITY.CRITICAL }] }],
+      });
       expect(decision.shouldBlock).toBe(true);
     });
 
     it('should trigger Phase -1 for Article VII high severity', () => {
-      const result = {
-        results: [
-          {
-            violations: [
-              {
-                article: 'VII',
-                severity: SEVERITY.HIGH,
-              },
-            ],
-          },
-        ],
-      };
-
-      const decision = checker.shouldBlockMerge(result);
-
+      const decision = checker.shouldBlockMerge({
+        results: [{ violations: [{ article: 'VII', severity: SEVERITY.HIGH }] }],
+      });
       expect(decision.requiresPhaseMinusOne).toBe(true);
     });
 
     it('should trigger Phase -1 for Article VIII violations', () => {
-      const result = {
-        results: [
-          {
-            violations: [
-              {
-                article: 'VIII',
-                severity: SEVERITY.HIGH,
-              },
-            ],
-          },
-        ],
-      };
-
-      const decision = checker.shouldBlockMerge(result);
-
+      const decision = checker.shouldBlockMerge({
+        results: [{ violations: [{ article: 'VIII', severity: SEVERITY.HIGH }] }],
+      });
       expect(decision.requiresPhaseMinusOne).toBe(true);
     });
   });
@@ -414,27 +425,19 @@ describe('ConstitutionalChecker', () => {
       const report = checker.generateReport(results);
 
       expect(report).toContain('Constitutional');
-    });
-
-    it('should include violation details', async () => {
-      const file = path.join(testDir, 'violation.js');
-      const longContent = Array(600).fill('// line').join('\n');
-      await fs.writeFile(file, longContent, 'utf-8');
-
-      const results = await checker.checkFiles([file]);
-      const report = checker.generateReport(results);
-
-      expect(report).toContain('VII');
-    });
-
-    it('should show summary statistics', async () => {
-      const file = path.join(testDir, 'stats.js');
-      await fs.writeFile(file, '/** Requirement: R */ const x = 1;', 'utf-8');
-
-      const results = await checker.checkFiles([file]);
-      const report = checker.generateReport(results);
-
       expect(report).toContain('Summary');
+    });
+
+    it('should include violation details with requirement IDs', async () => {
+      const file = path.join(testDir, 'violation.js');
+      await fs.writeFile(file, '// REQ-1\nclass ApiWrapper {}', 'utf-8');
+
+      const results = await checker.checkFiles([file]);
+      const report = checker.generateReport(results);
+
+      expect(report).toContain('Article VIII');
+      expect(report).toContain('Anti-Abstraction Gate');
+      expect(report).toContain('VIII-2');
     });
   });
 

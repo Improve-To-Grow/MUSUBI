@@ -23,6 +23,7 @@ Create a comprehensive requirements specification for the given feature using EA
 - Read `steering/structure.md` - Architecture patterns
 - Read `steering/tech.md` - Technology stack
 - Read `steering/product.md` - Product context
+- Read `steering/project.yml` - Constitution profile (library | cli | application, default `library`)
 
 # Step 2: Understand the Feature
 
@@ -34,7 +35,7 @@ Create a comprehensive requirements specification for the given feature using EA
 
 # Step 3: Generate EARS Requirements
 
-Use the 5 EARS patterns:
+Each requirement SHALL use one of the 5 EARS patterns (IV-1):
 
 ## 1. Ubiquitous Requirements
 Format: The [system] SHALL [requirement]
@@ -80,9 +81,9 @@ For each requirement:
 
 2. **Title**: Clear, descriptive name
 
-3. **EARS Statement**: Using one of the 5 patterns
+3. **EARS Statement**: Using one of the 5 patterns (IV-1), with a single interpretation (IV-2)
 
-4. **Acceptance Criteria**: Testable conditions
+4. **Acceptance Criteria**: Testable conditions (IV-3)
    - GIVEN [context]
    - WHEN [action]
    - THEN [expected result]
@@ -141,11 +142,11 @@ Based on steering/tech.md:
 
 Ensure requirements align with Constitutional Articles:
 
-- **Article I: Library-First** - Feature implemented as library in lib/
-- **Article II: CLI Interface** - Library exposes CLI interface
+- **Article I: Testable Core** - Feature logic in a core module tested without the UI, server or CLI (library in lib/ for library / cli, `src/lib/<domain>/` for application)
+- **Article II: Automation Interface** - Primary operations reachable without the UI (CLI for library / cli, HTTP API for application)
 - **Article III: Test-First** - Requirements include test scenarios
-- **Article IV: EARS Format** - All requirements in EARS format
-- **Article V: Traceability** - Each requirement traceable to code and tests
+- **Article IV: EARS Format** - All requirements in EARS format, unambiguous, with acceptance criteria (IV-1 to IV-3)
+- **Article V: Traceability** - Each requirement traceable to design, code and tests (IV-4, V-1 to V-3)
 
 ## 6. Dependencies
 - Other features required
@@ -233,8 +234,8 @@ This feature provides secure user authentication for the application.
 
 ## 4. Constitutional Compliance
 
-- ✅ Article I: Implemented as lib/auth/
-- ✅ Article II: CLI interface for user management
+- ✅ Article I: Implemented as lib/auth/ (library profile)
+- ✅ Article II: CLI interface for user management (library profile)
 - ✅ Article III: Test scenarios defined
 - ✅ Article IV: All requirements in EARS format
 - ✅ Article V: Traceability matrix included
@@ -245,13 +246,13 @@ This feature provides secure user authentication for the application.
 Before finalizing:
 
 1. **EARS Compliance**:
-   - All requirements use EARS patterns
+   - All requirements use EARS patterns (IV-1)
    - Keywords correct (WHEN, SHALL, IF, THEN, WHERE, WHILE)
-   - Requirements are unambiguous
+   - Requirements are unambiguous (IV-2)
 
 2. **Constitutional Compliance**:
-   - Library-first approach documented
-   - CLI interface requirements included
+   - Core module approach documented for the project profile (Article I)
+   - Automation interface requirements included: CLI for library / cli, HTTP API for application (Article II)
    - Test scenarios defined
    - Traceability considered
 
@@ -259,7 +260,7 @@ Before finalizing:
    - Functional requirements covered
    - Non-functional requirements included
    - Dependencies identified
-   - Acceptance criteria defined
+   - Acceptance criteria defined (IV-3)
 
 # Next Steps
 

@@ -219,8 +219,8 @@ musubi-design validate
 
 ```bash
 musubi-validate article 3  # Test-First
-musubi-validate article 1  # Library-First
-musubi-validate article 2  # CLI Interface
+musubi-validate article 1  # Testable Core
+musubi-validate article 2  # Automation Interface
 ```
 
 ### After Implementation

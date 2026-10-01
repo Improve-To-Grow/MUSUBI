@@ -101,8 +101,8 @@ Related requirements this decision impacts:
 
 ### Constitutional Compliance
 
-- [ ] **Article VII (Simplicity)**: Does not add unnecessary complexity
-- [ ] **Article VIII (Anti-Abstraction)**: Uses frameworks directly
+- [ ] **Article VII (Simplicity)**: Keeps the project count at 3 or fewer, or has Phase -1 Gate approval for more (VII-1, VII-2)
+- [ ] **Article VIII (Anti-Abstraction)**: Uses frameworks directly (VIII-1); any wrapper over a framework has Phase -1 Gate approval (VIII-2)
 - [ ] **Steering Alignment**: Consistent with steering files
 
 ---

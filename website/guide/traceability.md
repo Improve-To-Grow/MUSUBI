@@ -139,7 +139,9 @@ musubi-gaps
 
 Traceability is mandated by **Article V**:
 
-> 100% traceability SHALL be maintained between Requirements ↔ Design ↔ Code ↔ Tests.
+> The project SHALL maintain 100% traceability between Requirements ↔ Design ↔ Code ↔ Tests.
+
+Requirements V-1 to V-6 in the [constitution](./constitution.md#article-v-traceability-mandate) define each mapping: design (V-1), implementation (V-2), tests (V-3), requirement IDs in tests (V-4), the coverage matrix in design.md (V-5) and the task breakdown (V-6).
 
 Validate with:
 

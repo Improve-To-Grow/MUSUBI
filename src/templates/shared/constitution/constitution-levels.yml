@@ -1,0 +1,181 @@
+# Constitution Levels Configuration
+#
+# Defines enforcement levels for Constitutional Articles
+# Copied by `musubi init`; see "Project Profiles" in steering/rules/constitution.md
+
+schema_version: "1.0"
+
+# Constitution enforcement levels
+levels:
+  critical:
+    description: "Blocks on violation (required)"
+    enforcement: block
+    articles:
+      - id: CONST-001
+        name: "Article I - Testable-Core Principle"
+        description: "Keep feature logic in core modules that are tested without the delivery mechanism"
+        required: true
+        
+      - id: CONST-003
+        name: "Article III - Test-First Imperative"
+        description: "Test-first development (Red-Green-Blue)"
+        required: true
+        
+      - id: CONST-005
+        name: "Article V - Traceability Mandate"
+        description: "100% traceability across requirements <-> design <-> code <-> tests"
+        required: true
+
+  advisory:
+    description: "Warning only on violation"
+    enforcement: warn
+    articles:
+      - id: CONST-002
+        name: "Article II - Automation Interface Mandate"
+        description: "Make primary functionality reachable through a documented interface that does not require the UI"
+        reason: "Internal libraries may not need a CLI"
+        
+      - id: CONST-004
+        name: "Article IV - EARS Requirements Format"
+        description: "Requirements definition in EARS format"
+        reason: "A simple format is sufficient for small changes"
+        
+      - id: CONST-006
+        name: "Article VI - Project Memory"
+        description: "Consult steering files before making decisions"
+        reason: "Steering consultation cannot be fully verified automatically"
+        
+      - id: CONST-009
+        name: "Article IX - Real Service Testing"
+        description: "Testing with real services"
+        reason: "Mocking LLM/external API calls is acceptable"
+        exception_cases:
+          - llm_providers
+          - external_payment_apis
+          - third_party_services
+
+  flexible:
+    description: "Can be overridden in project settings"
+    enforcement: configurable
+    articles:
+      - id: CONST-007
+        name: "Article VII - Simplicity Gate"
+        description: "At most 3 projects initially; more require Phase -1 Gate approval"
+        
+      - id: CONST-008
+        name: "Article VIII - Anti-Abstraction Gate"
+        description: "Use framework features directly; abstractions require Phase -1 Gate approval"
+
+# Default levels per project profile (constitution v1.1, "Project Profiles", P-5)
+# The profile is declared in steering/project.yml as constitution.profile.
+# Without a declared profile, `library` applies (P-2).
+# Articles not listed here keep the level assigned under `levels` for every profile.
+# A project overrides single articles with constitution.levels in steering/project.yml (P-6).
+profile_defaults:
+  library:
+    CONST-001: critical
+    CONST-002: advisory
+  cli:
+    CONST-001: critical
+    CONST-002: critical
+  application:
+    CONST-001: advisory  # promote to critical once the core/delivery boundary check is clean
+    CONST-002: advisory
+
+# Configurable settings
+configurable:
+  coverage_threshold:
+    description: "Test coverage thresholds"
+    default: 80
+    min: 50
+    max: 100
+    per_package: true  # Configurable per package
+    
+  mock_allowed:
+    description: "Allow use of mocks"
+    default: false
+    exceptions:
+      - llm_providers
+      - external_apis
+      - payment_services
+      - analytics_services
+      
+  ears_required:
+    description: "EARS format required"
+    default: true
+    per_mode: true  # Configurable per workflow mode
+    mode_defaults:
+      small: false
+      medium: true
+      large: true
+      
+  code_limits:
+    description: "Code-size limits of Article VII (VII-4 to VII-6), in lines of code (non-blank, non-comment)"
+    max_file_lines: 500      # Clean Code: upper limit for files of significant systems
+    max_function_lines: 50   # ESLint max-lines-per-function default
+    max_imports: 10          # eslint-plugin-import max-dependencies default; index files exempt
+
+  adr_required:
+    description: "ADR (Architecture Decision Record) required"
+    default: false
+    per_mode: true
+    mode_defaults:
+      small: false
+      medium: false
+      large: true
+
+# Validation rules
+validation:
+  # Skip validation for specific paths
+  skip_paths:
+    - "**/*.test.js"
+    - "**/*.spec.js"
+    - "**/fixtures/**"
+    - "**/mocks/**"
+    - "**/testdata/**"
+    
+  # Custom rules per package type
+  package_rules:
+    library:
+      coverage_threshold: 90
+      mock_allowed: false
+      ears_required: true
+      
+    cli:
+      coverage_threshold: 70
+      mock_allowed: true
+      ears_required: true
+      
+    application:
+      coverage_threshold: 60
+      mock_allowed: true
+      ears_required: false
+      
+    extension:
+      coverage_threshold: 60
+      mock_allowed: true
+      ears_required: false
+      
+    infrastructure:
+      coverage_threshold: 50
+      mock_allowed: true
+      ears_required: false
+
+# Override mechanism
+# Projects can override in steering/project.yml:
+#
+# constitution:
+#   profile: application   # library | cli | application
+#   core_paths: [src/lib]
+#   delivery_paths: [src/app, src/components, src/hooks, src/contexts]
+#   adapter_paths: []
+#   levels:
+#     CONST-001: critical  # per-article level override
+#   level: advisory  # strict | advisory | relaxed
+#   overrides:
+#     coverage_threshold: 70
+#     code_limits:
+#       max_function_lines: 80
+#     mock_allowed:
+#       - "@openai/api"
+#       - "@anthropic/sdk"

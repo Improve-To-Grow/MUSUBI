@@ -16,7 +16,9 @@ Phase -1 Gates are pre-implementation validation checkpoints that enforce Consti
 
 ### Article VII: Simplicity Gate
 
-**Trigger**: Project count exceeds 3 independently deployable units
+**Trigger**: Project count exceeds 3 independently deployable units (VII-1); the additional projects are not implemented before approval (VII-2)
+
+**Not a trigger**: The code-size limits of Article VII (VII-4–VII-6: 500 lines of code per source file, 50 per function, 10 imports per file by default) are not Phase -1 Gate items. Their findings are reported at the article's level (CONST-007), and a project changes the limits with `constitution.overrides.code_limits` in `steering/project.yml`.
 
 **Current Status**: 
 - Detected: 5 sub-projects (musubi + References: musuhi, OpenSpec, spec-kit, ag2)
@@ -36,7 +38,7 @@ Phase -1 Gates are pre-implementation validation checkpoints that enforce Consti
 
 ### Article VIII: Anti-Abstraction Gate
 
-**Trigger**: Custom abstraction layers detected
+**Trigger**: Custom abstraction layer or wrapper library over a framework detected (VIII-2)
 
 **Current Status**: 
 - Detected: 2 potential abstraction files
@@ -52,7 +54,7 @@ Phase -1 Gates are pre-implementation validation checkpoints that enforce Consti
 - CLI wrappers provide value (scripting, automation)
 - No multi-framework abstraction (single implementation)
 - Direct usage of framework APIs (Commander, Inquirer)
-- Conclusion: Valid abstraction for CLI interface (Article II compliance)
+- Conclusion: Valid abstraction for the CLI that Article II (Automation Interface Mandate) requires under MUSUBI's `cli` profile (II-L1, II-L6)
 
 ---
 
@@ -72,6 +74,8 @@ Phase -1 Gates are pre-implementation validation checkpoints that enforce Consti
 - Business requirement: [Why this is needed]
 - Technical constraint: [Why alternatives don't work]
 - Team capacity: [Resources available]
+- Article VII: same justification for each additional project recorded in design.md (VII-3)
+- Article VIII: multi-framework support justification, team expertise analysis, migration path (VIII-3)
 
 **Alternatives Considered**:
 1. [Alternative 1] - Rejected because [reason]

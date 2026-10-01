@@ -228,7 +228,7 @@ Use template from `templates/change-proposal.md`:
 
 ### Phase 2: Development (Week 2-3)
 
-- [ ] Implement new requirements (library-first)
+- [ ] Implement new requirements in core modules (Article I, per project profile)
 - [ ] Modify existing code
 - [ ] Write tests (80%+ coverage)
 - [ ] Update documentation
@@ -315,8 +315,8 @@ Use template from `templates/change-proposal.md`:
 
 ### Article IV: EARS Format
 
-- [ ] All new requirements use EARS patterns
-- [ ] No ambiguous keywords (SHOULD, MUST, MAY)
+- [ ] All new requirements use EARS patterns (IV-1)
+- [ ] No ambiguous keywords (SHOULD, MUST, MAY) (IV-2)
 
 ### Article V: Traceability
 
@@ -324,10 +324,13 @@ Use template from `templates/change-proposal.md`:
 - [ ] All requirements have IDs
 - [ ] Links to affected components
 
-### Article I & II: Library-First + CLI
+### Article I & II: Testable Core + Automation Interface
 
-- [ ] New features implemented in lib/
-- [ ] CLI interface available
+Profile: {{PROFILE}} (`constitution.profile` in `steering/project.yml`, default `library`)
+
+- [ ] New feature logic in a core module with tests that run without the UI, server or CLI (I-1, I-2)
+- [ ] `library` / `cli`: new features implemented in lib/ (I-L1); CLI interface available (II-L1)
+- [ ] `application`: core module under `src/lib/<domain>/` (I-A1); machine-facing endpoints validate input against a schema (II-A4)
 
 ## Appendix
 
@@ -419,13 +422,12 @@ Use template from `templates/change-proposal.md`:
   -- Remove column
   ALTER TABLE users DROP COLUMN remember_token;
   ```
-````
 
 - **Rollback**: Restore from backup table
-
 ````
 
 **Dependency Analysis**:
+
 - List all affected services/components
 - Identify version requirements
 - Check for circular dependencies
@@ -438,12 +440,12 @@ Use template from `templates/change-proposal.md`:
 ```markdown
 ## Traceability Matrix
 
-| Change Requirement | Affected Component | Current Requirement | Action |
-|--------------------|-------------------|---------------------|--------|
-| REQ-NEW-001: 2FA | lib/auth/ | - | ADD |
-| REQ-AUTH-001: Password | lib/auth/password.ts | REQ-AUTH-001 | MODIFY |
-| REQ-AUTH-015: Remember Me | lib/auth/session.ts | REQ-AUTH-015 | REMOVE |
-````
+| Change Requirement        | Affected Component   | Current Requirement | Action |
+| ------------------------- | -------------------- | ------------------- | ------ |
+| REQ-NEW-001: 2FA          | lib/auth/            | -                   | ADD    |
+| REQ-AUTH-001: Password    | lib/auth/password.ts | REQ-AUTH-001        | MODIFY |
+| REQ-AUTH-015: Remember Me | lib/auth/session.ts  | REQ-AUTH-015        | REMOVE |
+```
 
 ---
 
@@ -560,7 +562,7 @@ Present summary to user:
    ### REQ-NEW-001: TOTP Generation
 
    WHEN a user enables 2FA,
-   THEN the system SHALL generate a TOTP secret
+   the system SHALL generate a TOTP secret
    AND the system SHALL display QR code
    AND the system SHALL require verification code.
 

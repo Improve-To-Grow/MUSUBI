@@ -3,6 +3,9 @@
  *
  * Manages Constitutional Article enforcement levels.
  * Supports critical/advisory/flexible levels with project-specific overrides.
+ *
+ * v1.1: Project profiles (library | cli | application) decide the default levels
+ * of Articles I and II ("Project Profiles" in steering/rules/constitution.md).
  */
 
 const fs = require('fs-extra');
@@ -20,18 +23,108 @@ const EnforcementLevel = {
 
 /**
  * Article IDs
+ *
+ * The v1.1 names (TESTABLE_CORE, AUTOMATION_INTERFACE, PROJECT_MEMORY, SIMPLICITY_GATE,
+ * ANTI_ABSTRACTION, INTEGRATION_FIRST) match the constitution. The older names are kept
+ * as aliases for compatibility.
  */
 const ArticleId = {
-  LIBRARY_FIRST: 'CONST-001',
-  CLI_INTERFACE: 'CONST-002',
+  TESTABLE_CORE: 'CONST-001',
+  AUTOMATION_INTERFACE: 'CONST-002',
   TEST_FIRST: 'CONST-003',
   EARS_FORMAT: 'CONST-004',
   TRACEABILITY: 'CONST-005',
+  PROJECT_MEMORY: 'CONST-006',
+  SIMPLICITY_GATE: 'CONST-007',
+  ANTI_ABSTRACTION: 'CONST-008',
+  INTEGRATION_FIRST: 'CONST-009',
+  // Aliases (pre-v1.1 names)
+  LIBRARY_FIRST: 'CONST-001',
+  CLI_INTERFACE: 'CONST-002',
   CONSTITUTION_ENFORCEMENT: 'CONST-006',
   DOCUMENTATION: 'CONST-007',
   CODE_QUALITY: 'CONST-008',
   REAL_SERVICE_TESTING: 'CONST-009',
 };
+
+/**
+ * Article display names (constitution v1.1)
+ */
+const ARTICLE_NAMES = {
+  [ArticleId.TESTABLE_CORE]: 'Article I - Testable-Core Principle',
+  [ArticleId.AUTOMATION_INTERFACE]: 'Article II - Automation Interface Mandate',
+  [ArticleId.TEST_FIRST]: 'Article III - Test-First Imperative',
+  [ArticleId.EARS_FORMAT]: 'Article IV - EARS Requirements Format',
+  [ArticleId.TRACEABILITY]: 'Article V - Traceability Mandate',
+  [ArticleId.PROJECT_MEMORY]: 'Article VI - Project Memory',
+  [ArticleId.SIMPLICITY_GATE]: 'Article VII - Simplicity Gate',
+  [ArticleId.ANTI_ABSTRACTION]: 'Article VIII - Anti-Abstraction Gate',
+  [ArticleId.INTEGRATION_FIRST]: 'Article IX - Integration-First Testing',
+};
+
+/**
+ * Project profiles (constitution v1.1, "Project Profiles")
+ */
+const ProjectProfile = {
+  LIBRARY: 'library',
+  CLI: 'cli',
+  APPLICATION: 'application',
+};
+
+/**
+ * Profile applied when steering/project.yml declares none (P-2)
+ */
+const DEFAULT_PROFILE = ProjectProfile.LIBRARY;
+
+/**
+ * Default levels of Articles I and II per profile (P-5)
+ */
+const DEFAULT_PROFILE_LEVELS = {
+  [ProjectProfile.LIBRARY]: { 'CONST-001': 'critical', 'CONST-002': 'advisory' },
+  [ProjectProfile.CLI]: { 'CONST-001': 'critical', 'CONST-002': 'critical' },
+  [ProjectProfile.APPLICATION]: { 'CONST-001': 'advisory', 'CONST-002': 'advisory' },
+};
+
+/**
+ * Core paths used when a project declares none (P-3)
+ */
+const DEFAULT_CORE_PATHS = {
+  [ProjectProfile.LIBRARY]: ['lib', 'packages'],
+  [ProjectProfile.CLI]: ['lib', 'packages'],
+  [ProjectProfile.APPLICATION]: [],
+};
+
+/**
+ * Code-size limits of Article VII (VII-4 to VII-6), in lines of code
+ * - 500 lines per file: upper limit for files of significant systems (Clean Code)
+ * - 50 lines per function: ESLint max-lines-per-function default
+ * - 10 imports per file: eslint-plugin-import max-dependencies default
+ */
+const DEFAULT_CODE_LIMITS = {
+  maxFileLines: 500,
+  maxFunctionLines: 50,
+  maxImports: 10,
+};
+
+const LEVELS = ['critical', 'advisory', 'flexible'];
+
+const LEVEL_ENFORCEMENT = {
+  critical: EnforcementLevel.BLOCK,
+  advisory: EnforcementLevel.WARN,
+  flexible: EnforcementLevel.CONFIGURE,
+};
+
+/**
+ * Normalize a path list from project.yml (string or array) to forward-slash relative paths
+ * @param {string|string[]|undefined} value - Declared paths
+ * @returns {string[]} Normalized paths
+ */
+function toPathList(value) {
+  const list = Array.isArray(value) ? value : value ? [value] : [];
+  return list
+    .filter(item => typeof item === 'string' && item.trim() !== '')
+    .map(item => item.trim().replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, ''));
+}
 
 /**
  * Default article levels
@@ -48,6 +141,11 @@ const DEFAULT_ARTICLE_LEVELS = {
   [ArticleId.REAL_SERVICE_TESTING]: 'advisory',
 };
 
+/**
+ * Resolves article levels, the project profile and configurable values (coverage, mocks,
+ * EARS, ADR, code-size limits) from steering/rules/constitution-levels.yml and
+ * steering/project.yml
+ */
 class ConstitutionLevelManager {
   /**
    * Create a new ConstitutionLevelManager
@@ -115,43 +213,102 @@ class ConstitutionLevelManager {
         critical: {
           enforcement: EnforcementLevel.BLOCK,
           articles: [
-            { id: ArticleId.LIBRARY_FIRST, name: 'Article I - Library-First Principle' },
-            { id: ArticleId.TEST_FIRST, name: 'Article III - Test-First Imperative' },
-            { id: ArticleId.TRACEABILITY, name: 'Article V - Traceability Mandate' },
+            { id: ArticleId.TESTABLE_CORE, name: ARTICLE_NAMES[ArticleId.TESTABLE_CORE] },
+            { id: ArticleId.TEST_FIRST, name: ARTICLE_NAMES[ArticleId.TEST_FIRST] },
+            { id: ArticleId.TRACEABILITY, name: ARTICLE_NAMES[ArticleId.TRACEABILITY] },
           ],
         },
         advisory: {
           enforcement: EnforcementLevel.WARN,
           articles: [
-            { id: ArticleId.CLI_INTERFACE, name: 'Article II - CLI Interface Mandate' },
-            { id: ArticleId.EARS_FORMAT, name: 'Article IV - EARS Requirements Format' },
-            { id: ArticleId.REAL_SERVICE_TESTING, name: 'Article IX - Real Service Testing' },
+            {
+              id: ArticleId.AUTOMATION_INTERFACE,
+              name: ARTICLE_NAMES[ArticleId.AUTOMATION_INTERFACE],
+            },
+            { id: ArticleId.EARS_FORMAT, name: ARTICLE_NAMES[ArticleId.EARS_FORMAT] },
+            { id: ArticleId.INTEGRATION_FIRST, name: ARTICLE_NAMES[ArticleId.INTEGRATION_FIRST] },
           ],
         },
         flexible: {
           enforcement: EnforcementLevel.CONFIGURE,
           articles: [
-            { id: ArticleId.DOCUMENTATION, name: 'Article VII - Documentation Requirements' },
-            { id: ArticleId.CODE_QUALITY, name: 'Article VIII - Code Quality Standards' },
+            { id: ArticleId.SIMPLICITY_GATE, name: ARTICLE_NAMES[ArticleId.SIMPLICITY_GATE] },
+            { id: ArticleId.ANTI_ABSTRACTION, name: ARTICLE_NAMES[ArticleId.ANTI_ABSTRACTION] },
           ],
         },
       },
+      profile_defaults: DEFAULT_PROFILE_LEVELS,
       configurable: {
         coverage_threshold: { default: 80, min: 50, max: 100 },
         mock_allowed: { default: false },
         ears_required: { default: true },
         adr_required: { default: false },
+        code_limits: {
+          max_file_lines: DEFAULT_CODE_LIMITS.maxFileLines,
+          max_function_lines: DEFAULT_CODE_LIMITS.maxFunctionLines,
+          max_imports: DEFAULT_CODE_LIMITS.maxImports,
+        },
       },
     };
   }
 
   /**
+   * Get the project profile and its paths from steering/project.yml
+   * @returns {Promise<object>} Profile configuration:
+   *   profile, declared, valid, declaredProfile, corePaths, corePathsDeclared,
+   *   deliveryPaths, adapterPaths, levels
+   */
+  async getProfileConfig() {
+    const project = (await this.loadProjectOverrides()) || {};
+    const declaredProfile = project.profile ?? null;
+    const declared = declaredProfile !== null;
+    const valid = !declared || Object.values(ProjectProfile).includes(declaredProfile);
+    const profile = declared && valid ? declaredProfile : DEFAULT_PROFILE; // P-2
+    const declaredCorePaths = toPathList(project.core_paths);
+    const corePathsDeclared = declaredCorePaths.length > 0;
+
+    return {
+      profile,
+      declared,
+      valid,
+      declaredProfile,
+      corePaths: corePathsDeclared ? declaredCorePaths : [...DEFAULT_CORE_PATHS[profile]], // P-3
+      corePathsDeclared,
+      deliveryPaths: toPathList(project.delivery_paths),
+      adapterPaths: toPathList(project.adapter_paths),
+      levels: project.levels && typeof project.levels === 'object' ? project.levels : {},
+    };
+  }
+
+  /**
+   * Get the project profile (library | cli | application)
+   * @returns {Promise<string>} Profile
+   */
+  async getProfile() {
+    return (await this.getProfileConfig()).profile;
+  }
+
+  /**
    * Get article level
+   *
+   * Resolution order: constitution.levels in steering/project.yml (P-6), the profile
+   * default from profile_defaults (P-5), the article's place under `levels`, and finally
+   * DEFAULT_ARTICLE_LEVELS.
    * @param {string} articleId - Article ID (e.g., 'CONST-001')
    * @returns {Promise<string>} Level ('critical', 'advisory', or 'flexible')
    */
   async getArticleLevel(articleId) {
     const config = await this.loadConfig();
+    const { profile, levels: projectLevels } = await this.getProfileConfig();
+
+    if (LEVELS.includes(projectLevels[articleId])) {
+      return projectLevels[articleId];
+    }
+
+    const profileLevel = config.profile_defaults?.[profile]?.[articleId];
+    if (LEVELS.includes(profileLevel)) {
+      return profileLevel;
+    }
 
     for (const [level, levelConfig] of Object.entries(config.levels || {})) {
       const articles = levelConfig.articles || [];
@@ -173,7 +330,7 @@ class ConstitutionLevelManager {
     const config = await this.loadConfig();
 
     const levelConfig = config.levels?.[level];
-    return levelConfig?.enforcement || EnforcementLevel.WARN;
+    return levelConfig?.enforcement || LEVEL_ENFORCEMENT[level] || EnforcementLevel.WARN;
   }
 
   /**
@@ -191,8 +348,7 @@ class ConstitutionLevelManager {
    * @returns {Promise<object[]>} Critical articles
    */
   async getCriticalArticles() {
-    const config = await this.loadConfig();
-    return config.levels?.critical?.articles || [];
+    return this._getArticlesAtLevel('critical');
   }
 
   /**
@@ -200,8 +356,7 @@ class ConstitutionLevelManager {
    * @returns {Promise<object[]>} Advisory articles
    */
   async getAdvisoryArticles() {
-    const config = await this.loadConfig();
-    return config.levels?.advisory?.articles || [];
+    return this._getArticlesAtLevel('advisory');
   }
 
   /**
@@ -209,8 +364,44 @@ class ConstitutionLevelManager {
    * @returns {Promise<object[]>} Flexible articles
    */
   async getFlexibleArticles() {
+    return this._getArticlesAtLevel('flexible');
+  }
+
+  /**
+   * Get the articles whose effective level (after profile defaults and project
+   * overrides) equals the given level
+   * @param {string} level - 'critical', 'advisory' or 'flexible'
+   * @returns {Promise<object[]>} Articles
+   * @private
+   */
+  async _getArticlesAtLevel(level) {
     const config = await this.loadConfig();
-    return config.levels?.flexible?.articles || [];
+    const { levels: projectLevels } = await this.getProfileConfig();
+    const articles = [];
+    const seen = new Set();
+
+    for (const levelConfig of Object.values(config.levels || {})) {
+      for (const article of levelConfig?.articles || []) {
+        if (seen.has(article.id)) continue;
+        seen.add(article.id);
+        articles.push(article);
+      }
+    }
+    // Articles that only appear in project overrides
+    for (const articleId of Object.keys(projectLevels)) {
+      if (!seen.has(articleId) && ARTICLE_NAMES[articleId]) {
+        seen.add(articleId);
+        articles.push({ id: articleId, name: ARTICLE_NAMES[articleId] });
+      }
+    }
+
+    const result = [];
+    for (const article of articles) {
+      if ((await this.getArticleLevel(article.id)) === level) {
+        result.push(article);
+      }
+    }
+    return result;
   }
 
   /**
@@ -306,6 +497,35 @@ class ConstitutionLevelManager {
   }
 
   /**
+   * Get the code-size limits of Article VII (VII-4 to VII-6)
+   *
+   * constitution-levels.yml (configurable.code_limits) sets them; steering/project.yml
+   * (constitution.overrides.code_limits) overrides single values.
+   * @returns {Promise<{maxFileLines: number, maxFunctionLines: number, maxImports: number}>}
+   */
+  async getCodeLimits() {
+    const config = await this.loadConfig();
+    const overrides = await this.loadProjectOverrides();
+    const sources = [config.configurable?.code_limits, overrides?.overrides?.code_limits];
+    const limits = { ...DEFAULT_CODE_LIMITS };
+    const keys = {
+      max_file_lines: 'maxFileLines',
+      max_function_lines: 'maxFunctionLines',
+      max_imports: 'maxImports',
+    };
+
+    for (const source of sources) {
+      for (const [yamlKey, key] of Object.entries(keys)) {
+        const value = source?.[yamlKey];
+        if (Number.isInteger(value) && value > 0) {
+          limits[key] = value;
+        }
+      }
+    }
+    return limits;
+  }
+
+  /**
    * Validate against constitution
    * @param {object} validation - Validation data
    * @returns {Promise<object>} Validation result
@@ -383,5 +603,11 @@ module.exports = {
   ConstitutionLevelManager,
   EnforcementLevel,
   ArticleId,
+  ARTICLE_NAMES,
+  ProjectProfile,
+  DEFAULT_PROFILE,
   DEFAULT_ARTICLE_LEVELS,
+  DEFAULT_PROFILE_LEVELS,
+  DEFAULT_CORE_PATHS,
+  DEFAULT_CODE_LIMITS,
 };

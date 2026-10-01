@@ -341,7 +341,7 @@ After user approval, **generate each file in order**:
 **Implementation guidelines**:
 
 1. **Create one file at a time**: Split large files
-2. **Maximum lines**: 300 lines or fewer per file recommended
+2. **Maximum lines**: 300 lines or fewer per file recommended (a stricter preference; the constitution requires at most 500 lines of code per source file, 50 per function and 10 imports per file, or the configured limits, VII-4–VII-6)
 3. **Code quality**:
    - Appropriate naming conventions
    - Comments (always explain complex logic)
@@ -1149,7 +1149,7 @@ code/
 
 1. **Create one file at a time**: Use the Write tool and create only one file per call
 2. **Progress reporting**: Always report progress after creating each file
-3. **File size limit**: 300 lines or fewer per file recommended (split if exceeded)
+3. **File size limit**: 300 lines or fewer per file recommended (split if exceeded); a stricter preference than the constitution's 500 lines of code per source file (VII-4)
 4. **File naming conventions**: Follow the project's conventions (camelCase, kebab-case, snake_case, etc.)
 5. **Test files**: Place at the same level as the implementation files or in the `tests/` directory
 
@@ -1212,7 +1212,7 @@ After creating each file, update `docs/progress-report.md`.
 
 ### 6. Documentation
 
-- **JSDoc comments**: JSDoc-style comments on all public functions and classes
+- **JSDoc comments**: JSDoc-style comments on all public functions and classes; the constitution requires a `/** … */` comment directly above each exported function and class of a core module (I-5, advisory)
 - **README**: Provide a README for each module/package
 - **Usage examples**: Include usage examples for complex APIs
 

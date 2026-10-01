@@ -13,6 +13,12 @@ tech_stack:
     - undecided  # To be determined
 
 
+# Constitution profile (constitution v1.1, "Project Profiles")
+constitution:
+  profile: cli # library | cli | application
+  core_paths: [src]
+  delivery_paths: [bin]
+
 # Review Gate Settings (v6.2.0)
 reviewGate:
   requirements:

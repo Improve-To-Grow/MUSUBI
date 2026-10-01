@@ -1295,7 +1295,7 @@ npx musubi-validate guardrails --type input --preset strict
 npx musubi-validate guardrails --type output --preset redact
 
 # Safety check with constitutional compliance
-npx musubi-validate guardrails --type safety --constitutional --level critical
+npx musubi-validate guardrails --type safety --level paranoid --constitutional --content-type code --file src/feature.js
 ```
 
 **Batch Security Scan**:

@@ -12,6 +12,7 @@
  */
 
 const EventEmitter = require('events');
+const { runSkillGuardrails } = require('./skill-guardrails');
 
 /**
  * Execution status
@@ -40,6 +41,8 @@ class ExecutionResult {
     this.duration = options.duration || 0;
     this.attempts = options.attempts || 0;
     this.metadata = options.metadata || {};
+    // Guardrail outcomes: { phase, guardrail, passed, violations }
+    this.guardrails = options.guardrails || [];
   }
 
   get success() {
@@ -56,6 +59,7 @@ class ExecutionResult {
       duration: this.duration,
       attempts: this.attempts,
       metadata: this.metadata,
+      guardrails: this.guardrails,
     };
   }
 }
@@ -72,6 +76,8 @@ class ExecutionContext {
     this.parentContext = options.parentContext || null;
     this.startTime = null;
     this.metadata = options.metadata || {};
+    // Extra guardrail context from the caller (e.g. projectRoot, testsWritten)
+    this.guardrailContext = options.guardrailContext || {};
   }
 
   _generateId() {
@@ -231,6 +237,7 @@ class SkillExecutor extends EventEmitter {
       input,
       variables: options.variables,
       metadata: options.metadata,
+      guardrailContext: options.guardrailContext,
     });
 
     // Create result
@@ -255,8 +262,8 @@ class SkillExecutor extends EventEmitter {
         throw new Error(`Input validation failed: ${inputValidation.errors.join(', ')}`);
       }
 
-      // Run guardrails (pre-execution)
-      await this._runGuardrails('pre', { skillId, input, context });
+      // Run guardrails (pre-execution) on the skill input
+      await this._runGuardrails('pre', { skillId, input, context }, metadata, result);
 
       // Run beforeExecute hooks
       for (const hook of this.hooks.beforeExecute) {
@@ -285,8 +292,8 @@ class SkillExecutor extends EventEmitter {
         throw new Error(`Output validation failed: ${outputValidation.errors.join(', ')}`);
       }
 
-      // Run guardrails (post-execution)
-      await this._runGuardrails('post', { skillId, input, output, context });
+      // Run guardrails (post-execution) on the skill output
+      await this._runGuardrails('post', { skillId, input, output, context }, metadata, result);
 
       // Complete
       result.status = ExecutionStatus.COMPLETED;
@@ -581,15 +588,12 @@ class SkillExecutor extends EventEmitter {
     });
   }
 
-  async _runGuardrails(phase, data) {
-    for (const guardrail of this.guardrails) {
-      if (guardrail.phase === phase || guardrail.phase === 'both') {
-        const result = await guardrail.check(data);
-        if (!result.passed) {
-          throw new Error(`Guardrail '${guardrail.name}' failed: ${result.reason}`);
-        }
-      }
-    }
+  /**
+   * Run the guardrails of a phase (see ./skill-guardrails)
+   * @private
+   */
+  async _runGuardrails(phase, data, metadata = {}, result = null) {
+    return runSkillGuardrails(this.guardrails, phase, data, metadata, result);
   }
 
   _isRetryable(error) {

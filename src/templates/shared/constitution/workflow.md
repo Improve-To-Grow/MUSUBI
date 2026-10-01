@@ -62,8 +62,8 @@ Research → Requirements → Design → Tasks → Implementation → Testing �
 
 ### Constitutional Validation
 
-- **Article VI**: Consult `steering/tech.md` for technology stack
-- **Article VI**: Consult `steering/structure.md` for architecture patterns
+- **Article VI**: Consult `steering/tech.md` for technology stack (VI-2, VI-4)
+- **Article VI**: Consult `steering/structure.md` for architecture patterns (VI-1, VI-4)
 
 ### Template
 
@@ -112,17 +112,17 @@ Use `templates/research.md` template.
 
 ### Quality Gates
 
-- [ ] All requirements in EARS format
+- [ ] All requirements in EARS format (IV-1)
 - [ ] Requirement IDs assigned
-- [ ] Acceptance criteria defined
+- [ ] Acceptance criteria defined (IV-3)
 - [ ] Stakeholders approved
 - [ ] **Constitutional validation passed (Article IV)**
 
 ### Constitutional Validation
 
-- **Article IV**: EARS format enforced
+- **Article IV**: EARS format enforced: one of the 5 patterns, single interpretation, acceptance criteria (IV-1–IV-3)
 - **Article V**: Requirements assigned unique IDs
-- **Article VI**: Consult `steering/product.md` for business context
+- **Article VI**: Consult `steering/product.md` for business context (VI-3, VI-4)
 
 ### Validation Command
 
@@ -197,12 +197,12 @@ Use `templates/requirements.md` template.
 
 ### Constitutional Validation
 
-- **Article I**: Features designed as libraries
-- **Article II**: CLI interfaces specified
-- **Article V**: 100% requirements coverage
-- **Article VI**: Design aligned with steering files
-- **Article VII**: Project count ≤ 3 (or Phase -1 Gate approval)
-- **Article VIII**: No custom abstraction layers (or Phase -1 Gate approval)
+- **Article I**: Core module, core paths and delivery paths named for each feature, per the project profile (I-1)
+- **Article II**: Automation interface specified: CLI for `library`/`cli`, HTTP API for `application` (II-1)
+- **Article V**: 100% requirements coverage, with a requirements coverage matrix in design.md (V-1, V-5)
+- **Article VI**: Design aligned with steering files (VI-4)
+- **Article VII**: Project count ≤ 3 (VII-1), or Phase -1 Gate approval (VII-2) with each additional project justified in design.md (VII-3)
+- **Article VIII**: Framework APIs used directly (VIII-1); no custom abstraction layers without Phase -1 Gate approval (VIII-2, VIII-3); runtime-constraint clients documented in design.md (VIII-4, VIII-5)
 
 ### Validation Command
 
@@ -274,7 +274,7 @@ Use `templates/design.md` template.
 
 ### Constitutional Validation
 
-- **Article V**: Tasks mapped to requirements
+- **Article V**: Tasks mapped to requirements (V-6)
 - **Article VI**: Plan aligned with steering context
 
 ### Template
@@ -296,15 +296,16 @@ Use `templates/tasks.md` template.
 ### Activities
 
 1. **Test-First Development (Red-Green-Blue)**
-   - **Red**: Write failing test for requirement
-   - **Green**: Write minimal code to pass test
-   - **Blue**: Refactor with confidence
+   - **Red**: Write failing test for requirement (III-2)
+   - **Green**: Write minimal code to pass test (III-3)
+   - **Blue**: Refactor while keeping all tests passing (III-4)
 
-2. **Library-First Implementation**
-   - Implement features as libraries
-   - Expose CLI interface
-   - Write library tests
-   - Document library API
+2. **Testable-Core Implementation** (read `constitution.profile` from `steering/project.yml`; `library` when absent)
+   - Implement feature logic in core modules (`library`/`cli`: libraries in `lib/`; `application`: folders under a core path such as `src/lib/`)
+   - Expose the automation interface (`library`/`cli`: CLI; `application`: HTTP API)
+   - Write core module tests that run without the app, a browser or a CLI
+   - Document the core module's public API: a `/** … */` comment above each exported function and class (I-5, advisory)
+   - Keep source files ≤ 500 lines of code, functions ≤ 50 and imports ≤ 10 per file, or the configured limits (Article VII, VII-4–VII-6)
 
 3. **Code Review**
    - SOLID principles validation
@@ -319,28 +320,29 @@ Use `templates/tasks.md` template.
 
 ### Deliverables
 
-- Source code (libraries + applications)
+- Source code (core modules + delivery code)
 - Test suites (unit, integration, E2E)
-- CLI interfaces
+- Automation interface (CLI or HTTP API, per profile)
 - Code review reports
 
 ### Quality Gates
 
-- [ ] **Tests written BEFORE code (Article III)**
-- [ ] **Features implemented as libraries (Article I)**
-- [ ] **CLI interfaces provided (Article II)**
-- [ ] Test coverage ≥ 80%
+- [ ] **Tests written BEFORE code (Article III, III-1)**
+- [ ] **Feature logic in tested core modules (Article I)**
+- [ ] **Automation interface provided: CLI or HTTP API (Article II)**
+- [ ] Test coverage ≥ configured threshold, default 80% (III-6)
 - [ ] Code review passed
 - [ ] No critical security issues
 - [ ] **Constitutional validation passed**
 
 ### Constitutional Validation
 
-- **Article I**: Library-First enforced
-- **Article II**: CLI interfaces exist
-- **Article III**: Test-First followed (check git history)
-- **Article V**: Code comments reference requirements
+- **Article I**: Testable Core enforced (core tests run without the app; no imports from delivery paths); exported functions and classes of core modules documented (I-5, advisory)
+- **Article II**: Automation interface exists (CLI for `library`/`cli`, HTTP API for `application`)
+- **Article III**: Test-First followed, check git history (III-1–III-4)
+- **Article V**: Code comments reference requirements (V-2)
 - **Article VI**: Code aligned with steering context
+- **Article VII**: Source files within the code-size limits (VII-4–VII-6); findings warn at Article VII's level and need no Phase -1 Gate
 
 ### Validation Command
 
@@ -389,9 +391,9 @@ git commit -m "refactor: improve authentication logic (REQ-AUTH-001)"
    - Verify 100% coverage
 
 3. **Integration Testing (Real Services)**
-   - Use real databases (Docker containers)
-   - Use test environments for external APIs
-   - Justify any mocks
+   - Use real, isolated databases (Docker containers or test schemas, IX-1, IX-2)
+   - Use sandbox or test environments for external APIs (IX-3)
+   - Mock a service only if it is unavailable in the test environment, has usage limits or costs, or has no test environment, and justify each mock (IX-4, IX-5)
 
 4. **Acceptance Testing**
    - Validate acceptance criteria
@@ -409,17 +411,17 @@ git commit -m "refactor: improve authentication logic (REQ-AUTH-001)"
 ### Quality Gates
 
 - [ ] All tests passing
-- [ ] Coverage ≥ 80%
-- [ ] **100% requirements coverage (Article V)**
-- [ ] **Integration tests use real services (Article IX)**
+- [ ] Coverage ≥ configured threshold, default 80% (III-6)
+- [ ] **100% requirements coverage (Article V, V-3)**
+- [ ] **Integration tests use real services (Article IX, IX-1)**
 - [ ] UAT passed
 - [ ] **Constitutional validation passed**
 
 ### Constitutional Validation
 
-- **Article III**: Test-First evidence in git history
-- **Article V**: 100% requirements → test coverage
-- **Article IX**: Integration tests use real services (mocks justified)
+- **Article III**: Test-First evidence in git history (III-1); every EARS requirement has a test (III-5)
+- **Article V**: 100% requirements → test coverage; tests reference requirement IDs (V-3, V-4)
+- **Article IX**: Integration tests use real services (IX-1); each mock justified (IX-4, IX-5)
 
 ### Validation Command
 
@@ -588,16 +590,16 @@ Design (impact analysis) → Tasks → Implementation → Testing → Deployment
 
 ## Stage Summary Table
 
-| Stage             | Skills                                                                           | Deliverables                  | Constitutional Articles |
-| ----------------- | -------------------------------------------------------------------------------- | ----------------------------- | ----------------------- |
-| 1. Research       | requirements-analyst, system-architect, technical-writer                         | research.md                   | VI                      |
-| 2. Requirements   | requirements-analyst, project-manager, change-impact-analyzer                    | requirements.md, changes.md   | IV, V, VI               |
-| 3. Design         | system-architect, api-designer, database-schema-designer, ui-ux-designer         | design.md, C4, ADR, API specs | I, II, V, VI, VII, VIII |
-| 4. Tasks          | project-manager, software-developer, test-engineer                               | tasks.md, test plan           | V, VI                   |
-| 5. Implementation | software-developer, test-engineer, code-reviewer                                 | source code, tests, CLI       | I, II, III, V, VI       |
-| 6. Testing        | test-engineer, quality-assurance, traceability-auditor                           | test reports, coverage        | III, V, IX              |
-| 7. Deployment     | devops-engineer, cloud-architect, release-coordinator, site-reliability-engineer | IaC, CI/CD, runbooks          | VI                      |
-| 8. Monitoring     | site-reliability-engineer, performance-optimizer, bug-hunter                     | SLO/SLI, dashboards, alerts   | VI                      |
+| Stage             | Skills                                                                           | Deliverables                   | Constitutional Articles |
+| ----------------- | -------------------------------------------------------------------------------- | ------------------------------ | ----------------------- |
+| 1. Research       | requirements-analyst, system-architect, technical-writer                         | research.md                    | VI                      |
+| 2. Requirements   | requirements-analyst, project-manager, change-impact-analyzer                    | requirements.md, changes.md    | IV, V, VI               |
+| 3. Design         | system-architect, api-designer, database-schema-designer, ui-ux-designer         | design.md, C4, ADR, API specs  | I, II, V, VI, VII, VIII |
+| 4. Tasks          | project-manager, software-developer, test-engineer                               | tasks.md, test plan            | V, VI                   |
+| 5. Implementation | software-developer, test-engineer, code-reviewer                                 | source code, tests, CLI or API | I, II, III, V, VI       |
+| 6. Testing        | test-engineer, quality-assurance, traceability-auditor                           | test reports, coverage         | III, V, IX              |
+| 7. Deployment     | devops-engineer, cloud-architect, release-coordinator, site-reliability-engineer | IaC, CI/CD, runbooks           | VI                      |
+| 8. Monitoring     | site-reliability-engineer, performance-optimizer, bug-hunter                     | SLO/SLI, dashboards, alerts    | VI                      |
 
 ---
 

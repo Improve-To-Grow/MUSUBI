@@ -341,7 +341,7 @@ describe('Re-exported modules', () => {
     });
 
     test('should export CONSTITUTIONAL_ARTICLES', () => {
-      expect(CONSTITUTIONAL_ARTICLES.SINGLE_SOURCE_OF_TRUTH).toBeDefined();
+      expect(CONSTITUTIONAL_ARTICLES.TESTABLE_CORE).toBeDefined();
     });
   });
 

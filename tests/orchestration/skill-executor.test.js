@@ -310,3 +310,142 @@ describe('IOValidator', () => {
     expect(result.valid).toBe(true);
   });
 });
+
+describe('SkillExecutor guardrails', () => {
+  const {
+    BaseGuardrail,
+    GuardrailPhase,
+    InputGuardrail,
+    OutputGuardrail,
+    SafetyCheckGuardrail,
+  } = require('../../src/orchestration/guardrails');
+
+  /** Guardrail that records what it receives and passes or fails on demand */
+  class RecordingGuardrail extends BaseGuardrail {
+    constructor(name, phase, pass = true) {
+      super({ name, phase });
+      this.pass = pass;
+      this.calls = [];
+    }
+
+    async check(input, context) {
+      this.calls.push({ input, context });
+      const violations = this.pass ? [] : [this.createViolation('BLOCKED', 'Blocked', 'error')];
+      return this.createResult(this.pass, violations, this.pass ? 'ok' : 'Blocked by test');
+    }
+  }
+
+  let registry;
+  let executor;
+  let handler;
+
+  beforeEach(() => {
+    registry = createMockRegistry();
+    handler = jest.fn(input => ({ content: input.code, filePath: 'src/feature.js' }));
+    registry.addSkill({
+      id: 'write-code',
+      name: 'Write Code',
+      contentType: 'code',
+      handler,
+      inputs: [],
+      outputs: [],
+    });
+    executor = new SkillExecutor(registry, { defaultTimeout: 5000 });
+  });
+
+  test('should give guardrails default phases: input before, output and safety after', () => {
+    expect(new InputGuardrail().phase).toBe(GuardrailPhase.PRE);
+    expect(new OutputGuardrail().phase).toBe(GuardrailPhase.POST);
+    expect(new SafetyCheckGuardrail().phase).toBe(GuardrailPhase.POST);
+    expect(new InputGuardrail({ phase: GuardrailPhase.BOTH }).phase).toBe(GuardrailPhase.BOTH);
+  });
+
+  test('should check the skill input before and the skill output after execution', async () => {
+    const pre = new RecordingGuardrail('pre-check', GuardrailPhase.PRE);
+    const post = new RecordingGuardrail('post-check', GuardrailPhase.POST);
+    executor.addGuardrail(pre);
+    executor.addGuardrail(post);
+
+    const result = await executor.execute(
+      'write-code',
+      { code: 'const a = 1;' },
+      { guardrailContext: { projectRoot: '/repo' } }
+    );
+
+    expect(result.success).toBe(true);
+    expect(pre.calls[0].input).toEqual({ code: 'const a = 1;' });
+    expect(pre.calls[0].context).toMatchObject({
+      skillId: 'write-code',
+      phase: 'pre',
+      projectRoot: '/repo',
+    });
+    expect(pre.calls[0].context.contentType).toBeUndefined();
+    expect(post.calls[0].input).toEqual({ content: 'const a = 1;', filePath: 'src/feature.js' });
+    expect(post.calls[0].context).toMatchObject({
+      skillId: 'write-code',
+      phase: 'post',
+      contentType: 'code',
+      filePath: 'src/feature.js',
+      projectRoot: '/repo',
+    });
+    expect(result.guardrails).toEqual([
+      expect.objectContaining({ phase: 'pre', guardrail: 'pre-check', passed: true }),
+      expect.objectContaining({ phase: 'post', guardrail: 'post-check', passed: true }),
+    ]);
+  });
+
+  test('should not run the skill when an input guardrail fails', async () => {
+    executor.addGuardrail(new RecordingGuardrail('gate', GuardrailPhase.PRE, false));
+
+    const result = await executor.execute('write-code', { code: 'x' });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe("Guardrail 'gate' failed (pre): Blocked by test [BLOCKED]");
+    expect(handler).not.toHaveBeenCalled();
+    expect(result.attempts).toBe(0);
+  });
+
+  test('should enforce the constitution on skill output with the skill content type', async () => {
+    executor.addGuardrail(
+      new SafetyCheckGuardrail({ enforceConstitution: true, enabledArticles: ['TRACEABILITY'] })
+    );
+
+    const traced = await executor.execute('write-code', { code: '// REQ-001\nconst a = 1;' });
+    const untraced = await executor.execute('write-code', { code: 'const a = 1;' });
+
+    expect(traced.success).toBe(true);
+    expect(untraced.success).toBe(false);
+    expect(untraced.error).toContain("Guardrail 'SafetyCheckGuardrail' failed (post)");
+    expect(untraced.error).toContain('CONSTITUTIONAL_V_2');
+  });
+
+  test('should fail unclassified skill output under a constitutional guardrail', async () => {
+    registry.addSkill({
+      id: 'chat',
+      name: 'Chat',
+      handler: () => ({ content: 'Hello' }),
+      inputs: [],
+      outputs: [],
+    });
+    executor.addGuardrail(new SafetyCheckGuardrail({ enforceConstitution: true }));
+
+    const result = await executor.execute('chat', {});
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('CONSTITUTIONAL_UNCLASSIFIED');
+  });
+
+  test('should keep supporting guardrail objects with check(data) and a reason', async () => {
+    executor.addGuardrail({
+      name: 'legacy',
+      phase: 'post',
+      check: async data => ({ passed: data.output.content !== 'bad', reason: 'bad output' }),
+    });
+
+    const ok = await executor.execute('write-code', { code: 'good' });
+    const bad = await executor.execute('write-code', { code: 'bad' });
+
+    expect(ok.success).toBe(true);
+    expect(bad.error).toBe("Guardrail 'legacy' failed (post): bad output");
+  });
+});

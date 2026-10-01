@@ -334,9 +334,9 @@ The {{COMPONENT}} SHALL follow [coding standards].
 
 This requirements document complies with:
 
-- ✅ **Article IV**: All requirements use EARS format
-- ✅ **Article V**: 100% traceability (requirements → design → code → tests)
-- ✅ **Article VI**: Business context from steering/product.md
+- ✅ **Article IV**: All requirements use one of the 5 EARS patterns (IV-1), have a single interpretation (IV-2) and include acceptance criteria (IV-3)
+- ✅ **Article V**: 100% traceability (requirements → design → code → tests, V-1–V-3)
+- ✅ **Article VI**: Business context from steering/product.md (VI-3)
 
 **Validation**:
 

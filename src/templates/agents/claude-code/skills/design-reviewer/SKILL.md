@@ -1120,12 +1120,12 @@ After the fixes are complete, the following report is generated:
 
 ---
 
-## 12. Constitutional Compliance (CONST-002, CONST-003)
+## 12. Constitutional Compliance (CONST-005)
 
 This skill ensures compliance with:
 
-- **Article 2 (Traceability)**: Links design decisions to requirements
-- **Article 3 (Quality Assurance)**: Systematic quality checks before implementation
+- **Article 5 (Traceability)**: Links design decisions to requirements (V-1)
+- **Quality Assurance**: Systematic quality checks before implementation
 - **User-Driven Correction**: User maintains control over all document changes
 - **ADR Documentation**: Rejected findings are documented with rationale
 

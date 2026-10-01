@@ -1249,8 +1249,8 @@ src/
 
 ### Mocking Strategy
 
-- **External APIs**: Always mock
-- **Database**: Use a real DB in integration tests
+- **External APIs**: In integration tests, call the sandbox or test environment (Article IX, IX-3); mock only a service that is unavailable in the test environment, has usage limits or costs, or has no test environment, and justify the mock in the test documentation (IX-4, IX-5)
+- **Database**: Use a real, isolated DB in integration tests: container or test schema (IX-1, IX-2)
 - **Time**: Mock things like `Date.now()`
 - **Random values**: Mock things like `Math.random()`
 

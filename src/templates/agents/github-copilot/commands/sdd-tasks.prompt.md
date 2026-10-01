@@ -37,6 +37,7 @@ storage/specs/{{feature-name}}-requirements.md
 steering/structure.md
 steering/tech.md
 steering/product.md
+steering/project.yml   # constitution.profile (library | cli | application)
 ```
 
 ---
@@ -104,10 +105,10 @@ Each task follows this format:
 
 **Test-First Checklist** (Article III):
 
-- [ ] Tests written BEFORE implementation
-- [ ] Red: Failing test committed
-- [ ] Green: Minimal implementation passes test
-- [ ] Blue: Refactored with confidence
+- [ ] Tests written BEFORE implementation (III-1)
+- [ ] Red: Failing test committed (III-2)
+- [ ] Green: Minimal implementation passes test (III-3)
+- [ ] Blue: Refactored with confidence (III-4)
 
 **Implementation Notes**:
 [File paths, code snippets, technical details]
@@ -120,19 +121,24 @@ npm test src/{{file}}.test.ts
 ```
 ````
 
-````
-
 ---
 
 ### 4. Create Task Hierarchy
 
 #### Task Categories (always include):
 
+Read `constitution.profile` from `steering/project.yml` first (`library` when absent, P-2). TASK-001 and TASK-006 depend on it.
+
 **P0 Tasks (Critical - Launch Blockers)**:
-1. **TASK-001: Set Up Project Structure (Library-First)**
-   - Create `lib/{{feature}}/` directory
-   - Set up library structure per Article I
-   - Create CLI interface per Article II
+
+1. **TASK-001: Set Up Project Structure (Testable Core, Article I)**
+   - `library` / `cli`:
+     - Create `lib/{{feature}}/` directory
+     - Set up library structure per Article I (I-L1–I-L3)
+     - Create CLI interface per Article II (II-L1)
+   - `application`:
+     - Create core module folder `src/lib/{{feature}}/` with co-located tests, no own `package.json` (I-A1, I-A2)
+     - Wire delivery: route handler and server action files under delivery paths that import from the core module (I-A3)
 
 2. **TASK-002: Write Tests for REQ-XXX-001**
    - Red phase (failing tests)
@@ -152,21 +158,28 @@ npm test src/{{file}}.test.ts
    - Migrations
    - Integration tests (real database, Article IX)
 
-6. **TASK-006: Implement CLI Interface**
-   - CLI commands per Article II
-   - Help text
-   - Error handling
+6. **TASK-006: Implement Automation Interface (Article II)**
+   - `library` / `cli`: Implement CLI Interface
+     - CLI commands per Article II (II-L1)
+     - Help text (II-L2)
+     - Error handling, exit codes (II-L4, II-L5)
+   - `application`: Implement Route Handlers / Server Actions (no CLI, II-A3)
+     - Delegate to core: validate input, authorize, call core, shape response (I-A3)
+     - Machine-facing endpoints validate input against a schema (II-A4)
+     - Return documented status and error codes (II-A5)
 
 7. **TASK-007: Implement API Endpoints**
    - REST/GraphQL endpoints
    - Input validation
    - Error handling
+   - `application`: route handlers are built in TASK-006; use this task only for endpoints not covered there
 
 **P1 Tasks (High - Required for Launch)**:
+
 8. **TASK-008: Write Integration Tests**
-   - Real services (Article IX)
+   - Real services (Article IX: IX-1)
    - API endpoint tests
-   - Coverage ≥ 80%
+   - Coverage ≥ configured threshold, default 80% (III-6)
 
 9. **TASK-009: Implement Caching**
    - Redis/memory cache
@@ -178,19 +191,21 @@ npm test src/{{file}}.test.ts
     - Authentication/authorization
 
 **P2 Tasks (Medium - Nice to Have)**:
+
 11. **TASK-011: Add Pagination**
 12. **TASK-012: Add Monitoring**
 
 **P3 Tasks (Low - Future)**:
+
 13. **TASK-013: Performance Optimization**
 
 ---
 
 ### 5. Follow Test-First Mandate (Article III)
 
-**CRITICAL**: For EVERY implementation task, create 3 separate tasks:
+**CRITICAL**: The developer SHALL write each test before the production code that makes it pass (III-1). For EVERY implementation task, create 3 separate tasks: RED (III-2), GREEN (III-3) and BLUE (III-4).
 
-```markdown
+````markdown
 ### TASK-002: Write Tests for REQ-AUTH-001 (RED)
 
 **Priority**: P0
@@ -203,13 +218,15 @@ Write failing tests for REQ-AUTH-001 user login functionality.
 **Test-First Phase**: ❤️ RED (Failing Tests)
 
 **Acceptance Criteria**:
-- [ ] Test file created: `lib/auth/tests/service.test.ts`
+
+- [ ] Test file created: `lib/auth/tests/service.test.ts` (`application`: `src/lib/auth/service.test.ts`)
 - [ ] Tests for all acceptance criteria from REQ-AUTH-001
 - [ ] Tests FAIL (red phase)
 - [ ] Tests reference requirement ID: `describe('REQ-AUTH-001: ...')`
 - [ ] Git commit: `test: add failing tests for REQ-AUTH-001`
 
 **Implementation Notes**:
+
 ```typescript
 // lib/auth/tests/service.test.ts
 describe('REQ-AUTH-001: User Login', () => {
@@ -217,12 +234,12 @@ describe('REQ-AUTH-001: User Login', () => {
     const service = new AuthService(mockRepository);
     const result = await service.login({
       email: 'user@example.com',
-      password: 'password123'
+      password: 'password123',
     });
     expect(result).toHaveProperty('sessionToken');
   });
 });
-````
+```
 
 ---
 
@@ -305,37 +322,37 @@ Refactor AuthService for better design while keeping tests green.
 - Improve error messages
 - Add logging
 - Add input validation
-
 ````
 
 ---
 
 ### 6. Map Tasks to Requirements (Article V)
 
-Create **Requirements Coverage Matrix**:
+Each task breakdown SHALL map its tasks to requirements (V-6). Create **Requirements Coverage Matrix**:
 
 ```markdown
 ## Requirements Coverage Matrix
 
-| Requirement ID | Priority | Tasks | Test Coverage | Status |
-|----------------|----------|-------|---------------|--------|
-| REQ-AUTH-001 | P0 | TASK-002, TASK-003, TASK-004 | 95% | Not Started |
-| REQ-AUTH-002 | P0 | TASK-005, TASK-006 | 90% | Not Started |
-| REQ-AUTH-003 | P0 | TASK-007 | 90% | Not Started |
-| REQ-PERF-001 | P1 | TASK-009 | 80% | Not Started |
-| REQ-SEC-001 | P1 | TASK-010 | 100% | Not Started |
+| Requirement ID | Priority | Tasks                        | Test Coverage | Status      |
+| -------------- | -------- | ---------------------------- | ------------- | ----------- |
+| REQ-AUTH-001   | P0       | TASK-002, TASK-003, TASK-004 | 95%           | Not Started |
+| REQ-AUTH-002   | P0       | TASK-005, TASK-006           | 90%           | Not Started |
+| REQ-AUTH-003   | P0       | TASK-007                     | 90%           | Not Started |
+| REQ-PERF-001   | P1       | TASK-009                     | 80%           | Not Started |
+| REQ-SEC-001    | P1       | TASK-010                     | 100%          | Not Started |
 
 **Coverage Summary**:
+
 - Total Requirements: [N]
 - Requirements with Tasks: [N] ([%]%)
 - **Coverage Goal**: 100% ✅
-````
+```
 
 **Validation**:
 
-- [ ] All requirements have corresponding tasks
+- [ ] All requirements have corresponding tasks (V-6)
 - [ ] All P0 requirements have P0 tasks
-- [ ] No orphan tasks (tasks without requirements)
+- [ ] No orphan tasks (tasks without requirements) (V-6)
 
 ---
 
@@ -343,25 +360,24 @@ Create **Requirements Coverage Matrix**:
 
 Show task execution order:
 
-```markdown
+````markdown
 ## Task Dependencies Graph
-```
 
+```text
 TASK-001 (Project Structure)
-├── TASK-002 (Tests - RED)
-│ └── TASK-003 (Implementation - GREEN)
-│ ├── TASK-004 (Refactor - BLUE)
-│ ├── TASK-006 (CLI)
-│ └── TASK-007 (API)
-│ └── TASK-008 (Integration Tests)
-│ └── TASK-010 (Security)
-└── TASK-005 (Repository)
-└── TASK-003 (Implementation)
-
+    ├── TASK-002 (Tests - RED)
+    │       └── TASK-003 (Implementation - GREEN)
+    │               ├── TASK-004 (Refactor - BLUE)
+    │               ├── TASK-006 (CLI or route handlers)
+    │               └── TASK-007 (API)
+    │                       └── TASK-008 (Integration Tests)
+    │                               └── TASK-010 (Security)
+    └── TASK-005 (Repository)
+            └── TASK-003 (Implementation)
 ```
 
 **Critical Path**: TASK-001 → TASK-002 → TASK-003 → TASK-007 → TASK-008
-```
+````
 
 ---
 
@@ -383,7 +399,7 @@ Break tasks into sprints:
 - TASK-003: Implement REQ-001 (5 points)
 - TASK-004: Refactor (2 points)
 - TASK-005: Database repository (5 points)
-- TASK-006: CLI interface (3 points)
+- TASK-006: CLI interface or route handlers (3 points)
 - TASK-007: API endpoints (5 points)
 
 **Total**: 25 story points
@@ -438,36 +454,45 @@ At end of document:
 
 Before marking feature complete, verify:
 
-### Article I: Library-First ✅
+### Article I: Testable Core ✅
 
-- [ ] All features implemented in `lib/{{feature}}/`
-- [ ] Library has independent test suite
-- [ ] Library exports public API
+- [ ] Each feature has a core module (I-1)
+- [ ] Core module tests run without the app, a browser or a CLI (I-2)
+- [ ] No imports from delivery paths into core paths (I-3)
+- [ ] (`library`, `cli`) All features implemented in `lib/{{feature}}/` (I-L1)
+- [ ] (`library`, `cli`) Library has independent test suite (I-L2)
+- [ ] (`library`, `cli`) Library exports public API (I-L3)
+- [ ] (`application`) Core module under a core path, e.g. `src/lib/{{feature}}/` (I-A1)
+- [ ] (`application`) Route handlers and server actions delegate to core (I-A3)
+- [ ] (`application`) No UI-only code in core paths (I-A4)
 
-### Article II: CLI Interface ✅
+### Article II: Automation Interface ✅
 
-- [ ] CLI interface implemented
-- [ ] All major operations exposed
-- [ ] Help text provided
+- [ ] All major operations callable without the UI (II-1)
+- [ ] (`library`, `cli`) CLI interface implemented (II-L1)
+- [ ] (`library`, `cli`) Help text provided (II-L2)
+- [ ] (`application`) Machine-facing endpoints validate input against a schema (II-A4)
+- [ ] (`application`) Machine-facing endpoints return documented status and error codes (II-A5)
+- [ ] (`application`) All `package.json` scripts resolve to existing files (II-A10)
 
 ### Article III: Test-First ✅
 
-- [ ] Tests written BEFORE implementation
-- [ ] Git history shows Red-Green-Blue cycle
+- [ ] Tests written BEFORE implementation (III-1)
+- [ ] Git history shows Red-Green-Blue cycle (III-2–III-4)
 - [ ] All tests passing
 
 ### Article V: Traceability ✅
 
-- [ ] All requirements mapped to tasks
+- [ ] All requirements mapped to tasks (V-6)
 - [ ] All tasks mapped to code
 - [ ] All code mapped to tests
 - [ ] 100% coverage achieved
 
 ### Article IX: Integration Testing ✅
 
-- [ ] Integration tests use real database
-- [ ] Integration tests use real cache
-- [ ] Mocks justified (if used)
+- [ ] Integration tests use real database (IX-1, IX-2)
+- [ ] Integration tests use real cache (IX-1)
+- [ ] Mocks justified (if used) (IX-4, IX-5)
 
 **Validation Commands**:
 
@@ -478,8 +503,6 @@ Before marking feature complete, verify:
 ```
 ````
 
-````
-
 ---
 
 ### 11. Save Task Breakdown
@@ -487,6 +510,7 @@ Before marking feature complete, verify:
 Save to: `storage/tasks/{{feature-name}}-tasks.md`
 
 **File Naming**:
+
 - Match requirements and design files
 
 ---
@@ -500,6 +524,7 @@ Save to: `storage/tasks/{{feature-name}}-tasks.md`
 **File**: storage/tasks/{{feature-name}}-tasks.md
 
 ### Summary:
+
 - **Total Tasks**: [N]
   - P0 (Critical): [N] tasks, [N] story points
   - P1 (High): [N] tasks, [N] story points
@@ -507,41 +532,48 @@ Save to: `storage/tasks/{{feature-name}}-tasks.md`
   - P3 (Low): [N] tasks, [N] story points
 
 ### Sprint Allocation:
+
 - Sprint 1: [N] tasks ([N] points)
 - Sprint 2: [N] tasks ([N] points)
 - Sprint 3: [N] tasks ([N] points)
 
 ### Requirements Coverage:
+
 - Total Requirements: [N]
 - Requirements with Tasks: [N] (100% ✅)
 
 ### Test-First Tasks:
+
 - RED (Test) tasks: [N]
 - GREEN (Implement) tasks: [N]
 - BLUE (Refactor) tasks: [N]
 
 ### Estimated Effort:
+
 - Total Story Points: [N]
 - Total Hours: [N]
 - Team Capacity: [N] points/sprint
 - Estimated Duration: [N] sprints
 
 ### Constitutional Compliance:
-- ✅ Article I: Library-first structure planned
-- ✅ Article II: CLI tasks included
+
+- ✅ Article I: Testable Core structure planned (profile: [library / cli / application])
+- ✅ Article II: Automation Interface tasks included (CLI or route handlers)
 - ✅ Article III: Test-first tasks (Red-Green-Blue)
 - ✅ Article V: 100% requirements coverage
 - ✅ Article IX: Integration test tasks with real services
 
 ### Critical Path:
+
 TASK-001 → TASK-002 → TASK-003 → TASK-007 → TASK-008
 
 ### Next Steps:
+
 1. Review task breakdown with team
 2. Allocate tasks to developers
 3. Begin Sprint 1 implementation
 4. OR use orchestrator: `@orchestrator implement {{feature-name}}`
-````
+```
 
 ---
 
@@ -562,8 +594,8 @@ TASK-001 → TASK-002 → TASK-003 → TASK-007 → TASK-008
 
 Before completing:
 
-- [ ] All requirements have corresponding tasks
-- [ ] Test-First tasks (Red-Green-Blue) for all implementations
+- [ ] All requirements have corresponding tasks (V-6)
+- [ ] Test-First tasks (Red-Green-Blue) for all implementations (III-2–III-4)
 - [ ] Task dependencies identified
 - [ ] Story points estimated
 - [ ] Sprint allocation complete

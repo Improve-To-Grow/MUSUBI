@@ -64,7 +64,7 @@ All requirements must use EARS patterns:
 ### Requirement: User Login
 
 WHEN user provides valid credentials,
-THEN the system SHALL authenticate the user
+the system SHALL authenticate the user
 AND the system SHALL create a session.
 ```
 
@@ -72,15 +72,17 @@ AND the system SHALL create a session.
 
 MUSUBI enforces 9 immutable constitutional articles:
 
-1. **Library-First Principle** - Features start as libraries
-2. **CLI Interface Mandate** - All libraries expose CLI
+1. **Testable-Core Principle** - Feature logic lives in core modules that are tested without the UI, server or CLI
+2. **Automation Interface Mandate** - Primary functionality is reachable without the UI: a CLI for library and cli projects, the HTTP API for applications
 3. **Test-First Imperative** - Tests before code (Red-Green-Blue)
 4. **EARS Requirements Format** - Unambiguous requirements
 5. **Traceability Mandate** - 100% coverage required
 6. **Project Memory** - All commands check steering first
-7. **Simplicity Gate** - Maximum 3 projects initially
+7. **Simplicity Gate** - Maximum 3 projects initially; files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10
 8. **Anti-Abstraction Gate** - Use framework features directly
 9. **Integration-First Testing** - Real services over mocks
+
+The project profile (`library | cli | application`) in `steering/project.yml` decides how Articles I and II apply (default: `library`).
 
 ## Documentation Language
 
@@ -176,12 +178,12 @@ npx musubi-sdd <command>
 
 ### Guardrails Commands (v3.9.0 NEW)
 
-| Command                                    | Purpose                           | Example                                                          |
-| ------------------------------------------ | --------------------------------- | ---------------------------------------------------------------- |
-| `musubi-validate guardrails`               | Input/Output guardrail validation | `npx musubi-validate guardrails --type input`                    |
-| `musubi-validate guardrails --type output` | Output content validation         | `echo "content" \| npx musubi-validate guardrails --type output` |
-| `musubi-validate guardrails --type safety` | Safety check with constitutional  | `npx musubi-validate guardrails --type safety --constitutional`  |
-| `musubi-validate guardrails-chain`         | Chain multiple guardrails         | `npx musubi-validate guardrails-chain --parallel`                |
+| Command                                    | Purpose                           | Example                                                                                                   |
+| ------------------------------------------ | --------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `musubi-validate guardrails`               | Input/Output guardrail validation | `npx musubi-validate guardrails --type input`                                                             |
+| `musubi-validate guardrails --type output` | Output content validation         | `echo "content" \| npx musubi-validate guardrails --type output`                                          |
+| `musubi-validate guardrails --type safety` | Safety check with constitutional  | `npx musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js` |
+| `musubi-validate guardrails-chain`         | Chain multiple guardrails         | `npx musubi-validate guardrails-chain --parallel`                                                         |
 
 ## Enterprise Scale Modules (v5.5.0 NEW)
 

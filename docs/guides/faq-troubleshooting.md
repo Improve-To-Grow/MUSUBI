@@ -72,17 +72,19 @@ npx musubi-sdd init --mode brownfield
 
 #### Q: What are the 9 Articles?
 
-**A:** The 9 immutable rules of the MUSUBI Constitution:
+**A:** The 9 immutable articles of the MUSUBI Constitution (`steering/rules/constitution.md`):
 
-1. Specification First
-2. Constitution Supremacy
-3. EARS Compliance
-4. Traceability
-5. Change Tracking
-6. Quality Gates
-7. Documentation
-8. Testing
-9. Continuous Improvement
+1. Testable-Core Principle
+2. Automation Interface Mandate
+3. Test-First Imperative
+4. EARS Requirements Format
+5. Traceability Mandate
+6. Project Memory
+7. Simplicity Gate
+8. Anti-Abstraction Gate
+9. Integration-First Testing
+
+The project profile (`library | cli | application`) in `steering/project.yml` decides how Articles I and II apply.
 
 #### Q: What is a P-Label?
 

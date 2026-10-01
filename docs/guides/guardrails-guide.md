@@ -22,8 +22,8 @@ npx musubi-validate guardrails "user input here" --type input
 # Output validation with PII redaction
 npx musubi-validate guardrails "output content" --type output --redact
 
-# Safety check with constitutional compliance
-npx musubi-validate guardrails "code or content" --type safety --constitutional
+# Safety check with constitutional compliance (the content type is required)
+npx musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js
 
 # Run guardrail chain
 npx musubi-validate guardrails-chain "content" --parallel
@@ -141,41 +141,36 @@ const customGuard = new OutputGuardrail({
 
 ### 3. SafetyCheckGuardrail
 
-Constitutional compliance and content safety.
+Content safety, plus constitutional compliance when `enforceConstitution` is on.
 
 **Safety Levels**:
 
-| Level | Description | Use Case |
-|-------|-------------|----------|
-| `LOW` | Permissive | Development |
-| `MEDIUM` | Balanced | Default |
-| `HIGH` | Strict | Production |
-| `CRITICAL` | Maximum | Security-critical |
+| Level | Rules | Use Case |
+|-------|-------|----------|
+| `basic` | Content required | Development |
+| `standard` | Required, max 50,000 characters, SQL and XSS injection | Default |
+| `strict` | Required, max 50,000 characters, SQL, XSS and command injection, PII | Production |
+| `paranoid` | Required, max 10,000 characters, all injection, PII, prohibited words | Security-critical |
 
-**Content Categories**:
-- `SAFE` - Content is safe
-- `HARMFUL` - Potentially harmful content
-- `HATE_SPEECH` - Hate or discrimination
-- `VIOLENCE` - Violent content
-- `SEXUAL` - Sexual content
-- `MISINFORMATION` - False information
-- `PII_EXPOSURE` - Personal data exposure
-- `ILLEGAL` - Illegal activities
+Injection detection targets untrusted text. For typed artifacts (`context.contentType` set to `code`, `test`, `requirements` or `design`) it is skipped, because code and documents legitimately contain braces, `--` flags, table rules and comments. The other rules still apply.
+
+**Phase**: the guardrail checks what a skill produces, so its default phase is `post` (see [With Skill Execution](#with-skill-execution)). Use `InputGuardrail` for skill input, or pass `phase: 'pre'` or `'both'`.
 
 ```javascript
 const { SafetyCheckGuardrail, SafetyLevel } = require('musubi-sdd/orchestration/guardrails');
 
 const safetyGuard = new SafetyCheckGuardrail({
-  level: SafetyLevel.HIGH,
-  checkConstitutional: true,  // Check 9 Constitutional Articles
-  checkPII: true,
-  tripwire: true
+  level: SafetyLevel.STRICT,
+  enforceConstitution: true,   // check the nine articles (needs context.contentType)
+  projectRoot: process.cwd(),  // the project's profile, article levels and code limits
 });
 
-const result = await safetyGuard.run(content);
-console.log(result.safetyLevel);   // 'HIGH'
-console.log(result.category);      // 'SAFE'
-console.log(result.constitutional); // { passed: true, violations: [] }
+const result = await safetyGuard.run(generatedCode, {
+  contentType: 'code',
+  filePath: 'src/lib/auth/service.ts',
+});
+console.log(result.passed);
+console.log(result.metadata.articleScores); // { I: 1, II: 'not-applicable', ... }
 ```
 
 ---
@@ -271,15 +266,16 @@ const rules = RuleRegistry.get('myRules');
 npx musubi-validate guardrails [content] [options]
 
 Options:
-  --type <type>        Guardrail type: input, output, safety (default: input)
-  --level <level>      Safety level: low, medium, high, critical
-  --preset <preset>    Use preset configuration
-  --constitutional     Enable constitutional compliance check
-  --redact             Enable PII redaction
-  --file <path>        Read content from file
-  --output <path>      Write result to file
-  --verbose            Verbose output
+  --file <path>          Read content from file (also the content's path for --constitutional)
+  -t, --type <type>      Guardrail type: input, output, safety (default: input)
+  -l, --level <level>    Safety level: basic, standard, strict, paranoid (default: standard)
+  --constitutional       Enable constitutional compliance checks (needs --content-type)
+  --content-type <type>  Artifact type of the content: code, test, requirements, design
+  --redact               Enable redaction for output guardrails
+  -f, --format <type>    Output format: console, json (default: console)
 ```
+
+`--constitutional` without a valid `--content-type` exits with code 1 before checking anything.
 
 ### guardrails-chain Command
 
@@ -300,11 +296,11 @@ Options:
 # Validate user input
 npx musubi-validate guardrails "Hello, my email is test@example.com" --type input
 
-# Validate with security preset
-npx musubi-validate guardrails "SELECT * FROM users" --type input --preset security
+# Check a source file against the constitution
+npx musubi-validate guardrails --type safety --level strict --constitutional --content-type code --file src/feature.js
 
-# Check safety with constitutional compliance
-npx musubi-validate guardrails "$(cat src/feature.js)" --type safety --constitutional --level high
+# Check a requirements document for EARS
+npx musubi-validate guardrails --type safety --constitutional --content-type requirements --file storage/specs/auth-requirements.md
 
 # Redact PII from output
 npx musubi-validate guardrails "Contact: john@example.com, 555-1234" --type output --redact
@@ -312,12 +308,9 @@ npx musubi-validate guardrails "Contact: john@example.com, 555-1234" --type outp
 # Run full chain
 npx musubi-validate guardrails-chain "user content here" --parallel
 
-# Validate file
-npx musubi-validate guardrails --type safety --file src/module.js --constitutional
-
 # Batch validation
 for file in src/*.js; do
-  npx musubi-validate guardrails --type safety --file "$file" --level high
+  npx musubi-validate guardrails --type safety --constitutional --content-type code --file "$file"
 done
 ```
 
@@ -325,29 +318,39 @@ done
 
 ## Integration Examples
 
-### With Orchestration
+### With Skill Execution
+
+`SkillExecutor` runs its guardrails around each skill: guardrails with phase `pre` check the skill input before the skill runs, guardrails with phase `post` check the skill output after it, and `both` runs in both. `InputGuardrail` defaults to `pre`, `OutputGuardrail` and `SafetyCheckGuardrail` to `post`.
+
+Each guardrail gets the content and a context that says what it is:
+
+- `skillId`, `executionId` and `phase`
+- `contentType`: from the output (`output.contentType`), the caller (`guardrailContext.contentType`) or the skill metadata (`contentType: 'code' | 'test' | 'requirements' | 'design'`)
+- `filePath`: from the output (`output.filePath`) or the caller
+- everything in `options.guardrailContext` (e.g. `projectRoot`, `testsWritten`, `requirementId`)
+
+A failing guardrail fails the execution with `Guardrail '<name>' failed (<phase>): <reason> [<codes>]`. A failing `pre` guardrail stops the skill from running. Each outcome is recorded in `result.guardrails`.
 
 ```javascript
-const { createOrchestrationEngine, PatternType } = require('musubi-sdd/orchestration');
-const { InputGuardrail, OutputGuardrail } = require('musubi-sdd/orchestration/guardrails');
+const { SkillExecutor } = require('musubi-sdd/orchestration/skill-executor');
+const {
+  createInputGuardrail,
+  SafetyCheckGuardrail,
+} = require('musubi-sdd/orchestration/guardrails');
 
-const engine = createOrchestrationEngine();
+registry.registerSkill(
+  { id: 'implement-service', name: 'Implement Service', contentType: 'code' },
+  async input => ({ content: generateCode(input), filePath: 'src/lib/auth/service.ts' })
+);
 
-// Add guardrails to skill execution
-engine.use('pre-execute', async (context) => {
-  const inputGuard = new InputGuardrail({ preset: 'security' });
-  const result = await inputGuard.run(context.input);
-  if (!result.passed) {
-    throw new Error(`Input validation failed: ${result.violations.join(', ')}`);
-  }
-  context.input = result.content; // Use sanitized input
+const executor = new SkillExecutor(registry);
+executor.addGuardrail(createInputGuardrail('userInput')); // pre: the request
+executor.addGuardrail(new SafetyCheckGuardrail({ enforceConstitution: true })); // post: the code
+
+const result = await executor.execute('implement-service', request, {
+  guardrailContext: { projectRoot: process.cwd(), requirementId: 'REQ-AUTH-001' },
 });
-
-engine.use('post-execute', async (context, output) => {
-  const outputGuard = new OutputGuardrail({ preset: 'redact' });
-  const result = await outputGuard.run(output);
-  return result.content; // Return sanitized output
-});
+console.log(result.guardrails); // [{ phase: 'pre', ... }, { phase: 'post', ... }]
 ```
 
 ### With Swarm Pattern
@@ -421,35 +424,54 @@ console.log(result.violations); // ['SQL injection detected']
 
 ## Constitutional Compliance
 
-Check content against the 9 Constitutional Articles:
+The constitution governs artifacts, so a guardrail checks content against it only as the artifact it is. Set `context.contentType` to `code`, `test`, `requirements` or `design`. Content without a content type, or with an unknown one, is unclassified: the check fails with `CONSTITUTIONAL_UNCLASSIFIED`, and every article is scored not applicable.
 
 ```javascript
-const { SafetyCheckGuardrail } = require('musubi-sdd/orchestration/guardrails');
+const { SafetyCheckGuardrail, NOT_APPLICABLE } = require('musubi-sdd/orchestration/guardrails');
 
-const guard = new SafetyCheckGuardrail({
-  checkConstitutional: true,
-  level: 'HIGH'
-});
+const guard = new SafetyCheckGuardrail({ enforceConstitution: true });
 
-const result = await guard.run(codeContent);
+const result = await guard.run(codeContent, { contentType: 'code', requirementId: 'REQ-001' });
 
-// Constitutional check results
-console.log(result.constitutional.passed);      // true/false
-console.log(result.constitutional.violations);  // Array of article violations
-console.log(result.constitutional.articles);    // Checked articles
+result.metadata.constitutionalViolations; // findings with context.requirement, e.g. 'V-2'
+result.metadata.articleScores; // { I: NOT_APPLICABLE, ..., V: 1, VII: 1, VIII: 1, ... }
+result.metadata.scores.constitutional; // mean of the applicable articles, or null
 ```
+
+Each article is scored 1 without findings, 0.5 with warnings only, 0 with an error, and `'not-applicable'` (`NOT_APPLICABLE`) when it does not apply to the content. Only applicable articles count towards the constitutional score.
 
 ### Articles Checked
 
-1. **Article I**: Library-First Principle
-2. **Article II**: CLI Interface Mandate
-3. **Article III**: Test-First Imperative
-4. **Article IV**: EARS Requirements Format
-5. **Article V**: Traceability Mandate
-6. **Article VI**: Project Memory
-7. **Article VII**: Simplicity Gate
-8. **Article VIII**: Anti-Abstraction Gate
-9. **Article IX**: Integration-First Testing
+The safety guardrail checks the nine articles of `steering/rules/constitution.md`, with the same rules as the CI checker (`src/constitutional/articles.js`). An article applies only when the content type and `context` give it something to check:
+
+| Article | Requirements | Applies when |
+| ------- | ------------ | ------------ |
+| I Testable-Core Principle | I-3, I-5 (advisory), I-A4, I-A5 | `code` whose `filePath` is under a core path |
+| II Automation Interface Mandate | II-A4 | `code` whose `filePath` is a route handler of an `application` |
+| III Test-First Imperative | III-1 | `code` with a boolean `context.testsWritten` |
+| IV EARS Requirements Format | IV-1, IV-2 | `requirements` |
+| V Traceability Mandate | V-2, V-4, V-5 | `code` and `test` (a requirement ID in the content, or `requirementId`/`specId` in the context); `design` (V-5: a table that lists requirement IDs) |
+| VI Project Memory | VI-4 | any type, with a boolean `context.steeringLoaded` |
+| VII Simplicity Gate | VII-2, VII-4, VII-5, VII-6 | VII-2: a numeric `context.projectCount`. VII-4–VII-6: `code` (with a `filePath` and a known profile, a source file in a core or delivery path) |
+| VIII Anti-Abstraction Gate | VIII-2 | `code`; approved with `phaseMinusOneApproved` or `runtimeConstraintDocumented` |
+| IX Integration-First Testing | IX-5 | `test` whose `filePath` is an integration test |
+
+Severity follows the article levels of the project profile (`constitution-levels.yml`, `constitution.levels` in `steering/project.yml`). Findings in critical articles are errors and fail the check. Among Articles VII and VIII, only the Phase -1 Gate findings (VII-2, VIII-2) are errors. The code-size findings (VII-4–VII-6) are warnings at Article VII's level (CONST-007), unless the project promotes CONST-007 to critical. Findings in advisory articles, and requirements tagged _(advisory)_ such as I-5, are warnings. Pass `projectRoot` (in the config or `context`) to use a project's profile and levels; without it, the `library` defaults apply, or the defaults of `context.profile`.
+
+The code-size limits come from `code_limits` in `constitution-levels.yml` and `constitution.overrides.code_limits` in `steering/project.yml` (defaults: 500 lines of code per file, 50 per function, 10 imports per file). `context.codeLimits` overrides them for a single check, e.g. `{ maxFunctionLines: 80 }` (keys `maxFileLines`, `maxFunctionLines`, `maxImports`).
+
+```javascript
+const guard = new SafetyCheckGuardrail({ enforceConstitution: true, projectRoot: process.cwd() });
+
+const result = await guard.run(generatedCode, {
+  contentType: 'code',
+  filePath: 'src/lib/auth/service.ts',
+  requirementId: 'REQ-AUTH-001',
+  testsWritten: true,
+});
+```
+
+Agent boundaries are a separate safety check: when `context.allowedAgents` is set, an `agentId` outside the list fails the check (`AGENT_BOUNDARY`).
 
 ---
 

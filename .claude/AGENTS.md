@@ -200,7 +200,7 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_dependencies` - Detect Article I (Library-First) violations
+- `find_dependencies` - Detect core → delivery import violations (Article I, I-3)
 - `analyze_module_structure` - Verify Constitution compliance of module structure
 
 **Example Usage**:
@@ -640,15 +640,17 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 All agents must comply with the 9 Constitutional Articles defined in `steering/rules/constitution.md`:
 
-1. **Article I**: Library-First Principle - Use existing libraries before writing custom code
-2. **Article II**: CLI Interface Mandate - All tools must have CLI interfaces
+1. **Article I**: Testable-Core Principle - Feature logic lives in core modules that are tested without the UI, server or CLI; the project profile (library | cli | application) decides what a core module is
+2. **Article II**: Automation Interface Mandate - Primary functionality is reachable without the UI: a CLI for library and cli projects, the HTTP API for applications
 3. **Article III**: Test-First Imperative - Write tests before implementation (80%+ coverage)
 4. **Article IV**: EARS Requirements Format - All requirements use EARS patterns
 5. **Article V**: Traceability Obligation - Maintain requirement ↔ design ↔ code ↔ test mapping
 6. **Article VI**: Project Memory - Read steering files before starting work
-7. **Article VII**: Simplicity Gate - Maximum 3 projects initially
+7. **Article VII**: Simplicity Gate - Maximum 3 projects initially; files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10
 8. **Article VIII**: Anti-Abstraction Gate - Use framework features directly
 9. **Article IX**: Real Services in Tests - Use actual services/APIs in tests
+
+The project profile (`library | cli | application`) in `steering/project.yml` (`constitution.profile`, default `library` when absent) decides how Articles I and II apply. Read it before applying those articles.
 
 Use `@constitution-enforcer` to validate compliance.
 

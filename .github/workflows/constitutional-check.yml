@@ -47,6 +47,7 @@ jobs:
             src/**/*.ts
             lib/**/*.js
             lib/**/*.ts
+            storage/specs/**/*requirements*.md
       
       - name: Run Constitutional Check
         if: steps.changed-files.outputs.any_changed == 'true'

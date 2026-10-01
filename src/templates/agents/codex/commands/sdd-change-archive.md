@@ -261,8 +261,6 @@ git checkout archive/{{deprecated-feature}} -- lib/{{deprecated-feature}}/
 ```
 ````
 
-````
-
 ---
 
 ### 6. Update Documentation
@@ -277,17 +275,21 @@ git checkout archive/{{deprecated-feature}} -- lib/{{deprecated-feature}}/
 ### [{{VERSION}}] - {{DATE}}
 
 #### Added
+
 - {{FEATURE}}: {{DESCRIPTION}} (CHG-{{NUMBER}})
 
 #### Changed
+
 - {{MODIFIED_FEATURE}}: {{DESCRIPTION}}
 
 #### Deprecated
+
 - {{DEPRECATED_FEATURE}}: Use {{ALTERNATIVE}} instead
 
 #### Removed
+
 - {{REMOVED_FEATURE}}: Removed after {{DAYS}}-day deprecation period
-````
+```
 
 **Update API Documentation** (if applicable):
 
@@ -490,7 +492,6 @@ git checkout archive/{{deprecated-feature}} -- lib/{{deprecated-feature}}/
 # If rollback needed (unlikely)
 git checkout archive/{{change-name}}
 ```
-````
 
 **Deprecated Code Recovery**:
 
@@ -501,13 +502,13 @@ git checkout archive/{{deprecated-feature}} -- lib/{{deprecated-feature}}/
 
 ## Constitutional Compliance (Final Check)
 
-- ✅ Article I: Library-First - Maintained
-- ✅ Article II: CLI Interface - Maintained
+- ✅ Article I: Testable Core - Maintained (profile from `steering/project.yml`: {{PROFILE}})
+- ✅ Article II: Automation Interface - Maintained (CLI for library/cli, HTTP API for application)
 - ✅ Article III: Test Coverage - 87% (>= 80%)
 - ✅ Article IV: EARS Format - All requirements
 - ✅ Article V: Traceability - 100% coverage
 - ✅ Article VI: Steering - Updated
-- ✅ Article VII: Simplicity - No unnecessary complexity added
+- ✅ Article VII: Simplicity - Project count still ≤ 3 (VII-1); code within the size limits (VII-4–VII-6)
 - ✅ Article VIII: Anti-Abstraction - No unnecessary wrappers
 - ✅ Article IX: Integration Tests - Included
 
@@ -520,7 +521,6 @@ git checkout archive/{{deprecated-feature}} -- lib/{{deprecated-feature}}/
 ---
 
 **Change successfully archived** ✅
-
 ````
 
 **Save To**: `storage/changes/{{change-name}}-archive.md`
@@ -557,7 +557,7 @@ cat > storage/archive/{{YEAR}}/{{change-name}}/README.md <<EOF
 - **Duration**: {{DAYS}} days
 - **Status**: Successfully archived ✅
 EOF
-````
+```
 
 ---
 

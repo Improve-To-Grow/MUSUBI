@@ -32,9 +32,10 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 
 - [ ] Follows existing architecture patterns (check `steering/structure.md`)
 - [ ] SOLID principles are applied appropriately
-- [ ] No unnecessary complexity (Article VII: Simplicity Gate)
-- [ ] No premature abstraction (Article VIII: Anti-Abstraction)
-- [ ] Library-first principle followed (Article I)
+- [ ] No unnecessary complexity
+- [ ] No more than 3 projects (deployable units) without Phase -1 Gate approval (Article VII: Simplicity Gate, VII-1, VII-2)
+- [ ] Framework APIs used directly; no custom wrapper over a framework without Phase -1 Gate approval (Article VIII: Anti-Abstraction, VIII-1, VIII-2)
+- [ ] Testable-core principle followed for the project profile (Article I)
 
 ### 3. Code Style
 
@@ -46,7 +47,7 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 
 ### 4. Testing
 
-- [ ] Tests written before implementation (Article III)
+- [ ] Tests written before implementation (Article III, III-1)
 - [ ] Unit tests cover core logic
 - [ ] Integration tests verify component interaction
 - [ ] Test names clearly describe behavior
@@ -71,7 +72,7 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 ### 7. Maintainability
 
 - [ ] Code is readable and self-documenting
-- [ ] Functions/methods are appropriately sized
+- [ ] Functions/methods have at most 50 lines of code and source files at most 500 lines of code and 10 imports, or the configured limits (Article VII, VII-4–VII-6)
 - [ ] No code duplication
 - [ ] Dependencies are justified
 - [ ] Easy to modify/extend
@@ -145,17 +146,21 @@ Optional: This could be improved by [suggestion].
 
 ## Constitutional Compliance Check
 
-During review, verify:
+During review, verify (read `constitution.profile` from `steering/project.yml` first; default `library`):
 
-- [ ] **Article I**: Library-First - Feature in `lib/` directory?
-- [ ] **Article II**: CLI Interface - Library has CLI entry point?
-- [ ] **Article III**: Test-First - Tests committed before code?
-- [ ] **Article IV**: EARS - Requirements use EARS format?
-- [ ] **Article V**: Traceability - REQ-ID referenced in code/tests?
-- [ ] **Article VI**: Project Memory - Steering files consulted?
-- [ ] **Article VII**: Simplicity - Simplest viable solution?
-- [ ] **Article VIII**: Anti-Abstraction - No premature abstractions?
-- [ ] **Article IX**: Integration-First - Integration tests present?
+- [ ] **Article I**: Testable Core - Feature logic in a core module with tests that run without the UI, server or CLI; no imports from delivery paths (I-1–I-3)? Exported functions and classes of core modules have doc comments (I-5, advisory)?
+  - `library`, `cli`: Feature in `lib/` directory (I-L1)?
+  - `application`: Feature logic in a core path such as `src/lib/<domain>/`, no components or React hooks there; route handlers delegate to core (I-A3, I-A4)?
+- [ ] **Article II**: Automation Interface - Primary operations reachable without the UI (II-1)?
+  - `library`, `cli`: Library has CLI entry point with `--help` (II-L1, II-L2)?
+  - `application`: Machine-facing endpoints validate input against a schema; `package.json` scripts resolve (II-A4, II-A10)?
+- [ ] **Article III**: Test-First - Tests committed before code (III-1); every EARS requirement has a test (III-5)?
+- [ ] **Article IV**: EARS - Requirements use an EARS pattern and include acceptance criteria (IV-1, IV-3)?
+- [ ] **Article V**: Traceability - REQ-ID referenced in code and tests (V-2, V-4)?
+- [ ] **Article VI**: Project Memory - Steering files consulted (VI-4)?
+- [ ] **Article VII**: Simplicity - At most 3 projects, or Phase -1 Gate approval for more (VII-1, VII-2)? Source files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10, or the configured limits (VII-4–VII-6; a warning, not a Phase -1 Gate item)?
+- [ ] **Article VIII**: Anti-Abstraction - Framework APIs used directly; any wrapper has Phase -1 Gate approval or is a runtime-constraint client documented in design.md (VIII-1, VIII-2, VIII-4, VIII-5)?
+- [ ] **Article IX**: Integration-First - Integration tests use real services; each mock justified (IX-1, IX-4, IX-5)?
 
 ---
 

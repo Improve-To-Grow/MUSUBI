@@ -2,7 +2,9 @@
  * @fileoverview Safety Check integration for Guardrails
  *
  * Provides safety checks that can integrate with MUSUBI's
- * Constitutional Articles for governance compliance.
+ * Constitutional Articles for governance compliance. The constitutional checks follow the
+ * nine articles of steering/rules/constitution.md (v1.1) and share their rules with the
+ * CI checker (src/constitutional/articles.js).
  *
  * @module orchestration/guardrails/safety-check
  * @version 3.9.0
@@ -10,8 +12,14 @@
 
 'use strict';
 
-const { BaseGuardrail } = require('./base-guardrail');
+const { BaseGuardrail, GuardrailPhase } = require('./base-guardrail');
 const { rules } = require('./guardrail-rules');
+const {
+  CONTENT_TYPES,
+  NOT_APPLICABLE,
+  ConstitutionalMapping,
+  checkConstitutionalCompliance,
+} = require('./constitutional-compliance');
 
 /**
  * Safety check levels
@@ -25,66 +33,6 @@ const SafetyLevel = {
   STRICT: 'strict',
   /** Maximum safety with all checks enabled */
   PARANOID: 'paranoid',
-};
-
-/**
- * Constitutional article mappings for guardrail rules
- */
-const ConstitutionalMapping = {
-  // Article I: Spec Supremacy
-  SPEC_SUPREMACY: {
-    article: 'I',
-    title: 'Spec Supremacy',
-    checks: ['required', 'format'],
-  },
-  // Article II: Traceability Mandate
-  TRACEABILITY: {
-    article: 'II',
-    title: 'Traceability Mandate',
-    checks: ['traceId'],
-  },
-  // Article III: Immutable History
-  IMMUTABLE_HISTORY: {
-    article: 'III',
-    title: 'Immutable History',
-    checks: ['noModification'],
-  },
-  // Article IV: Validation Gates
-  VALIDATION_GATES: {
-    article: 'IV',
-    title: 'Validation Gates',
-    checks: ['validate'],
-  },
-  // Article V: Agent Boundaries
-  AGENT_BOUNDARIES: {
-    article: 'V',
-    title: 'Agent Boundaries',
-    checks: ['agentScope'],
-  },
-  // Article VI: Graceful Degradation
-  GRACEFUL_DEGRADATION: {
-    article: 'VI',
-    title: 'Graceful Degradation',
-    checks: ['fallback'],
-  },
-  // Article VII: Quality Assurance
-  QUALITY_ASSURANCE: {
-    article: 'VII',
-    title: 'Quality Assurance',
-    checks: ['quality'],
-  },
-  // Article VIII: Human Override
-  HUMAN_OVERRIDE: {
-    article: 'VIII',
-    title: 'Human Override',
-    checks: ['humanApproval'],
-  },
-  // Article IX: Continuous Improvement
-  CONTINUOUS_IMPROVEMENT: {
-    article: 'IX',
-    title: 'Continuous Improvement',
-    checks: ['metrics'],
-  },
 };
 
 /**
@@ -107,6 +55,7 @@ class SafetyCheckGuardrail extends BaseGuardrail {
    * @param {string} [config.level='standard'] - Safety level
    * @param {boolean} [config.enforceConstitution=false] - Enforce constitutional articles
    * @param {Array<string>} [config.enabledArticles] - Specific articles to enforce
+   * @param {string} [config.projectRoot] - Project whose profile and article levels apply
    * @param {Object} [config.customChecks] - Custom safety checks
    */
   constructor(config = {}) {
@@ -117,11 +66,13 @@ class SafetyCheckGuardrail extends BaseGuardrail {
       failFast: config.failFast,
       severity: config.severity || 'error',
       tripwireEnabled: config.tripwireEnabled,
+      phase: config.phase || GuardrailPhase.POST,
     });
 
     this.level = config.level || SafetyLevel.STANDARD;
     this.enforceConstitution = config.enforceConstitution || false;
     this.enabledArticles = config.enabledArticles || Object.keys(ConstitutionalMapping);
+    this.projectRoot = config.projectRoot || null;
     this.customChecks = config.customChecks || {};
 
     // Build rules based on safety level
@@ -169,19 +120,59 @@ class SafetyCheckGuardrail extends BaseGuardrail {
    * @returns {Promise<SafetyCheckResult>}
    */
   async check(input, context = {}) {
-    const violations = [];
-    const constitutionalViolations = [];
-    const scores = {};
-
-    // Extract content
     const content = this.extractContent(input);
+    const scores = {};
+    const violations = await this.runSafetyRules(content, context);
 
-    // Run standard safety rules
-    for (const rule of this.rules) {
+    // Agent boundaries (not a constitutional article)
+    const boundaryViolation = this.checkAgentBoundaries(input, context);
+    if (boundaryViolation) violations.push(boundaryViolation);
+
+    // Check constitutional compliance if enabled
+    const constitutional = this.enforceConstitution
+      ? await this.checkConstitutionalCompliance(input, context)
+      : { violations: [] };
+    if (this.enforceConstitution) scores.constitutional = constitutional.score;
+
+    violations.push(...(await this.runCustomChecks(input, context, scores)));
+
+    // Calculate overall safety score
+    const allViolations = [...violations, ...constitutional.violations];
+    const errorCount = allViolations.filter(v => v.severity === 'error').length;
+    const safe = errorCount === 0;
+
+    return this.createResult(
+      safe,
+      allViolations,
+      safe ? 'Safety check passed' : `Safety check failed with ${errorCount} error(s)`,
+      0,
+      {
+        level: this.level,
+        safe,
+        constitutionalCompliance: this.enforceConstitution,
+        constitutionalViolations: constitutional.violations,
+        articleScores: constitutional.articleScores,
+        scores,
+      }
+    );
+  }
+
+  /**
+   * Run the safety rules of the configured level. Injection detection targets untrusted text;
+   * typed artifacts (context.contentType: code, test, requirements, design) legitimately
+   * contain braces, `--` flags, table rules and comments, so it is skipped for them.
+   * @private
+   * @param {string} content - Content to check
+   * @param {Object} [context] - Execution context
+   * @returns {Promise<Array>} Violations
+   */
+  async runSafetyRules(content, context = {}) {
+    const isArtifact = CONTENT_TYPES.includes(context.contentType);
+    const violations = [];
+    for (const rule of this.rules.filter(r => !(isArtifact && r.id === 'noInjection'))) {
       try {
         const result = await Promise.resolve(rule.check(content));
-        let passed = typeof result === 'object' ? result.passed : result;
-
+        const passed = typeof result === 'object' ? result.passed : result;
         if (!passed) {
           violations.push(
             this.createViolation(rule.id.toUpperCase(), rule.message, rule.severity || 'error', {
@@ -195,20 +186,23 @@ class SafetyCheckGuardrail extends BaseGuardrail {
         );
       }
     }
+    return violations;
+  }
 
-    // Check constitutional compliance if enabled
-    if (this.enforceConstitution) {
-      const constitutionalResult = await this.checkConstitutionalCompliance(input, context);
-      constitutionalViolations.push(...constitutionalResult.violations);
-      scores.constitutional = constitutionalResult.score;
-    }
-
-    // Run custom checks
+  /**
+   * Run the custom checks and record their scores
+   * @private
+   * @param {*} input - Input to check
+   * @param {Object} context - Execution context
+   * @param {Object} scores - Scores by check name (updated)
+   * @returns {Promise<Array>} Violations
+   */
+  async runCustomChecks(input, context, scores) {
+    const violations = [];
     for (const [checkName, checkFn] of Object.entries(this.customChecks)) {
       try {
         const result = await checkFn(input, context);
         scores[checkName] = result.score || (result.passed ? 1.0 : 0.0);
-
         if (!result.passed) {
           violations.push(
             this.createViolation(
@@ -228,172 +222,44 @@ class SafetyCheckGuardrail extends BaseGuardrail {
         );
       }
     }
-
-    // Calculate overall safety score
-    const allViolations = [...violations, ...constitutionalViolations];
-    const errorCount = allViolations.filter(v => v.severity === 'error').length;
-    const safe = errorCount === 0;
-
-    return this.createResult(
-      safe,
-      allViolations,
-      safe ? 'Safety check passed' : `Safety check failed with ${errorCount} error(s)`,
-      0,
-      {
-        level: this.level,
-        safe,
-        constitutionalCompliance: this.enforceConstitution,
-        constitutionalViolations,
-        scores,
-      }
-    );
+    return violations;
   }
 
   /**
-   * Check constitutional article compliance
+   * Check constitutional article compliance of the content (see ./constitutional-compliance)
    * @private
    * @param {*} input - Input to check
-   * @param {Object} context - Execution context
-   * @returns {Promise<Object>}
+   * @param {Object} context - Execution context; contentType is required
+   * @returns {Promise<Object>} { compliant, score, violations, articleScores }
    */
   async checkConstitutionalCompliance(input, context) {
-    const violations = [];
-    let complianceScore = 1.0;
-    const articleScores = {};
-
-    for (const articleKey of this.enabledArticles) {
-      const mapping = ConstitutionalMapping[articleKey];
-      if (!mapping) continue;
-
-      const articleResult = await this.checkArticle(articleKey, mapping, input, context);
-      articleScores[mapping.article] = articleResult.score;
-
-      if (!articleResult.compliant) {
-        complianceScore -= (1 / this.enabledArticles.length) * (1 - articleResult.score);
-        violations.push(
-          this.createViolation(
-            `CONSTITUTIONAL_ARTICLE_${mapping.article}`,
-            `Constitutional Article ${mapping.article} (${mapping.title}) violation: ${articleResult.message}`,
-            'error',
-            { article: mapping.article, title: mapping.title }
-          )
-        );
-      }
-    }
-
-    return {
-      compliant: violations.length === 0,
-      score: Math.max(0, complianceScore),
-      violations,
-      articleScores,
-    };
+    return checkConstitutionalCompliance({
+      content: this.extractContent(input),
+      input,
+      context,
+      enabledArticles: this.enabledArticles,
+      projectRoot: context.projectRoot || this.projectRoot,
+      createViolation: (...args) => this.createViolation(...args),
+    });
   }
 
   /**
-   * Check a specific constitutional article
-   * @private
-   * @param {string} articleKey - Article key
-   * @param {Object} mapping - Article mapping
-   * @param {*} input - Input to check
-   * @param {Object} context - Execution context
-   * @returns {Promise<Object>}
-   */
-  async checkArticle(articleKey, mapping, input, context) {
-    // Default implementation - can be overridden for specific article checks
-    switch (articleKey) {
-      case 'SPEC_SUPREMACY':
-        // Check that input references specifications
-        return this.checkSpecSupremacy(input, context);
-
-      case 'TRACEABILITY':
-        // Check for trace IDs
-        return this.checkTraceability(input, context);
-
-      case 'VALIDATION_GATES':
-        // Check validation status
-        return this.checkValidationGates(input, context);
-
-      case 'AGENT_BOUNDARIES':
-        // Check agent scope
-        return this.checkAgentBoundaries(input, context);
-
-      default:
-        // Default: compliant
-        return { compliant: true, score: 1.0, message: 'Check not implemented' };
-    }
-  }
-
-  /**
-   * Check Article I: Spec Supremacy compliance
+   * Agent boundaries: an agent outside context.allowedAgents fails the safety check
    * @private
    */
-  async checkSpecSupremacy(input, context) {
-    // Check if the operation references specification
-    const hasSpecRef =
-      context.specId ||
-      context.requirementId ||
-      (typeof input === 'object' && (input.specId || input.requirementId));
-
-    return {
-      compliant: hasSpecRef !== false,
-      score: hasSpecRef ? 1.0 : 0.5,
-      message: hasSpecRef ? 'Specification reference found' : 'No specification reference',
-    };
-  }
-
-  /**
-   * Check Article II: Traceability Mandate compliance
-   * @private
-   */
-  async checkTraceability(input, context) {
-    const hasTraceId =
-      context.traceId ||
-      context.correlationId ||
-      (typeof input === 'object' && (input.traceId || input.correlationId));
-
-    return {
-      compliant: hasTraceId !== false,
-      score: hasTraceId ? 1.0 : 0.5,
-      message: hasTraceId ? 'Trace ID found' : 'No trace ID',
-    };
-  }
-
-  /**
-   * Check Article IV: Validation Gates compliance
-   * @private
-   */
-  async checkValidationGates(input, context) {
-    const isValidated =
-      context.validated === true || (typeof input === 'object' && input.validated === true);
-
-    return {
-      compliant: true, // Validation is optional at input stage
-      score: isValidated ? 1.0 : 0.7,
-      message: isValidated ? 'Content validated' : 'Content not yet validated',
-    };
-  }
-
-  /**
-   * Check Article V: Agent Boundaries compliance
-   * @private
-   */
-  async checkAgentBoundaries(input, context) {
-    const agentId = context.agentId || (typeof input === 'object' && input.agentId);
+  checkAgentBoundaries(input, context) {
+    const agentId = context.agentId || (typeof input === 'object' && input?.agentId);
     const allowedAgents = context.allowedAgents || [];
 
-    if (!agentId) {
-      return { compliant: true, score: 0.8, message: 'No agent specified' };
+    if (!agentId || allowedAgents.length === 0 || allowedAgents.includes(agentId)) {
+      return null;
     }
-
-    if (allowedAgents.length > 0 && !allowedAgents.includes(agentId)) {
-      return {
-        compliant: false,
-        score: 0.0,
-        message: `Agent '${agentId}' not in allowed list`,
-      };
-    }
-
-    return { compliant: true, score: 1.0, message: 'Agent within boundaries' };
+    return this.createViolation(
+      'AGENT_BOUNDARY',
+      `Agent '${agentId}' not in allowed list`,
+      'error',
+      { agentId, allowedAgents }
+    );
   }
 
   /**
@@ -468,4 +334,6 @@ module.exports = {
   createSafetyCheckGuardrail,
   SafetyLevel,
   ConstitutionalMapping,
+  CONTENT_TYPES,
+  NOT_APPLICABLE,
 };

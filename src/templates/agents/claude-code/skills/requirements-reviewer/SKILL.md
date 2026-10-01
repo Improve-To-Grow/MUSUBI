@@ -990,9 +990,9 @@ After the fixes are complete, the following report is generated:
 
 ---
 
-## 13. Constitutional Compliance (CONST-003)
+## 13. Constitutional Compliance (CONST-004)
 
-This skill ensures compliance with Article 3 (Quality Assurance) of the MUSUBI Constitution:
+This skill checks requirements against Article 4 (EARS Requirements Format) of the MUSUBI Constitution: each requirement uses one of the 5 EARS patterns (IV-1), has a single interpretation (IV-2) and includes acceptance criteria (IV-3). The review provides:
 
 - ✅ **Systematic Review**: Structured inspection process ensures thorough quality checks
 - ✅ **Defect Prevention**: Early defect identification prevents downstream issues

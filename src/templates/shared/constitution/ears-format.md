@@ -68,7 +68,7 @@ The logging system SHALL output logs in JSON format.
 ### REQ-AUTH-002: User Login
 
 WHEN a user provides valid credentials,
-THEN the authentication system SHALL authenticate the user
+the authentication system SHALL authenticate the user
 AND the system SHALL create a session
 AND the system SHALL redirect to the dashboard.
 
@@ -84,7 +84,7 @@ AND the system SHALL redirect to the dashboard.
 ### REQ-NOTIFY-001: Order Confirmation
 
 WHEN an order is successfully placed,
-THEN the notification system SHALL send an email confirmation
+the notification system SHALL send an email confirmation
 AND the system SHALL include order details
 AND the system SHALL include tracking number.
 
@@ -327,7 +327,7 @@ Every requirement MUST have acceptance criteria that:
 ### REQ-REG-001: Account Creation
 
 WHEN a user submits valid registration information,
-THEN the registration system SHALL create a new user account
+the registration system SHALL create a new user account
 AND the system SHALL hash the password using bcrypt
 AND the system SHALL send a verification email
 AND the system SHALL return HTTP 201 with user ID.
@@ -618,13 +618,13 @@ The authentication system SHALL hash passwords using bcrypt with cost factor 12.
 
 ## Quick Reference
 
-| Pattern      | Keyword              | Use Case                    | Example                                     |
-| ------------ | -------------------- | --------------------------- | ------------------------------------------- |
-| Ubiquitous   | `The [system] SHALL` | Always-active functionality | The API SHALL authenticate requests         |
-| Event-Driven | `WHEN ... THEN`      | Triggered by events         | WHEN user clicks Submit, THEN validate form |
-| State-Driven | `WHILE ... SHALL`    | Active during state         | WHILE loading, UI SHALL show spinner        |
-| Unwanted     | `IF ... THEN`        | Error handling              | IF timeout, THEN return HTTP 504            |
-| Optional     | `WHERE ... SHALL`    | Feature flags               | WHERE 2FA enabled, SHALL require OTP        |
+| Pattern      | Keyword                   | Use Case                    | Example                                          |
+| ------------ | ------------------------- | --------------------------- | ------------------------------------------------ |
+| Ubiquitous   | `The [system] SHALL`      | Always-active functionality | The API SHALL authenticate requests              |
+| Event-Driven | `WHEN ..., the ... SHALL` | Triggered by events         | WHEN user clicks Submit, the form SHALL validate |
+| State-Driven | `WHILE ... SHALL`         | Active during state         | WHILE loading, UI SHALL show spinner             |
+| Unwanted     | `IF ... THEN`             | Error handling              | IF timeout, THEN return HTTP 504                 |
+| Optional     | `WHERE ... SHALL`         | Feature flags               | WHERE 2FA enabled, SHALL require OTP             |
 
 ---
 

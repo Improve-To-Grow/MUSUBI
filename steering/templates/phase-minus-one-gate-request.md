@@ -21,8 +21,12 @@ Use this template to request approval for exceptions to Constitutional Articles 
 
 ### Which article requires exception?
 
-- [ ] **Article VII**: Exceeding 3 project limit
-- [ ] **Article VIII**: Creating abstraction layer over framework
+- [ ] **Article VII**: Exceeding the 3-project limit (VII-1); the additional projects are not implemented before approval (VII-2)
+- [ ] **Article VIII**: Creating an abstraction layer or wrapper library over a framework (VIII-2)
+
+A project-owned client that exists because the vendor SDK cannot run on the target runtime needs no gate request (VIII-4); document the constraint in design.md instead (VIII-5).
+
+The code-size limits of Article VII (VII-4–VII-6) need no gate request either: findings are reported at the article's level (CONST-007), and a project changes the limits with `constitution.overrides.code_limits` in `steering/project.yml`.
 
 ---
 
@@ -56,9 +60,11 @@ Use this template to request approval for exceptions to Constitutional Articles 
 
 ## For Simplicity Gate (Article VII)
 
+A project is an independently deployable unit. design.md justifies each additional project with business requirements, technical constraints and a team capacity analysis (VII-3); this section carries the same analysis.
+
 ### Current Project Count
 
-| # | Project | Purpose | Independent? |
+| # | Project | Purpose | Independently deployable? |
 |---|---------|---------|--------------|
 | 1 | [name] | [purpose] | Yes/No |
 | 2 | [name] | [purpose] | Yes/No |
@@ -80,6 +86,8 @@ Use this template to request approval for exceptions to Constitutional Articles 
 ---
 
 ## For Anti-Abstraction Gate (Article VIII)
+
+The request includes a multi-framework support justification, a team expertise analysis and a migration path (VIII-3).
 
 ### Framework Being Abstracted
 
@@ -193,6 +201,7 @@ If approved, the following constraints will apply:
 ### Documentation Updates
 
 - [ ] Updated `steering/complexity-tracking.md`
+- [ ] Article VII: justification for each additional project recorded in design.md (VII-3)
 - [ ] Updated architecture documentation
 - [ ] Team notified
 

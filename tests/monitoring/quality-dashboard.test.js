@@ -385,9 +385,20 @@ describe('HEALTH_STATUS', () => {
 });
 
 describe('CONSTITUTIONAL_ARTICLES', () => {
-  test('should have all 9 articles', () => {
-    expect(Object.keys(CONSTITUTIONAL_ARTICLES).length).toBe(9);
-    expect(CONSTITUTIONAL_ARTICLES.SINGLE_SOURCE_OF_TRUTH).toBe('article-1');
-    expect(CONSTITUTIONAL_ARTICLES.GOVERNANCE).toBe('article-9');
+  test('should have the nine articles of the constitution', () => {
+    expect(Object.keys(CONSTITUTIONAL_ARTICLES)).toEqual([
+      'TESTABLE_CORE',
+      'AUTOMATION_INTERFACE',
+      'TEST_FIRST',
+      'EARS_FORMAT',
+      'TRACEABILITY',
+      'PROJECT_MEMORY',
+      'SIMPLICITY_GATE',
+      'ANTI_ABSTRACTION',
+      'INTEGRATION_FIRST',
+    ]);
+    expect(CONSTITUTIONAL_ARTICLES.TESTABLE_CORE).toBe('article-1');
+    expect(CONSTITUTIONAL_ARTICLES.TRACEABILITY).toBe('article-5');
+    expect(CONSTITUTIONAL_ARTICLES.INTEGRATION_FIRST).toBe('article-9');
   });
 });

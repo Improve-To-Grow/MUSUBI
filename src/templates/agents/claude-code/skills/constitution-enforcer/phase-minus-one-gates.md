@@ -18,7 +18,7 @@ User Request
 │  ┌─────────────────────────────────┐   │
 │  │ Gate 1: Steering Check          │   │
 │  │ Gate 2: EARS Validation         │   │
-│  │ Gate 3: Library-First Check     │   │
+│  │ Gate 3: Testable-Core Gate      │   │
 │  │ Gate 4: Test-First Confirmation │   │
 │  │ Gate 5: Traceability Setup      │   │
 │  │ Gate 6: Simplicity Gate         │   │
@@ -50,20 +50,20 @@ required_files=(
 
 for file in "${required_files[@]}"; do
     if [ ! -f "$file" ]; then
-        FAIL "Steering file missing: $file"
+        FAIL "VI-1–VI-3: Steering file missing: $file"
     fi
 done
 
-# Check if steering was read (agent must confirm)
+# Check if steering was read (agent must confirm, VI-4)
 PASS "Steering files exist and will be consulted"
 ```
 
 **Pass Criteria**:
 
-- [ ] `steering/structure.md` exists
-- [ ] `steering/tech.md` exists
-- [ ] `steering/product.md` exists
-- [ ] Agent confirms steering review
+- [ ] `steering/structure.md` exists (VI-1)
+- [ ] `steering/tech.md` exists (VI-2)
+- [ ] `steering/product.md` exists (VI-3)
+- [ ] Agent confirms steering review (VI-4)
 
 **Failure Action**:
 → Run `steering` skill to generate missing files
@@ -93,18 +93,19 @@ def validate_ears_format(requirements_file):
 
     for line in requirements_file:
         if any(kw in line.lower() for kw in invalid_keywords):
-            FAIL(f"Ambiguous keyword found: {line}")
+            FAIL(f"IV-2: Ambiguous keyword found: {line}")
 
         if "REQ-" in line and not any(re.match(p, line) for p in valid_patterns):
-            WARN(f"Requirement may not follow EARS: {line}")
+            WARN(f"IV-1: Requirement may not follow EARS: {line}")
 
     PASS("All requirements follow EARS format")
 ```
 
 **Pass Criteria**:
 
-- [ ] All requirements use SHALL/MUST (not should/may)
-- [ ] Requirements follow EARS patterns
+- [ ] All requirements use SHALL/MUST (not should/may), with a single interpretation (IV-2)
+- [ ] Requirements follow one of the 5 EARS patterns (IV-1)
+- [ ] Each requirement has acceptance criteria (IV-3)
 - [ ] Each requirement has unique ID (REQ-XXX)
 
 **Failure Action**:
@@ -112,36 +113,58 @@ def validate_ears_format(requirements_file):
 
 ---
 
-## Gate 3: Library-First Check (Article I)
+## Gate 3: Testable-Core Gate (Article I)
 
-**Purpose**: Ensure features are implemented as standalone libraries first.
+**Purpose**: Ensure feature logic lives in core modules that are tested without the UI, server or CLI. The project profile decides what a core module is.
 
 **Validation**:
 
 ```bash
+# Read the profile and core paths from steering/project.yml
+# (default profile: library, P-2; default core paths for library/cli: lib/ packages/, P-3)
+profile=$(yq '.constitution.profile // "library"' steering/project.yml)
+core_paths=$(yq '.constitution.core_paths // [] | .[]' steering/project.yml)
+
 # For new features, check target directory
 feature_path="$1"
+core_module_path="$2" # application: core module named for the feature in design.md
 
-if [[ "$feature_path" == *"/app/"* ]] || [[ "$feature_path" == *"/web/"* ]]; then
-    # Check if corresponding lib exists
-    lib_path=$(echo "$feature_path" | sed 's/app\//lib\//; s/web\//lib\//')
+case "$profile" in
+library|cli)
+    # I-L1: the feature starts as a library under a core path
+    if [[ "$feature_path" == *"/app/"* ]] || [[ "$feature_path" == *"/web/"* ]]; then
+        # Check if corresponding lib exists
+        lib_path=$(echo "$feature_path" | sed 's/app\//lib\//; s/web\//lib\//')
 
-    if [ ! -d "$lib_path" ]; then
-        FAIL "Feature must be in lib/ first before app/ or web/"
+        if [ ! -d "$lib_path" ]; then
+            FAIL "I-L1: Feature must be in lib/ first before app/ or web/"
+        fi
     fi
-fi
+    ;;
+application)
+    # I-1, I-A1: the feature's core module is a folder under a core path, e.g. src/lib/<domain>/
+    # (app/ is a delivery path here, not a violation)
+    if ! is_under "$core_module_path" $core_paths; then
+        FAIL "I-A1: Core module must be a folder under a core path (${core_paths})"
+    fi
+    ;;
+esac
 
-PASS "Library-First principle satisfied"
+PASS "Testable-Core principle satisfied"
 ```
 
 **Pass Criteria**:
 
-- [ ] New feature targets `lib/` directory first
-- [ ] OR: Existing `lib/` module exists for the feature
-- [ ] Library has no framework dependencies
+- [ ] Feature logic targets a core path (I-1)
+- [ ] Core module will have tests that run without the app, a browser or a CLI (I-2)
+- [ ] Core module does not import from delivery paths (I-3)
+- [ ] Exported functions and classes of the core module will have doc comments (I-5, advisory)
+- [ ] (`library`, `cli`) New feature targets `lib/` directory first, OR an existing `lib/` module exists for the feature (I-L1)
+- [ ] (`application`) Core module is a folder under a core path, e.g. `src/lib/<domain>/`, with no UI-only code (I-A1, I-A4)
 
 **Failure Action**:
-→ Restructure to create `lib/` module first
+→ `library`, `cli`: Restructure to create `lib/` module first
+→ `application`: Move feature logic from the delivery layer into a folder under a core path
 
 ---
 
@@ -156,9 +179,9 @@ PASS "Library-First principle satisfied"
 echo "TEST-FIRST CONFIRMATION REQUIRED"
 echo ""
 echo "Do you confirm that:"
-echo "1. Tests will be written BEFORE implementation code?"
-echo "2. Tests will be committed BEFORE source code?"
-echo "3. Red-Green-Refactor cycle will be followed?"
+echo "1. Tests will be written BEFORE implementation code (III-1)?"
+echo "2. Tests will be committed BEFORE source code (III-1)?"
+echo "3. Red-Green-Blue cycle will be followed (III-2–III-4)?"
 echo ""
 
 # Agent must explicitly confirm
@@ -171,8 +194,9 @@ PASS "Test-First commitment confirmed"
 
 **Pass Criteria**:
 
-- [ ] Agent confirms test-first commitment
+- [ ] Agent confirms test-first commitment (III-1)
 - [ ] Test file paths identified
+- [ ] A test planned for every EARS requirement (III-5)
 - [ ] Test framework confirmed in steering/tech.md
 
 **Failure Action**:
@@ -210,10 +234,10 @@ def validate_traceability_setup(feature_name):
 **Pass Criteria**:
 
 - [ ] Requirements file exists or will be created first
-- [ ] Design will reference requirements
-- [ ] Tasks will reference design
-- [ ] Code will reference tasks
-- [ ] Tests will reference requirements
+- [ ] Design will reference requirements and include a coverage matrix (V-1, V-5)
+- [ ] Tasks will map to requirements (V-6)
+- [ ] Code will map to requirements (V-2)
+- [ ] Tests will reference requirement IDs (V-3, V-4)
 
 **Failure Action**:
 → Create requirements before proceeding
@@ -222,50 +246,41 @@ def validate_traceability_setup(feature_name):
 
 ## Gate 6: Simplicity Gate (Article VII)
 
-**Purpose**: Enforce simplest viable solution.
+**Purpose**: Limit the initial architecture to at most 3 projects. A project is an independently deployable unit.
+
+**Not gated**: The code-size limits of Article VII (VII-4–VII-6: lines of code per file and per function, imports per file) do not decide this gate. They are checked at the article's level (CONST-007), not gated.
 
 **Validation**:
 
 ```markdown
 ## Simplicity Checklist
 
-For the proposed solution, verify:
+For the proposed design, verify:
 
-1. **Minimal Dependencies**
-   - [ ] Uses only necessary dependencies
-   - [ ] Avoids "nice-to-have" libraries
-   - [ ] Each dependency is justified
+1. **Project Count**
+   - [ ] Count each independently deployable unit (web app, API service, worker)
+   - [ ] Initial architecture has at most 3 projects (VII-1)
 
-2. **Minimal Abstractions**
-   - [ ] No premature abstraction
-   - [ ] Concrete implementations first
-   - [ ] Abstractions only when pattern repeats 3+ times
-
-3. **Minimal Scope**
-   - [ ] Implements only specified requirements
-   - [ ] No gold-plating
-   - [ ] YAGNI (You Aren't Gonna Need It) applied
-
-4. **Readability Over Cleverness**
-   - [ ] Clear, simple code preferred
-   - [ ] No clever tricks unless necessary
-   - [ ] Comments explain "why", not "what"
+2. **More Than 3 Projects**
+   - [ ] Phase -1 Gate approval before implementing the additional projects (VII-2)
+   - [ ] Approval from `system-architect` and `project-manager`
+   - [ ] design.md justifies each additional project with business requirements,
+         technical constraints and a team capacity analysis (VII-3)
 ```
 
 **Pass Criteria**:
 
-- [ ] Solution is the simplest that satisfies requirements
-- [ ] No unnecessary complexity identified
-- [ ] Dependencies are minimal and justified
+- [ ] At most 3 projects (VII-1), or Phase -1 Gate approval for the additional projects (VII-2)
+- [ ] Each additional project justified in design.md (VII-3)
 
 **Failure Action**:
-→ Simplify proposed approach
+→ Reduce the project count, or submit a Phase -1 Gate request (`steering/templates/phase-minus-one-gate-request.md`) with the VII-3 justification
 
 ---
 
 ## Gate 7: Anti-Abstraction Gate (Article VIII)
 
-**Purpose**: Prevent unnecessary abstraction layers.
+**Purpose**: Use framework features directly; a custom abstraction layer over a framework needs Phase -1 Gate approval.
 
 **Validation**:
 
@@ -274,31 +289,28 @@ For the proposed solution, verify:
 
 For the proposed solution, verify:
 
-1. **No Premature Interfaces**
-   - [ ] Interfaces created only for actual polymorphism
-   - [ ] No "just in case" interfaces
+1. **Framework Used Directly**
+   - [ ] Framework APIs called directly (VIII-1)
+   - [ ] No custom abstraction layer or wrapper library over a framework (VIII-2)
 
-2. **No Unnecessary Factories**
-   - [ ] Factory patterns only when construction logic is complex
-   - [ ] Direct instantiation preferred when possible
+2. **Abstraction Proposed**
+   - [ ] Phase -1 Gate approval from `system-architect` and `software-developer` (VIII-2)
+   - [ ] Gate request includes a multi-framework support justification,
+         a team expertise analysis and a migration path (VIII-3)
 
-3. **No Over-Engineering**
-   - [ ] No enterprise patterns for simple problems
-   - [ ] Complexity justified by requirements
-
-4. **Concrete First**
-   - [ ] Start with concrete implementations
-   - [ ] Refactor to abstractions when duplication appears
+3. **Runtime Constraint**
+   - [ ] Vendor SDK cannot run on the target runtime (VIII-4)
+   - [ ] Constraint documented in design.md (VIII-5)
 ```
 
 **Pass Criteria**:
 
-- [ ] No premature abstraction patterns
-- [ ] Concrete implementations prioritized
-- [ ] Any abstraction is justified by requirements
+- [ ] Framework APIs used directly (VIII-1)
+- [ ] Any abstraction over a framework has Phase -1 Gate approval (VIII-2) with the analysis VIII-3 requires
+- [ ] A project-owned client that exists because the vendor SDK cannot run on the target runtime (VIII-4) has that constraint documented in design.md (VIII-5)
 
 **Failure Action**:
-→ Remove unnecessary abstractions from proposal
+→ Use the framework directly, or submit a Phase -1 Gate request with the VIII-3 analysis
 
 ---
 
@@ -313,8 +325,8 @@ For the proposed solution, verify:
     ├── Gate 2: Validate EARS format
     │     └── FAIL? → Run requirements-analyst
     │
-    ├── Gate 3: Check library-first structure
-    │     └── FAIL? → Restructure to lib/ first
+    ├── Gate 3: Check testable-core structure (per project profile)
+    │     └── FAIL? → Restructure to lib/ first (library, cli) or move logic into a core path (application)
     │
     ├── Gate 4: Confirm test-first commitment
     │     └── FAIL? → Cannot proceed
@@ -322,11 +334,11 @@ For the proposed solution, verify:
     ├── Gate 5: Verify traceability setup
     │     └── FAIL? → Create requirements first
     │
-    ├── Gate 6: Simplicity check
-    │     └── FAIL? → Simplify approach
+    ├── Gate 6: Simplicity check (at most 3 projects)
+    │     └── FAIL? → Reduce projects or request Phase -1 Gate approval
     │
     └── Gate 7: Anti-abstraction check
-          └── FAIL? → Remove abstractions
+          └── FAIL? → Use the framework directly or request Phase -1 Gate approval
     │
     ▼
 ALL GATES PASSED → Proceed to implementation
@@ -342,18 +354,19 @@ ALL GATES PASSED → Proceed to implementation
 **Feature**: [Feature Name]
 **Date**: [YYYY-MM-DD]
 **Validator**: constitution-enforcer
+**Profile**: [library | cli | application]
 
 ## Gate Results
 
-| Gate                | Status  | Notes                  |
-| ------------------- | ------- | ---------------------- |
-| 1. Steering Check   | ✅ PASS | All files exist        |
-| 2. EARS Validation  | ✅ PASS | 5/5 requirements valid |
-| 3. Library-First    | ✅ PASS | Target: lib/auth/      |
-| 4. Test-First       | ✅ PASS | Commitment confirmed   |
-| 5. Traceability     | ✅ PASS | Requirements exist     |
-| 6. Simplicity       | ✅ PASS | Minimal approach       |
-| 7. Anti-Abstraction | ✅ PASS | No premature patterns  |
+| Gate                | Status  | Notes                   |
+| ------------------- | ------- | ----------------------- |
+| 1. Steering Check   | ✅ PASS | All files exist         |
+| 2. EARS Validation  | ✅ PASS | 5/5 requirements valid  |
+| 3. Testable Core    | ✅ PASS | Target: lib/auth/       |
+| 4. Test-First       | ✅ PASS | Commitment confirmed    |
+| 5. Traceability     | ✅ PASS | Requirements exist      |
+| 6. Simplicity       | ✅ PASS | 2 projects (≤ 3)        |
+| 7. Anti-Abstraction | ✅ PASS | Framework used directly |
 
 ## Overall Result: ✅ PASS
 
@@ -380,15 +393,19 @@ Implementation may proceed.
 
 - Gate 3: Requires architectural decision
 - Gate 4: Requires developer commitment
-- Gate 6: Requires design simplification
-- Gate 7: Requires refactoring proposal
+- Gate 6: Requires fewer projects or a Phase -1 Gate request
+- Gate 7: Requires removing the wrapper or a Phase -1 Gate request
 
 ### Blocking Gates
 
 - Gate 4 (Test-First): MUST pass - no exceptions
-- Gate 2 (EARS): MUST pass - no exceptions
+- Gate 2 (EARS): Blocks when EARS is required for the workflow mode (`ears_required`, medium and large by default); Article IV itself is advisory (CONST-004)
 
 ### Waivable Gates (with justification)
 
-- Gate 6 (Simplicity): Waivable with documented reason
-- Gate 7 (Anti-Abstraction): Waivable with documented reason
+- Gate 6 (Simplicity): Waivable with Phase -1 Gate approval and a justification in design.md (VII-2, VII-3)
+- Gate 7 (Anti-Abstraction): Waivable with Phase -1 Gate approval (VIII-2, VIII-3), or by a runtime constraint documented in design.md (VIII-4, VIII-5)
+
+### Profile-Dependent Gates
+
+- Gate 3 (Testable Core): Blocks when Article I is critical for the project profile (`library` and `cli` by default); warns for `application` unless `constitution.levels` sets CONST-001 to critical (P-5, P-6)

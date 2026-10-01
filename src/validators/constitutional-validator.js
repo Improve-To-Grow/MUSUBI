@@ -7,31 +7,37 @@
  * Part of MUSUBI SDD governance system.
  *
  * v2.0: Supports Constitution levels (critical/advisory/flexible)
+ * v2.1: Articles I and II follow the project profile (library | cli | application)
+ *       declared in steering/project.yml (constitution v1.1, "Project Profiles")
  */
 
 const fs = require('fs');
 const path = require('path');
-const glob = require('glob');
-const {
-  ConstitutionLevelManager,
-  ArticleId,
-  EnforcementLevel: _EnforcementLevel,
-} = require('./constitution-level-manager');
+const { ConstitutionLevelManager, ArticleId } = require('./constitution-level-manager');
+const { isUnder } = require('../constitutional/articles');
+const { ProjectFiles, CODE_EXTENSIONS } = require('./project-files');
+const { checkTestableCore, checkAutomationInterface, checkCodeSize } = require('./profile-checks');
 
+/**
+ * Validates a project against the 9 Constitutional Articles of steering/rules/constitution.md
+ */
 class ConstitutionalValidator {
   constructor(projectRoot, options = {}) {
     this.projectRoot = projectRoot;
     this.violations = [];
     this.warnings = [];
     this.passes = [];
+    this._packageTypeExplicit = Boolean(options.packageType);
     this.options = {
+      ...options,
       mode: options.mode || 'medium',
       packageType: options.packageType || 'application',
       strict: options.strict || false,
-      ...options,
     };
     this.levelManager = new ConstitutionLevelManager(projectRoot);
+    this.files = new ProjectFiles(projectRoot);
     this._levelCache = {};
+    this.profileConfig = null;
   }
 
   /**
@@ -43,8 +49,8 @@ class ConstitutionalValidator {
     // Load level configuration
     await this._loadLevelConfig();
 
-    await this.validateArticleI(); // Library-First
-    await this.validateArticleII(); // CLI Interface
+    await this.validateArticleI(); // Testable Core
+    await this.validateArticleII(); // Automation Interface
     await this.validateArticleIII(); // Test-First
     await this.validateArticleIV(); // EARS Format
     await this.validateArticleV(); // Traceability
@@ -57,16 +63,23 @@ class ConstitutionalValidator {
   }
 
   /**
-   * Load level configuration for context
+   * Load the project profile and level configuration
    * @private
    */
   async _loadLevelConfig() {
+    this.profileConfig = await this.levelManager.getProfileConfig();
+
+    // A declared profile doubles as the package type for configurable values
+    if (!this._packageTypeExplicit && this.profileConfig.declared && this.profileConfig.valid) {
+      this.options.packageType = this.profileConfig.profile;
+    }
+
     const context = {
       mode: this.options.mode,
       packageType: this.options.packageType,
     };
 
-    for (const articleId of Object.values(ArticleId)) {
+    for (const articleId of new Set(Object.values(ArticleId))) {
       this._levelCache[articleId] = {
         level: await this.levelManager.getArticleLevel(articleId),
         enforcement: await this.levelManager.getEnforcementType(articleId),
@@ -79,6 +92,7 @@ class ConstitutionalValidator {
     this._levelCache.mockAllowed = await this.levelManager.isMockAllowed(null, context);
     this._levelCache.earsRequired = await this.levelManager.isEarsRequired(context);
     this._levelCache.adrRequired = await this.levelManager.isAdrRequired(context);
+    this._levelCache.codeLimits = await this.levelManager.getCodeLimits();
   }
 
   /**
@@ -88,9 +102,11 @@ class ConstitutionalValidator {
    * @param {boolean} passed - Whether the check passed
    * @param {string} message - Finding message
    * @param {string} recommendation - Recommendation for fixing
+   * @param {object} [options] - { advisory: true } for requirements tagged (advisory),
+   *   which never block, whatever the article level
    * @private
    */
-  _recordFinding(articleId, articleName, passed, message, recommendation) {
+  _recordFinding(articleId, articleName, passed, message, recommendation, options = {}) {
     const levelInfo = this._levelCache[articleId] || { level: 'advisory', isBlocking: false };
 
     if (passed) {
@@ -103,22 +119,25 @@ class ConstitutionalValidator {
       return;
     }
 
+    const level = options.advisory ? 'advisory' : levelInfo.level;
+    const isBlocking = options.advisory ? false : levelInfo.isBlocking;
+
     // Determine severity based on level
-    if (levelInfo.isBlocking || this.options.strict) {
+    if (isBlocking || this.options.strict) {
       this.violations.push({
         article: articleName,
         articleId,
-        level: levelInfo.level,
+        level,
         message,
-        severity: levelInfo.level === 'critical' ? 'critical' : 'high',
-        blocking: levelInfo.isBlocking,
+        severity: level === 'critical' ? 'critical' : 'high',
+        blocking: isBlocking,
         recommendation,
       });
     } else {
       this.warnings.push({
         article: articleName,
         articleId,
-        level: levelInfo.level,
+        level,
         message,
         recommendation,
       });
@@ -126,101 +145,35 @@ class ConstitutionalValidator {
   }
 
   /**
-   * Article I: Library-First Principle (CRITICAL)
+   * Context for the profile checks of one article
+   * @private
    */
-  async validateArticleI() {
-    const articleId = ArticleId.LIBRARY_FIRST;
-    const articleName = 'Article I: Library-First';
-
-    // Check for lib/ or packages/ directory
-    const libDirs = ['lib', 'packages', 'libs', 'src'].filter(dir =>
-      fs.existsSync(path.join(this.projectRoot, dir))
-    );
-
-    if (libDirs.length === 0) {
-      this._recordFinding(
-        articleId,
-        articleName,
-        false,
-        'No library directory found (lib/, packages/, libs/, src/)',
-        'Create a lib/ directory for reusable components'
-      );
-    } else {
-      this._recordFinding(
-        articleId,
-        articleName,
-        true,
-        `Library directory found: ${libDirs.join(', ')}`,
-        null
-      );
-    }
-
-    // Check if features have test suites
-    const libPath = path.join(this.projectRoot, libDirs[0] || 'lib');
-    if (fs.existsSync(libPath)) {
-      const subDirs = fs
-        .readdirSync(libPath)
-        .filter(f => fs.statSync(path.join(libPath, f)).isDirectory());
-
-      for (const lib of subDirs) {
-        // Check multiple possible test directory names
-        const testDirs = ['tests', 'test', '__tests__'];
-        const hasTestDir = testDirs.some(dir => fs.existsSync(path.join(libPath, lib, dir)));
-
-        // Check for test files in the library root or test subdirectories
-        const testFile = glob.sync(path.join(libPath, lib, '**/*.test.{js,ts}'));
-        const specFile = glob.sync(path.join(libPath, lib, '**/*.spec.{js,ts}'));
-
-        if (!hasTestDir && testFile.length === 0 && specFile.length === 0) {
-          this._recordFinding(
-            articleId,
-            articleName,
-            false,
-            `Library '${lib}' has no test suite`,
-            `Add tests to ${libPath}/${lib}/`
-          );
-        }
-      }
-    }
+  _checkContext(articleId, articleName) {
+    return {
+      files: this.files,
+      profile: this.profileConfig,
+      limits: this._levelCache.codeLimits,
+      record: (passed, message, recommendation, options) =>
+        this._recordFinding(articleId, articleName, passed, message, recommendation, options),
+    };
   }
 
   /**
-   * Article II: CLI Interface Mandate (ADVISORY)
+   * Article I: Testable-Core Principle
+   * CRITICAL for library and cli, ADVISORY for application (P-5)
+   */
+  async validateArticleI() {
+    checkTestableCore(this._checkContext(ArticleId.TESTABLE_CORE, 'Article I: Testable Core'));
+  }
+
+  /**
+   * Article II: Automation Interface Mandate
+   * ADVISORY for library and application, CRITICAL for cli (P-5)
    */
   async validateArticleII() {
-    const articleId = ArticleId.CLI_INTERFACE;
-    const articleName = 'Article II: CLI Interface';
-
-    // Check for bin/ directory
-    const binPath = path.join(this.projectRoot, 'bin');
-    const packageJson = this.readPackageJson();
-
-    if (fs.existsSync(binPath)) {
-      const cliFiles = fs.readdirSync(binPath);
-      this._recordFinding(
-        articleId,
-        articleName,
-        true,
-        `CLI interfaces found in bin/: ${cliFiles.length} file(s)`,
-        null
-      );
-    } else if (packageJson?.bin) {
-      this._recordFinding(
-        articleId,
-        articleName,
-        true,
-        `CLI entry points defined in package.json`,
-        null
-      );
-    } else {
-      this._recordFinding(
-        articleId,
-        articleName,
-        false,
-        'No CLI interface found',
-        'Add bin/ directory or define "bin" in package.json'
-      );
-    }
+    checkAutomationInterface(
+      this._checkContext(ArticleId.AUTOMATION_INTERFACE, 'Article II: Automation Interface')
+    );
   }
 
   /**
@@ -230,28 +183,31 @@ class ConstitutionalValidator {
     const articleId = ArticleId.TEST_FIRST;
     const articleName = 'Article III: Test-First';
 
-    // Check for test directory
-    const testDirs = ['tests', 'test', '__tests__', 'spec'].filter(dir =>
-      fs.existsSync(path.join(this.projectRoot, dir))
-    );
+    // Check for a test directory or co-located test files
+    const testDirs = this.files.testDirs();
+    const hasColocatedTests =
+      testDirs.length === 0 && this.files.glob(`**/*.{test,spec}.${CODE_EXTENSIONS}`).length > 0;
 
-    if (testDirs.length === 0) {
+    if (testDirs.length === 0 && !hasColocatedTests) {
       this._recordFinding(
         articleId,
         articleName,
         false,
-        'No test directory found',
-        'Create tests/ directory with test files'
+        'No tests found (no test directory and no *.test.* or *.spec.* files)',
+        'Create tests/ or co-located *.test.* files'
       );
       return;
     }
 
     // Check test coverage configuration
-    const jestConfig = fs.existsSync(path.join(this.projectRoot, 'jest.config.js'));
-    const coverageDir = fs.existsSync(path.join(this.projectRoot, 'coverage'));
+    const packageJson = this.readPackageJson();
+    const hasCoverageConfig =
+      this.files.glob('{jest,vitest}.config.{js,cjs,mjs,ts,mts}').length > 0 ||
+      Boolean(packageJson?.jest) ||
+      fs.existsSync(path.join(this.projectRoot, 'coverage'));
     const coverageThreshold = this._levelCache.coverageThreshold || 80;
 
-    if (!jestConfig && !coverageDir) {
+    if (!hasCoverageConfig) {
       this._recordFinding(
         articleId,
         articleName,
@@ -264,7 +220,7 @@ class ConstitutionalValidator {
         articleId,
         articleName,
         true,
-        `Test infrastructure found: ${testDirs.join(', ')}`,
+        `Test infrastructure found: ${testDirs.length ? testDirs.join(', ') : 'co-located tests'}`,
         null
       );
     }
@@ -291,9 +247,7 @@ class ConstitutionalValidator {
     }
 
     // Find requirements files
-    const reqFiles = glob.sync(path.join(this.projectRoot, '**/*requirements*.md'), {
-      ignore: ['**/node_modules/**', '**/templates/**'],
-    });
+    const reqFiles = this.files.glob('**/*requirements*.md', { ignore: ['**/templates/**'] });
 
     if (reqFiles.length === 0) {
       this._recordFinding(
@@ -325,7 +279,7 @@ class ConstitutionalValidator {
           articleName,
           false,
           `${path.basename(file)} contains ambiguous keywords`,
-          'Replace should/may with SHALL/MUST'
+          'Replace should/may with SHALL'
         );
       } else {
         this._recordFinding(
@@ -347,9 +301,7 @@ class ConstitutionalValidator {
     const articleName = 'Article V: Traceability';
 
     // Check for traceability matrix
-    const traceFiles = glob.sync(path.join(this.projectRoot, '**/*{trace,coverage-matrix}*.md'), {
-      ignore: ['**/node_modules/**'],
-    });
+    const traceFiles = this.files.glob('**/*{trace,coverage-matrix}*.md');
 
     if (traceFiles.length === 0) {
       this._recordFinding(
@@ -370,9 +322,7 @@ class ConstitutionalValidator {
     }
 
     // Check for REQ-XXX patterns in test files
-    const testFiles = glob.sync(path.join(this.projectRoot, '**/*.test.{js,ts}'), {
-      ignore: ['**/node_modules/**'],
-    });
+    const testFiles = this.files.glob('**/*.test.{js,ts}');
 
     let testsWithReqs = 0;
     for (const file of testFiles) {
@@ -397,7 +347,7 @@ class ConstitutionalValidator {
    * Article VI: Project Memory (Steering) (ADVISORY)
    */
   async validateArticleVI() {
-    const articleId = ArticleId.CONSTITUTION_ENFORCEMENT;
+    const articleId = ArticleId.PROJECT_MEMORY;
     const articleName = 'Article VI: Project Memory';
 
     const steeringPath = path.join(this.projectRoot, 'steering');
@@ -434,7 +384,7 @@ class ConstitutionalValidator {
    * Article VII: Simplicity Gate (FLEXIBLE)
    */
   async validateArticleVII() {
-    const articleId = ArticleId.DOCUMENTATION;
+    const articleId = ArticleId.SIMPLICITY_GATE;
     const articleName = 'Article VII: Simplicity Gate';
 
     // Count top-level directories that look like projects
@@ -488,13 +438,16 @@ class ConstitutionalValidator {
         null
       );
     }
+
+    // VII-4 to VII-6: code-size limits
+    checkCodeSize(this._checkContext(articleId, articleName));
   }
 
   /**
    * Article VIII: Anti-Abstraction Gate (FLEXIBLE)
    */
   async validateArticleVIII() {
-    const articleId = ArticleId.CODE_QUALITY;
+    const articleId = ArticleId.ANTI_ABSTRACTION;
     const articleName = 'Article VIII: Anti-Abstraction';
 
     // Check for common wrapper patterns
@@ -506,11 +459,13 @@ class ConstitutionalValidator {
       '**/adapters/*.{js,ts}',
     ];
 
+    // Declared adapter paths hold request-context code (I-A5), not framework wrappers
+    const adapterPaths = this.profileConfig?.adapterPaths || [];
     const potentialWrappers = [];
     for (const pattern of wrapperPatterns) {
-      const matches = glob.sync(path.join(this.projectRoot, pattern), {
-        ignore: ['**/node_modules/**', '**/templates/**'],
-      });
+      const matches = this.files
+        .glob(pattern, { ignore: ['**/templates/**'] })
+        .filter(file => !isUnder(this.files.rel(file), adapterPaths));
       potentialWrappers.push(...matches);
     }
 
@@ -520,7 +475,7 @@ class ConstitutionalValidator {
         articleName,
         false,
         `Potential wrapper abstractions detected: ${potentialWrappers.length} file(s)`,
-        'Verify abstractions are justified per Phase -1 Gate'
+        'Verify abstractions are justified per Phase -1 Gate (VIII-2, VIII-3), or document a runtime constraint in design.md (VIII-4, VIII-5)'
       );
     } else {
       this._recordFinding(
@@ -538,7 +493,7 @@ class ConstitutionalValidator {
    * Now supports mock exceptions for LLM providers and external APIs
    */
   async validateArticleIX() {
-    const articleId = ArticleId.REAL_SERVICE_TESTING;
+    const articleId = ArticleId.INTEGRATION_FIRST;
     const articleName = 'Article IX: Integration-First';
 
     // Check for docker-compose for test infrastructure
@@ -547,9 +502,7 @@ class ConstitutionalValidator {
       fs.existsSync(path.join(this.projectRoot, 'docker-compose.test.yml'));
 
     // Check for mock usage
-    const testFiles = glob.sync(path.join(this.projectRoot, '**/*.test.{js,ts}'), {
-      ignore: ['**/node_modules/**'],
-    });
+    const testFiles = this.files.glob('**/*.test.{js,ts}');
 
     let mockCount = 0;
     let allowedMocks = 0;
@@ -615,11 +568,7 @@ class ConstitutionalValidator {
    * Utility: Read package.json
    */
   readPackageJson() {
-    const pkgPath = path.join(this.projectRoot, 'package.json');
-    if (fs.existsSync(pkgPath)) {
-      return JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
-    }
-    return null;
+    return this.files.readPackageJson();
   }
 
   /**
@@ -628,6 +577,7 @@ class ConstitutionalValidator {
   generateReport() {
     const criticalViolations = this.violations.filter(v => v.blocking);
     const nonBlockingViolations = this.violations.filter(v => !v.blocking);
+    const profile = this.profileConfig?.profile || null;
 
     const report = {
       timestamp: new Date().toISOString(),
@@ -641,6 +591,7 @@ class ConstitutionalValidator {
         status: criticalViolations.length === 0 ? 'COMPLIANT' : 'NON-COMPLIANT',
         mode: this.options.mode,
         packageType: this.options.packageType,
+        profile,
       },
       passes: this.passes,
       warnings: this.warnings,
@@ -655,7 +606,9 @@ class ConstitutionalValidator {
     console.log('\n' + '='.repeat(60));
     console.log('📜 CONSTITUTIONAL VALIDATION REPORT');
     console.log('='.repeat(60));
-    console.log(`Mode: ${this.options.mode} | Package: ${this.options.packageType}`);
+    console.log(
+      `Profile: ${profile} | Mode: ${this.options.mode} | Package: ${this.options.packageType}`
+    );
     console.log(`Status: ${report.summary.status}`);
     console.log(
       `Passes: ${report.summary.passes} | Warnings: ${report.summary.warnings} | Violations: ${report.summary.violations}`
@@ -697,9 +650,11 @@ class ConstitutionalValidator {
 
 // CLI execution
 if (require.main === module) {
-  const projectRoot = process.argv[2] || process.cwd();
-  const mode = process.argv[3] || 'medium';
-  const packageType = process.argv[4] || 'application';
+  const positional = process.argv.slice(2).filter(arg => !arg.startsWith('--'));
+  const projectRoot = positional[0] || process.cwd();
+  const mode = positional[1] || 'medium';
+  // Without an explicit package type, a declared profile is used (see _loadLevelConfig)
+  const packageType = positional[2];
   const strict = process.argv.includes('--strict');
 
   const validator = new ConstitutionalValidator(projectRoot, {
