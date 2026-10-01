@@ -2,7 +2,7 @@
 name: musubi
 description: Ultimate Specification Driven Development Tool with Review Gate Engine
 locale: en
-version: "6.2.3"
+version: '6.2.3'
 created: 2025-12-12
 updated: 2026-01-01
 
@@ -10,12 +10,11 @@ updated: 2026-01-01
 tech_stack:
   approach: undecided
   languages:
-    - undecided  # To be determined
-
+    - undecided # To be determined
 
 # Constitution profile (constitution v1.1, "Project Profiles")
 constitution:
-  profile: cli # library | cli | application
+  profile: application # library | cli | application
   core_paths: [src]
   delivery_paths: [bin]
 
