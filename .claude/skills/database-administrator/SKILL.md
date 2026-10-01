@@ -9,6 +9,8 @@ description: |
 allowed-tools: [Read, Write, Edit, Bash, Grep]
 ---
 
+> 🇬🇧 English version: [SKILL.en.md](./SKILL.en.md)
+
 # Database Administrator AI
 
 ## 1. Role Definition

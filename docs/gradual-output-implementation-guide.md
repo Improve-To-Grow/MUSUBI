@@ -12,21 +12,21 @@
 
 Agents with **full gradual output implementation**:
 
-1. ✅ **system-architect** - Phase 4 "段階的成果物生成"
-2. ✅ **cloud-architect** - Phase 4 "段階的成果物生成"
-3. ✅ **technical-writer** - Phase 3 "段階的成果物生成"
-4. ✅ **api-designer** - Phase 4 "段階的成果物生成"
-5. ✅ **requirements-analyst** - Phase 6 "段階的成果物生成"
-6. ✅ **project-manager** - Phase 6 "段階的成果物生成"
-7. ✅ **database-schema-designer** - Phase 5 "段階的成果物生成"
-8. ✅ **ui-ux-designer** - Phase 5 "段階的成果物生成と開発引き継ぎ"
-9. ✅ **test-engineer** - Phase 4 "段階的テスト実装" (2025-11-22 updated)
+1. ✅ **system-architect** - Phase 4 "段階的成果物生成" (Gradual Deliverable Generation)
+2. ✅ **cloud-architect** - Phase 4 "段階的成果物生成" (Gradual Deliverable Generation)
+3. ✅ **technical-writer** - Phase 3 "段階的成果物生成" (Gradual Deliverable Generation)
+4. ✅ **api-designer** - Phase 4 "段階的成果物生成" (Gradual Deliverable Generation)
+5. ✅ **requirements-analyst** - Phase 6 "段階的成果物生成" (Gradual Deliverable Generation)
+6. ✅ **project-manager** - Phase 6 "段階的成果物生成" (Gradual Deliverable Generation)
+7. ✅ **database-schema-designer** - Phase 5 "段階的成果物生成" (Gradual Deliverable Generation)
+8. ✅ **ui-ux-designer** - Phase 5 "段階的成果物生成と開発引き継ぎ" (Gradual Deliverable Generation and Development Handoff)
+9. ✅ **test-engineer** - Phase 4 "段階的テスト実装" (Gradual Test Implementation) (2025-11-22 updated)
 
 ### 🔧 Needs Enhancement (11/25 agents)
 
 Agents with partial implementation (needs strengthening):
 
-10. 🔧 **software-developer** - Has "1ファイルずつ" but missing progress counter
+10. 🔧 **software-developer** - Has "1ファイルずつ" (one file at a time) but missing progress counter
 11. 🔧 **bug-hunter** - Has Phase 4 but no step-by-step reporting
 12. 🔧 **performance-optimizer** - Has Phase 4 but no file-by-file saves
 13. 🔧 **security-auditor** - Has Phase 4 but no gradual output
@@ -133,6 +133,87 @@ Agents without Phase 4 or gradual output:
 ```
 ```
 
+**English version of the template above:**
+
+```markdown
+### Phase 4: Gradual Deliverable Generation
+
+**CRITICAL: Prevent context length overflow**
+
+**Output principles:**
+- ✅ Generate and save one file at a time, in order
+- ✅ Report progress after each file is generated
+- ✅ Split large files (>300 lines) into multiple parts
+- ✅ Partial deliverables remain even if an error occurs
+- ✅ Execute in a way that makes progress visible to the user
+
+```
+🤖 Thank you for confirming. I will generate the following deliverables in order.
+
+【Planned deliverables】(both English and Japanese versions)
+1. [Deliverable 1]
+2. [Deliverable 2]
+3. [Deliverable 3]
+...
+
+Total: N files
+
+**Important: Gradual generation approach**
+Each document/code file is generated and saved one at a time, with progress reported.
+This makes intermediate progress visible, and partial deliverables remain even if an error occurs.
+
+May I start generating?
+👤 User: [Awaiting response]
+```
+
+**Step 1: [Deliverable 1] - English version**
+
+```
+🤖 [1/N] Generating the English version of [Deliverable 1]...
+
+📝 ./[path]/[filename]-[date].md
+✅ Saved successfully
+
+[1/N] Done. Moving on to the next file.
+```
+
+**Step 2: [Deliverable 2] - English version**
+
+```
+🤖 [2/N] Generating the English version of [Deliverable 2]...
+
+📝 ./[path]/[filename]-[date].md
+✅ Saved successfully
+
+[2/N] Done. Moving on to the next file.
+```
+
+... (continue for all files)
+
+**Final Step: All deliverables generated**
+
+```
+🤖 ✨ All deliverables have been generated!
+
+## 📊 Generation Summary
+- **Files created**: N
+- **English versions**: X
+- **Japanese versions**: Y
+
+## 📂 Generated Files
+1. ✅ ./[path]/[file1].md
+2. ✅ ./[path]/[file2].md
+...
+
+## 🔍 Next Steps
+1. Please review the deliverables and share your feedback
+2. Let me know if anything is missing or needs correction
+3. Call [related agent] to proceed to the next stage
+
+👤 User: [Awaiting feedback]
+```
+```
+
 ---
 
 ## Agent-Specific Implementation Instructions
@@ -157,6 +238,16 @@ Agents without Phase 4 or gradual output:
 [1/N] 完了。次のファイルに進みます。
 ```
 
+English:
+```
+🤖 [1/N] Generating [Component/Module name]...
+
+📝 src/[path]/[filename].ts
+✅ Saved successfully (150 lines)
+
+[1/N] Done. Moving on to the next file.
+```
+
 ### Document Generators Group
 
 **Agents**: technical-writer, requirements-analyst, project-manager
@@ -177,6 +268,16 @@ Agents without Phase 4 or gradual output:
 [1/N] 完了。次のドキュメントに進みます。
 ```
 
+English:
+```
+🤖 [1/N] Generating the English version of [Document title]...
+
+📝 docs/[path]/[filename]-[date].md
+✅ Saved successfully
+
+[1/N] Done. Moving on to the next document.
+```
+
 ### Design/Architecture Generators Group
 
 **Agents**: system-architect, cloud-architect, ui-ux-designer, database-schema-designer, api-designer
@@ -195,6 +296,16 @@ Agents without Phase 4 or gradual output:
 ✅ 保存が完了しました
 
 [1/N] 完了。次の成果物に進みます。
+```
+
+English:
+```
+🤖 [1/N] Generating the English version of [Design artifact]...
+
+📝 design/[category]/[filename]-[project]-[date].md
+✅ Saved successfully
+
+[1/N] Done. Moving on to the next deliverable.
 ```
 
 ### Infrastructure/DevOps Generators Group
@@ -218,6 +329,16 @@ Agents without Phase 4 or gradual output:
 [1/N] 完了。次の設定ファイルに進みます。
 ```
 
+English:
+```
+🤖 [1/N] Generating [Config/Script name]...
+
+📝 [path]/[filename]
+✅ Saved successfully (200 lines)
+
+[1/N] Done. Moving on to the next config file.
+```
+
 ### Review/Audit Generators Group
 
 **Agents**: code-reviewer, quality-assurance, security-auditor, traceability-auditor, constitution-enforcer
@@ -237,6 +358,16 @@ Agents without Phase 4 or gradual output:
 ✅ 保存が完了しました
 
 [1/N] 完了。次のレポートに進みます。
+```
+
+English:
+```
+🤖 [1/N] Generating [Report type]...
+
+📝 reports/[category]/[filename]-[date].md
+✅ Saved successfully
+
+[1/N] Done. Moving on to the next report.
 ```
 
 ---
@@ -266,6 +397,19 @@ Add at the beginning of Phase 4:
 - ✅ ユーザーに進捗が見える形で実行
 ```
 
+English:
+
+```markdown
+**CRITICAL: Prevent context length overflow**
+
+**Output principles:**
+- ✅ Generate and save one file at a time, in order
+- ✅ Report progress after each file is generated
+- ✅ Split large files (>300 lines) into multiple parts
+- ✅ Partial deliverables remain even if an error occurs
+- ✅ Execute in a way that makes progress visible to the user
+```
+
 ### Step 3: Add File List and Confirmation
 
 Before generation starts:
@@ -291,6 +435,29 @@ Before generation starts:
 ```
 ```
 
+English:
+
+```markdown
+```
+🤖 Thank you for confirming. I will generate the following deliverables in order.
+
+【Planned deliverables】
+1. [Specific file name 1]
+2. [Specific file name 2]
+3. [Specific file name 3]
+...
+
+Total: N files
+
+**Important: Gradual generation approach**
+Each file is generated and saved one at a time, with progress reported.
+This makes intermediate progress visible, and partial deliverables remain even if an error occurs.
+
+May I start generating?
+👤 User: [Awaiting response]
+```
+```
+
 ### Step 4: Add Step-by-Step Generation
 
 For each file:
@@ -305,6 +472,21 @@ For each file:
 ✅ 保存が完了しました (行数)
 
 [1/N] 完了。次のファイルに進みます。
+```
+```
+
+English:
+
+```markdown
+**Step 1: [File/Component Name]**
+
+```
+🤖 [1/N] Generating [specific content]...
+
+📝 [specific file path]
+✅ Saved successfully (line count)
+
+[1/N] Done. Moving on to the next file.
 ```
 ```
 
@@ -334,6 +516,30 @@ After all files generated:
 ```
 ```
 
+English:
+
+```markdown
+```
+🤖 ✨ All deliverables have been generated!
+
+## 📊 Generation Summary
+- **Files created**: N
+- **[Breakdown by category]**
+
+## 📂 Generated Files
+1. ✅ [file path 1]
+2. ✅ [file path 2]
+...
+
+## 🔍 Next Steps
+1. Please review the deliverables and share your feedback
+2. Let me know if anything is missing or needs correction
+3. Call [related agent] to proceed to the next stage
+
+👤 User: [Awaiting feedback]
+```
+```
+
 ---
 
 ## Quick Reference
@@ -353,6 +559,20 @@ After all files generated:
 ...
 ```
 
+English:
+```
+🤖 [1/8] Generating the type definition file...
+📝 src/types/auth.types.ts
+✅ Saved successfully (120 lines)
+[1/8] Done. Moving on to the next file.
+
+🤖 [2/8] Generating the service layer...
+📝 src/services/authService.ts
+✅ Saved successfully (200 lines)
+[2/8] Done. Moving on to the next file.
+...
+```
+
 ### ❌ Bad Example (no gradual output)
 
 ```
@@ -361,6 +581,15 @@ After all files generated:
 [Huge code dump with 8 files at once, 1500+ lines total]
 
 ✅ 実装完了!
+```
+
+English:
+```
+🤖 Starting implementation!
+
+[Huge code dump with 8 files at once, 1500+ lines total]
+
+✅ Implementation complete!
 ```
 
 **Problem**: If error occurs halfway, all work is lost. Context overflow likely.

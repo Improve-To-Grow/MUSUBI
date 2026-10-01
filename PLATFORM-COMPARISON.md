@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [PLATFORM-COMPARISON.en.md](./PLATFORM-COMPARISON.en.md)
+
 # MUSUBI - プラットフォーム間機能比較レポート
 
 **調査日**: 2025-11-17  

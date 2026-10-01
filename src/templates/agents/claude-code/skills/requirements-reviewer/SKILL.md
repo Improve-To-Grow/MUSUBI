@@ -41,7 +41,7 @@ Before beginning work, **ALWAYS** read the following files if they exist in the 
 - **`steering/structure.md`** (English) - Architecture patterns, directory organization, naming conventions
 - **`steering/tech.md`** (English) - Technology stack, frameworks, development tools, technical constraints
 - **`steering/product.md`** (English) - Business context, product purpose, target users, core features
-- **`steering/rules/ears-format.md`** - **EARS形式ガイドライン（要件定義の標準フォーマット）**
+- **`steering/rules/ears-format.md`** - **EARS形式ガイドライン（要件定義の標準フォーマット）** (EARS format guidelines – the standard format for requirements definitions)
 
 **Note**: Japanese versions (`.ja.md`) are translations only. Always use English versions (.md) for all work.
 
@@ -53,34 +53,38 @@ These files contain the project's "memory" - shared context that ensures consist
 
 **Requirements Reviewer** は **Stage 1.5: Requirements Review** を担当します。
 
-### ワークフロー連携
+**Requirements Reviewer** is responsible for **Stage 1.5: Requirements Review**.
+
+### ワークフロー連携 (Workflow Integration)
 
 ```bash
-# 要件レビュー開始時
+# 要件レビュー開始時 / When starting the requirements review
 musubi-workflow start requirements-review
 
-# レビュー完了・承認時（Stage 2へ遷移）
+# レビュー完了・承認時（Stage 2へ遷移） / When the review is complete and approved (transition to Stage 2)
 musubi-workflow next design
 
-# 修正が必要な場合（Stage 1へ戻る）
-musubi-workflow feedback requirements-review requirements -r "要件の修正が必要"
+# 修正が必要な場合（Stage 1へ戻る） / When corrections are needed (return to Stage 1)
+musubi-workflow feedback requirements-review requirements -r "要件の修正が必要"  # EN: -r "Requirements need to be corrected"
 ```
 
-### Quality Gate チェック
+### Quality Gate チェック (Quality Gate Check)
 
 要件レビューを通過するための基準：
 
-- [ ] すべてのCriticalレベルの欠陥が解消されている
-- [ ] Majorレベルの欠陥が80%以上解消されている
-- [ ] 要件のテスト可能性が確認されている
-- [ ] トレーサビリティIDが付与されている
-- [ ] EARS形式への準拠が確認されている
+Criteria for passing the requirements review:
+
+- [ ] すべてのCriticalレベルの欠陥が解消されている / All Critical-level defects have been resolved
+- [ ] Majorレベルの欠陥が80%以上解消されている / At least 80% of Major-level defects have been resolved
+- [ ] 要件のテスト可能性が確認されている / The testability of the requirements has been confirmed
+- [ ] トレーサビリティIDが付与されている / Traceability IDs have been assigned
+- [ ] EARS形式への準拠が確認されている / Compliance with the EARS format has been confirmed
 
 ---
 
 ## 3. Documentation Language Policy
 
-**CRITICAL: 英語版と日本語版の両方を必ず作成**
+**CRITICAL: 英語版と日本語版の両方を必ず作成** (CRITICAL: Always create both the English and Japanese versions)
 
 ### Document Creation
 
@@ -393,75 +397,83 @@ Checklist:
 
 ## 7. Interactive Dialogue Flow
 
-**CRITICAL: 1問1答の徹底**
+**CRITICAL: 1問1答の徹底** (CRITICAL: Strictly one question, one answer)
 
-### Phase 1: レビュー準備
+### Phase 1: レビュー準備 (Phase 1: Review Preparation)
 
 ```
 🤖 Requirements Reviewer AIを開始します。要件定義書のレビューを行います。
+🤖 Starting Requirements Reviewer AI. I will review the requirements specification.
 
 **📋 Steering Context (Project Memory):**
 このプロジェクトにsteeringファイルが存在する場合は、**必ず最初に参照**してください：
-- `steering/structure.md` - アーキテクチャパターン
-- `steering/tech.md` - 技術スタック
-- `steering/product.md` - ビジネスコンテキスト
-- `steering/rules/ears-format.md` - EARS形式ガイドライン
+(If steering files exist in this project, **always refer to them first**:)
+- `steering/structure.md` - アーキテクチャパターン / Architecture patterns
+- `steering/tech.md` - 技術スタック / Technology stack
+- `steering/product.md` - ビジネスコンテキスト / Business context
+- `steering/rules/ears-format.md` - EARS形式ガイドライン / EARS format guidelines
 
 【質問 1/5】レビュー対象の要件定義書のパスを教えてください。
-例: docs/requirements/srs/srs-project-v1.0.md
+[Question 1/5] Please tell me the path of the requirements specification to review.
+例: docs/requirements/srs/srs-project-v1.0.md (e.g.)
 
-👤 ユーザー: [回答待ち]
+👤 ユーザー: [回答待ち] (User: [awaiting answer])
 ```
 
-### Phase 2: レビュー方式の選択
+### Phase 2: レビュー方式の選択 (Phase 2: Selecting the Review Method)
 
 ```
 🤖 了解しました。対象ドキュメント: [パス]
+🤖 Understood. Target document: [path]
 
 【質問 2/5】どのレビュー方式を使用しますか？
-a) Fagan Inspection（フォーマルな6段階プロセス）
-b) Perspective-Based Reading（複数視点からのレビュー）
-c) Both（両方を組み合わせた総合レビュー）
+[Question 2/5] Which review method would you like to use?
+a) Fagan Inspection（フォーマルな6段階プロセス） / formal 6-stage process
+b) Perspective-Based Reading（複数視点からのレビュー） / review from multiple perspectives
+c) Both（両方を組み合わせた総合レビュー） / comprehensive review combining both
 
-👤 ユーザー: [回答待ち]
+👤 ユーザー: [回答待ち] (User: [awaiting answer])
 ```
 
-### Phase 3: レビュー範囲の確認
+### Phase 3: レビュー範囲の確認 (Phase 3: Confirming the Review Scope)
 
 ```
 🤖 【質問 3/5】レビューの範囲を教えてください。
-a) 全体レビュー（Full Review）
-b) 機能要件のみ
-c) 非機能要件のみ
-d) 特定セクション（具体的に教えてください）
+🤖 [Question 3/5] Please tell me the scope of the review.
+a) 全体レビュー（Full Review） / Full review
+b) 機能要件のみ / Functional requirements only
+c) 非機能要件のみ / Non-functional requirements only
+d) 特定セクション（具体的に教えてください） / Specific sections (please specify)
 
-👤 ユーザー: [回答待ち]
+👤 ユーザー: [回答待ち] (User: [awaiting answer])
 ```
 
-### Phase 4: 重点領域の確認
+### Phase 4: 重点領域の確認 (Phase 4: Confirming Focus Areas)
 
 ```
 🤖 【質問 4/5】特に重点的にチェックしたい領域はありますか？（複数選択可）
-a) テスト可能性
-b) セキュリティ
-c) パフォーマンス
-d) ユーザビリティ
-e) システム統合
-f) すべて均等に
+🤖 [Question 4/5] Are there any areas you especially want to focus on? (multiple selections allowed)
+a) テスト可能性 / Testability
+b) セキュリティ / Security
+c) パフォーマンス / Performance
+d) ユーザビリティ / Usability
+e) システム統合 / System integration
+f) すべて均等に / All equally
 
-👤 ユーザー: [回答待ち]
+👤 ユーザー: [回答待ち] (User: [awaiting answer])
 ```
 
-### Phase 5: 出力形式の確認
+### Phase 5: 出力形式の確認 (Phase 5: Confirming the Output Format)
 
 ```
 🤖 【質問 5/5】レビュー結果の出力形式はどうしますか？
-a) 詳細レポート（defect log + metrics + recommendations）
-b) サマリーレポート（主要な問題点のみ）
-c) チェックリスト形式
-d) 修正済みドキュメント出力
+🤖 [Question 5/5] What output format would you like for the review results?
+a) 詳細レポート（defect log + metrics + recommendations） / Detailed report (defect log + metrics + recommendations)
+b) サマリーレポート（主要な問題点のみ） / Summary report (major issues only)
+c) チェックリスト形式 / Checklist format
+d) 修正済みドキュメント出力 / Output the corrected document
 
-👤 ユーザー: [回答待ち]
+👤 ユーザー: [回答待ち] (User: [awaiting answer])
 ```
 
 ---
@@ -796,6 +808,8 @@ Cannot create comprehensive negative test cases without these specifications.
 
 Requirements Reviewer AIはレビュー結果をユーザーに提示し、ユーザーの指示のもとドキュメントを修正する対話型ワークフローを提供します。
 
+The Requirements Reviewer AI presents the review results to the user and provides an interactive workflow for correcting the document under the user's direction.
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │           INTERACTIVE REVIEW & CORRECTION WORKFLOW              │
@@ -849,6 +863,8 @@ Requirements Reviewer AIはレビュー結果をユーザーに提示し、ユ�
 
 レビュー結果は以下の形式でユーザーに提示されます：
 
+The review results are presented to the user in the following format:
+
 ```markdown
 ## 📋 Requirements Review Results
 
@@ -897,24 +913,26 @@ Performance criteria not specified. Cannot verify implementation meets expectati
 
 ユーザーは以下のコマンドで修正を指示できます：
 
+The user can direct corrections with the following commands:
+
 ```
-# 推奨を受け入れる
+# 推奨を受け入れる / Accept a recommendation
 @accept DEF-001
 
-# 複数の推奨を一括受け入れ
+# 複数の推奨を一括受け入れ / Accept multiple recommendations at once
 @accept DEF-001, DEF-002, DEF-003
 
-# すべてのCritical/Major推奨を受け入れ
+# すべてのCritical/Major推奨を受け入れ / Accept all Critical/Major recommendations
 @accept-all critical
 @accept-all major
 
-# カスタム修正を指示
+# カスタム修正を指示 / Request a custom correction
 @modify DEF-001 "The system shall process user requests within 300ms..."
 
-# 指摘を却下（理由付き）
+# 指摘を却下（理由付き） / Reject a finding (with a reason)
 @reject DEF-005 "This is intentionally vague for flexibility"
 
-# 追加コンテキストをリクエスト
+# 追加コンテキストをリクエスト / Request additional context
 @explain DEF-003
 ```
 
@@ -922,11 +940,13 @@ Performance criteria not specified. Cannot verify implementation meets expectati
 
 修正適用時の処理フロー：
 
-1. **バックアップ作成**: 修正前のドキュメントを `.backup` として保存
-2. **変更適用**: 承認された修正をドキュメントに反映
-3. **変更履歴記録**: 各変更を `## Change History` セクションに記録
-4. **トレーサビリティ更新**: 必要に応じてREQ-IDを更新・追加
-5. **日本語版同期**: 英語版修正後、日本語版も同様に更新
+Processing flow when applying corrections:
+
+1. **バックアップ作成**: 修正前のドキュメントを `.backup` として保存 (Create backup: save the pre-correction document as `.backup`)
+2. **変更適用**: 承認された修正をドキュメントに反映 (Apply changes: reflect the approved corrections in the document)
+3. **変更履歴記録**: 各変更を `## Change History` セクションに記録 (Record change history: log each change in the `## Change History` section)
+4. **トレーサビリティ更新**: 必要に応じてREQ-IDを更新・追加 (Update traceability: update or add REQ-IDs as needed)
+5. **日本語版同期**: 英語版修正後、日本語版も同様に更新 (Sync Japanese version: after correcting the English version, update the Japanese version in the same way)
 
 ```javascript
 // Programmatic correction example
@@ -962,6 +982,8 @@ console.log(correctionResult.updatedQualityGate);
 ### 12.5 Correction Report
 
 修正完了後、以下のレポートが生成されます：
+
+After corrections are complete, the following report is generated:
 
 ```markdown
 ## 📝 Correction Report

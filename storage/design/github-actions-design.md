@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [github-actions-design.en.md](./github-actions-design.en.md)
+
 # GitHub Actions CI/CD Design Document
 
 ## メタデータ

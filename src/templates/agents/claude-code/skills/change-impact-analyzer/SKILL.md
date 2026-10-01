@@ -310,21 +310,22 @@ find api/ -name "*.yaml" -o -name "*.json"
 3. Identify indirect (cascading) dependencies
 4. Identify integration points
 
-### Phase 4: 段階的影響分析レポート生成
+### Phase 4: 段階的影響分析レポート生成 (Incremental Impact Analysis Report Generation)
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: コンテキスト長オーバーフロー防止 (Preventing Context Length Overflow)**
 
-**出力方式の原則:**
+**出力方式の原則 (Output Principles):**
 
-- ✅ 1セクションずつ順番に生成・保存
-- ✅ 各セクション生成後に進捗を報告
-- ✅ 大きなレポートをセクションごとに分割
-- ✅ エラー発生時も部分的なレポートが残る
+- ✅ 1セクションずつ順番に生成・保存 / Generate and save one section at a time, in order
+- ✅ 各セクション生成後に進捗を報告 / Report progress after each section is generated
+- ✅ 大きなレポートをセクションごとに分割 / Split large reports into sections
+- ✅ エラー発生時も部分的なレポートが残る / A partial report remains even if an error occurs
 
 ```
 🤖 確認ありがとうございます。影響分析レポートを順番に生成します。
+   (Thank you for confirming. I will generate the impact analysis report step by step.)
 
-【生成予定のセクション】
+【生成予定のセクション】 (Planned sections)
 1. Executive Summary
 2. Affected Components
 3. Breaking Changes
@@ -332,71 +333,77 @@ find api/ -name "*.yaml" -o -name "*.json"
 5. Recommendations
 6. Approval Checklist
 
-合計: 6セクション
+合計: 6セクション (Total: 6 sections)
 
-**重要: 段階的生成方式**
+**重要: 段階的生成方式** (Important: incremental generation)
 各セクションを1つずつ生成・保存し、進捗を報告します。
+(I will generate and save each section one at a time and report progress.)
 これにより、途中経過が見え、エラーが発生しても部分的なレポートが残ります。
+(This way you can see intermediate progress, and a partial report remains even if an error occurs.)
 
-生成を開始してよろしいですか?
-👤 ユーザー: [回答待ち]
+生成を開始してよろしいですか? (May I start generating?)
+👤 ユーザー: [回答待ち] (User: [awaiting response])
 ```
 
 ユーザーが承認後、**各セクションを順番に生成**:
 
+After the user approves, **generate each section in order**:
+
 **Step 1: Executive Summary**
 
 ```
-🤖 [1/6] Executive Summaryを生成しています...
+🤖 [1/6] Executive Summaryを生成しています... (Generating Executive Summary...)
 
 📝 impact-analysis/add-two-factor-auth-report.md (Section 1)
-✅ 保存が完了しました
+✅ 保存が完了しました (Saved successfully)
 
-[1/6] 完了。次のセクションに進みます。
+[1/6] 完了。次のセクションに進みます。 (Done. Moving on to the next section.)
 ```
 
 **Step 2: Affected Components**
 
 ```
-🤖 [2/6] Affected Componentsを生成しています...
+🤖 [2/6] Affected Componentsを生成しています... (Generating Affected Components...)
 
 📝 impact-analysis/add-two-factor-auth-report.md (Section 2)
-✅ 保存が完了しました
+✅ 保存が完了しました (Saved successfully)
 
-[2/6] 完了。次のセクションに進みます。
+[2/6] 完了。次のセクションに進みます。 (Done. Moving on to the next section.)
 ```
 
-**大きな影響分析レポート(>300行)の場合:**
+**大きな影響分析レポート(>300行)の場合 (For large impact analysis reports, >300 lines):**
 
 ```
 🤖 影響分析レポート全体が500行超えるため、セクションごとに保存します。
+   (The full impact analysis report exceeds 500 lines, so I will save it section by section.)
 ⚠️ 各セクションを個別ファイルとして生成し、最後に統合します。
+   (Each section will be generated as a separate file and merged at the end.)
 
 📝 Part 1/3: impact-analysis/add-two-factor-auth-report-part1.md (Executive Summary & Affected Components)
-✅ 保存が完了しました (200行)
+✅ 保存が完了しました (200行) (Saved: 200 lines)
 
 📝 Part 2/3: impact-analysis/add-two-factor-auth-report-part2.md (Risk Assessment & Dependencies)
-✅ 保存が完了しました (180行)
+✅ 保存が完了しました (180行) (Saved: 180 lines)
 
 📝 Part 3/3: impact-analysis/add-two-factor-auth-report-part3.md (Recommendations & Approval)
-✅ 保存が完了しました (150行)
+✅ 保存が完了しました (150行) (Saved: 150 lines)
 
-✅ レポート生成完了: 3ファイル (合計530行)
-💡 必要に応じて統合版も生成できます
+✅ レポート生成完了: 3ファイル (合計530行) (Report generation complete: 3 files, 530 lines total)
+💡 必要に応じて統合版も生成できます (A merged version can also be generated if needed)
 ```
 
-**Final: レポート生成完了サマリー**
+**Final: レポート生成完了サマリー (Report Generation Completion Summary)**
 
 ```
-🤖 ✨ 影響分析レポートの生成が完了しました！
+🤖 ✨ 影響分析レポートの生成が完了しました！ (Impact analysis report generation is complete!)
 
-## 📊 分析サマリー
-- **影響を受けるコンポーネント**: 12ファイル
-- **破壊的変更**: 1件
-- **リスクレベル**: HIGH
+## 📊 分析サマリー (Analysis Summary)
+- **影響を受けるコンポーネント (Affected components)**: 12ファイル (12 files)
+- **破壊的変更 (Breaking changes)**: 1件 (1)
+- **リスクレベル (Risk level)**: HIGH
 
-## 📂 生成されたレポート
-✅ impact-analysis/add-two-factor-auth-report.md (6セクション)
+## 📂 生成されたレポート (Generated Reports)
+✅ impact-analysis/add-two-factor-auth-report.md (6セクション / 6 sections)
 
 ```
 

@@ -231,4 +231,4 @@ const analysis = await generator.analyze();
 
 ---
 
-**MUSUBI for Qwen Code** - むすび - Bringing specifications, design, and code together.
+**MUSUBI for Qwen Code** - むすび (Musubi, "to tie together") - Bringing specifications, design, and code together.

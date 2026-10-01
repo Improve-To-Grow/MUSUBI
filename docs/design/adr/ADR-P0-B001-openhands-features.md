@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [ADR-P0-B001-openhands-features.en.md](./ADR-P0-B001-openhands-features.en.md)
+
 # ADR-P0-B001: OpenHands由来機能の導入
 
 | 項目 | 内容 |

@@ -242,4 +242,4 @@ const analysis = await generator.analyze();
 
 ---
 
-**MUSUBI for GitHub Copilot** - むすび - Bringing specifications, design, and code together.
+**MUSUBI for GitHub Copilot** - むすび (Musubi) - Bringing specifications, design, and code together.

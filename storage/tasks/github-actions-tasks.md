@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [github-actions-tasks.en.md](./github-actions-tasks.en.md)
+
 # GitHub Actions Implementation Tasks
 
 ## メタデータ

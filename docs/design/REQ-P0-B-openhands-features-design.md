@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [REQ-P0-B-openhands-features-design.en.md](./REQ-P0-B-openhands-features-design.en.md)
+
 # REQ-P0-B: OpenHands由来機能 - 統合設計ドキュメント
 
 | 項目 | 内容 |

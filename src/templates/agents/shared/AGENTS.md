@@ -16,16 +16,16 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 | MCP Tool                   | Primary Agents                                             | Usage                  |
 | -------------------------- | ---------------------------------------------------------- | ---------------------- |
-| `query_codebase`           | @orchestrator, @steering                                   | コードベース全体の検索 |
-| `find_dependencies`        | @change-impact-analyzer, @constitution-enforcer            | 依存関係分析・違反検出 |
-| `find_callers`             | @change-impact-analyzer, @test-engineer, @security-auditor | 呼び出し元追跡         |
-| `find_callees`             | @software-developer                                        | 呼び出し先追跡         |
-| `find_implementations`     | @api-designer, @system-architect                           | 実装クラス検索         |
-| `analyze_module_structure` | @system-architect, @steering                               | モジュール構造分析     |
-| `get_code_snippet`         | @software-developer, @code-reviewer                        | ソースコード取得       |
-| `global_search`            | @orchestrator, @technical-writer                           | GraphRAGグローバル検索 |
-| `local_search`             | @software-developer, @bug-hunter                           | GraphRAGローカル検索   |
-| `suggest_refactoring`      | @code-reviewer, @performance-optimizer                     | リファクタリング提案   |
+| `query_codebase`           | @orchestrator, @steering                                   | コードベース全体の検索 / Codebase-wide search |
+| `find_dependencies`        | @change-impact-analyzer, @constitution-enforcer            | 依存関係分析・違反検出 / Dependency analysis & violation detection |
+| `find_callers`             | @change-impact-analyzer, @test-engineer, @security-auditor | 呼び出し元追跡 / Caller tracing |
+| `find_callees`             | @software-developer                                        | 呼び出し先追跡 / Callee tracing |
+| `find_implementations`     | @api-designer, @system-architect                           | 実装クラス検索 / Implementation class search |
+| `analyze_module_structure` | @system-architect, @steering                               | モジュール構造分析 / Module structure analysis |
+| `get_code_snippet`         | @software-developer, @code-reviewer                        | ソースコード取得 / Source code retrieval |
+| `global_search`            | @orchestrator, @technical-writer                           | GraphRAGグローバル検索 / GraphRAG global search |
+| `local_search`             | @software-developer, @bug-hunter                           | GraphRAGローカル検索 / GraphRAG local search |
+| `suggest_refactoring`      | @code-reviewer, @performance-optimizer                     | リファクタリング提案 / Refactoring suggestions |
 
 **Setup**: See `steering/tech.md` for MCP configuration.
 
@@ -98,9 +98,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_callers` - バグの影響範囲特定
-- `local_search` - ローカルコンテキストで根本原因分析
-- `get_code_snippet` - 問題のコード取得
+- `find_callers` - バグの影響範囲特定 / Identify the impact scope of a bug
+- `local_search` - ローカルコンテキストで根本原因分析 / Root-cause analysis using local context
+- `get_code_snippet` - 問題のコード取得 / Retrieve the problematic code
 
 **Example Usage**:
 
@@ -125,9 +125,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_dependencies` - 変更対象の依存関係を分析
-- `find_callers` - 変更影響範囲を特定（呼び出し元追跡）
-- `query_codebase` - 関連コードの検索
+- `find_dependencies` - 変更対象の依存関係を分析 / Analyze dependencies of the change target
+- `find_callers` - 変更影響範囲を特定（呼び出し元追跡） / Identify change impact scope (caller tracing)
+- `query_codebase` - 関連コードの検索 / Search for related code
 
 **Example Usage**:
 
@@ -173,9 +173,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `suggest_refactoring` - リファクタリング提案
-- `find_dependencies` - 依存関係の複雑度分析
-- `get_code_snippet` - ソースコード取得
+- `suggest_refactoring` - リファクタリング提案 / Refactoring suggestions
+- `find_dependencies` - 依存関係の複雑度分析 / Analyze dependency complexity
+- `get_code_snippet` - ソースコード取得 / Retrieve source code
 
 **Example Usage**:
 
@@ -200,8 +200,8 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_dependencies` - Article I（Library-First）違反検出
-- `analyze_module_structure` - モジュール構造の憲法遵守確認
+- `find_dependencies` - Article I（Library-First）違反検出 / Detect Article I (Library-First) violations
+- `analyze_module_structure` - モジュール構造の憲法遵守確認 / Verify module structure complies with the constitution
 
 **Example Usage**:
 
@@ -289,8 +289,8 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `global_search` - コードベース全体の俯瞰とコミュニティ検出
-- `query_codebase` - タスクに関連するコードの検索
+- `global_search` - コードベース全体の俯瞰とコミュニティ検出 / Get an overview of the entire codebase and detect communities
+- `query_codebase` - タスクに関連するコードの検索 / Search for code relevant to the task
 
 **Example Usage**:
 
@@ -420,9 +420,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_callers` - 危険な関数の呼び出し元追跡
-- `query_codebase` - 脆弱性パターンの検索
-- `find_dependencies` - セキュリティ依存関係の分析
+- `find_callers` - 危険な関数の呼び出し元追跡 / Trace callers of dangerous functions
+- `query_codebase` - 脆弱性パターンの検索 / Search for vulnerability patterns
+- `find_dependencies` - セキュリティ依存関係の分析 / Analyze security-related dependencies
 
 **Example Usage**:
 
@@ -468,10 +468,10 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `get_code_snippet` - 既存コードの参照
-- `find_callees` - 呼び出し先の確認
-- `local_search` - 類似実装パターンの発見
-- `query_codebase` - 関連コードの検索
+- `get_code_snippet` - 既存コードの参照 / Reference existing code
+- `find_callees` - 呼び出し先の確認 / Check callees
+- `local_search` - 類似実装パターンの発見 / Discover similar implementation patterns
+- `query_codebase` - 関連コードの検索 / Search for related code
 
 **Example Usage**:
 
@@ -496,9 +496,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `global_search` - コードベース構造の理解
-- `analyze_module_structure` - モジュール構造の分析
-- `query_codebase` - 技術スタックの検出
+- `global_search` - コードベース構造の理解 / Understand codebase structure
+- `analyze_module_structure` - モジュール構造の分析 / Analyze module structure
+- `query_codebase` - 技術スタックの検出 / Detect the technology stack
 
 **Example Usage**:
 
@@ -523,9 +523,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `global_search` - コミュニティ検出でモジュール境界を発見
-- `analyze_module_structure` - モジュール構造分析
-- `find_dependencies` - コンポーネント間依存関係の可視化
+- `global_search` - コミュニティ検出でモジュール境界を発見 / Discover module boundaries via community detection
+- `analyze_module_structure` - モジュール構造分析 / Module structure analysis
+- `find_dependencies` - コンポーネント間依存関係の可視化 / Visualize inter-component dependencies
 
 **Example Usage**:
 
@@ -571,9 +571,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_callers` - テストカバレッジの自動判定
-- `find_dependencies` - 未テストコードパスの発見
-- `query_codebase` - テスト対象の検索
+- `find_callers` - テストカバレッジの自動判定 / Automatically assess test coverage
+- `find_dependencies` - 未テストコードパスの発見 / Discover untested code paths
+- `query_codebase` - テスト対象の検索 / Search for test targets
 
 **Example Usage**:
 
@@ -598,9 +598,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `query_codebase` - 要件IDでコードベースを検索
-- `find_callers` - 要件→コード→テストのマッピング検証
-- `find_dependencies` - トレーサビリティチェーンの確認
+- `query_codebase` - 要件IDでコードベースを検索 / Search the codebase by requirement ID
+- `find_callers` - 要件→コード→テストのマッピング検証 / Verify requirement → code → test mapping
+- `find_dependencies` - トレーサビリティチェーンの確認 / Check the traceability chain
 
 **Example Usage**:
 

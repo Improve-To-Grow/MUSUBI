@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [troubleshooting.en.md](./troubleshooting.en.md)
+
 # 🔧 トラブルシューティングガイド
 
 **MUSUBI v3.5.1** | 最終更新: 2025-12-08

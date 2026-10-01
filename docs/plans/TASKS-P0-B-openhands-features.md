@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [TASKS-P0-B-openhands-features.en.md](./TASKS-P0-B-openhands-features.en.md)
+
 # REQ-P0-B: OpenHands由来機能 - タスク分解
 
 | 項目 | 内容 |

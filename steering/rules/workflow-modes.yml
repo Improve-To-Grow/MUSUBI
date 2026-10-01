@@ -8,12 +8,12 @@ schema_version: "1.0"
 # Workflow mode definitions
 modes:
   small:
-    description: "1-2時間の作業（バグ修正、小機能追加）"
+    description: "1-2時間の作業（バグ修正、小機能追加）"  # EN: 1-2 hours of work (bug fixes, small feature additions)
     estimated_duration: "1-2h"
     stages:
-      - requirements   # 簡易要件定義
-      - implement      # 実装（テスト含む）
-      - validate       # 検証
+      - requirements   # 簡易要件定義 / Simplified requirements definition
+      - implement      # 実装（テスト含む） / Implementation (including tests)
+      - validate       # 検証 / Validation
     skip_artifacts:
       - design.md
       - tasks.md
@@ -22,14 +22,14 @@ modes:
       ears_format: optional
       traceability: relaxed
     use_cases:
-      - "バグ修正"
-      - "ドキュメント更新"
-      - "設定変更"
-      - "小規模リファクタリング"
-      - "依存関係の更新"
+      - "バグ修正"  # EN: Bug fixes
+      - "ドキュメント更新"  # EN: Documentation updates
+      - "設定変更"  # EN: Configuration changes
+      - "小規模リファクタリング"  # EN: Small-scale refactoring
+      - "依存関係の更新"  # EN: Dependency updates
 
   medium:
-    description: "1-2日の作業（中規模機能）"
+    description: "1-2日の作業（中規模機能）"  # EN: 1-2 days of work (medium-sized features)
     estimated_duration: "1-2d"
     stages:
       - requirements
@@ -43,23 +43,23 @@ modes:
       ears_format: required
       traceability: standard
     use_cases:
-      - "新規API追加"
-      - "既存機能の拡張"
-      - "パフォーマンス改善"
-      - "テストスイート追加"
-      - "統合機能"
+      - "新規API追加"  # EN: Adding new APIs
+      - "既存機能の拡張"  # EN: Extending existing features
+      - "パフォーマンス改善"  # EN: Performance improvements
+      - "テストスイート追加"  # EN: Adding test suites
+      - "統合機能"  # EN: Integration features
 
   large:
-    description: "1週間以上（大規模機能、新モジュール）"
+    description: "1週間以上（大規模機能、新モジュール）"  # EN: 1 week or more (large features, new modules)
     estimated_duration: "1w+"
     stages:
-      - steering       # プロジェクト記憶更新
-      - requirements   # 詳細要件定義
-      - design         # アーキテクチャ設計
-      - tasks          # タスク分解
-      - implement      # 実装
-      - validate       # 検証
-      - review         # レビュー
+      - steering       # プロジェクト記憶更新 / Update project memory
+      - requirements   # 詳細要件定義 / Detailed requirements definition
+      - design         # アーキテクチャ設計 / Architecture design
+      - tasks          # タスク分解 / Task decomposition
+      - implement      # 実装 / Implementation
+      - validate       # 検証 / Validation
+      - review         # レビュー / Review
     skip_artifacts: []
     requirements:
       coverage_threshold: 80
@@ -67,11 +67,11 @@ modes:
       traceability: strict
       adr_required: true
     use_cases:
-      - "新規モジュール作成"
-      - "アーキテクチャ変更"
-      - "破壊的変更"
-      - "新規プラットフォーム対応"
-      - "セキュリティ機能"
+      - "新規モジュール作成"  # EN: Creating new modules
+      - "アーキテクチャ変更"  # EN: Architecture changes
+      - "破壊的変更"  # EN: Breaking changes
+      - "新規プラットフォーム対応"  # EN: Supporting new platforms
+      - "セキュリティ機能"  # EN: Security features
 
 # Default mode selection rules
 auto_detection:
@@ -91,7 +91,7 @@ auto_detection:
 # Stage definitions (full list)
 stages:
   spike:
-    description: "技術調査・PoC"
+    description: "技術調査・PoC"  # EN: Technical investigation / PoC
     optional: true
     outputs:
       - spike-{topic}.md
@@ -100,7 +100,7 @@ stages:
       - system-architect
     
   steering:
-    description: "プロジェクト記憶の更新"
+    description: "プロジェクト記憶の更新"  # EN: Updating project memory
     optional: true
     outputs:
       - steering/structure.md
@@ -109,7 +109,7 @@ stages:
       - steering-agent
     
   requirements:
-    description: "要件定義（EARS形式）"
+    description: "要件定義（EARS形式）"  # EN: Requirements definition (EARS format)
     optional: false
     outputs:
       - requirements.md
@@ -119,7 +119,7 @@ stages:
       - steering/templates/requirements.md
       
   design:
-    description: "技術設計（C4モデル）"
+    description: "技術設計（C4モデル）"  # EN: Technical design (C4 model)
     optional: false
     outputs:
       - design.md
@@ -130,7 +130,7 @@ stages:
       - steering/templates/design.md
       
   tasks:
-    description: "タスク分解"
+    description: "タスク分解"  # EN: Task decomposition
     optional: false
     outputs:
       - tasks.md
@@ -140,7 +140,7 @@ stages:
       - steering/templates/tasks.md
       
   implement:
-    description: "実装（TDD）"
+    description: "実装（TDD）"  # EN: Implementation (TDD)
     optional: false
     outputs:
       - source files
@@ -149,12 +149,12 @@ stages:
       - software-developer
       - code-generator
     sub_stages:
-      - implement-test   # テストのみ（Red Phase）
-      - implement-code   # コードのみ（Green Phase）
-      - implement-refactor  # リファクタ（Blue Phase）
+      - implement-test   # テストのみ（Red Phase） / Tests only (Red Phase)
+      - implement-code   # コードのみ（Green Phase） / Code only (Green Phase)
+      - implement-refactor  # リファクタ（Blue Phase） / Refactor (Blue Phase)
       
   validate:
-    description: "検証・品質チェック"
+    description: "検証・品質チェック"  # EN: Validation / quality checks
     optional: false
     outputs:
       - validation-report.md
@@ -168,7 +168,7 @@ stages:
       - traceability
       
   review:
-    description: "コードレビュー"
+    description: "コードレビュー"  # EN: Code review
     optional: true
     outputs:
       - review-comments.md
@@ -176,7 +176,7 @@ stages:
       - code-reviewer
       
   testing:
-    description: "統合・E2Eテスト"
+    description: "統合・E2Eテスト"  # EN: Integration / E2E tests
     optional: true
     outputs:
       - test-report.md
@@ -184,7 +184,7 @@ stages:
       - test-runner
       
   deployment:
-    description: "デプロイ"
+    description: "デプロイ"  # EN: Deployment
     optional: true
     outputs:
       - deployment-log.md
@@ -192,7 +192,7 @@ stages:
       - release-manager
       
   monitoring:
-    description: "監視・メトリクス確認"
+    description: "監視・メトリクス確認"  # EN: Monitoring / metrics review
     optional: true
     outputs:
       - monitoring-report.md
@@ -200,7 +200,7 @@ stages:
       - monitoring-agent
       
   retrospective:
-    description: "振り返り"
+    description: "振り返り"  # EN: Retrospective
     optional: true
     outputs:
       - retrospective.md

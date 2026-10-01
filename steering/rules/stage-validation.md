@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [stage-validation.en.md](./stage-validation.en.md)
+
 # Stage Validation Guide
 
 ステージ間の自動検証とフィードバックループのガイド。

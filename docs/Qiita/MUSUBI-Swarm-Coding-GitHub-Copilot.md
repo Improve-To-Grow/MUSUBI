@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [MUSUBI-Swarm-Coding-GitHub-Copilot.en.md](./MUSUBI-Swarm-Coding-GitHub-Copilot.en.md)
+
 ## はじめに
 
 **「1人のAIより、チームで働くAI」** ── これが次世代のコーディング体験です。

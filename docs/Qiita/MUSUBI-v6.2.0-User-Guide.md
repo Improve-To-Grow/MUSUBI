@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [MUSUBI-v6.2.0-User-Guide.en.md](./MUSUBI-v6.2.0-User-Guide.en.md)
+
 # 【MUSUBI v6.2.0】Review Gate Engine搭載！品質を自動で守るSDD完全ガイド
 
 ## はじめに

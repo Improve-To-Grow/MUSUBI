@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [musubi-improvement-plan-v0.8.en.md](./musubi-improvement-plan-v0.8.en.md)
+
 # MUSUBI 改善プラン v0.8
 
 **作成日**: 2025-12-12

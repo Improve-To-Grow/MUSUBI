@@ -163,20 +163,20 @@ coverage_design = (requirements_with_design / requirements_total) * 100
 coverage_test = (requirements_with_tests / requirements_total) * 100
 ```
 
-### Phase 5: 段階的レポート生成
+### Phase 5: 段階的レポート生成 (Incremental Report Generation)
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: コンテキスト長オーバーフロー防止 / Prevent context length overflow**
 
-**出力方式の原則:**
+**出力方式の原則 / Output principles:**
 
-- ✅ 1セクションずつ順番に生成・保存
-- ✅ 各セクション生成後に進捗を報告
-- ✅ エラー発生時も部分的なレポートが残る
+- ✅ 1セクションずつ順番に生成・保存 / Generate and save one section at a time, in order
+- ✅ 各セクション生成後に進捗を報告 / Report progress after generating each section
+- ✅ エラー発生時も部分的なレポートが残る / A partial report remains even if an error occurs
 
 ```
-🤖 確認ありがとうございます。トレーサビリティ監査レポートを順番に生成します。
+🤖 確認ありがとうございます。トレーサビリティ監査レポートを順番に生成します。 / Thank you for confirming. I will generate the traceability audit report in order.
 
-【生成予定のセクション】
+【生成予定のセクション】 / [Planned Sections]
 1. Executive Summary
 2. Traceability Matrix
 3. Coverage Analysis
@@ -184,69 +184,69 @@ coverage_test = (requirements_with_tests / requirements_total) * 100
 5. Recommendations
 6. Constitutional Compliance
 
-合計: 6セクション
+合計: 6セクション / Total: 6 sections
 
-**重要: 段階的生成方式**
-各セクションを1つずつ生成・保存し、進捗を報告します。
-これにより、途中経過が見え、エラーが発生しても部分的なレポートが残ります。
+**重要: 段階的生成方式 / Important: Incremental generation approach**
+各セクションを1つずつ生成・保存し、進捗を報告します。 / Each section is generated and saved one at a time, and progress is reported.
+これにより、途中経過が見え、エラーが発生しても部分的なレポートが残ります。 / This makes intermediate progress visible, and a partial report remains even if an error occurs.
 
-生成を開始してよろしいですか?
-👤 ユーザー: [回答待ち]
+生成を開始してよろしいですか? / May I start generating?
+👤 ユーザー: [回答待ち] / 👤 User: [awaiting answer]
 ```
 
-ユーザーが承認後、**各セクションを順番に生成**:
+ユーザーが承認後、**各セクションを順番に生成**: / After user approval, **generate each section in order**:
 
 **Step 1: Executive Summary**
 
 ```
-🤖 [1/6] Executive Summaryを生成しています...
+🤖 [1/6] Executive Summaryを生成しています... / Generating the Executive Summary...
 
 📝 traceability/audit-report.md (Section 1)
-✅ 保存が完了しました
+✅ 保存が完了しました / Saved
 
-[1/6] 完了。次のセクションに進みます。
+[1/6] 完了。次のセクションに進みます。 / Done. Moving on to the next section.
 ```
 
 **Step 2: Traceability Matrix**
 
 ```
-🤖 [2/6] Traceability Matrixを生成しています...
+🤖 [2/6] Traceability Matrixを生成しています... / Generating the Traceability Matrix...
 
 📝 traceability/audit-report.md (Section 2)
-✅ 保存が完了しました
+✅ 保存が完了しました / Saved
 
-[2/6] 完了。次のセクションに進みます。
+[2/6] 完了。次のセクションに進みます。 / Done. Moving on to the next section.
 ```
 
-**大きなトレーサビリティレポート(>300行)の場合:**
+**大きなトレーサビリティレポート(>300行)の場合 / For large traceability reports (>300 lines):**
 
 ```
-🤖 トレーサビリティマトリクスが大規模なため、2パートに分割します。
-⚠️ 要件数が多いため、分割して詳細な追跡情報を生成します。
+🤖 トレーサビリティマトリクスが大規模なため、2パートに分割します。 / The traceability matrix is large, so it will be split into 2 parts.
+⚠️ 要件数が多いため、分割して詳細な追跡情報を生成します。 / Because there are many requirements, detailed tracing information will be generated in parts.
 
-📝 Part 1/2: traceability/audit-report.md (要件1-50の追跡情報)
-✅ 保存が完了しました (280行)
+📝 Part 1/2: traceability/audit-report.md (要件1-50の追跡情報) / (tracing info for requirements 1-50)
+✅ 保存が完了しました (280行) / Saved (280 lines)
 
-📝 Part 2/2: traceability/audit-report.md (要件51-100の追跡情報)
-✅ 保存が完了しました (250行)
+📝 Part 2/2: traceability/audit-report.md (要件51-100の追跡情報) / (tracing info for requirements 51-100)
+✅ 保存が完了しました (250行) / Saved (250 lines)
 
-✅ レポート生成完了: traceability/audit-report.md (530行)
+✅ レポート生成完了: traceability/audit-report.md (530行) / Report generation complete (530 lines)
 
-全要件の追跡が完了しました。
+全要件の追跡が完了しました。 / Tracing of all requirements is complete.
 ```
 
-**Final: レポート生成完了サマリー**
+**Final: レポート生成完了サマリー / Report generation summary**
 
 ```
-🤖 ✨ トレーサビリティ監査レポートの生成が完了しました！
+🤖 ✨ トレーサビリティ監査レポートの生成が完了しました！ / The traceability audit report has been generated!
 
-## 📊 監査サマリー
-- **全体トレーサビリティ**: 66.7%
-- **実装済み要件**: 2/3
-- **孤立アイテム**: 2件
+## 📊 監査サマリー (Audit Summary)
+- **全体トレーサビリティ / Overall traceability**: 66.7%
+- **実装済み要件 / Implemented requirements**: 2/3
+- **孤立アイテム / Orphaned items**: 2件 / 2 items
 
-## 📂 生成されたレポート
-✅ traceability/audit-report.md (6セクション)
+## 📂 生成されたレポート (Generated Reports)
+✅ traceability/audit-report.md (6セクション) / (6 sections)
 
 ```
 

@@ -1,7 +1,7 @@
 /**
  * MUSUBI Issue Resolver
  *
- * GitHub Issue を分析し、自動的に解決策を提案・実装
+ * GitHub Issue を分析し、自動的に解決策を提案・実装 / Analyzes GitHub Issues and automatically proposes/implements solutions
  *
  * @module src/resolvers/issue-resolver
  * @see REQ-P0-B006
@@ -11,7 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// GitHub クライアント（オプショナル依存）
+// GitHub クライアント（オプショナル依存） / GitHub client (optional dependency)
 let GitHubClient;
 try {
   GitHubClient = require('../integrations/github-client').GitHubClient;
@@ -20,7 +20,7 @@ try {
 }
 
 /**
- * Issue タイプ
+ * Issue タイプ / Issue type
  */
 const IssueType = {
   BUG: 'bug',
@@ -32,7 +32,7 @@ const IssueType = {
 };
 
 /**
- * 解決ステータス
+ * 解決ステータス / Resolution status
  */
 const ResolverStatus = {
   PENDING: 'pending',
@@ -44,7 +44,7 @@ const ResolverStatus = {
 };
 
 /**
- * Issue 情報
+ * Issue 情報 / Issue information
  */
 class IssueInfo {
   constructor(options = {}) {
@@ -59,7 +59,7 @@ class IssueInfo {
   }
 
   /**
-   * Issue タイプを推定
+   * Issue タイプを推定 / Infer the Issue type
    * @returns {string}
    */
   get type() {
@@ -83,7 +83,7 @@ class IssueInfo {
       return IssueType.TEST;
     }
 
-    // タイトルと本文からも推定
+    // タイトルと本文からも推定 / Also infer from the title and body
     const content = `${this.title} ${this.body}`.toLowerCase();
     if (content.includes('bug') || content.includes('error') || content.includes('fix')) {
       return IssueType.BUG;
@@ -96,7 +96,7 @@ class IssueInfo {
   }
 
   /**
-   * 全コンテンツを取得
+   * 全コンテンツを取得 / Get all content
    * @returns {string}
    */
   get fullContent() {
@@ -110,7 +110,7 @@ class IssueInfo {
 }
 
 /**
- * 解決結果
+ * 解決結果 / Resolution result
  */
 class ResolverResult {
   constructor(options = {}) {
@@ -142,7 +142,7 @@ class ResolverResult {
   }
 
   /**
-   * Markdown形式でレポート
+   * Markdown形式でレポート / Report in Markdown format
    * @returns {string}
    */
   toMarkdown() {
@@ -195,7 +195,7 @@ class ResolverResult {
 }
 
 /**
- * 影響分析結果
+ * 影響分析結果 / Impact analysis result
  */
 class ImpactAnalysis {
   constructor(options = {}) {
@@ -218,15 +218,15 @@ class ImpactAnalysis {
 }
 
 /**
- * Issue リゾルバー
+ * Issue リゾルバー / Issue resolver
  */
 class IssueResolver {
   /**
    * @param {Object} options
-   * @param {string} options.projectRoot - プロジェクトルート
-   * @param {string} options.githubToken - GitHub トークン
-   * @param {boolean} options.draftPR - Draft PR を作成するか
-   * @param {boolean} options.dryRun - 実際には変更しない
+   * @param {string} options.projectRoot - プロジェクトルート / Project root
+   * @param {string} options.githubToken - GitHub トークン / GitHub token
+   * @param {boolean} options.draftPR - Draft PR を作成するか / Whether to create a Draft PR
+   * @param {boolean} options.dryRun - 実際には変更しない / Do not actually make changes
    */
   constructor(options = {}) {
     this.projectRoot = options.projectRoot || process.cwd();
@@ -235,7 +235,7 @@ class IssueResolver {
     this.dryRun = options.dryRun || false;
     this.repo = options.repo || this._detectRepo();
 
-    // GitHub クライアント初期化
+    // GitHub クライアント初期化 / Initialize GitHub client
     this.github = null;
     if (GitHubClient && this.githubToken && this.repo) {
       this.github = new GitHubClient({
@@ -247,7 +247,7 @@ class IssueResolver {
   }
 
   /**
-   * リポジトリ情報を検出
+   * リポジトリ情報を検出 / Detect repository information
    * @returns {Object|null}
    */
   _detectRepo() {
@@ -261,32 +261,32 @@ class IssueResolver {
         return { owner: match[1], repo: match[2].replace('.git', '') };
       }
     } catch (e) {
-      // 無視
+      // 無視 / Ignore
     }
     return null;
   }
 
   /**
-   * Issue を解決
-   * @param {string|number|IssueInfo} issue - Issue URL、番号、またはIssueInfo
+   * Issue を解決 / Resolve an Issue
+   * @param {string|number|IssueInfo} issue - Issue URL、番号、またはIssueInfo / Issue URL, number, or IssueInfo
    * @returns {Promise<ResolverResult>}
    */
   async resolve(issue) {
     const result = new ResolverResult({ status: ResolverStatus.ANALYZING });
 
     try {
-      // 1. Issue 情報を取得/正規化
+      // 1. Issue 情報を取得/正規化 / 1. Fetch/normalize Issue information
       const issueInfo = issue instanceof IssueInfo ? issue : await this.fetchIssue(issue);
       result.issue = issueInfo;
 
-      // 2. 要件抽出
+      // 2. 要件抽出 / 2. Extract requirements
       result.requirements = this.extractRequirements(issueInfo);
 
-      // 3. 影響範囲分析
+      // 3. 影響範囲分析 / 3. Analyze impact scope
       result.status = ResolverStatus.ANALYZING;
       result.impactAnalysis = await this.analyzeImpact(result.requirements, issueInfo);
 
-      // 4. 変更計画を生成
+      // 4. 変更計画を生成 / 4. Generate change plan
       result.status = ResolverStatus.IMPLEMENTING;
       result.changes = await this.planChanges(
         issueInfo,
@@ -294,27 +294,27 @@ class IssueResolver {
         result.impactAnalysis
       );
 
-      // 5. テスト計画を生成
+      // 5. テスト計画を生成 / 5. Generate test plan
       result.status = ResolverStatus.TESTING;
       result.tests = await this.planTests(issueInfo, result.changes);
 
-      // 6. ブランチ名を決定
+      // 6. ブランチ名を決定 / 6. Determine branch name
       result.branchName = this.generateBranchName(issueInfo);
 
-      // 7. Dry run でなければ PR を作成
+      // 7. Dry run でなければ PR を作成 / 7. Create a PR unless dry run
       if (!this.dryRun && this.github) {
         try {
-          // ブランチ作成
+          // ブランチ作成 / Create branch
           await this.github.createBranch(result.branchName);
 
-          // 分析結果を Issue にコメント
+          // 分析結果を Issue にコメント / Comment the analysis result on the Issue
           const analysisComment = this._formatAnalysisComment(result);
           await this.github.addIssueComment(issueInfo.number, analysisComment);
 
-          // ラベル追加
+          // ラベル追加 / Add labels
           await this.github.addLabels(issueInfo.number, ['musubi-analyzed']);
 
-          // PR 作成（Draft）
+          // PR 作成（Draft） / Create PR (Draft)
           const prBody = this._formatPRBody(issueInfo, result);
           const pr = await this.github.createPullRequest({
             title: `${issueInfo.type === IssueType.BUG ? 'fix' : 'feat'}: ${issueInfo.title} (Closes #${issueInfo.number})`,
@@ -327,7 +327,7 @@ class IssueResolver {
           result.prUrl = pr.html_url;
         } catch (apiError) {
           console.warn(`GitHub API error: ${apiError.message}`);
-          // API エラーでも解析結果は返す
+          // API エラーでも解析結果は返す / Return the analysis result even on API errors
         }
       }
 
@@ -341,7 +341,7 @@ class IssueResolver {
   }
 
   /**
-   * 分析コメントをフォーマット
+   * 分析コメントをフォーマット / Format the analysis comment
    * @param {ResolverResult} result
    * @returns {string}
    */
@@ -375,7 +375,7 @@ class IssueResolver {
   }
 
   /**
-   * PR 本文をフォーマット
+   * PR 本文をフォーマット / Format the PR body
    * @param {IssueInfo} issue
    * @param {ResolverResult} result
    * @returns {string}
@@ -408,12 +408,12 @@ class IssueResolver {
   }
 
   /**
-   * Issue を取得
-   * @param {string|number} issueRef - Issue URL または番号
+   * Issue を取得 / Fetch the Issue
+   * @param {string|number} issueRef - Issue URL または番号 / Issue URL or number
    * @returns {Promise<IssueInfo>}
    */
   async fetchIssue(issueRef) {
-    // URL からパース
+    // URL からパース / Parse from URL
     let issueNumber;
     if (typeof issueRef === 'string' && issueRef.includes('github.com')) {
       const match = issueRef.match(/\/issues\/(\d+)/);
@@ -424,7 +424,7 @@ class IssueResolver {
       issueNumber = typeof issueRef === 'number' ? issueRef : parseInt(issueRef);
     }
 
-    // GitHub API で取得
+    // GitHub API で取得 / Fetch via GitHub API
     if (this.github && issueNumber) {
       try {
         const issueData = await this.github.getIssue(issueNumber);
@@ -445,11 +445,11 @@ class IssueResolver {
         });
       } catch (error) {
         console.warn(`Failed to fetch issue #${issueNumber} from GitHub: ${error.message}`);
-        // フォールバック
+        // フォールバック / Fallback
       }
     }
 
-    // フォールバック: ローカルモック
+    // フォールバック: ローカルモック / Fallback: local mock
     return new IssueInfo({
       number: issueNumber,
       title: `Issue #${issueNumber}`,
@@ -459,7 +459,7 @@ class IssueResolver {
   }
 
   /**
-   * Issue から要件を抽出
+   * Issue から要件を抽出 / Extract requirements from the Issue
    * @param {IssueInfo} issue
    * @returns {string[]}
    */
@@ -467,14 +467,14 @@ class IssueResolver {
     const requirements = [];
     const content = issue.fullContent;
 
-    // タスクリスト（チェックボックス）を抽出
+    // タスクリスト（チェックボックス）を抽出 / Extract task lists (checkboxes)
     const taskPattern = /- \[[ x]\] (.+)/g;
     let match;
     while ((match = taskPattern.exec(content)) !== null) {
       requirements.push(match[1].trim());
     }
 
-    // 「should」「must」「need to」パターンを抽出
+    // 「should」「must」「need to」パターンを抽出 / Extract 'should' / 'must' / 'need to' patterns
     const requirementPatterns = [
       /(?:should|must|need to|needs to)\s+(.+?)(?:\.|$)/gi,
       /(?:expected|expect|want)\s+(?:to\s+)?(.+?)(?:\.|$)/gi,
@@ -489,7 +489,7 @@ class IssueResolver {
       }
     }
 
-    // Issue タイプに基づくデフォルト要件
+    // Issue タイプに基づくデフォルト要件 / Default requirements based on Issue type
     if (requirements.length === 0) {
       switch (issue.type) {
         case IssueType.BUG:
@@ -507,7 +507,7 @@ class IssueResolver {
   }
 
   /**
-   * 影響範囲を分析
+   * 影響範囲を分析 / Analyze impact scope
    * @param {string[]} requirements
    * @param {IssueInfo} issue
    * @returns {Promise<ImpactAnalysis>}
@@ -516,7 +516,7 @@ class IssueResolver {
     const analysis = new ImpactAnalysis();
     const content = issue.fullContent.toLowerCase();
 
-    // ファイルパスの検出
+    // ファイルパスの検出 / Detect file paths
     const filePattern = /(?:in|at|file)\s+[`"]?([a-zA-Z0-9_\-./]+\.[a-zA-Z]+)[`"]?/gi;
     let match;
     while ((match = filePattern.exec(content)) !== null) {
@@ -526,7 +526,7 @@ class IssueResolver {
       }
     }
 
-    // バッククォートで囲まれたパスを検出
+    // バッククォートで囲まれたパスを検出 / Detect paths enclosed in backticks
     const backtickPattern = /`([a-zA-Z0-9_\-./]+\.[a-zA-Z]+)`/g;
     while ((match = backtickPattern.exec(content)) !== null) {
       const filePath = match[1];
@@ -535,7 +535,7 @@ class IssueResolver {
       }
     }
 
-    // コンポーネントの検出
+    // コンポーネントの検出 / Detect components
     const componentPatterns = [
       /(?:component|module|class|function)\s+[`"]?(\w+)[`"]?/gi,
       /(\w+)(?:Component|Module|Service|Controller|Manager)/g,
@@ -550,22 +550,22 @@ class IssueResolver {
       }
     }
 
-    // 要件IDの検出
+    // 要件IDの検出 / Detect requirement IDs
     const reqPattern = /REQ-[A-Z0-9]+-\d+/g;
     const reqMatches = issue.fullContent.match(reqPattern) || [];
     analysis.relatedRequirements = [...new Set(reqMatches)];
 
-    // リスクレベルの推定
+    // リスクレベルの推定 / Estimate risk level
     analysis.riskLevel = this._estimateRiskLevel(issue, analysis);
 
-    // 工数の推定
+    // 工数の推定 / Estimate effort
     analysis.estimatedEffort = this._estimateEffort(issue, requirements);
 
     return analysis;
   }
 
   /**
-   * リスクレベルを推定
+   * リスクレベルを推定 / Estimate risk level
    * @param {IssueInfo} issue
    * @param {ImpactAnalysis} analysis
    * @returns {string}
@@ -573,7 +573,7 @@ class IssueResolver {
   _estimateRiskLevel(issue, analysis) {
     const content = issue.fullContent.toLowerCase();
 
-    // 高リスクキーワード
+    // 高リスクキーワード / High-risk keywords
     const highRiskKeywords = [
       'security',
       'authentication',
@@ -586,7 +586,7 @@ class IssueResolver {
       return 'high';
     }
 
-    // 中リスク
+    // 中リスク / Medium risk
     if (analysis.affectedFiles.length > 5 || analysis.affectedComponents.length > 3) {
       return 'medium';
     }
@@ -595,7 +595,7 @@ class IssueResolver {
   }
 
   /**
-   * 工数を推定
+   * 工数を推定 / Estimate effort
    * @param {IssueInfo} issue
    * @param {string[]} requirements
    * @returns {string}
@@ -607,7 +607,7 @@ class IssueResolver {
   }
 
   /**
-   * 変更計画を作成
+   * 変更計画を作成 / Create change plan
    * @param {IssueInfo} issue
    * @param {string[]} requirements
    * @param {ImpactAnalysis} impact
@@ -616,7 +616,7 @@ class IssueResolver {
   async planChanges(issue, requirements, impact) {
     const changes = [];
 
-    // 影響ファイルに対する変更を計画
+    // 影響ファイルに対する変更を計画 / Plan changes for affected files
     for (const file of impact.affectedFiles) {
       changes.push({
         file,
@@ -625,10 +625,10 @@ class IssueResolver {
       });
     }
 
-    // Issue タイプに基づく追加変更
+    // Issue タイプに基づく追加変更 / Additional changes based on Issue type
     if (issue.type === IssueType.BUG && changes.length === 0) {
       changes.push({
-        file: 'src/fix.js', // プレースホルダー
+        file: 'src/fix.js', // プレースホルダー / Placeholder
         type: 'modify',
         description: `Fix: ${issue.title}`,
       });
@@ -636,7 +636,7 @@ class IssueResolver {
 
     if (issue.type === IssueType.FEATURE) {
       changes.push({
-        file: 'src/new-feature.js', // プレースホルダー
+        file: 'src/new-feature.js', // プレースホルダー / Placeholder
         type: 'create',
         description: `Implement: ${issue.title}`,
       });
@@ -646,7 +646,7 @@ class IssueResolver {
   }
 
   /**
-   * テスト計画を作成
+   * テスト計画を作成 / Create test plan
    * @param {IssueInfo} issue
    * @param {Object[]} changes
    * @returns {Promise<Object[]>}
@@ -665,7 +665,7 @@ class IssueResolver {
       }
     }
 
-    // Issue タイプに基づく追加テスト
+    // Issue タイプに基づく追加テスト / Additional tests based on Issue type
     if (issue.type === IssueType.BUG) {
       tests.push({
         file: 'tests/regression.test.js',
@@ -678,7 +678,7 @@ class IssueResolver {
   }
 
   /**
-   * ブランチ名を生成
+   * ブランチ名を生成 / Generate branch name
    * @param {IssueInfo} issue
    * @returns {string}
    */
@@ -693,7 +693,7 @@ class IssueResolver {
   }
 
   /**
-   * プレビューを生成（dry run用）
+   * プレビューを生成（dry run用） / Generate preview (for dry run)
    * @param {ResolverResult} result
    * @returns {string}
    */

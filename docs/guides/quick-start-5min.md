@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [quick-start-5min.en.md](./quick-start-5min.en.md)
+
 # 🚀 MUSUBI 5分間クイックスタート
 
 **MUSUBI v3.5.1** | 最終更新: 2025-12-08

@@ -1,10 +1,10 @@
 # Phase 4 & 5 Design Document
 
-## メタデータ
-- **ドキュメント種別**: 設計書 (SDD Stage 3)
-- **作成日**: 2025-12-10
-- **プロジェクト**: MUSUBI v5.0.0
-- **関連要件**: [srs-musubi-v5.0.0.md](../../docs/requirements/srs/srs-musubi-v5.0.0.md)
+## メタデータ (Metadata)
+- **ドキュメント種別 (Document Type)**: 設計書 / Design Document (SDD Stage 3)
+- **作成日 (Created)**: 2025-12-10
+- **プロジェクト (Project)**: MUSUBI v5.0.0
+- **関連要件 (Related Requirements)**: [srs-musubi-v5.0.0.md](../../docs/requirements/srs/srs-musubi-v5.0.0.md)
 - **Constitutional Compliance**: Article III (Design-First), Article V (Traceability)
 
 ---
@@ -17,18 +17,20 @@
 **Date**: 2025-12-10  
 **Context**:  
 LLMエージェントに効率的なコンテキストを提供するため、コードベースの構造と関係性を理解する必要がある。
+To provide LLM agents with efficient context, the structure and relationships of the codebase need to be understood.
 
 **Decision**:  
 3つの独立したコンポーネントによる階層的アプローチを採用:
-1. RepositoryMap - ファイル構造とエントリポイント
-2. ASTExtractor - シンボルと関係性
-3. ContextOptimizer - トークン最適化
+Adopt a hierarchical approach with three independent components:
+1. RepositoryMap - ファイル構造とエントリポイント / File structure and entry points
+2. ASTExtractor - シンボルと関係性 / Symbols and relationships
+3. ContextOptimizer - トークン最適化 / Token optimization
 
 **Consequences**:
-- ✅ 関心事の分離
-- ✅ 独立したテスト可能性
-- ✅ 段階的な処理
-- ⚠️ 3つのコンポーネント間の統合が必要
+- ✅ 関心事の分離 / Separation of concerns
+- ✅ 独立したテスト可能性 / Independent testability
+- ✅ 段階的な処理 / Incremental processing
+- ⚠️ 3つのコンポーネント間の統合が必要 / Requires integration between the three components
 
 **Traceability**:
 - REQ-P4-001, REQ-P4-002, REQ-P4-003
@@ -41,20 +43,22 @@ LLMエージェントに効率的なコンテキストを提供するため、�
 **Date**: 2025-12-10  
 **Context**:  
 本番運用のために、品質メトリクス、インシデント管理、リリース自動化が必要。
+Production operation requires quality metrics, incident management, and release automation.
 
 **Decision**:  
 5つの専門コンポーネントを持つモニタリングレイヤーを実装:
-1. QualityDashboard - カバレッジと品質メトリクス
-2. IncidentManager - エラー追跡とインシデント対応
-3. ReleaseManager - バージョン管理とリリース自動化
-4. Observability - ログ、メトリクス、トレース
-5. CostTracker - API使用量とコスト管理
+Implement a monitoring layer with five specialized components:
+1. QualityDashboard - カバレッジと品質メトリクス / Coverage and quality metrics
+2. IncidentManager - エラー追跡とインシデント対応 / Error tracking and incident response
+3. ReleaseManager - バージョン管理とリリース自動化 / Version management and release automation
+4. Observability - ログ、メトリクス、トレース / Logs, metrics, traces
+5. CostTracker - API使用量とコスト管理 / API usage and cost management
 
 **Consequences**:
-- ✅ 包括的な可観測性
-- ✅ 自動化されたリリースプロセス
-- ✅ コスト可視化
-- ⚠️ 追加の依存関係
+- ✅ 包括的な可観測性 / Comprehensive observability
+- ✅ 自動化されたリリースプロセス / Automated release process
+- ✅ コスト可視化 / Cost visibility
+- ⚠️ 追加の依存関係 / Additional dependencies
 
 **Traceability**:
 - REQ-P5-001, REQ-P5-002, REQ-P5-003, REQ-P5-004, REQ-P5-005

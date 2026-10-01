@@ -261,9 +261,9 @@ program
  */
 function getModeDescription(mode) {
   const descriptions = {
-    small: '1-2時間',
-    medium: '1-2日',
-    large: '1週間+',
+    small: '1-2時間', // EN: 1-2 hours
+    medium: '1-2日', // EN: 1-2 days
+    large: '1週間+', // EN: 1 week+
   };
   return descriptions[mode] || mode;
 }

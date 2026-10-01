@@ -12,13 +12,19 @@
 
 Phase -1 GateはConstitutional Article VII（Simplicity）またはArticle VIII（Anti-Abstraction）の違反を検出した際に自動的に発動する特別レビュープロセスです。
 
+The Phase -1 Gate is a special review process that is triggered automatically when a violation of Constitutional Article VII (Simplicity) or Article VIII (Anti-Abstraction) is detected.
+
 このゲートが発動した場合、以下のレビュアーに通知し、承認ワークフローを開始する必要があります：
 
-- **System Architect**（必須）
-- **Project Manager**（任意）
-- **Human Developer**（最終承認）
+When this gate is triggered, the following reviewers must be notified and an approval workflow must be started:
+
+- **System Architect**（必須 / required）
+- **Project Manager**（任意 / optional）
+- **Human Developer**（最終承認 / final approval）
 
 通知チャネルとワークフローの設計を決定する必要があります。
+
+We need to decide on the design of the notification channels and the workflow.
 
 ---
 
@@ -27,6 +33,8 @@ Phase -1 GateはConstitutional Article VII（Simplicity）またはArticle VIII�
 ### Primary Channel: GitHub/GitLab Integration
 
 GitHub Issues/Pull Request Commentsを主要な通知・ワークフローチャネルとして使用します。
+
+GitHub Issues / Pull Request comments are used as the primary notification and workflow channel.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -136,6 +144,8 @@ body: |
 
 オプションでSlack/Discord/Teams通知をサポート：
 
+Optionally supports Slack/Discord/Teams notifications:
+
 ```yaml
 # musubi.config.yml
 
@@ -161,43 +171,45 @@ phaseMinusOne:
 ### Alternative 1: Email-Only Notification
 
 **Pros**:
-- シンプル
-- 全ての開発者がアクセス可能
+- シンプル / Simple
+- 全ての開発者がアクセス可能 / Accessible to all developers
 
 **Cons**:
-- ワークフロー統合なし
-- トラッキングが困難
-- 非同期性が高すぎる
+- ワークフロー統合なし / No workflow integration
+- トラッキングが困難 / Hard to track
+- 非同期性が高すぎる / Too asynchronous
 
-**Rejected**: 開発ワークフローとの統合不足
+**Rejected**: 開発ワークフローとの統合不足 / Insufficient integration with the development workflow
 
 ### Alternative 2: Slack-First Approach
 
 **Pros**:
-- リアルタイム通知
-- スレッドでの議論
+- リアルタイム通知 / Real-time notifications
+- スレッドでの議論 / Threaded discussions
 
 **Cons**:
-- Slackアカウントが必要
-- 通知の永続化が不確実
-- GitHub/GitLabワークフローとの分離
+- Slackアカウントが必要 / Requires a Slack account
+- 通知の永続化が不確実 / Notification persistence is uncertain
+- GitHub/GitLabワークフローとの分離 / Separated from the GitHub/GitLab workflow
 
-**Rejected**: 開発ワークフローとの一貫性を優先
+**Rejected**: 開発ワークフローとの一貫性を優先 / Consistency with the development workflow takes priority
 
 ### Alternative 3: Custom Review Tool
 
 専用のWebベースレビューツールを構築。
 
+Build a dedicated web-based review tool.
+
 **Pros**:
-- カスタマイズ性が高い
-- 専用ワークフロー
+- カスタマイズ性が高い / Highly customizable
+- 専用ワークフロー / Dedicated workflow
 
 **Cons**:
-- 開発コストが高い
-- 追加の認証が必要
-- Article VII（Simplicity）違反
+- 開発コストが高い / High development cost
+- 追加の認証が必要 / Requires additional authentication
+- Article VII（Simplicity）違反 / Violates Article VII (Simplicity)
 
-**Rejected**: オーバーエンジニアリング
+**Rejected**: オーバーエンジニアリング / Over-engineering
 
 ---
 
@@ -205,22 +217,22 @@ phaseMinusOne:
 
 ### Positive
 
-1. **ワークフロー統合**: 既存のGitHub/GitLab開発フローに組み込み
-2. **永続化**: Issues/PRに記録が残る
-3. **非同期対応**: タイムゾーンをまたいだレビューが可能
-4. **トレーサビリティ**: コードとレビューの紐付けが自動
+1. **ワークフロー統合 (Workflow integration)**: 既存のGitHub/GitLab開発フローに組み込み / Built into the existing GitHub/GitLab development flow
+2. **永続化 (Persistence)**: Issues/PRに記録が残る / Records remain in Issues/PRs
+3. **非同期対応 (Asynchronous support)**: タイムゾーンをまたいだレビューが可能 / Reviews across time zones are possible
+4. **トレーサビリティ (Traceability)**: コードとレビューの紐付けが自動 / Code and reviews are linked automatically
 
 ### Negative
 
-1. **GitHub/GitLab依存**: これらのプラットフォームを使用しない環境では制限
-2. **通知の見逃し**: 大量の通知に埋もれる可能性
-3. **オフライン制限**: ネットワーク接続が必要
+1. **GitHub/GitLab依存 (GitHub/GitLab dependency)**: これらのプラットフォームを使用しない環境では制限 / Limited in environments that do not use these platforms
+2. **通知の見逃し (Missed notifications)**: 大量の通知に埋もれる可能性 / Notifications may get buried in high volume
+3. **オフライン制限 (Offline limitation)**: ネットワーク接続が必要 / Requires a network connection
 
 ### Mitigations
 
-- **プラットフォーム依存**: Gitea/Bitbucket対応を将来的に検討
-- **通知管理**: `phase-minus-one`ラベルでフィルタリング可能に
-- **オフライン**: ローカルでの検出結果をキャッシュし、オンライン時に通知
+- **プラットフォーム依存 (Platform dependency)**: Gitea/Bitbucket対応を将来的に検討 / Consider Gitea/Bitbucket support in the future
+- **通知管理 (Notification management)**: `phase-minus-one`ラベルでフィルタリング可能に / Make filtering possible via the `phase-minus-one` label
+- **オフライン (Offline)**: ローカルでの検出結果をキャッシュし、オンライン時に通知 / Cache detection results locally and notify when back online
 
 ---
 
@@ -290,13 +302,13 @@ phaseMinusOne:
     systemArchitect:
       required: true
       githubTeam: "@org/architects"
-      timeout: 48h  # 自動エスカレーション
+      timeout: 48h  # 自動エスカレーション / Auto-escalation
     projectManager:
       required: false
       githubTeam: "@org/pms"
     humanDeveloper:
       required: true
-      autoAssign: true  # PR作成者
+      autoAssign: true  # PR作成者 / PR author
 ```
 
 ---

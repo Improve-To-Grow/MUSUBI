@@ -33,7 +33,7 @@ jobs:
       - name: Run Security Analysis
         id: security
         run: |
-          # 変更されたファイルを取得
+          # 変更されたファイルを取得 / Get changed files
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(js|ts|py|json|yml|yaml)$' || true)
           else
@@ -47,7 +47,7 @@ jobs:
             exit 0
           fi
 
-          # セキュリティ分析実行
+          # セキュリティ分析実行 / Run security analysis
           echo "$FILES" | xargs musubi-analyze security --format json > security-report.json 2>/dev/null || true
 
           if [ -f security-report.json ]; then

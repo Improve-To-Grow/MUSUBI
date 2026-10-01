@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [musubi-v0.4.0-auto-sync.en.md](./musubi-v0.4.0-auto-sync.en.md)
+
 # MUSUBI v0.4.0 - プロジェクトメモリだけでは足りなかった理由と自動同期の実装
 
 **タグ**: `AI` `ChatGPT` `GitHub` `npm` `ドキュメント`

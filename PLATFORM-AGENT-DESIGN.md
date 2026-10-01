@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [PLATFORM-AGENT-DESIGN.en.md](./PLATFORM-AGENT-DESIGN.en.md)
+
 # MUSUBI Multi-Agent Platform Design
 
 ## 🎯 新しいアプローチ: Agent-Based Distribution

@@ -14,21 +14,21 @@ const yaml = require('js-yaml');
  */
 const DEFAULT_MODES = {
   small: {
-    description: '1-2時間の作業（バグ修正、小機能）',
+    description: '1-2時間の作業（バグ修正、小機能）', // EN: '1-2 hours of work (bug fixes, small features)'
     stages: ['requirements', 'implement', 'validate'],
     coverageThreshold: 60,
     earsFormat: 'optional',
     traceability: 'relaxed',
   },
   medium: {
-    description: '1-2日の作業（中規模機能）',
+    description: '1-2日の作業（中規模機能）', // EN: '1-2 days of work (medium-sized features)'
     stages: ['requirements', 'design', 'tasks', 'implement', 'validate'],
     coverageThreshold: 70,
     earsFormat: 'required',
     traceability: 'standard',
   },
   large: {
-    description: '1週間以上（大規模機能、新モジュール）',
+    description: '1週間以上（大規模機能、新モジュール）', // EN: '1 week or more (large features, new modules)'
     stages: ['steering', 'requirements', 'design', 'tasks', 'implement', 'validate', 'review'],
     coverageThreshold: 80,
     earsFormat: 'required',

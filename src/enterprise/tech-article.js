@@ -162,7 +162,7 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
 
     // Table of Contents
     if (this.config.includeTableOfContents && content.sections) {
-      sections.push('## 目次');
+      sections.push('## 目次'); // EN: ## Table of Contents
       sections.push('');
       content.sections.forEach((section, idx) => {
         sections.push(`${idx + 1}. [${section.title}](#${this.slugify(section.title)})`);
@@ -219,9 +219,9 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
 
     // Benchmarks
     if (content.benchmarks) {
-      sections.push('## ベンチマーク結果');
+      sections.push('## ベンチマーク結果'); // EN: ## Benchmark Results
       sections.push('');
-      sections.push('| 項目 | 値 |');
+      sections.push('| 項目 | 値 |'); // EN: | Item | Value |
       sections.push('|------|-----|');
       for (const [key, value] of Object.entries(content.benchmarks)) {
         sections.push(`| ${key} | ${value} |`);
@@ -231,7 +231,7 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
 
     // Conclusion
     if (content.conclusion) {
-      sections.push('## まとめ');
+      sections.push('## まとめ'); // EN: ## Summary
       sections.push('');
       sections.push(content.conclusion);
       sections.push('');
@@ -239,7 +239,7 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
 
     // References
     if (content.references && content.references.length > 0) {
-      sections.push('## 参考文献');
+      sections.push('## 参考文献'); // EN: ## References
       sections.push('');
       for (const ref of content.references) {
         sections.push(`- ${template.link(ref.title, ref.url)}`);
@@ -275,8 +275,8 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
    */
   async generateFromExperiment(experimentReport, options = {}) {
     const content = {
-      title: options.title || `実験レポート: ${experimentReport.metadata?.title || 'Unknown'}`,
-      description: options.description || '実験結果と観察のレポート',
+      title: options.title || `実験レポート: ${experimentReport.metadata?.title || 'Unknown'}`, // EN: `Experiment Report: ${title}`
+      description: options.description || '実験結果と観察のレポート', // EN: 'Report of experiment results and observations'
       tags: options.tags || ['experiment', 'test', 'report'],
       introduction: options.introduction || this.generateExperimentIntroduction(experimentReport),
       sections: this.generateExperimentSections(experimentReport),
@@ -296,9 +296,9 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
   generateExperimentIntroduction(report) {
     const summary = report.summary || {};
     return (
-      `本記事では、${report.metadata?.title || 'テスト'}の実験結果を報告します。` +
-      `合計${summary.total || 0}件のテストを実行し、` +
-      `${summary.passRate || '0%'}のパス率を達成しました。`
+      `本記事では、${report.metadata?.title || 'テスト'}の実験結果を報告します。` + // EN: `This article reports the experiment results of ${title || 'Test'}.`
+      `合計${summary.total || 0}件のテストを実行し、` + // EN: `A total of ${total} tests were run, `
+      `${summary.passRate || '0%'}のパス率を達成しました。` // EN: `achieving a pass rate of ${passRate}.`
     );
   }
 
@@ -312,7 +312,8 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
 
     // Summary section
     sections.push({
-      title: '実験サマリー',
+      title: '実験サマリー', // EN: 'Experiment Summary'
+      // EN (table below): | Metric | Value | / Total tests / Passed / Failed / Skipped / Pass rate
       content: `
 | 指標 | 値 |
 |------|-----|
@@ -327,7 +328,7 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
     // Metrics section (if available)
     if (report.metrics && Object.keys(report.metrics).length > 0) {
       sections.push({
-        title: 'メトリクス',
+        title: 'メトリクス', // EN: 'Metrics'
         content: this.formatMetricsSection(report.metrics),
       });
     }
@@ -335,7 +336,7 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
     // Observations section
     if (report.observations && report.observations.length > 0) {
       sections.push({
-        title: '観察結果',
+        title: '観察結果', // EN: 'Observations'
         content: report.observations.map(o => `- ${o}`).join('\n'),
       });
     }
@@ -352,9 +353,9 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
     const lines = [];
 
     if (metrics.performance) {
-      lines.push('### パフォーマンス');
+      lines.push('### パフォーマンス'); // EN: '### Performance'
       lines.push('');
-      lines.push('| 指標 | 値 |');
+      lines.push('| 指標 | 値 |'); // EN: '| Metric | Value |'
       lines.push('|------|-----|');
       for (const [key, value] of Object.entries(metrics.performance)) {
         lines.push(`| ${key} | ${value} |`);
@@ -363,9 +364,9 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
     }
 
     if (metrics.coverage) {
-      lines.push('### カバレッジ');
+      lines.push('### カバレッジ'); // EN: '### Coverage'
       lines.push('');
-      lines.push('| 種別 | 値 |');
+      lines.push('| 種別 | 値 |'); // EN: '| Type | Value |'
       lines.push('|------|-----|');
       for (const [key, value] of Object.entries(metrics.coverage)) {
         lines.push(`| ${key} | ${value} |`);
@@ -404,13 +405,13 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
     const passRate = parseFloat(summary.passRate) || 0;
 
     if (passRate >= 95) {
-      return '実験は非常に成功裏に完了しました。すべての品質基準を満たしています。';
+      return '実験は非常に成功裏に完了しました。すべての品質基準を満たしています。'; // EN: 'The experiment completed very successfully. All quality criteria are met.'
     } else if (passRate >= 80) {
-      return '実験は概ね成功しましたが、いくつかの改善点が見つかりました。';
+      return '実験は概ね成功しましたが、いくつかの改善点が見つかりました。'; // EN: 'The experiment was largely successful, but some areas for improvement were found.'
     } else if (passRate >= 50) {
-      return '実験結果は混合的でした。重大な問題がいくつか検出されました。';
+      return '実験結果は混合的でした。重大な問題がいくつか検出されました。'; // EN: 'The experiment results were mixed. Several critical issues were detected.'
     } else {
-      return '実験では多くの問題が検出されました。根本的な見直しが必要です。';
+      return '実験では多くの問題が検出されました。根本的な見直しが必要です。'; // EN: 'The experiment detected many issues. A fundamental review is required.'
     }
   }
 
@@ -476,7 +477,7 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
     const words = this.countWords(text);
     // Average reading speed: 400 characters/words per minute for Japanese
     const minutes = Math.ceil(words / 400);
-    return `約${minutes}分`;
+    return `約${minutes}分`; // EN: `About ${minutes} min`
   }
 
   /**

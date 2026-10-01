@@ -2,7 +2,7 @@
  * MUSUBI Large Project Analyzer
  *
  * Streaming analysis for large-scale projects (10,000+ files)
- * Designed based on analysis of GCC codebase (1,000万+ lines)
+ * Designed based on analysis of GCC codebase (1,000万+ lines / 10M+ lines)
  *
  * Features:
  * - Chunk-based file processing

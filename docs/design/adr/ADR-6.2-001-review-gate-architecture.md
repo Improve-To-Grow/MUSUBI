@@ -12,12 +12,16 @@
 
 MUSUBI SDDワークフローには現在、明示的なレビューゲートが存在しません。YAGOKOROプロジェクト（v1.0.0〜v5.0.0）の開発経験から、以下の問題が特定されました：
 
-1. 要件の曖昧さが設計段階で発覚する
-2. 設計変更が実装後に必要になる
-3. テストカバレッジの事後確認のみ
-4. Constitutional Articles遵守の手動確認
+The MUSUBI SDD workflow currently has no explicit review gates. Development experience on the YAGOKORO project (v1.0.0–v5.0.0) identified the following problems:
+
+1. 要件の曖昧さが設計段階で発覚する / Requirement ambiguities are discovered only at the design stage
+2. 設計変更が実装後に必要になる / Design changes become necessary after implementation
+3. テストカバレッジの事後確認のみ / Test coverage is only checked after the fact
+4. Constitutional Articles遵守の手動確認 / Compliance with Constitutional Articles is checked manually
 
 レビューゲートを追加することで、各フェーズ間での品質チェックを自動化し、問題の早期発見を可能にする必要があります。
+
+By adding review gates, we need to automate quality checks between phases and enable early detection of problems.
 
 ---
 
@@ -26,6 +30,8 @@ MUSUBI SDDワークフローには現在、明示的なレビューゲートが�
 ### Architecture Pattern: Gate-Based Workflow
 
 各ワークフローフェーズ（Requirements → Design → Tasks → Implement → Validate）の間に独立したReviewGateクラスを配置します。
+
+An independent ReviewGate class is placed between each workflow phase (Requirements → Design → Tasks → Implement → Validate).
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
@@ -74,6 +80,7 @@ interface ReviewGate {
 #### 3. ReviewPromptRegistry
 
 統一的なプロンプト管理を提供：
+(Provides unified prompt management:)
 
 ```typescript
 const REVIEW_PROMPTS = [
@@ -91,31 +98,33 @@ const REVIEW_PROMPTS = [
 ### Alternative 1: Monolithic ReviewEngine
 
 単一のReviewEngineクラスで全てのレビューを処理する。
+(Handle all reviews in a single ReviewEngine class.)
 
 **Pros**:
-- シンプルな実装
-- 共通ロジックの重複を避けられる
+- シンプルな実装 / Simple implementation
+- 共通ロジックの重複を避けられる / Avoids duplication of common logic
 
 **Cons**:
-- 単一責任原則違反
-- テストが困難
-- 新しいゲートタイプの追加が困難
+- 単一責任原則違反 / Violates the Single Responsibility Principle
+- テストが困難 / Difficult to test
+- 新しいゲートタイプの追加が困難 / Difficult to add new gate types
 
-**Rejected**: 拡張性と保守性を優先
+**Rejected**: 拡張性と保守性を優先 / Extensibility and maintainability take priority
 
 ### Alternative 2: Plugin-Based Architecture
 
 各ゲートをプラグインとして動的にロードする。
+(Load each gate dynamically as a plugin.)
 
 **Pros**:
-- 高い拡張性
-- サードパーティゲートのサポート
+- 高い拡張性 / High extensibility
+- サードパーティゲートのサポート / Support for third-party gates
 
 **Cons**:
-- 過度に複雑
-- Phase -1 Gate（Anti-Abstraction）違反の可能性
+- 過度に複雑 / Overly complex
+- Phase -1 Gate（Anti-Abstraction）違反の可能性 / Possible violation of the Phase -1 Gate (Anti-Abstraction)
 
-**Rejected**: Constitutional Article VIII違反
+**Rejected**: Constitutional Article VIII違反 / Violates Constitutional Article VIII
 
 ---
 
@@ -123,22 +132,22 @@ const REVIEW_PROMPTS = [
 
 ### Positive
 
-1. **独立したテスト**: 各ゲートは独立してユニットテスト可能
-2. **拡張性**: 新しいゲートタイプの追加が容易
-3. **明確な責任分離**: 各ゲートは特定のフェーズのみを担当
-4. **AGENTS.md統合**: プロンプト追加で機能拡張可能
+1. **独立したテスト (Independent testing)**: 各ゲートは独立してユニットテスト可能 / Each gate can be unit-tested independently
+2. **拡張性 (Extensibility)**: 新しいゲートタイプの追加が容易 / Easy to add new gate types
+3. **明確な責任分離 (Clear separation of responsibilities)**: 各ゲートは特定のフェーズのみを担当 / Each gate is responsible for one specific phase only
+4. **AGENTS.md統合 (AGENTS.md integration)**: プロンプト追加で機能拡張可能 / Functionality can be extended by adding prompts
 
 ### Negative
 
-1. **コード重複の可能性**: 共通チェックロジックが重複する可能性
-2. **学習コスト**: 開発者は複数のゲートクラスを理解する必要
-3. **設定の複雑さ**: 各ゲートに個別の設定が必要
+1. **コード重複の可能性 (Possible code duplication)**: 共通チェックロジックが重複する可能性 / Common check logic may be duplicated
+2. **学習コスト (Learning cost)**: 開発者は複数のゲートクラスを理解する必要 / Developers need to understand multiple gate classes
+3. **設定の複雑さ (Configuration complexity)**: 各ゲートに個別の設定が必要 / Each gate requires its own configuration
 
 ### Mitigations
 
-- 共通ロジックは`ReviewGateBase`クラスに抽出
-- ドキュメントとサンプルを充実
-- デフォルト設定を提供し、カスタマイズはオプショナルに
+- 共通ロジックは`ReviewGateBase`クラスに抽出 / Extract common logic into a `ReviewGateBase` class
+- ドキュメントとサンプルを充実 / Provide thorough documentation and samples
+- デフォルト設定を提供し、カスタマイズはオプショナルに / Provide default settings and make customization optional
 
 ---
 
@@ -149,7 +158,7 @@ const REVIEW_PROMPTS = [
 ```
 src/review/
 ├── gates/
-│   ├── base-review-gate.ts          # 共通基底クラス
+│   ├── base-review-gate.ts          # 共通基底クラス / Common base class
 │   ├── requirements-review-gate.ts
 │   ├── design-review-gate.ts
 │   └── implementation-review-gate.ts

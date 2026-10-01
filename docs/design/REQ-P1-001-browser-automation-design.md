@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [REQ-P1-001-browser-automation-design.en.md](./REQ-P1-001-browser-automation-design.en.md)
+
 # REQ-P1-001: Browser Automation Agent 設計書
 
 ## 概要

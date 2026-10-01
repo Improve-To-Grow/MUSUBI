@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [REQ-P1-002-web-gui-design.en.md](./REQ-P1-002-web-gui-design.en.md)
+
 # REQ-P1-002: Web GUI Dashboard 設計書
 
 ## 概要

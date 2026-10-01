@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [MUSUBI-v6.1.2-User-Guide.en.md](./MUSUBI-v6.1.2-User-Guide.en.md)
+
 # 【MUSUBI v6.1.2】AIに自然言語で話しかけるだけ！仕様駆動開発の完全ガイド
 
 ## はじめに

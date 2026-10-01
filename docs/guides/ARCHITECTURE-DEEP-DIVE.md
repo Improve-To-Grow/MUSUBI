@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [ARCHITECTURE-DEEP-DIVE.en.md](./ARCHITECTURE-DEEP-DIVE.en.md)
+
 # MUSUBI Architecture Deep Dive
 
 MUSUBI SDD の内部アーキテクチャと設計思想の詳細ガイド。

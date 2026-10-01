@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [PLUGIN-DEVELOPMENT.en.md](./PLUGIN-DEVELOPMENT.en.md)
+
 # MUSUBI Plugin Development Guide
 
 サードパーティ拡張機能を作成するための完全ガイド。

@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [GCC-ANALYSIS-IMPROVEMENTS.en.md](./GCC-ANALYSIS-IMPROVEMENTS.en.md)
+
 # MUSUBI改善提案: GCCプロジェクト分析からの学び
 
 **作成日**: 2025-12-10

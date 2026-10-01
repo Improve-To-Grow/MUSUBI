@@ -3,6 +3,8 @@
  *
  * Fagan Inspection と Perspective-Based Reading (PBR) を用いた
  * 要件定義書の体系的なレビューを実施
+ * Performs a systematic review of requirements documents
+ * using Fagan Inspection and Perspective-Based Reading (PBR)
  *
  * @module src/validators/requirements-reviewer
  */
@@ -11,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * 欠陥の深刻度
+ * 欠陥の深刻度 / Defect severity
  */
 const DefectSeverity = {
   CRITICAL: 'critical',
@@ -21,7 +23,7 @@ const DefectSeverity = {
 };
 
 /**
- * 欠陥の種類
+ * 欠陥の種類 / Defect type
  */
 const DefectType = {
   MISSING: 'missing',
@@ -33,7 +35,7 @@ const DefectType = {
 };
 
 /**
- * レビューの視点
+ * レビューの視点 / Review perspective
  */
 const ReviewPerspective = {
   USER: 'user',
@@ -44,7 +46,7 @@ const ReviewPerspective = {
 };
 
 /**
- * レビュー方式
+ * レビュー方式 / Review method
  */
 const ReviewMethod = {
   FAGAN: 'fagan',
@@ -53,7 +55,7 @@ const ReviewMethod = {
 };
 
 /**
- * 欠陥クラス
+ * 欠陥クラス / Defect class
  */
 class Defect {
   constructor(options = {}) {
@@ -88,7 +90,7 @@ class Defect {
 }
 
 /**
- * レビュー結果クラス
+ * レビュー結果クラス / Review result class
  */
 class ReviewResult {
   constructor() {
@@ -117,19 +119,19 @@ class ReviewResult {
   updateMetrics() {
     this.metrics.totalDefects = this.defects.length;
 
-    // Severity別カウント
+    // Severity別カウント / Count by severity
     this.metrics.bySeverity = {};
     Object.values(DefectSeverity).forEach(sev => {
       this.metrics.bySeverity[sev] = this.defects.filter(d => d.severity === sev).length;
     });
 
-    // Type別カウント
+    // Type別カウント / Count by type
     this.metrics.byType = {};
     Object.values(DefectType).forEach(type => {
       this.metrics.byType[type] = this.defects.filter(d => d.type === type).length;
     });
 
-    // Perspective別カウント
+    // Perspective別カウント / Count by perspective
     this.metrics.byPerspective = {};
     Object.values(ReviewPerspective).forEach(persp => {
       this.metrics.byPerspective[persp] = this.defects.filter(d => d.perspective === persp).length;
@@ -146,7 +148,7 @@ class ReviewResult {
 
     const criteria = [];
 
-    // Critical欠陥チェック
+    // Critical欠陥チェック / Critical defect check
     const criticalCount = this.metrics.bySeverity[DefectSeverity.CRITICAL] || 0;
     criteria.push({
       name: 'No Critical Defects',
@@ -155,7 +157,7 @@ class ReviewResult {
       threshold: maxCritical,
     });
 
-    // Major欠陥率チェック
+    // Major欠陥率チェック / Major defect rate check
     const majorCount = this.metrics.bySeverity[DefectSeverity.MAJOR] || 0;
     const majorPercent =
       this.metrics.totalDefects > 0 ? (majorCount / this.metrics.totalDefects) * 100 : 0;
@@ -166,7 +168,7 @@ class ReviewResult {
       threshold: maxMajorPercent,
     });
 
-    // テスト可能性スコアチェック
+    // テスト可能性スコアチェック / Testability score check
     criteria.push({
       name: 'Testability Score',
       passed: this.metrics.testabilityScore >= minTestabilityScore,
@@ -174,7 +176,7 @@ class ReviewResult {
       threshold: Math.round(minTestabilityScore * 100),
     });
 
-    // EARS準拠率チェック
+    // EARS準拠率チェック / EARS compliance rate check
     criteria.push({
       name: 'EARS Compliance',
       passed: this.metrics.earsCompliance >= minEarsCompliance,
@@ -250,7 +252,7 @@ class ReviewResult {
 }
 
 /**
- * Requirements Reviewer クラス
+ * Requirements Reviewer クラス / Requirements Reviewer class
  */
 class RequirementsReviewer {
   constructor(projectPath = process.cwd()) {
@@ -293,22 +295,22 @@ class RequirementsReviewer {
       'when required',
       'as appropriate',
       // Japanese equivalents
-      '迅速',
-      '高速',
-      '適切',
-      '適当',
-      '十分',
-      '多く',
-      '少なく',
-      '必要に応じて',
-      'など',
-      'ユーザーフレンドリー',
-      '使いやすい',
+      '迅速', // EN: quick
+      '高速', // EN: fast
+      '適切', // EN: appropriate
+      '適当', // EN: suitable / adequate
+      '十分', // EN: sufficient
+      '多く', // EN: many
+      '少なく', // EN: few / less
+      '必要に応じて', // EN: as needed
+      'など', // EN: etc. / and so on
+      'ユーザーフレンドリー', // EN: user-friendly
+      '使いやすい', // EN: easy to use
     ];
   }
 
   /**
-   * ドキュメントを読み込む
+   * ドキュメントを読み込む / Load the document
    */
   async loadDocument(documentPath) {
     const fullPath = path.isAbsolute(documentPath)
@@ -323,7 +325,7 @@ class RequirementsReviewer {
   }
 
   /**
-   * 要件を抽出
+   * 要件を抽出 / Extract requirements
    */
   extractRequirements(content) {
     const requirements = [];
@@ -342,7 +344,7 @@ class RequirementsReviewer {
   }
 
   /**
-   * EARS形式準拠をチェック
+   * EARS形式準拠をチェック / Check EARS format compliance
    */
   checkEarsCompliance(requirements) {
     let compliantCount = 0;
@@ -359,7 +361,7 @@ class RequirementsReviewer {
   }
 
   /**
-   * 曖昧な用語をチェック
+   * 曖昧な用語をチェック / Check for ambiguous terms
    */
   findAmbiguousTerms(text) {
     const found = [];
@@ -373,7 +375,7 @@ class RequirementsReviewer {
   }
 
   /**
-   * テスト可能性をチェック
+   * テスト可能性をチェック / Check testability
    */
   checkTestability(requirements) {
     let testableCount = 0;
@@ -381,12 +383,12 @@ class RequirementsReviewer {
     requirements.forEach(req => {
       const text = req.text.toLowerCase();
 
-      // テスト可能な指標
+      // テスト可能な指標 / Testable indicators
       const hasNumber = /\d+/.test(text);
-      const hasUnit = /\b(秒|分|時間|日|%|パーセント|seconds?|minutes?|hours?|days?|percent)/i.test(
+      const hasUnit = /\b(秒|分|時間|日|%|パーセント|seconds?|minutes?|hours?|days?|percent)/i.test( // EN: units - seconds|minutes|hours|days|%|percent
         text
       );
-      const hasQuantifier = /\b(以下|以上|未満|超|within|at least|at most|maximum|minimum)/i.test(
+      const hasQuantifier = /\b(以下|以上|未満|超|within|at least|at most|maximum|minimum)/i.test( // EN: quantifiers - or less|or more|less than|more than
         text
       );
       const ambiguousTerms = this.findAmbiguousTerms(text);
@@ -406,7 +408,7 @@ class RequirementsReviewer {
   }
 
   /**
-   * Fagan Inspectionスタイルのレビュー
+   * Fagan Inspectionスタイルのレビュー / Fagan Inspection-style review
    */
   async reviewFagan(content, _options = {}) {
     const result = new ReviewResult();
@@ -416,10 +418,10 @@ class RequirementsReviewer {
 
     // Phase 1: Completeness Check (完全性チェック)
     const requiredSections = [
-      { pattern: /## .*機能要件|## .*Functional/i, name: 'Functional Requirements' },
-      { pattern: /## .*非機能要件|## .*Non-Functional/i, name: 'Non-Functional Requirements' },
-      { pattern: /## .*制約|## .*Constraints/i, name: 'Constraints' },
-      { pattern: /## .*用語|## .*Glossary|## .*Definitions/i, name: 'Glossary/Definitions' },
+      { pattern: /## .*機能要件|## .*Functional/i, name: 'Functional Requirements' }, // EN: 機能要件 = functional requirements
+      { pattern: /## .*非機能要件|## .*Non-Functional/i, name: 'Non-Functional Requirements' }, // EN: 非機能要件 = non-functional requirements
+      { pattern: /## .*制約|## .*Constraints/i, name: 'Constraints' }, // EN: 制約 = constraints
+      { pattern: /## .*用語|## .*Glossary|## .*Definitions/i, name: 'Glossary/Definitions' }, // EN: 用語 = terminology
     ];
 
     requiredSections.forEach(section => {
@@ -497,7 +499,7 @@ class RequirementsReviewer {
     });
 
     // Phase 3: Consistency Check (矛盾チェック)
-    // 同じ要件IDの重複をチェック
+    // 同じ要件IDの重複をチェック / Check for duplicate requirement IDs
     const idCounts = {};
     requirements.forEach(req => {
       idCounts[req.id] = (idCounts[req.id] || 0) + 1;
@@ -530,7 +532,7 @@ class RequirementsReviewer {
   }
 
   /**
-   * Perspective-Based Reading レビュー
+   * Perspective-Based Reading レビュー / Perspective-Based Reading review
    */
   async reviewPBR(content, options = {}) {
     const result = new ReviewResult();
@@ -541,8 +543,8 @@ class RequirementsReviewer {
 
     // User Perspective
     if (perspectives.includes(ReviewPerspective.USER)) {
-      // ユーザーシナリオの有無チェック
-      if (!/ユーザー|user|利用者|actor/i.test(content)) {
+      // ユーザーシナリオの有無チェック / Check for presence of user scenarios
+      if (!/ユーザー|user|利用者|actor/i.test(content)) { // EN: ユーザー = user, 利用者 = user/end user
         result.addDefect(
           new Defect({
             id: `DEF-${String(defectCounter++).padStart(3, '0')}`,
@@ -557,8 +559,8 @@ class RequirementsReviewer {
         );
       }
 
-      // エラーメッセージ要件チェック
-      if (!/エラー.*メッセージ|error.*message/i.test(content)) {
+      // エラーメッセージ要件チェック / Check for error message requirements
+      if (!/エラー.*メッセージ|error.*message/i.test(content)) { // EN: エラー.*メッセージ = error ... message
         result.addDefect(
           new Defect({
             id: `DEF-${String(defectCounter++).padStart(3, '0')}`,
@@ -575,10 +577,10 @@ class RequirementsReviewer {
 
     // Developer Perspective
     if (perspectives.includes(ReviewPerspective.DEVELOPER)) {
-      // データ型の定義チェック
+      // データ型の定義チェック / Check data type definitions
       requirements.forEach(req => {
-        if (/データ|data|入力|output|input|値|value/i.test(req.text)) {
-          if (!/型|type|format|形式|string|number|integer|boolean/i.test(req.text)) {
+        if (/データ|data|入力|output|input|値|value/i.test(req.text)) { // EN: データ = data, 入力 = input, 値 = value
+          if (!/型|type|format|形式|string|number|integer|boolean/i.test(req.text)) { // EN: 型 = type, 形式 = format
             result.addDefect(
               new Defect({
                 id: `DEF-${String(defectCounter++).padStart(3, '0')}`,
@@ -596,9 +598,9 @@ class RequirementsReviewer {
         }
       });
 
-      // APIインターフェースチェック
-      if (/API|interface|インターフェース|連携/i.test(content)) {
-        if (!/endpoint|エンドポイント|request|response|JSON|XML/i.test(content)) {
+      // APIインターフェースチェック / API interface check
+      if (/API|interface|インターフェース|連携/i.test(content)) { // EN: インターフェース = interface, 連携 = integration
+        if (!/endpoint|エンドポイント|request|response|JSON|XML/i.test(content)) { // EN: エンドポイント = endpoint
           result.addDefect(
             new Defect({
               id: `DEF-${String(defectCounter++).padStart(3, '0')}`,
@@ -618,9 +620,9 @@ class RequirementsReviewer {
     // Tester Perspective
     if (perspectives.includes(ReviewPerspective.TESTER)) {
       requirements.forEach(req => {
-        // 境界値チェック
-        if (/範囲|range|以上|以下|between|limit/i.test(req.text)) {
-          if (!/最小|最大|min|max|boundary|\d+/i.test(req.text)) {
+        // 境界値チェック / Boundary value check
+        if (/範囲|range|以上|以下|between|limit/i.test(req.text)) { // EN: 範囲 = range, 以上 = or more, 以下 = or less
+          if (!/最小|最大|min|max|boundary|\d+/i.test(req.text)) { // EN: 最小 = minimum, 最大 = maximum
             result.addDefect(
               new Defect({
                 id: `DEF-${String(defectCounter++).padStart(3, '0')}`,
@@ -638,8 +640,8 @@ class RequirementsReviewer {
         }
       });
 
-      // 受入基準チェック
-      if (!/受入基準|acceptance criteria|verification|検証/i.test(content)) {
+      // 受入基準チェック / Acceptance criteria check
+      if (!/受入基準|acceptance criteria|verification|検証/i.test(content)) { // EN: 受入基準 = acceptance criteria, 検証 = verification
         result.addDefect(
           new Defect({
             id: `DEF-${String(defectCounter++).padStart(3, '0')}`,
@@ -657,8 +659,8 @@ class RequirementsReviewer {
 
     // Architect Perspective
     if (perspectives.includes(ReviewPerspective.ARCHITECT)) {
-      // スケーラビリティ要件チェック
-      if (!/スケーラビリティ|scalability|拡張性|concurrent|同時/i.test(content)) {
+      // スケーラビリティ要件チェック / Scalability requirement check
+      if (!/スケーラビリティ|scalability|拡張性|concurrent|同時/i.test(content)) { // EN: スケーラビリティ = scalability, 拡張性 = extensibility, 同時 = concurrent
         result.addDefect(
           new Defect({
             id: `DEF-${String(defectCounter++).padStart(3, '0')}`,
@@ -672,8 +674,8 @@ class RequirementsReviewer {
         );
       }
 
-      // 可用性要件チェック
-      if (!/可用性|availability|SLA|uptime|稼働率/i.test(content)) {
+      // 可用性要件チェック / Availability requirement check
+      if (!/可用性|availability|SLA|uptime|稼働率/i.test(content)) { // EN: 可用性 = availability, 稼働率 = uptime ratio
         result.addDefect(
           new Defect({
             id: `DEF-${String(defectCounter++).padStart(3, '0')}`,
@@ -691,10 +693,10 @@ class RequirementsReviewer {
 
     // Security Perspective
     if (perspectives.includes(ReviewPerspective.SECURITY)) {
-      // 認証要件チェック
+      // 認証要件チェック / Authentication requirement check
       if (
-        /ログイン|login|認証|authentication|ユーザー登録/i.test(content) &&
-        !/パスワード.*ポリシー|password.*policy|MFA|多要素|2FA/i.test(content)
+        /ログイン|login|認証|authentication|ユーザー登録/i.test(content) && // EN: ログイン = login, 認証 = authentication, ユーザー登録 = user registration
+        !/パスワード.*ポリシー|password.*policy|MFA|多要素|2FA/i.test(content) // EN: パスワード.*ポリシー = password policy, 多要素 = multi-factor
       ) {
         result.addDefect(
           new Defect({
@@ -710,10 +712,10 @@ class RequirementsReviewer {
         );
       }
 
-      // データ保護チェック
+      // データ保護チェック / Data protection check
       if (
-        /個人情報|personal|PII|機密|sensitive|プライバシー/i.test(content) &&
-        !/暗号化|encryption|GDPR|匿名化|anonymize/i.test(content)
+        /個人情報|personal|PII|機密|sensitive|プライバシー/i.test(content) && // EN: 個人情報 = personal information, 機密 = confidential, プライバシー = privacy
+        !/暗号化|encryption|GDPR|匿名化|anonymize/i.test(content) // EN: 暗号化 = encryption, 匿名化 = anonymization
       ) {
         result.addDefect(
           new Defect({
@@ -729,8 +731,8 @@ class RequirementsReviewer {
         );
       }
 
-      // 監査ログチェック
-      if (!/監査|audit.*log|ログ記録|logging/i.test(content)) {
+      // 監査ログチェック / Audit log check
+      if (!/監査|audit.*log|ログ記録|logging/i.test(content)) { // EN: 監査 = audit, ログ記録 = log recording
         result.addDefect(
           new Defect({
             id: `DEF-${String(defectCounter++).padStart(3, '0')}`,
@@ -757,7 +759,7 @@ class RequirementsReviewer {
   }
 
   /**
-   * 総合レビュー（Fagan + PBR）
+   * 総合レビュー（Fagan + PBR） / Comprehensive review (Fagan + PBR)
    */
   async review(documentPath, options = {}) {
     const content = await this.loadDocument(documentPath);
@@ -770,15 +772,15 @@ class RequirementsReviewer {
         return this.reviewPBR(content, options);
       case ReviewMethod.COMBINED:
       default: {
-        // 両方のレビューを実行してマージ
+        // 両方のレビューを実行してマージ / Run both reviews and merge
         const faganResult = await this.reviewFagan(content, options);
         const pbrResult = await this.reviewPBR(content, options);
 
-        // 結果をマージ
+        // 結果をマージ / Merge results
         const combinedResult = new ReviewResult();
         const allDefects = [...faganResult.defects, ...pbrResult.defects];
 
-        // 重複を除去（同じrequirementIdとtypeの組み合わせ）
+        // 重複を除去（同じrequirementIdとtypeの組み合わせ） / Remove duplicates (same requirementId and type combination)
         const seen = new Set();
         allDefects.forEach(defect => {
           const key = `${defect.requirementId}-${defect.type}-${defect.title}`;
@@ -788,7 +790,7 @@ class RequirementsReviewer {
           }
         });
 
-        // メトリクス統合
+        // メトリクス統合 / Merge metrics
         combinedResult.metrics.earsCompliance =
           (faganResult.metrics.earsCompliance + pbrResult.metrics.earsCompliance) / 2;
         combinedResult.metrics.testabilityScore =
@@ -803,11 +805,11 @@ class RequirementsReviewer {
   }
 
   /**
-   * レビュー結果に基づいてドキュメントを修正
-   * @param {string} documentPath - 修正対象のドキュメントパス
-   * @param {Array} corrections - 修正指示の配列
-   * @param {Object} options - オプション
-   * @returns {Object} 修正結果
+   * レビュー結果に基づいてドキュメントを修正 / Correct the document based on review results
+   * @param {string} documentPath - 修正対象のドキュメントパス / Path of the document to correct
+   * @param {Array} corrections - 修正指示の配列 / Array of correction instructions
+   * @param {Object} options - オプション / Options
+   * @returns {Object} 修正結果 / Correction result
    */
   async applyCorrections(documentPath, corrections, options = {}) {
     const fullPath = path.isAbsolute(documentPath)
@@ -818,7 +820,7 @@ class RequirementsReviewer {
       throw new Error(`Document not found: ${fullPath}`);
     }
 
-    // バックアップ作成
+    // バックアップ作成 / Create backup
     if (options.createBackup !== false) {
       const backupPath = `${fullPath}.backup`;
       fs.copyFileSync(fullPath, backupPath);
@@ -833,7 +835,7 @@ class RequirementsReviewer {
 
       switch (action) {
         case 'accept': {
-          // 推奨を適用
+          // 推奨を適用 / Apply recommendation
           const defect = this._findDefectInContent(content, defectId);
           if (defect && defect.evidence && defect.recommendation) {
             content = content.replace(defect.evidence, defect.recommendation);
@@ -848,7 +850,7 @@ class RequirementsReviewer {
         }
 
         case 'modify': {
-          // カスタム修正を適用
+          // カスタム修正を適用 / Apply custom correction
           const modifyDefect = this._findDefectInContent(content, defectId);
           if (modifyDefect && modifyDefect.evidence && newText) {
             content = content.replace(modifyDefect.evidence, newText);
@@ -871,7 +873,7 @@ class RequirementsReviewer {
       }
     }
 
-    // 変更履歴を追加
+    // 変更履歴を追加 / Add change history
     const changeHistoryEntry = this._generateChangeHistoryEntry(appliedChanges);
     if (changeHistoryEntry && !content.includes('## Change History')) {
       content += `\n\n## Change History\n\n${changeHistoryEntry}`;
@@ -882,14 +884,14 @@ class RequirementsReviewer {
       );
     }
 
-    // ファイルを保存
+    // ファイルを保存 / Save file
     fs.writeFileSync(fullPath, content, 'utf-8');
 
-    // 日本語版も更新
+    // 日本語版も更新 / Also update the Japanese version
     if (options.updateJapanese !== false) {
       const jaPath = fullPath.replace(/\.md$/, '.ja.md');
       if (fs.existsSync(jaPath)) {
-        // 簡易的な日本語版更新（実際にはより高度な翻訳ロジックが必要）
+        // 簡易的な日本語版更新（実際にはより高度な翻訳ロジックが必要） / Simple Japanese version update (a more advanced translation logic is actually needed)
         let jaContent = fs.readFileSync(jaPath, 'utf-8');
         for (const change of appliedChanges) {
           if (jaContent.includes(change.original)) {
@@ -900,7 +902,7 @@ class RequirementsReviewer {
       }
     }
 
-    // 再レビューして品質ゲートを更新
+    // 再レビューして品質ゲートを更新 / Re-review and update the quality gate
     const updatedResult = await this.review(documentPath, options.reviewOptions || {});
 
     return {
@@ -920,7 +922,7 @@ class RequirementsReviewer {
   }
 
   /**
-   * 修正レポートを生成
+   * 修正レポートを生成 / Generate correction report
    */
   generateCorrectionReport(correctionResult) {
     const { changesApplied, rejectedFindings, updatedQualityGate, filesModified } =
@@ -977,11 +979,11 @@ class RequirementsReviewer {
   }
 
   /**
-   * 内部: 欠陥情報を取得（簡易実装）
+   * 内部: 欠陥情報を取得（簡易実装） / Internal: get defect info (simple implementation)
    */
   _findDefectInContent(_content, defectId) {
-    // 実際の実装ではレビュー結果から欠陥を検索
-    // ここでは簡易的なプレースホルダーを返す
+    // 実際の実装ではレビュー結果から欠陥を検索 / In a real implementation, search for defects in the review results
+    // ここでは簡易的なプレースホルダーを返す / Here, return a simple placeholder
     return {
       id: defectId,
       evidence: '',
@@ -990,7 +992,7 @@ class RequirementsReviewer {
   }
 
   /**
-   * 内部: 変更履歴エントリを生成
+   * 内部: 変更履歴エントリを生成 / Internal: generate change history entry
    */
   _generateChangeHistoryEntry(appliedChanges) {
     if (appliedChanges.length === 0) return null;

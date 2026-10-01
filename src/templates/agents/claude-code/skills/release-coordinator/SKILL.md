@@ -44,33 +44,37 @@ Before beginning work, **ALWAYS** read the following files if they exist in the 
 
 **Release Coordinator** は **Stage 7: Deployment** を担当します。
 
-### ワークフロー連携
+**Release Coordinator** is responsible for **Stage 7: Deployment**.
+
+### ワークフロー連携 (Workflow Integration)
 
 ```bash
-# デプロイ開始時（Stage 7へ遷移）
+# デプロイ開始時（Stage 7へ遷移） / When deployment starts (transition to Stage 7)
 musubi-workflow next deployment
 
-# デプロイ完了時（Stage 8へ遷移）
+# デプロイ完了時（Stage 8へ遷移） / When deployment completes (transition to Stage 8)
 musubi-workflow next monitoring
 ```
 
-### リリースタイプ別フロー
+### リリースタイプ別フロー (Flow by Release Type)
 
-| リリースタイプ | ワークフローアクション                       |
+| リリースタイプ (Release Type) | ワークフローアクション (Workflow Action)                       |
 | -------------- | -------------------------------------------- |
-| Hotfix         | `musubi-workflow init hotfix-xxx` → 高速パス |
-| Patch          | 通常フロー（Stage 6→7→8）                    |
-| Minor/Major    | 完全フロー（Stage 0→9）                      |
+| Hotfix         | `musubi-workflow init hotfix-xxx` → 高速パス / fast path |
+| Patch          | 通常フロー（Stage 6→7→8） / Standard flow (Stage 6→7→8)                    |
+| Minor/Major    | 完全フロー（Stage 0→9） / Full flow (Stage 0→9)                      |
 
-### デプロイ完了チェックリスト
+### デプロイ完了チェックリスト (Deployment Completion Checklist)
 
 デプロイステージを完了する前に確認：
 
-- [ ] ステージング環境でのテスト完了
-- [ ] 本番デプロイ完了
-- [ ] ヘルスチェック確認
-- [ ] ロールバック手順準備
-- [ ] リリースノート作成
+Verify before completing the deployment stage:
+
+- [ ] ステージング環境でのテスト完了 / Testing in staging environment completed
+- [ ] 本番デプロイ完了 / Production deployment completed
+- [ ] ヘルスチェック確認 / Health checks verified
+- [ ] ロールバック手順準備 / Rollback procedure prepared
+- [ ] リリースノート作成 / Release notes written
 
 ---
 
@@ -638,92 +642,98 @@ If you encounter any issues, please contact support@example.com or visit our [He
 3. Monitor metrics (site-reliability-engineer)
 4. Progressive rollout (5% → 25% → 50% → 100%)
 
-### Phase 6: 段階的ポストリリース
+### Phase 6: 段階的ポストリリース (Incremental Post-Release)
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: コンテキスト長オーバーフロー防止 (Preventing Context Length Overflow)**
 
-**出力方式の原则:**
+**出力方式の原则 (Output Principles):**
 
-- ✅ 1タスクずつ順番に実行・報告
-- ✅ 各タスク後に進捗を報告
-- ✅ エラー発生時も部分的な成果物が残る
+- ✅ 1タスクずつ順番に実行・報告 / Execute and report one task at a time, in order
+- ✅ 各タスク後に進捗を報告 / Report progress after each task
+- ✅ エラー発生時も部分的な成果物が残る / Partial deliverables remain even if an error occurs
 
 ```
 🤖 確認ありがとうございます。ポストリリースタスクを順番に実行します。
+   (Thank you for confirming. I will execute the post-release tasks in order.)
 
-【実行予定のタスク】
-1. ヘルスチェックSLO検証
-2. リリースノート公開
-3. ユーザー通知
-4. クリーンアップ(ブランチマージ、フィーチャーフラグ削除)
-5. 振り返り会議スケジュール
+【実行予定のタスク】 (Planned tasks)
+1. ヘルスチェックSLO検証 (Health check & SLO verification)
+2. リリースノート公開 (Publish release notes)
+3. ユーザー通知 (User notification)
+4. クリーンアップ(ブランチマージ、フィーチャーフラグ削除) (Cleanup: branch merge, feature flag removal)
+5. 振り返り会議スケジュール (Schedule retrospective meeting)
 
-合計: 5タスク
+合計: 5タスク (Total: 5 tasks)
 
-**重要: 段階的実行方式**
+**重要: 段階的実行方式** (Important: incremental execution)
 各タスクを1つずつ実行・報告し、進捗を報告します。
+(I will execute and report each task one at a time and report progress.)
 これにより、途中経過が見え、エラーが発生しても部分的な成果物が残ります。
+(This way you can see intermediate progress, and partial deliverables remain even if an error occurs.)
 
-実行を開始してよろしいですか?
-👤 ユーザー: [回答待ち]
+実行を開始してよろしいですか? (May I start executing?)
+👤 ユーザー: [回答待ち] (User: [awaiting response])
 ```
 
 ユーザーが承認後、**各タスクを順番に実行**:
 
-**Step 1: ヘルスチェック検証**
+After the user approves, **execute each task in order**:
+
+**Step 1: ヘルスチェック検証 (Health Check Verification)**
 
 ```
-🤖 [1/5] ヘルスチェックとSLOを検証しています...
+🤖 [1/5] ヘルスチェックとSLOを検証しています... (Verifying health checks and SLOs...)
 
-✅ 検証完了: すべてのヘルスチェックが成功
+✅ 検証完了: すべてのヘルスチェックが成功 (Verification complete: all health checks passed)
 ✅ SLO: 99.95% (Target: 99.9%)
 
-[1/5] 完了。次のタスクに進みます。
+[1/5] 完了。次のタスクに進みます。 (Done. Moving on to the next task.)
 ```
 
-**Step 2: リリースノート公開**
+**Step 2: リリースノート公開 (Publish Release Notes)**
 
 ```
-🤖 [2/5] リリースノートを公開しています...
+🤖 [2/5] リリースノートを公開しています... (Publishing release notes...)
 
 📝 docs/releases/v1.2.0.md
-✅ 公開完了
+✅ 公開完了 (Published)
 
-[2/5] 完了。次のタスクに進みます。
+[2/5] 完了。次のタスクに進みます。 (Done. Moving on to the next task.)
 ```
 
-**大きなリリースドキュメント(>300行)の場合:**
+**大きなリリースドキュメント(>300行)の場合 (For large release documents, >300 lines):**
 
 ```
-🤖 包括的なリリースドキュメントを生成しています...
+🤖 包括的なリリースドキュメントを生成しています... (Generating comprehensive release documentation...)
 ⚠️ リリースノートが詳細で400行になるため、2パートに分割して生成します。
+   (The release notes are detailed and reach 400 lines, so they will be generated in 2 parts.)
 
-📝 Part 1/2: docs/releases/v2.0.0.md (新機能 & 破壊的変更)
-✅ 保存が完了しました (250行)
+📝 Part 1/2: docs/releases/v2.0.0.md (新機能 & 破壊的変更 / New Features & Breaking Changes)
+✅ 保存が完了しました (250行) (Saved: 250 lines)
 
-📝 Part 2/2: docs/releases/v2.0.0.md (バグ修正 & 移行ガイド)
-✅ 保存が完了しました (180行)
+📝 Part 2/2: docs/releases/v2.0.0.md (バグ修正 & 移行ガイド / Bug Fixes & Migration Guide)
+✅ 保存が完了しました (180行) (Saved: 180 lines)
 
-✅ リリースノート生成完了: docs/releases/v2.0.0.md (430行)
-💡 ユーザー向け、開発者向けの両方の情報を含みます
+✅ リリースノート生成完了: docs/releases/v2.0.0.md (430行) (Release notes complete: 430 lines)
+💡 ユーザー向け、開発者向けの両方の情報を含みます (Includes information for both users and developers)
 ```
 
-**Final: ポストリリース完了サマリー**
+**Final: ポストリリース完了サマリー (Post-Release Completion Summary)**
 
 ```
-🤖 ✨ ポストリリースタスクが完了しました！
+🤖 ✨ ポストリリースタスクが完了しました！ (Post-release tasks are complete!)
 
-## 📊 リリースサマリー
-- **リリースバージョン**: v1.2.0
-- **デプロイ成功率**: 100%
-- **SLO達成率**: 99.95%
+## 📊 リリースサマリー (Release Summary)
+- **リリースバージョン (Release version)**: v1.2.0
+- **デプロイ成功率 (Deployment success rate)**: 100%
+- **SLO達成率 (SLO attainment)**: 99.95%
 
-## ✅ 完了したタスク
-1. ✅ ヘルスチェック検証
-2. ✅ リリースノート公開 (docs/releases/v1.2.0.md)
-3. ✅ ユーザー通知送信
-4. ✅ クリーンアップ(ブランチマージ、フィーチャーフラグ削除)
-5. ✅ 振り返り会議スケジュール (2025-11-27)
+## ✅ 完了したタスク (Completed Tasks)
+1. ✅ ヘルスチェック検証 (Health check verification)
+2. ✅ リリースノート公開 (Release notes published) (docs/releases/v1.2.0.md)
+3. ✅ ユーザー通知送信 (User notifications sent)
+4. ✅ クリーンアップ(ブランチマージ、フィーチャーフラグ削除) (Cleanup: branch merge, feature flag removal)
+5. ✅ 振り返り会議スケジュール (Retrospective scheduled) (2025-11-27)
 
 ```
 

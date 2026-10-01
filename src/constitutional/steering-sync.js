@@ -93,8 +93,8 @@ class SteeringSync {
         issues.push({
           type: 'version-mismatch',
           file: 'product.md',
-          message: `product.mdのバージョン（${project.version}）が不整合です`,
-          suggestion: `product.mdを更新してバージョン${project.version}を反映してください`,
+          message: `product.mdのバージョン（${project.version}）が不整合です`, // EN: Version in product.md (${project.version}) is inconsistent
+          suggestion: `product.mdを更新してバージョン${project.version}を反映してください`, // EN: Please update product.md to reflect version ${project.version}
         });
       }
     }
@@ -112,8 +112,8 @@ class SteeringSync {
           issues.push({
             type: 'missing-directory',
             file: 'structure.md',
-            message: `structure.mdで参照されているディレクトリ "${dirName}" が存在しません`,
-            suggestion: `ディレクトリを作成するか、structure.mdから参照を削除してください`,
+            message: `structure.mdで参照されているディレクトリ "${dirName}" が存在しません`, // EN: Directory "${dirName}" referenced in structure.md does not exist
+            suggestion: `ディレクトリを作成するか、structure.mdから参照を削除してください`, // EN: Please create the directory or remove the reference from structure.md
           });
         }
       }
@@ -126,8 +126,8 @@ class SteeringSync {
           issues.push({
             type: 'tech-mismatch',
             file: 'tech.md',
-            message: `project.ymlの技術スタック "${techItem}" がtech.mdに記載されていません`,
-            suggestion: `tech.mdに "${techItem}" を追加してください`,
+            message: `project.ymlの技術スタック "${techItem}" がtech.mdに記載されていません`, // EN: Tech stack item "${techItem}" from project.yml is not listed in tech.md
+            suggestion: `tech.mdに "${techItem}" を追加してください`, // EN: Please add "${techItem}" to tech.md
           });
         }
       }
@@ -156,7 +156,7 @@ class SteeringSync {
             // Version updates require manual review
             failed.push({
               issue,
-              reason: 'バージョン更新は手動レビューが必要です',
+              reason: 'バージョン更新は手動レビューが必要です', // EN: Version updates require manual review
             });
             break;
 
@@ -169,7 +169,7 @@ class SteeringSync {
           default:
             failed.push({
               issue,
-              reason: '自動修正がサポートされていません',
+              reason: '自動修正がサポートされていません', // EN: Auto-fix is not supported
             });
         }
       } catch (error) {

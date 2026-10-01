@@ -3,6 +3,8 @@
  *
  * ATAM、SOLID原則、デザインパターン、結合度・凝集度、
  * エラーハンドリング、セキュリティの観点から設計書をレビュー
+ * Reviews design documents from the perspectives of ATAM, SOLID principles, design patterns,
+ * coupling/cohesion, error handling, and security
  *
  * @module src/validators/design-reviewer
  */
@@ -11,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * 問題の深刻度
+ * 問題の深刻度 / Issue severity
  */
 const IssueSeverity = {
   CRITICAL: 'critical',
@@ -21,7 +23,7 @@ const IssueSeverity = {
 };
 
 /**
- * 問題のカテゴリ
+ * 問題のカテゴリ / Issue category
  */
 const IssueCategory = {
   ATAM: 'atam',
@@ -36,7 +38,7 @@ const IssueCategory = {
 };
 
 /**
- * SOLID原則の種類
+ * SOLID原則の種類 / Types of SOLID principles
  */
 const SOLIDPrinciple = {
   SRP: 'srp', // Single Responsibility
@@ -47,7 +49,7 @@ const SOLIDPrinciple = {
 };
 
 /**
- * レビュー観点
+ * レビュー観点 / Review perspectives
  */
 const ReviewFocus = {
   ATAM: 'atam',
@@ -60,7 +62,7 @@ const ReviewFocus = {
 };
 
 /**
- * 品質属性
+ * 品質属性 / Quality attributes
  */
 const QualityAttribute = {
   PERFORMANCE: 'performance',
@@ -73,7 +75,7 @@ const QualityAttribute = {
 };
 
 /**
- * 設計上の問題クラス
+ * 設計上の問題クラス / Design issue class
  */
 class DesignIssue {
   constructor(options = {}) {
@@ -106,7 +108,7 @@ class DesignIssue {
 }
 
 /**
- * レビュー結果クラス
+ * レビュー結果クラス / Review result class
  */
 class DesignReviewResult {
   constructor() {
@@ -135,19 +137,19 @@ class DesignReviewResult {
   updateMetrics() {
     this.metrics.totalIssues = this.issues.length;
 
-    // Severity別カウント
+    // Severity別カウント / Count by severity
     this.metrics.bySeverity = {};
     Object.values(IssueSeverity).forEach(sev => {
       this.metrics.bySeverity[sev] = this.issues.filter(i => i.severity === sev).length;
     });
 
-    // Category別カウント
+    // Category別カウント / Count by category
     this.metrics.byCategory = {};
     Object.values(IssueCategory).forEach(cat => {
       this.metrics.byCategory[cat] = this.issues.filter(i => i.category === cat).length;
     });
 
-    // SOLID原則別カウント
+    // SOLID原則別カウント / Count by SOLID principle
     this.metrics.solidCompliance = {};
     Object.values(SOLIDPrinciple).forEach(principle => {
       const violations = this.issues.filter(
@@ -167,7 +169,7 @@ class DesignReviewResult {
 
     const criteria = [];
 
-    // Critical問題チェック
+    // Critical問題チェック / Critical issue check
     const criticalCount = this.metrics.bySeverity[IssueSeverity.CRITICAL] || 0;
     criteria.push({
       name: 'No Critical Issues',
@@ -176,7 +178,7 @@ class DesignReviewResult {
       threshold: maxCritical,
     });
 
-    // Major問題率チェック
+    // Major問題率チェック / Major issue ratio check
     const majorCount = this.metrics.bySeverity[IssueSeverity.MAJOR] || 0;
     const majorPercent =
       this.metrics.totalIssues > 0 ? (majorCount / this.metrics.totalIssues) * 100 : 0;
@@ -187,7 +189,7 @@ class DesignReviewResult {
       threshold: maxMajorPercent,
     });
 
-    // SOLID準拠チェック
+    // SOLID準拠チェック / SOLID compliance check
     if (requireSolidCompliance) {
       const solidViolations = this.issues.filter(i => i.category === IssueCategory.SOLID).length;
       criteria.push({
@@ -198,7 +200,7 @@ class DesignReviewResult {
       });
     }
 
-    // セキュリティレビューチェック
+    // セキュリティレビューチェック / Security review check
     if (requireSecurityReview) {
       const securityIssues = this.issues.filter(
         i => i.category === IssueCategory.SECURITY && i.severity === IssueSeverity.CRITICAL
@@ -307,13 +309,13 @@ class DesignReviewResult {
 }
 
 /**
- * Design Reviewer クラス
+ * Design Reviewer クラス / Design Reviewer class
  */
 class DesignReviewer {
   constructor(projectPath = process.cwd()) {
     this.projectPath = projectPath;
 
-    // SOLID違反を検出するためのパターン
+    // SOLID違反を検出するためのパターン / Patterns for detecting SOLID violations
     this.solidViolationPatterns = {
       srp: [
         /class\s+\w*(Manager|Handler|Processor|Service|Controller)\b/gi,
@@ -333,7 +335,7 @@ class DesignReviewer {
       ],
     };
 
-    // デザインパターンの検出
+    // デザインパターンの検出 / Design pattern detection
     this.patternIndicators = {
       singleton: /\bgetInstance\b|\bINSTANCE\b|\bprivate\s+static/gi,
       factory: /\bFactory\b|\bcreate[A-Z]\w+\(/gi,
@@ -345,7 +347,7 @@ class DesignReviewer {
       repository: /\bRepository\b/gi,
     };
 
-    // セキュリティ関連キーワード
+    // セキュリティ関連キーワード / Security-related keywords
     this.securityKeywords = {
       authentication: /\b(auth|login|oauth|jwt|token|session|credential|password)\b/gi,
       authorization: /\b(permission|role|access|rbac|abac|acl|policy)\b/gi,
@@ -353,7 +355,7 @@ class DesignReviewer {
       validation: /\b(validate|sanitize|escape|xss|injection|csrf)\b/gi,
     };
 
-    // エラーハンドリングパターン
+    // エラーハンドリングパターン / Error handling patterns
     this.errorHandlingPatterns = {
       emptyTry: /try\s*\{[^}]*\}\s*catch\s*\([^)]*\)\s*\{\s*\}/gi,
       genericCatch: /catch\s*\(\s*(Exception|Error|Throwable)\s+/gi,
@@ -362,7 +364,7 @@ class DesignReviewer {
   }
 
   /**
-   * ドキュメントを読み込む
+   * ドキュメントを読み込む / Read the document
    */
   async loadDocument(documentPath) {
     const fullPath = path.isAbsolute(documentPath)
@@ -377,13 +379,13 @@ class DesignReviewer {
   }
 
   /**
-   * SOLID原則のレビュー
+   * SOLID原則のレビュー / Review SOLID principles
    */
   reviewSOLID(content, _options = {}) {
     const issues = [];
     let issueCounter = 1;
 
-    // SRP (Single Responsibility Principle) チェック
+    // SRP (Single Responsibility Principle) チェック / check
     this.solidViolationPatterns.srp.forEach(pattern => {
       const matches = content.match(pattern) || [];
       matches.forEach(match => {
@@ -403,7 +405,7 @@ class DesignReviewer {
       });
     });
 
-    // OCP (Open/Closed Principle) チェック
+    // OCP (Open/Closed Principle) チェック / check
     this.solidViolationPatterns.ocp.forEach(pattern => {
       const matches = content.match(pattern) || [];
       matches.forEach(match => {
@@ -423,7 +425,7 @@ class DesignReviewer {
       });
     });
 
-    // LSP (Liskov Substitution Principle) チェック
+    // LSP (Liskov Substitution Principle) チェック / check
     this.solidViolationPatterns.lsp.forEach(pattern => {
       const matches = content.match(pattern) || [];
       matches.forEach(match => {
@@ -443,7 +445,7 @@ class DesignReviewer {
       });
     });
 
-    // ISP (Interface Segregation Principle) チェック
+    // ISP (Interface Segregation Principle) チェック / check
     if (/interface\s+\w+\s*\{/gi.test(content)) {
       // Check for "fat" interfaces mentioned in design
       if (/fat\s+interface|large\s+interface|많은\s+메서드/gi.test(content)) {
@@ -462,7 +464,7 @@ class DesignReviewer {
       }
     }
 
-    // DIP (Dependency Inversion Principle) チェック
+    // DIP (Dependency Inversion Principle) チェック / check
     if (/directly\s+depend|concrete\s+class|tight\s+coupling|直接依存/gi.test(content)) {
       issues.push(
         new DesignIssue({
@@ -482,21 +484,21 @@ class DesignReviewer {
   }
 
   /**
-   * デザインパターンのレビュー
+   * デザインパターンのレビュー / Review design patterns
    */
   reviewPatterns(content, _options = {}) {
     const issues = [];
     let issueCounter = 1;
     const detectedPatterns = [];
 
-    // パターン検出
+    // パターン検出 / Pattern detection
     Object.entries(this.patternIndicators).forEach(([pattern, regex]) => {
       if (regex.test(content)) {
         detectedPatterns.push(pattern);
       }
     });
 
-    // Singleton乱用チェック
+    // Singleton乱用チェック / Singleton overuse check
     if (detectedPatterns.includes('singleton')) {
       const singletonCount = (content.match(/Singleton|getInstance|INSTANCE/gi) || []).length;
       if (singletonCount > 3) {
@@ -514,7 +516,7 @@ class DesignReviewer {
       }
     }
 
-    // 必要なパターンの欠如チェック
+    // 必要なパターンの欠如チェック / Check for missing necessary patterns
     if (
       /複雑.*生成|complex.*creation|オブジェクト.*生成/gi.test(content) &&
       !detectedPatterns.includes('factory')
@@ -531,7 +533,7 @@ class DesignReviewer {
       );
     }
 
-    // イベント処理があるがObserverパターンがない
+    // イベント処理があるがObserverパターンがない / Event handling exists but no Observer pattern
     if (
       /event|イベント|notification|通知/gi.test(content) &&
       !detectedPatterns.includes('observer')
@@ -552,13 +554,13 @@ class DesignReviewer {
   }
 
   /**
-   * 結合度・凝集度のレビュー
+   * 結合度・凝集度のレビュー / Review coupling and cohesion
    */
   reviewCouplingCohesion(content, _options = {}) {
     const issues = [];
     let issueCounter = 1;
 
-    // 高結合の兆候
+    // 高結合の兆候 / Signs of high coupling
     if (/tight\s*coupling|密結合|強結合|直接.*依存/gi.test(content)) {
       issues.push(
         new DesignIssue({
@@ -572,7 +574,7 @@ class DesignReviewer {
       );
     }
 
-    // グローバル状態の使用
+    // グローバル状態の使用 / Use of global state
     if (/global\s*(state|variable)|グローバル.*変数|共有.*状態/gi.test(content)) {
       issues.push(
         new DesignIssue({
@@ -586,7 +588,7 @@ class DesignReviewer {
       );
     }
 
-    // 低凝集の兆候
+    // 低凝集の兆候 / Signs of low cohesion
     if (/utility\s*class|ヘルパー.*クラス|misc|その他/gi.test(content)) {
       issues.push(
         new DesignIssue({
@@ -601,7 +603,7 @@ class DesignReviewer {
       );
     }
 
-    // 循環依存
+    // 循環依存 / Circular dependencies
     if (/circular\s*dependency|循環.*依存|相互.*依存/gi.test(content)) {
       issues.push(
         new DesignIssue({
@@ -620,13 +622,13 @@ class DesignReviewer {
   }
 
   /**
-   * エラーハンドリングのレビュー
+   * エラーハンドリングのレビュー / Review error handling
    */
   reviewErrorHandling(content, _options = {}) {
     const issues = [];
     let issueCounter = 1;
 
-    // エラーハンドリング戦略の有無
+    // エラーハンドリング戦略の有無 / Presence of an error handling strategy
     if (!/error\s*handling|エラー.*ハンドリング|例外.*処理|exception/gi.test(content)) {
       issues.push(
         new DesignIssue({
@@ -641,7 +643,7 @@ class DesignReviewer {
       );
     }
 
-    // リトライ戦略
+    // リトライ戦略 / Retry strategy
     if (
       /network|API|外部.*サービス|external.*service/gi.test(content) &&
       !/retry|リトライ|再試行|backoff/gi.test(content)
@@ -658,7 +660,7 @@ class DesignReviewer {
       );
     }
 
-    // サーキットブレーカー
+    // サーキットブレーカー / Circuit breaker
     if (
       /microservice|マイクロサービス|distributed/gi.test(content) &&
       !/circuit\s*breaker|サーキット.*ブレーカー/gi.test(content)
@@ -675,7 +677,7 @@ class DesignReviewer {
       );
     }
 
-    // グレースフルデグラデーション
+    // グレースフルデグラデーション / Graceful degradation
     if (!/graceful\s*degradation|縮退運転|フォールバック|fallback/gi.test(content)) {
       issues.push(
         new DesignIssue({
@@ -693,13 +695,13 @@ class DesignReviewer {
   }
 
   /**
-   * セキュリティのレビュー
+   * セキュリティのレビュー / Review security
    */
   reviewSecurity(content, _options = {}) {
     const issues = [];
     let issueCounter = 1;
 
-    // 認証
+    // 認証 / Authentication
     if (
       /user|ユーザー|account|アカウント/gi.test(content) &&
       !this.securityKeywords.authentication.test(content)
@@ -717,7 +719,7 @@ class DesignReviewer {
       );
     }
 
-    // 認可
+    // 認可 / Authorization
     if (
       /role|権限|permission|管理者|admin/gi.test(content) &&
       !/authorization|認可|access\s*control|アクセス制御/gi.test(content)
@@ -735,7 +737,7 @@ class DesignReviewer {
       );
     }
 
-    // データ保護
+    // データ保護 / Data protection
     if (
       /personal|個人|sensitive|機密|PII|password/gi.test(content) &&
       !this.securityKeywords.encryption.test(content)
@@ -753,7 +755,7 @@ class DesignReviewer {
       );
     }
 
-    // 入力検証
+    // 入力検証 / Input validation
     if (
       /input|入力|form|フォーム|API/gi.test(content) &&
       !this.securityKeywords.validation.test(content)
@@ -771,7 +773,7 @@ class DesignReviewer {
       );
     }
 
-    // 監査ログ
+    // 監査ログ / Audit logging
     if (!/audit|監査|logging|ログ/gi.test(content)) {
       issues.push(
         new DesignIssue({
@@ -790,13 +792,13 @@ class DesignReviewer {
   }
 
   /**
-   * C4モデルのレビュー
+   * C4モデルのレビュー / Review the C4 model
    */
   reviewC4Model(content, _options = {}) {
     const issues = [];
     let issueCounter = 1;
 
-    // C4ダイアグラムの有無
+    // C4ダイアグラムの有無 / Presence of C4 diagrams
     const hasContext = /context\s*diagram|コンテキスト.*図|システム.*境界/gi.test(content);
     const hasContainer = /container\s*diagram|コンテナ.*図|アプリケーション.*構成/gi.test(content);
     const hasComponent = /component\s*diagram|コンポーネント.*図/gi.test(content);
@@ -846,13 +848,13 @@ class DesignReviewer {
   }
 
   /**
-   * ADRのレビュー
+   * ADRのレビュー / Review ADRs
    */
   reviewADR(content, _options = {}) {
     const issues = [];
     let issueCounter = 1;
 
-    // ADRの基本構造チェック
+    // ADRの基本構造チェック / Check basic ADR structure
     const hasStatus = /status:\s*(proposed|accepted|deprecated|superseded)/gi.test(content);
     const hasContext = /##\s*context|##\s*背景|##\s*コンテキスト/gi.test(content);
     const hasDecision = /##\s*decision|##\s*決定/gi.test(content);
@@ -928,7 +930,7 @@ class DesignReviewer {
   }
 
   /**
-   * 総合レビュー
+   * 総合レビュー / Comprehensive review
    */
   async review(documentPath, options = {}) {
     const content = await this.loadDocument(documentPath);
@@ -937,7 +939,7 @@ class DesignReviewer {
 
     const result = new DesignReviewResult();
 
-    // 各観点でレビュー
+    // 各観点でレビュー / Review from each perspective
     if (isAllFocus || focus.includes(ReviewFocus.SOLID)) {
       const solidIssues = this.reviewSOLID(content, options);
       solidIssues.forEach(issue => result.addIssue(issue));
@@ -963,7 +965,7 @@ class DesignReviewer {
       securityIssues.forEach(issue => result.addIssue(issue));
     }
 
-    // C4とADRは特定のドキュメントタイプの場合のみ
+    // C4とADRは特定のドキュメントタイプの場合のみ / C4 and ADR are checked only for specific document types
     if (options.checkC4 || /c4|architecture|アーキテクチャ/gi.test(content)) {
       const c4Issues = this.reviewC4Model(content, options);
       c4Issues.forEach(issue => result.addIssue(issue));
@@ -980,11 +982,11 @@ class DesignReviewer {
   }
 
   /**
-   * レビュー結果に基づいてドキュメントを修正
-   * @param {string} documentPath - 修正対象のドキュメントパス
-   * @param {Array} corrections - 修正指示の配列
-   * @param {Object} options - オプション
-   * @returns {Object} 修正結果
+   * レビュー結果に基づいてドキュメントを修正 / Correct the document based on review results
+   * @param {string} documentPath - 修正対象のドキュメントパス / Path of the document to correct
+   * @param {Array} corrections - 修正指示の配列 / Array of correction instructions
+   * @param {Object} options - オプション / Options
+   * @returns {Object} 修正結果 / Correction result
    */
   async applyCorrections(documentPath, corrections, options = {}) {
     const fullPath = path.isAbsolute(documentPath)
@@ -995,7 +997,7 @@ class DesignReviewer {
       throw new Error(`Document not found: ${fullPath}`);
     }
 
-    // バックアップ作成
+    // バックアップ作成 / Create backup
     if (options.createBackup !== false) {
       const backupPath = `${fullPath}.backup`;
       fs.copyFileSync(fullPath, backupPath);
@@ -1011,7 +1013,7 @@ class DesignReviewer {
 
       switch (action) {
         case 'accept': {
-          // 推奨を適用
+          // 推奨を適用 / Apply recommendation
           const issue = this._findIssueInContent(content, issueId);
           if (issue && issue.evidence && issue.recommendation) {
             content = content.replace(issue.evidence, issue.recommendation);
@@ -1027,7 +1029,7 @@ class DesignReviewer {
         }
 
         case 'modify': {
-          // カスタム修正を適用
+          // カスタム修正を適用 / Apply custom correction
           const modifyIssue = this._findIssueInContent(content, issueId);
           if (modifyIssue && modifyIssue.evidence && newDesign) {
             content = content.replace(modifyIssue.evidence, newDesign);
@@ -1050,7 +1052,7 @@ class DesignReviewer {
           break;
 
         case 'reject-with-adr':
-          // ADRを作成して却下
+          // ADRを作成して却下 / Create an ADR and reject
           rejectedFindings.push({
             issueId,
             reason: reason || 'See ADR',
@@ -1065,7 +1067,7 @@ class DesignReviewer {
       }
     }
 
-    // 変更履歴を追加
+    // 変更履歴を追加 / Add change history
     const changeHistoryEntry = this._generateChangeHistoryEntry(appliedChanges);
     if (changeHistoryEntry && !content.includes('## Change History')) {
       content += `\n\n## Change History\n\n${changeHistoryEntry}`;
@@ -1076,10 +1078,10 @@ class DesignReviewer {
       );
     }
 
-    // ファイルを保存
+    // ファイルを保存 / Save the file
     fs.writeFileSync(fullPath, content, 'utf-8');
 
-    // 日本語版も更新
+    // 日本語版も更新 / Also update the Japanese version
     if (options.updateJapanese !== false) {
       const jaPath = fullPath.replace(/\.md$/, '.ja.md');
       if (fs.existsSync(jaPath)) {
@@ -1093,7 +1095,7 @@ class DesignReviewer {
       }
     }
 
-    // 再レビューして品質ゲートを更新
+    // 再レビューして品質ゲートを更新 / Re-review and update the quality gate
     const updatedResult = await this.review(documentPath, options.reviewOptions || {});
 
     return {
@@ -1116,7 +1118,7 @@ class DesignReviewer {
   }
 
   /**
-   * 修正レポートを生成
+   * 修正レポートを生成 / Generate correction report
    */
   generateCorrectionReport(correctionResult) {
     const {
@@ -1208,10 +1210,10 @@ class DesignReviewer {
   }
 
   /**
-   * 内部: 問題情報を取得（簡易実装）
+   * 内部: 問題情報を取得（簡易実装） / Internal: get issue information (simplified implementation)
    */
   _findIssueInContent(_content, issueId) {
-    // 実際の実装ではレビュー結果から問題を検索
+    // 実際の実装ではレビュー結果から問題を検索 / In a real implementation, search issues from the review results
     return {
       id: issueId,
       category: 'unknown',
@@ -1221,7 +1223,7 @@ class DesignReviewer {
   }
 
   /**
-   * 内部: ADRを生成
+   * 内部: ADRを生成 / Internal: generate ADR
    */
   _generateADR(issueId, reason, adrPath) {
     const adrId = `ADR-${Date.now()}`;
@@ -1259,7 +1261,7 @@ ${date}
       ? path.join(adrPath, `${adrId}-${issueId.toLowerCase()}.md`)
       : `docs/adr/${adrId}-${issueId.toLowerCase()}.md`;
 
-    // 実際のファイル書き込みは呼び出し元で行う
+    // 実際のファイル書き込みは呼び出し元で行う / Actual file writing is done by the caller
     return {
       id: adrId,
       issueId,
@@ -1270,7 +1272,7 @@ ${date}
   }
 
   /**
-   * 内部: 変更履歴エントリを生成
+   * 内部: 変更履歴エントリを生成 / Internal: generate change history entry
    */
   _generateChangeHistoryEntry(appliedChanges) {
     if (appliedChanges.length === 0) return null;

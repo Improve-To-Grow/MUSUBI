@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [SERENA-STEERING-COMPARISON.en.md](./SERENA-STEERING-COMPARISON.en.md)
+
 # Serena vs MUSUBI Steering - 機能比較と適用可能性分析
 
 ## 調査日: 2025-11-22

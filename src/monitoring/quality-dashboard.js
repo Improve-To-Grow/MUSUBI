@@ -1,6 +1,7 @@
 /**
  * Quality Metrics Dashboard
  * カバレッジメトリクス、Constitutional準拠メトリクス、プロジェクトヘルス指標
+ * Coverage metrics, Constitutional compliance metrics, and project health indicators
  *
  * Part of MUSUBI v5.0.0 - Production Readiness
  *

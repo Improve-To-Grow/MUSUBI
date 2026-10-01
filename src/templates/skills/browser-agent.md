@@ -6,6 +6,8 @@ category: testing
 platform: claude-code
 ---
 
+> 🇬🇧 English version: [browser-agent.en.md](./browser-agent.en.md)
+
 # Browser Agent スキル
 
 自然言語コマンドでブラウザを操作し、スクリーンショット取得・比較、E2E テストコード生成を行うエージェントです。

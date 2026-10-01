@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [MUSUBI-v6.0.0-User-Guide.en.md](./MUSUBI-v6.0.0-User-Guide.en.md)
+
 # 【MUSUBI v6.1.0】完全ユーザーガイド - 7つのAIプラットフォームで仕様駆動開発を始めよう
 
 # はじめに

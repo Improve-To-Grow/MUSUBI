@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [MUSUBI-CodeGraph-MCP-Integration.en.md](./MUSUBI-CodeGraph-MCP-Integration.en.md)
+
 # MUSUBI v2.0 × CodeGraph MCP Server - AIエージェントにコード理解力を与える革新的統合
 
 ## はじめに

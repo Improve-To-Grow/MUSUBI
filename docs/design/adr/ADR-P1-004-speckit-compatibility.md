@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [ADR-P1-004-speckit-compatibility.en.md](./ADR-P1-004-speckit-compatibility.en.md)
+
 # ADR-P1-004: Spec Kit Compatibility
 
 ## Status

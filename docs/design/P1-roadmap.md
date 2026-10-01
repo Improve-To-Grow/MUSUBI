@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [P1-roadmap.en.md](./P1-roadmap.en.md)
+
 # MUSUBI P1 ロードマップ - 機能差別化フェーズ
 
 ## 概要

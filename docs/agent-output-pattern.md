@@ -9,57 +9,71 @@ Prevent context length overflow errors by breaking agent output into small chunk
 ### Phase 4: Gradual Output Generation
 
 ```markdown
-### Phase 4: 段階的成果物生成
+### Phase 4: 段階的成果物生成 (Gradual Deliverable Generation)
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: コンテキスト長オーバーフロー防止** (Prevent context length overflow)
 
-**出力方式:**
-- 1ファイルずつ順番に生成・保存
-- 各ファイル生成後に進捗を報告
-- 大きなファイル(>300行)は複数に分割
-- エラー発生時も部分的な成果物が残る
+**出力方式:** (Output method:)
+- 1ファイルずつ順番に生成・保存 / Generate and save one file at a time, in order
+- 各ファイル生成後に進捗を報告 / Report progress after each file is generated
+- 大きなファイル(>300行)は複数に分割 / Split large files (>300 lines) into multiple files
+- エラー発生時も部分的な成果物が残る / Partial deliverables remain even if an error occurs
 
 ```
 🤖 確認ありがとうございます。以下の成果物を順番に生成します。
+   (Thank you for confirming. I will generate the following deliverables in order.)
 
 【生成予定の成果物】（英語版と日本語版の両方）
+[Planned deliverables] (both English and Japanese versions)
 1. [Document/Code 1]
 2. [Document/Code 2]
 3. [Document/Code 3]
 ...
 
 合計: Nファイル
+Total: N files
 
-**重要: 段階的生成方式**
+**重要: 段階的生成方式** (Important: gradual generation method)
 各ドキュメント/コードファイルを1つずつ生成・保存し、進捗を報告します。
+(I will generate and save each document/code file one at a time and report progress.)
 これにより、途中経過が見え、エラーが発生しても部分的な成果物が残ります。
+(This makes intermediate progress visible, and partial deliverables remain even if an error occurs.)
 
 生成を開始してよろしいですか？
+(May I start generating?)
 👤 ユーザー: [回答待ち]
+   (User: [awaiting response])
 ```
 
 ユーザーが承認後、**各ファイルを順番に生成**:
+After the user approves, **generate each file in order**:
 
-**Step 1: [File 1 Name] - 英語版**
+**Step 1: [File 1 Name] - 英語版** (English version)
 
 ```
 🤖 [1/N] [File 1 Name]英語版を生成しています...
+   (Generating the English version of [File 1 Name]...)
 
 📝 ./[path]/[filename]-[date].md
 ✅ 保存が完了しました
+   (Saved successfully)
 
 [1/N] 完了。次のファイルに進みます。
+(Done. Moving on to the next file.)
 ```
 
-**Step 2: [File 2 Name] - 英語版**
+**Step 2: [File 2 Name] - 英語版** (English version)
 
 ```
 🤖 [2/N] [File 2 Name]英語版を生成しています...
+   (Generating the English version of [File 2 Name]...)
 
 📝 ./[path]/[filename]-[date].md
 ✅ 保存が完了しました
+   (Saved successfully)
 
 [2/N] 完了。次のファイルに進みます。
+(Done. Moving on to the next file.)
 ```
 
 ...
@@ -68,23 +82,25 @@ Prevent context length overflow errors by breaking agent output into small chunk
 
 ```
 🤖 ✨ すべての成果物の生成が完了しました！
+   (All deliverables have been generated!)
 
-## 📊 生成サマリー
-- **作成ファイル数**: N個
-- **英語版**: X個
-- **日本語版**: Y個
+## 📊 生成サマリー (Generation Summary)
+- **作成ファイル数**: N個 / Files created: N
+- **英語版**: X個 / English versions: X
+- **日本語版**: Y個 / Japanese versions: Y
 
-## 📂 生成されたファイル
+## 📂 生成されたファイル (Generated Files)
 1. ✅ ./[path]/[file1]
 2. ✅ ./[path]/[file2]
 ...
 
-## 🔍 次のステップ
-1. 成果物を確認して、フィードバックをお願いします
-2. 不足や修正が必要な箇所があれば教えてください
-3. [関連エージェント]を呼び出して次の工程に進めます
+## 🔍 次のステップ (Next Steps)
+1. 成果物を確認して、フィードバックをお願いします / Please review the deliverables and share your feedback
+2. 不足や修正が必要な箇所があれば教えてください / Let me know if anything is missing or needs changes
+3. [関連エージェント]を呼び出して次の工程に進めます / You can call [related agent] to proceed to the next stage
 
 👤 ユーザー: [フィードバック待ち]
+   (User: [awaiting feedback])
 ```
 ```
 
@@ -117,11 +133,14 @@ Prevent context length overflow errors by breaking agent output into small chunk
 **Step 1: [Component Name]**
 
 🤖 [1/N] [Component Name]を生成しています...
+   (Generating [Component Name]...)
 
 📝 src/[path]/[filename].ts
 ✅ 保存が完了しました (150行)
+   (Saved successfully (150 lines))
 
 [1/N] 完了。次のファイルに進みます。
+(Done. Moving on to the next file.)
 ```
 
 ### Document Generators (technical-writer, requirements-analyst, etc.)
@@ -129,11 +148,14 @@ Prevent context length overflow errors by breaking agent output into small chunk
 **Step 1: [Document Title] - English Version**
 
 🤖 [1/N] [Document Title]英語版を生成しています...
+   (Generating the English version of [Document Title]...)
 
 📝 docs/[path]/[filename]-[date].md
 ✅ 保存が完了しました
+   (Saved successfully)
 
 [1/N] 完了。次のドキュメントに進みます。
+(Done. Moving on to the next document.)
 ```
 
 ### Design Generators (system-architect, database-schema-designer, etc.)
@@ -141,11 +163,14 @@ Prevent context length overflow errors by breaking agent output into small chunk
 **Step 1: [Design Artifact] - English Version**
 
 🤖 [1/N] [Design Artifact]英語版を生成しています...
+   (Generating the English version of [Design Artifact]...)
 
 📝 design/[category]/[filename]-[project]-[date].md
 ✅ 保存が完了しました
+   (Saved successfully)
 
 [1/N] 完了。次の成果物に進みます。
+(Done. Moving on to the next deliverable.)
 ```
 
 ## File Size Guidelines
@@ -161,7 +186,7 @@ Prevent context length overflow errors by breaking agent output into small chunk
 
 For each agent's SKILL.md:
 
-- [ ] Phase 4 has "段階的成果物生成" section
+- [ ] Phase 4 has "段階的成果物生成" (Gradual Deliverable Generation) section
 - [ ] Lists all files to be generated upfront
 - [ ] Asks user confirmation before generation
 - [ ] Generates files one-by-one with progress counter

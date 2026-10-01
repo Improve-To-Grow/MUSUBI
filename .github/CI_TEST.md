@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [CI_TEST.en.md](./CI_TEST.en.md)
+
 # Phase 1: GitHub Actions CI Workflow Implementation
 
 ## 📋 概要

@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [cli-reference.en.md](./cli-reference.en.md)
+
 # 📖 MUSUBI CLI コマンドリファレンス
 
 **MUSUBI v3.5.1** | 最終更新: 2025-12-08

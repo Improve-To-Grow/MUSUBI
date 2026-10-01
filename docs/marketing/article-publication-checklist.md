@@ -12,18 +12,20 @@
 | ✅ | Version: v2.1.1 | Updated |
 | ✅ | License mention (MIT) | Added |
 | ✅ | Star CTA | Added |
-| ✅ | v2.0 CodeGraph MCP統合セクション追加 | Added |
-| ✅ | 既存Qiita記事へのリンク追加 | Added |
+| ✅ | v2.0 CodeGraph MCP統合セクション追加 / Added v2.0 CodeGraph MCP integration section | Added |
+| ✅ | 既存Qiita記事へのリンク追加 / Added links to existing Qiita articles | Added |
 | ⬜ | Qiita post created | Pending |
 
 **Suggested Qiita Title:**
 ```
 MUSUBI ではじめる仕様駆動開発入門 - Vibe CodingからSDD（Specification Driven Development）へ
+(EN: Getting Started with Specification Driven Development with MUSUBI - From Vibe Coding to SDD)
 ```
 
 **Suggested Tags:**
 ```
 GitHub-Copilot, Claude, SDD, AI, 開発効率化
+(EN: 開発効率化 = development efficiency)
 ```
 
 ---
@@ -38,18 +40,20 @@ GitHub-Copilot, Claude, SDD, AI, 開発効率化
 | ✅ | Version: v2.1.1 | Updated |
 | ✅ | License mention (MIT) | Added |
 | ✅ | Star CTA | Added |
-| ✅ | v2.0 CodeGraph MCP統合セクション追加 | Added |
-| ✅ | 既存Qiita記事へのリンク追加 | Added |
+| ✅ | v2.0 CodeGraph MCP統合セクション追加 / Added v2.0 CodeGraph MCP integration section | Added |
+| ✅ | 既存Qiita記事へのリンク追加 / Added links to existing Qiita articles | Added |
 | ⬜ | Qiita post created | Pending |
 
 **Suggested Qiita Title:**
 ```
 Ultimate SDD Tool "MUSUBI" - 7つのAIエージェント対応、25スキル搭載の究極仕様駆動開発ツール
+(EN: Ultimate SDD Tool "MUSUBI" - The ultimate specification-driven development tool supporting 7 AI agents with 25 skills)
 ```
 
 **Suggested Tags:**
 ```
 SDD, マルチエージェント, 要件定義, 設計, AI
+(EN: SDD, multi-agent, requirements definition, design, AI)
 ```
 
 ---
@@ -59,7 +63,7 @@ SDD, マルチエージェント, 要件定義, 設計, AI
 | Title | URL | Status |
 |-------|-----|--------|
 | MUSUBI v2.0 × CodeGraph MCP Server | https://qiita.com/hisaho/items/719210ccc20fe2514054 | ✅ Published |
-| MUSUBI - 25スキル究極SDD | https://qiita.com/hisaho/items/a245c2ad5adf2ab5a409 | ✅ Published |
+| MUSUBI - 25スキル究極SDD (MUSUBI - Ultimate SDD with 25 skills) | https://qiita.com/hisaho/items/a245c2ad5adf2ab5a409 | ✅ Published |
 | CodeGraph MCP Server | https://qiita.com/hisaho/items/b99ac51d78119ef60b6b | ✅ Published |
 
 ---

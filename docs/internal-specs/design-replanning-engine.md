@@ -440,21 +440,25 @@ function createLLMProvider(provider = 'auto', config = {}) {
 
 **Context**:
 リプラニング機能は代替パス生成にLLMを使用する。
+The replanning feature uses an LLM to generate alternative paths.
 異なるプラットフォーム（GitHub Copilot, Anthropic, OpenAI）で動作する必要がある。
+It must work across different platforms (GitHub Copilot, Anthropic, OpenAI).
 
 **Decision**:
 Strategy パターンを使用してLLMプロバイダーを抽象化する。
+Abstract the LLM providers using the Strategy pattern.
 `LLMProvider` 基底クラスを定義し、各プラットフォーム用の具象クラスを実装する。
+Define an `LLMProvider` base class and implement a concrete class for each platform.
 
 **Rationale**:
-- 新しいLLMプロバイダーの追加が容易
-- テスト時にモックプロバイダーを使用可能
-- プラットフォーム固有のコードを分離
+- 新しいLLMプロバイダーの追加が容易 / Easy to add new LLM providers
+- テスト時にモックプロバイダーを使用可能 / Mock providers can be used in tests
+- プラットフォーム固有のコードを分離 / Isolates platform-specific code
 
 **Consequences**:
-- ✅ 拡張性が高い
-- ✅ テスタビリティが向上
-- ⚠️ プロバイダー間のAPI差異を吸収するコードが必要
+- ✅ 拡張性が高い / Highly extensible
+- ✅ テスタビリティが向上 / Improved testability
+- ⚠️ プロバイダー間のAPI差異を吸収するコードが必要 / Requires code to absorb API differences between providers
 
 ---
 
@@ -464,20 +468,23 @@ Strategy パターンを使用してLLMプロバイダーを抽象化する。
 
 **Context**:
 リプラニングは様々な条件で発動する必要がある（タスク失敗、タイムアウト、コンテキスト変更等）。
+Replanning must be triggered under various conditions (task failure, timeout, context change, etc.).
 
 **Decision**:
 EventEmitter パターンを使用してトリガーシステムを実装する。
+Implement the trigger system using the EventEmitter pattern.
 `PlanMonitor` がイベントを監視し、条件に応じてトリガーを発火する。
+`PlanMonitor` watches events and fires triggers depending on the conditions.
 
 **Rationale**:
-- Node.jsのEventEmitterと整合性がある
-- 既存のOrchestrationEngineのイベントシステムと統合可能
-- 非同期処理との相性が良い
+- Node.jsのEventEmitterと整合性がある / Consistent with Node.js EventEmitter
+- 既存のOrchestrationEngineのイベントシステムと統合可能 / Can integrate with the existing OrchestrationEngine event system
+- 非同期処理との相性が良い / Works well with asynchronous processing
 
 **Consequences**:
-- ✅ 疎結合な設計
-- ✅ 新しいトリガータイプの追加が容易
-- ⚠️ イベントのデバッグが複雑になる可能性
+- ✅ 疎結合な設計 / Loosely coupled design
+- ✅ 新しいトリガータイプの追加が容易 / Easy to add new trigger types
+- ⚠️ イベントのデバッグが複雑になる可能性 / Event debugging may become complex
 
 ---
 
@@ -487,24 +494,27 @@ EventEmitter パターンを使用してトリガーシステムを実装する�
 
 **Context**:
 LLMが生成する代替パスの信頼性を評価する必要がある。
+The reliability of LLM-generated alternative paths must be evaluated.
 低信頼度の代替パスは人間の承認を要求する。
+Low-confidence alternative paths require human approval.
 
 **Decision**:
 以下の要素に基づく信頼度スコア（0.0-1.0）を算出する：
-1. LLMの自己評価（40%）
-2. 類似タスクの過去成功率（30%）
-3. リソース可用性（20%）
-4. 複雑度スコア（10%）
+Compute a confidence score (0.0-1.0) based on the following factors:
+1. LLMの自己評価（40%） / LLM self-assessment (40%)
+2. 類似タスクの過去成功率（30%） / Historical success rate of similar tasks (30%)
+3. リソース可用性（20%） / Resource availability (20%)
+4. 複雑度スコア（10%） / Complexity score (10%)
 
 **Rationale**:
-- 複数の観点から信頼度を評価
-- 過去データを活用した学習効果
-- 人間介入の判断基準として機能
+- 複数の観点から信頼度を評価 / Evaluates confidence from multiple perspectives
+- 過去データを活用した学習効果 / Learning effect from leveraging historical data
+- 人間介入の判断基準として機能 / Serves as a criterion for deciding on human intervention
 
 **Consequences**:
-- ✅ リスクの定量化が可能
-- ✅ 自動化と人間介入のバランス
-- ⚠️ スコアリングロジックの調整が必要
+- ✅ リスクの定量化が可能 / Enables risk quantification
+- ✅ 自動化と人間介入のバランス / Balance between automation and human intervention
+- ⚠️ スコアリングロジックの調整が必要 / Scoring logic requires tuning
 
 ---
 
@@ -514,20 +524,23 @@ LLMが生成する代替パスの信頼性を評価する必要がある。
 
 **Context**:
 リプラニングの履歴を監査・デバッグ・学習目的で保存する必要がある。
+Replanning history must be stored for auditing, debugging, and learning purposes.
 
 **Decision**:
 インメモリストレージをデフォルトとし、オプションでファイルシステムへの永続化をサポートする。
+Use in-memory storage by default, with optional persistence to the file system.
 履歴はJSON形式で保存し、Markdownレポートへのエクスポート機能を提供する。
+History is stored as JSON, with export to Markdown reports.
 
 **Rationale**:
-- シンプルな実装から開始
-- 将来的なデータベース統合に拡張可能
-- 人間が読みやすいレポート形式
+- シンプルな実装から開始 / Start with a simple implementation
+- 将来的なデータベース統合に拡張可能 / Extensible to future database integration
+- 人間が読みやすいレポート形式 / Human-readable report format
 
 **Consequences**:
-- ✅ 実装がシンプル
-- ✅ エクスポート形式の柔軟性
-- ⚠️ 大量の履歴でメモリ使用量が増加
+- ✅ 実装がシンプル / Simple implementation
+- ✅ エクスポート形式の柔軟性 / Flexible export formats
+- ⚠️ 大量の履歴でメモリ使用量が増加 / Memory usage grows with large histories
 
 ---
 
@@ -581,7 +594,7 @@ tests/
 ### 6.1 OrchestrationEngine Integration
 
 ```javascript
-// orchestration-engine.js への追加
+// orchestration-engine.js への追加 / Additions to orchestration-engine.js
 class OrchestrationEngine extends EventEmitter {
   constructor(options = {}) {
     // ... existing code ...
@@ -607,7 +620,7 @@ class OrchestrationEngine extends EventEmitter {
 ### 6.2 SwarmPattern Integration
 
 ```javascript
-// patterns/swarm.js への追加
+// patterns/swarm.js への追加 / Additions to patterns/swarm.js
 class SwarmPattern extends BasePattern {
   async execute(context, engine) {
     // ... existing code ...

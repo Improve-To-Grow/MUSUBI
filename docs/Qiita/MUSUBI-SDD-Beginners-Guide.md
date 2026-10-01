@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [MUSUBI-SDD-Beginners-Guide.en.md](./MUSUBI-SDD-Beginners-Guide.en.md)
+
 # MUSUBI ではじめる仕様駆動開発入門 - Vibe CodingからSDD（Specification Driven Development）へ
 
 > **MUSUBI v2.1.1** - 7つのAIエージェント対応、25スキル搭載の究極仕様駆動開発ツール

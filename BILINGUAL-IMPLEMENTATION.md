@@ -6,6 +6,8 @@ Implemented comprehensive bilingual documentation support across all MUSUBI comp
 
 **すべてのエージェントが作成するドキュメントは英語と日本語の２つを作成。すべてのエージェントが作成するドキュメントは英語版を参照します。**
 
+**(English: Every document created by any agent is produced in two versions, English and Japanese. All agents refer to the English version of the documents.)**
+
 ## Implementation Summary
 
 ### 1. Slash Commands Updated (6 commands)

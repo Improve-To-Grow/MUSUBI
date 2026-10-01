@@ -1,5 +1,7 @@
 title: MUSUBIの軌跡：Spec-CopilotからMUSUHI、そしてMUSUBIへの完全進化ガイド
 
+> 🇬🇧 English version: [MUSUBI-Complete-Evolution-History.en.md](./MUSUBI-Complete-Evolution-History.en.md)
+
 # MUSUBIの軌跡：Spec-CopilotからMUSUHI、そしてMUSUBIへの完全進化ガイド
 
 ## はじめに

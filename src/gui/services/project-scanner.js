@@ -126,7 +126,7 @@ class ProjectScanner {
    */
   parseConstitutionArticles(content) {
     const articles = [];
-    const articleRegex = /#{2,3}\s+(?:Article|第)\s*(\d+)[:\s]+(.+?)(?=\n#{2,3}|\n##|$)/gs;
+    const articleRegex = /#{2,3}\s+(?:Article|第)\s*(\d+)[:\s]+(.+?)(?=\n#{2,3}|\n##|$)/gs; // 第 = Japanese ordinal prefix ("第N条" = "Article N")
 
     let match;
     while ((match = articleRegex.exec(content)) !== null) {

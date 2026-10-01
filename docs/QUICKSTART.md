@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [QUICKSTART.en.md](./QUICKSTART.en.md)
+
 # MUSUBI SDD クイックスタートガイド
 
 ## 🚀 5分で始める MUSUBI SDD

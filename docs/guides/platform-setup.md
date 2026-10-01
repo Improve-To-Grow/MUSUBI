@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [platform-setup.en.md](./platform-setup.en.md)
+
 # 🔧 プラットフォーム別セットアップガイド
 
 **MUSUBI v3.5.1** | 最終更新: 2025-12-08

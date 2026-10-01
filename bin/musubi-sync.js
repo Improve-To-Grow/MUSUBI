@@ -463,10 +463,10 @@ async function updateTechMd(changes, _actualState) {
   if (await fs.pathExists(techMdJaPath)) {
     let content = await fs.readFile(techMdJaPath, 'utf8');
 
-    const frameworkSection = '## フレームワーク';
+    const frameworkSection = '## フレームワーク'; // EN: "## Frameworks" (heading matched in steering/tech.ja.md)
     if (content.includes(frameworkSection)) {
       const newEntries = newFrameworks
-        .map(fw => `- **${fw}** (detected) - 自動検出されたフレームワーク`)
+        .map(fw => `- **${fw}** (detected) - 自動検出されたフレームワーク`) // EN: "auto-detected framework"
         .join('\n');
       content = content.replace(frameworkSection, `${frameworkSection}\n\n${newEntries}\n`);
     }
@@ -501,7 +501,7 @@ async function updateStructureMd(changes, _actualState) {
     let content = await fs.readFile(structureMdJaPath, 'utf8');
 
     const dirList = newDirs.map(dir => `${dir}/`).join('\n');
-    content += `\n\n## 新規ディレクトリ (検出日: ${new Date().toISOString().split('T')[0]})\n\n\`\`\`\n${dirList}\n\`\`\`\n`;
+    content += `\n\n## 新規ディレクトリ (検出日: ${new Date().toISOString().split('T')[0]})\n\n\`\`\`\n${dirList}\n\`\`\`\n`; // EN: "## New Directories (Detected: <date>)"
 
     await fs.writeFile(structureMdJaPath, content);
   }

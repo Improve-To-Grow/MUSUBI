@@ -70,6 +70,7 @@ steering/tech.md         # Technology stack
 
 ```
 この機能で解決したい『本当の課題』は何ですか？
+What is the "real problem" you want this feature to solve?
 ```
 
 → STOP HERE. Wait for user response.
@@ -78,6 +79,7 @@ steering/tech.md         # Technology stack
 
 ```
 この機能を最も必要としているのは誰ですか？
+Who needs this feature the most?
 ```
 
 → STOP HERE. Wait for user response.
@@ -86,6 +88,7 @@ steering/tech.md         # Technology stack
 
 ```
 もしこの機能が完璧に動作したら、何が変わりますか？
+If this feature worked perfectly, what would change?
 ```
 
 → STOP HERE. Wait for user response.
@@ -94,6 +97,7 @@ steering/tech.md         # Technology stack
 
 ```
 この機能で『絶対にやってはいけないこと』はありますか？
+Is there anything this feature must "absolutely never do"?
 ```
 
 → STOP HERE. Wait for user response.
@@ -102,6 +106,7 @@ steering/tech.md         # Technology stack
 
 ```
 この機能が『成功した』と言えるのはどんな状態ですか？
+What state would let you say this feature has "succeeded"?
 ```
 
 → STOP HERE. Wait for user response.
@@ -110,8 +115,10 @@ steering/tech.md         # Technology stack
 
 ```
 ここまでの理解を確認させてください：
+Let me confirm my understanding so far:
 [Summary]
 この理解で正しいですか？
+Is this understanding correct?
 ```
 
 #### Example Dialogue Flow
@@ -119,24 +126,30 @@ steering/tech.md         # Technology stack
 **AI Turn 1**:
 
 > まず、この機能について教えてください。
+> (First, please tell me about this feature.)
 >
 > **この機能で解決したい『本当の課題』は何ですか？**
+> **(What is the "real problem" you want this feature to solve?)**
 
-**User**: "CSVから社員データをインポートしたい"
+**User**: "CSVから社員データをインポートしたい" ("I want to import employee data from CSV")
 
 **AI Turn 2**:
 
 > なるほど、社員データのCSVインポートですね。
+> (I see, so this is a CSV import of employee data.)
 >
 > **このインポート機能を最も必要としているのは誰ですか？**（人事部？IT管理者？）
+> **(Who needs this import feature the most?)** (HR? IT administrators?)
 
-**User**: "人事部です"
+**User**: "人事部です" ("The HR department")
 
 **AI Turn 3**:
 
 > 人事部の方が使うのですね。
+> (So it will be used by HR staff.)
 >
 > **もしこの機能が完璧に動作したら、人事部の業務はどう変わりますか？**
+> **(If this feature worked perfectly, how would HR's work change?)**
 
 ...(continues one question at a time)
 
@@ -586,26 +599,31 @@ Present summary to user:
 2. **Interactive Dialogue (1-on-1)**:
 
    **AI**: 「認証機能について、この機能で解決したい『本当の課題』は何ですか？」
+   ("Regarding the authentication feature, what is the 'real problem' you want it to solve?")
 
-   **User**: 「ユーザーがログインできるようにしたい」
+   **User**: 「ユーザーがログインできるようにしたい」 ("I want users to be able to log in")
 
    **AI**: 「なるほど。では、この機能がないと、誰がどのように困りますか？」
+   ("I see. Then without this feature, who would be affected, and how?")
 
    **User**: 「顧客がサービスを使えない。また、管理者が顧客データを保護できない」
+   ("Customers can't use the service. Also, administrators can't protect customer data.")
 
    **AI**: 「顧客データの保護が重要なのですね。この機能で『絶対にやってはいけないこと』はありますか？」
+   ("So protecting customer data is important. Is there anything this feature must 'absolutely never do'?")
 
-   **User**: 「データ漏洩。SOC2準拠が必要」
+   **User**: 「データ漏洩。SOC2準拠が必要」 ("Data leaks. SOC2 compliance is required.")
 
    **AI**: 「SOC2準拠が必要とのこと。この機能が『成功した』と言えるのはどんな状態ですか？」
+   ("Understood, SOC2 compliance is required. What state would let you say this feature has 'succeeded'?")
 
-   **User**: 「ログイン成功率99%以上、不正アクセスゼロ」
+   **User**: 「ログイン成功率99%以上、不正アクセスゼロ」 ("Login success rate of 99% or higher, zero unauthorized access")
 
-   **AI**: 「理解しました。確認させてください：
-   - **表面的要求**: ユーザーがログインできること
-   - **真の目的**: SOC2準拠でセキュアな顧客データ保護
-   - **成功基準**: ログイン成功率99%以上、不正アクセスゼロ
-     この理解で正しいですか？」
+   **AI**: 「理解しました。確認させてください： ("Understood. Let me confirm:)
+   - **表面的要求**: ユーザーがログインできること (Surface request: users can log in)
+   - **真の目的**: SOC2準拠でセキュアな顧客データ保護 (True purpose: secure, SOC2-compliant protection of customer data)
+   - **成功基準**: ログイン成功率99%以上、不正アクセスゼロ (Success criteria: login success rate of 99% or higher, zero unauthorized access)
+     この理解で正しいですか？」 (Is this understanding correct?")
 
 3. **MECE Analysis**:
    - User Journey: Login → Session → Logout → Error handling
@@ -617,9 +635,9 @@ Present summary to user:
    ```markdown
    ## True Purpose Statement
 
-   - Surface Request: ユーザーログイン機能
-   - True Purpose: SOC2準拠のセキュアな顧客データ保護基盤
-   - Key Insight: 単なるログインではなく、コンプライアンス要件が重要
+   - Surface Request: ユーザーログイン機能 / User login feature
+   - True Purpose: SOC2準拠のセキュアな顧客データ保護基盤 / A secure, SOC2-compliant foundation for protecting customer data
+   - Key Insight: 単なるログインではなく、コンプライアンス要件が重要 / It's not just login; the compliance requirements are what matter
 
    ### REQ-AUTH-001: User Login
 

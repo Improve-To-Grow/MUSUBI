@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [MUSUBI-v5.8.0-Enterprise-Features.en.md](./MUSUBI-v5.8.0-Enterprise-Features.en.md)
+
 # 【MUSUBI v5.8.0】エンタープライズ対応！マルチテナント・AI最適化・統合プラットフォーム
 
 ## はじめに

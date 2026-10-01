@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [Ultimate-SDD-Tool-MUSUBI.en.md](./Ultimate-SDD-Tool-MUSUBI.en.md)
+
 # Ultimate SDD Tool "MUSUBI" - 7つのAIエージェント対応、25スキル搭載の究極仕様駆動開発ツール
 
 > **MUSUBI v2.1.1** - 仕様、設計、コードを結びつける包括的SDDフレームワーク

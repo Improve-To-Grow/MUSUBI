@@ -1,5 +1,7 @@
 title: MUSUBI v3.0.0完全ガイド: 27の専門AIエージェントとスキル
 
+> 🇬🇧 English version: [MUSUBI-v3.0.0-Agents-and-Skills.en.md](./MUSUBI-v3.0.0-Agents-and-Skills.en.md)
+
 # 第1章 はじめに
 
 MUSUBI (Specification Driven Development) v3.0.0は、Claude Codeを活用した仕様駆動開発フレームワークです。本記事では、MUSUBIに搭載された **27の専門AIエージェント（Skill）** について、それぞれの役割、使用可能なツール、専門領域を詳しく解説します。

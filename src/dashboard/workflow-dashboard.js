@@ -230,7 +230,7 @@ class WorkflowDashboard {
       actions.push({
         type: 'resolve-blocker',
         priority: 'high',
-        description: `${unresolvedBlockers.length}件のブロッカーを解決してください`,
+        description: `${unresolvedBlockers.length}件のブロッカーを解決してください`, // EN: Please resolve ${n} blocker(s)
         blockers: unresolvedBlockers,
       });
     }
@@ -241,7 +241,7 @@ class WorkflowDashboard {
         actions.push({
           type: 'create-artifact',
           priority: 'medium',
-          description: 'プロジェクトメモリファイルを作成してください',
+          description: 'プロジェクトメモリファイルを作成してください', // EN: Please create the project memory files
           artifacts: ['structure.md', 'tech.md', 'product.md'],
         });
         break;
@@ -249,7 +249,7 @@ class WorkflowDashboard {
         actions.push({
           type: 'create-artifact',
           priority: 'medium',
-          description: 'EARS形式の要件ドキュメントを作成してください',
+          description: 'EARS形式の要件ドキュメントを作成してください', // EN: Please create a requirements document in EARS format
           artifacts: ['requirements.md'],
         });
         break;
@@ -257,7 +257,7 @@ class WorkflowDashboard {
         actions.push({
           type: 'create-artifact',
           priority: 'medium',
-          description: 'C4設計ドキュメントとADRを作成してください',
+          description: 'C4設計ドキュメントとADRを作成してください', // EN: Please create the C4 design document and ADRs
           artifacts: ['design.md', 'adr-*.md'],
         });
         break;
@@ -265,14 +265,14 @@ class WorkflowDashboard {
         actions.push({
           type: 'run-review',
           priority: 'medium',
-          description: 'レビューゲートを実行して実装を検証してください',
+          description: 'レビューゲートを実行して実装を検証してください', // EN: Please run the review gate to verify the implementation
         });
         break;
       case 'validation':
         actions.push({
           type: 'complete-validation',
           priority: 'medium',
-          description: '全てのテストが通過していることを確認してください',
+          description: '全てのテストが通過していることを確認してください', // EN: Please confirm that all tests pass
         });
         break;
     }

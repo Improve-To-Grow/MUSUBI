@@ -1,6 +1,6 @@
 # Awesome List Submissions for MUSUBI
 
-> REQ-P0-002: Awesome List掲載計画書
+> REQ-P0-002: Awesome List掲載計画書 (Awesome List Submission Plan)
 > Target: 4 Awesome Lists PRs
 
 ## 1. awesome-claude-code (Primary Target)

@@ -17,18 +17,20 @@
 
 本ドキュメントは、MUSUBI v6.2 の改善要件（IMP-6.2-001〜008）に基づく技術設計を定義します。主要な改善領域は以下の通りです：
 
-1. **レビューワークフロー統合** (IMP-6.2-001) - Critical
-2. **進捗可視化** (IMP-6.2-002) - High  
-3. **スプリント管理** (IMP-6.2-003) - High
-4. **トレーサビリティ自動化** (IMP-6.2-004) - High
-5. **Constitutional Compliance強化** (IMP-6.2-005) - Medium
-6. **ドキュメント生成自動化** (IMP-6.2-006) - Medium
-7. **Steering自動同期** (IMP-6.2-007) - Medium
-8. **エラーハンドリング** (IMP-6.2-008) - Medium
+This document defines the technical design based on the MUSUBI v6.2 improvement requirements (IMP-6.2-001 to 008). The main areas of improvement are as follows:
+
+1. **レビューワークフロー統合 / Review workflow integration** (IMP-6.2-001) - Critical
+2. **進捗可視化 / Progress visualization** (IMP-6.2-002) - High  
+3. **スプリント管理 / Sprint management** (IMP-6.2-003) - High
+4. **トレーサビリティ自動化 / Traceability automation** (IMP-6.2-004) - High
+5. **Constitutional Compliance強化 / Constitutional Compliance enhancement** (IMP-6.2-005) - Medium
+6. **ドキュメント生成自動化 / Documentation generation automation** (IMP-6.2-006) - Medium
+7. **Steering自動同期 / Automatic Steering synchronization** (IMP-6.2-007) - Medium
+8. **エラーハンドリング / Error handling** (IMP-6.2-008) - Medium
 
 ### 1.1 Requirements Traceability Matrix
 
-| 要件ID | 設計セクション | コンポーネント | テスト |
+| 要件ID (Requirement ID) | 設計セクション (Design Section) | コンポーネント (Component) | テスト (Test) |
 |--------|---------------|---------------|--------|
 | IMP-6.2-001-01 | 3.1 | RequirementsReviewGate | TBD |
 | IMP-6.2-001-02 | 3.2 | DesignReviewGate | TBD |
@@ -197,6 +199,8 @@
 
 Review Gate Engineは独立したライブラリとして設計され、MUSUBIコアから分離して使用可能です。
 
+The Review Gate Engine is designed as an independent library and can be used separately from the MUSUBI core.
+
 ```
 lib/
 └── musubi-review-gate/              # Independent library package
@@ -329,15 +333,15 @@ export abstract class BaseReviewGate implements ReviewGate {
 
 ### 3.1 RequirementsReviewGate (IMP-6.2-001-01)
 
-**Purpose**: 要件ドキュメント作成後のレビューゲート
+**Purpose**: 要件ドキュメント作成後のレビューゲート / Review gate after the requirements document is created
 
 ```typescript
 // src/review/gates/requirements-review-gate.ts
 
 interface RequirementsReviewConfig {
-  earsPatterns: string[];           // 許可されるEARSパターン
-  minAcceptanceCriteria: number;    // 最低AC数
-  requireStakeholders: boolean;     // ステークホルダー必須
+  earsPatterns: string[];           // 許可されるEARSパターン / Allowed EARS patterns
+  minAcceptanceCriteria: number;    // 最低AC数 / Minimum number of ACs
+  requireStakeholders: boolean;     // ステークホルダー必須 / Stakeholders required
 }
 
 interface RequirementsReviewResult {
@@ -382,15 +386,15 @@ class EARSChecker {
 
 ### 3.2 DesignReviewGate (IMP-6.2-001-02)
 
-**Purpose**: 設計ドキュメント作成後のレビューゲート
+**Purpose**: 設計ドキュメント作成後のレビューゲート / Review gate after the design document is created
 
 ```typescript
 // src/review/gates/design-review-gate.ts
 
 interface DesignReviewConfig {
-  requireC4Levels: number[];        // 必須C4レベル [1,2,3]
-  requireADR: boolean;              // ADR必須
-  constitutionalArticles: number[]; // チェック対象Article
+  requireC4Levels: number[];        // 必須C4レベル [1,2,3] / Required C4 levels [1,2,3]
+  requireADR: boolean;              // ADR必須 / ADR required
+  constitutionalArticles: number[]; // チェック対象Article / Articles to check
 }
 
 interface DesignReviewResult {
@@ -436,15 +440,15 @@ class C4Checker {
 
 ### 3.3 ImplementationReviewGate (IMP-6.2-001-03)
 
-**Purpose**: Sprint完了時のレビューゲート
+**Purpose**: Sprint完了時のレビューゲート / Review gate at Sprint completion
 
 ```typescript
 // src/review/gates/implementation-review-gate.ts
 
 interface ImplementationReviewConfig {
-  minTestCoverage: number;          // デフォルト: 80
+  minTestCoverage: number;          // デフォルト: 80 / Default: 80
   coverageType: 'line' | 'branch' | 'function';
-  lintStrict: boolean;              // デフォルト: true
+  lintStrict: boolean;              // デフォルト: true / Default: true
   requireTraceability: boolean;
 }
 
@@ -476,7 +480,7 @@ class ImplementationReviewGate {
 
 ### 3.4 ReviewPromptRegistry (IMP-6.2-001-04)
 
-**Purpose**: レビュープロンプトの登録と管理
+**Purpose**: レビュープロンプトの登録と管理 / Registration and management of review prompts
 
 ```typescript
 // src/review/prompts/review-prompt-registry.ts
@@ -538,7 +542,7 @@ class ReviewPromptRegistry {
 
 ### 4.1 WorkflowDashboard (IMP-6.2-002-01)
 
-**Purpose**: ワークフローステージの可視化
+**Purpose**: ワークフローステージの可視化 / Visualization of workflow stages
 
 ```typescript
 // src/dashboard/workflow-dashboard.ts
@@ -622,7 +626,7 @@ nextActions:
 
 ### 4.2 TransitionRecorder (IMP-6.2-002-02)
 
-**Purpose**: ステージ遷移の記録
+**Purpose**: ステージ遷移の記録 / Recording of stage transitions
 
 ```typescript
 // src/dashboard/transition-recorder.ts
@@ -681,7 +685,7 @@ transitions:
 
 ### 5.1 SprintPlanner (IMP-6.2-003-01)
 
-**Purpose**: スプリント計画テンプレートの提供
+**Purpose**: スプリント計画テンプレートの提供 / Provides sprint planning templates
 
 ```typescript
 // src/sprint/sprint-planner.ts
@@ -700,7 +704,7 @@ interface SprintPlan {
 interface SprintGoal {
   id: string;
   description: string;
-  requirementIds: string[];  // トレース先要件
+  requirementIds: string[];  // トレース先要件 / Requirements traced to
   priority: 'must' | 'should' | 'could';
 }
 
@@ -712,7 +716,7 @@ interface SprintTask {
   estimatedHours: number;
   assignee?: string;
   status: 'todo' | 'in-progress' | 'review' | 'done';
-  dependencies: string[];    // 他タスクID
+  dependencies: string[];    // 他タスクID / Other task IDs
 }
 
 class SprintPlanner {
@@ -762,7 +766,7 @@ graph LR
 
 ### 5.2 SprintReporter (IMP-6.2-003-02)
 
-**Purpose**: スプリント完了レポートの自動生成
+**Purpose**: スプリント完了レポートの自動生成 / Automatic generation of sprint completion reports
 
 ```typescript
 // src/sprint/sprint-reporter.ts
@@ -814,7 +818,7 @@ class SprintReporter {
 
 ### 6.1 TraceabilityExtractor (IMP-6.2-004-01)
 
-**Purpose**: トレーサビリティリンクの自動抽出
+**Purpose**: トレーサビリティリンクの自動抽出 / Automatic extraction of traceability links
 
 ```typescript
 // src/traceability/extractor.ts
@@ -824,14 +828,14 @@ interface TraceabilityLink {
   sourceType: 'code' | 'test' | 'commit' | 'design';
   sourcePath: string;
   sourceLine?: number;
-  context: string;                // 周辺コンテキスト
+  context: string;                // 周辺コンテキスト / Surrounding context
   extractedAt: Date;
 }
 
 interface ExtractionConfig {
-  patterns: RegExp[];             // カスタムパターン
-  includeGlobs: string[];         // 対象ファイル
-  excludeGlobs: string[];         // 除外ファイル
+  patterns: RegExp[];             // カスタムパターン / Custom patterns
+  includeGlobs: string[];         // 対象ファイル / Target files
+  excludeGlobs: string[];         // 除外ファイル / Excluded files
   scanCommits: boolean;
 }
 
@@ -874,7 +878,7 @@ requirements:
 
 ### 6.2 GapDetector (IMP-6.2-004-02)
 
-**Purpose**: トレーサビリティギャップの検出
+**Purpose**: トレーサビリティギャップの検出 / Detection of traceability gaps
 
 ```typescript
 // src/traceability/gap-detector.ts
@@ -912,7 +916,7 @@ class GapDetector {
 
 ### 7.1 ConstitutionChecker (IMP-6.2-005-01)
 
-**Purpose**: Constitutional Articles遵守の自動検証
+**Purpose**: Constitutional Articles遵守の自動検証 / Automatic verification of compliance with the Constitutional Articles
 
 ```typescript
 // src/constitution/checker.ts
@@ -970,7 +974,7 @@ class ArticleIIIChecker {  // Test-First
 
 ### 7.2 PhaseMinusOneGate (IMP-6.2-005-02)
 
-**Purpose**: Article VII/VIII違反時の自動トリガー
+**Purpose**: Article VII/VIII違反時の自動トリガー / Automatic trigger on Article VII/VIII violations
 
 ```typescript
 // src/constitution/phase-minus-one-gate.ts
@@ -1027,7 +1031,7 @@ stateDiagram-v2
 
 ### 8.1 ExperimentReporter (IMP-6.2-006-01)
 
-**Purpose**: テスト結果からの実験レポート自動生成
+**Purpose**: テスト結果からの実験レポート自動生成 / Automatic generation of experiment reports from test results
 
 ```typescript
 // src/docs/experiment-reporter.ts
@@ -1065,7 +1069,7 @@ class ExperimentReporter {
 
 ### 8.2 ArticleGenerator (IMP-6.2-006-02)
 
-**Purpose**: 技術記事テンプレートの生成
+**Purpose**: 技術記事テンプレートの生成 / Generation of technical article templates
 
 ```typescript
 // src/docs/article-generator.ts
@@ -1109,13 +1113,13 @@ class ArticleGenerator {
 
 ### 9.1 SteeringSyncer (IMP-6.2-007-01)
 
-**Purpose**: バージョン更新時のSteering自動更新
+**Purpose**: バージョン更新時のSteering自動更新 / Automatic Steering update on version bumps
 
 ```typescript
 // src/steering/syncer.ts
 
 interface SyncConfig {
-  files: string[];              // 対象ファイル
+  files: string[];              // 対象ファイル / Target files
   autoCommit: boolean;
   commitMessage: string;
 }
@@ -1145,7 +1149,7 @@ class SteeringSyncer {
 
 ### 9.2 SteeringValidator (IMP-6.2-007-02)
 
-**Purpose**: Steeringファイル間の整合性チェック
+**Purpose**: Steeringファイル間の整合性チェック / Consistency check across Steering files
 
 ```typescript
 // src/steering/validator.ts
@@ -1181,7 +1185,7 @@ class SteeringValidator {
 
 ### 10.1 RecoveryGuide (IMP-6.2-008-01)
 
-**Purpose**: 失敗したステージのリカバリーガイダンス
+**Purpose**: 失敗したステージのリカバリーガイダンス / Recovery guidance for failed stages
 
 #### 10.1.1 Error Pattern Catalog
 
@@ -1313,7 +1317,7 @@ class RecoveryGuide {
 
 ### 10.2 RollbackManager (IMP-6.2-008-02)
 
-**Purpose**: ワークフローステージのロールバック
+**Purpose**: ワークフローステージのロールバック / Rollback of workflow stages
 
 ```typescript
 // src/recovery/rollback-manager.ts
@@ -1322,7 +1326,7 @@ type RollbackGranularity = 'file' | 'commit' | 'stage' | 'sprint';
 
 interface RollbackConfig {
   granularity: RollbackGranularity;
-  target: string;                    // ファイルパス / コミットSHA / ステージ名 / スプリントID
+  target: string;                    // ファイルパス / コミットSHA / ステージ名 / スプリントID (File path / commit SHA / stage name / sprint ID)
   dryRun: boolean;
   confirmPrompt: boolean;
 }
@@ -1389,7 +1393,7 @@ tests/
 
 ### 11.2 Test Requirements per Component
 
-| コンポーネント | Unit Tests | Integration Tests | Coverage Target |
+| コンポーネント (Component) | Unit Tests | Integration Tests | Coverage Target |
 |---------------|------------|-------------------|----------------|
 | RequirementsReviewGate | EARS, Stakeholder, AC checks | Full requirements review | 90% |
 | DesignReviewGate | C4, ADR, Constitution checks | Full design review | 90% |
@@ -1404,6 +1408,8 @@ tests/
 ### 11.3 Red-Green-Blue Implementation Order
 
 **Phase 1テスト（Week 1）**: 実装前に以下のテストを作成
+
+**Phase 1 tests (Week 1)**: Write the following tests before implementation
 
 ```typescript
 // tests/review/gates/requirements-review-gate.test.ts
@@ -1655,12 +1661,16 @@ class ReviewPanel {
 
 **Context**: 要件→設計→実装の各フェーズ間にレビューゲートを追加する必要がある。
 
+**Context**: Review gates need to be added between each phase: requirements → design → implementation.
+
 **Decision**: 各フェーズごとに独立したReviewGateクラスを実装し、ReviewPromptRegistryで統一的に管理する。
 
+**Decision**: Implement an independent ReviewGate class for each phase and manage them uniformly via the ReviewPromptRegistry.
+
 **Consequences**:
-- 各ゲートは独立してテスト可能
-- 新しいゲートタイプの追加が容易
-- AGENTS.mdへのプロンプト追加で拡張可能
+- 各ゲートは独立してテスト可能 / Each gate can be tested independently
+- 新しいゲートタイプの追加が容易 / Easy to add new gate types
+- AGENTS.mdへのプロンプト追加で拡張可能 / Extensible by adding prompts to AGENTS.md
 
 **Status**: Proposed
 
@@ -1670,16 +1680,20 @@ class ReviewPanel {
 
 **Context**: トレーサビリティリンクを永続化する形式を決定する必要がある。
 
+**Context**: The format for persisting traceability links needs to be decided.
+
 **Decision**: YAML形式でstorage/traceability/matrix.ymlに保存する。
 
+**Decision**: Store them in YAML format in storage/traceability/matrix.yml.
+
 **Rationale**:
-- 人間が読める
-- Gitでのdiffが見やすい
-- 既存のMUSUBI設定ファイルと一貫性がある
+- 人間が読める / Human-readable
+- Gitでのdiffが見やすい / Easy-to-read diffs in Git
+- 既存のMUSUBI設定ファイルと一貫性がある / Consistent with existing MUSUBI configuration files
 
 **Consequences**:
-- 大規模プロジェクトでは性能に影響する可能性
-- 必要に応じてSQLite等への移行パスを用意
+- 大規模プロジェクトでは性能に影響する可能性 / May affect performance in large-scale projects
+- 必要に応じてSQLite等への移行パスを用意 / Provide a migration path to SQLite or similar if needed
 
 **Status**: Proposed
 
@@ -1689,16 +1703,20 @@ class ReviewPanel {
 
 **Context**: Phase -1 Gate発動時にレビュアーへ通知する方法を決定する必要がある。
 
+**Context**: The method for notifying reviewers when the Phase -1 Gate is triggered needs to be decided.
+
 **Decision**: GitHub Issues/PR Commentを主要通知チャネルとし、オプションでSlack/Discord連携をサポート。
 
+**Decision**: Use GitHub Issues/PR comments as the primary notification channel, with optional Slack/Discord integration support.
+
 **Rationale**:
-- 開発ワークフローに統合
-- 通知の永続化
-- 非同期レビューをサポート
+- 開発ワークフローに統合 / Integrated into the development workflow
+- 通知の永続化 / Notifications are persisted
+- 非同期レビューをサポート / Supports asynchronous reviews
 
 **Consequences**:
-- GitHub/GitLab依存
-- オフライン環境では制限あり
+- GitHub/GitLab依存 / Depends on GitHub/GitLab
+- オフライン環境では制限あり / Limited in offline environments
 
 **Status**: Proposed
 
@@ -1710,19 +1728,19 @@ class ReviewPanel {
 
 ### 15.1 Performance Targets
 
-| 操作 | 目標時間 | 測定方法 |
+| 操作 (Operation) | 目標時間 (Target Time) | 測定方法 (Measurement Method) |
 |------|---------|---------|
-| RequirementsReviewGate | < 10秒 | Jest performance test |
-| DesignReviewGate | < 15秒 | Jest performance test |
-| ImplementationReviewGate | < 30秒 | CI/CD logs |
-| TraceabilityExtractor (1000 files) | < 60秒 | Benchmark |
-| Dashboard update | < 5秒 | UI response time |
+| RequirementsReviewGate | < 10秒 (10s) | Jest performance test |
+| DesignReviewGate | < 15秒 (15s) | Jest performance test |
+| ImplementationReviewGate | < 30秒 (30s) | CI/CD logs |
+| TraceabilityExtractor (1000 files) | < 60秒 (60s) | Benchmark |
+| Dashboard update | < 5秒 (5s) | UI response time |
 
 ### 15.2 Scalability
 
-- 最大要件数: 10,000件（YAMLストレージ）
-- 最大トレースリンク: 100,000件
-- 同時レビューセッション: 10並列
+- 最大要件数: 10,000件（YAMLストレージ） / Max requirements: 10,000 (YAML storage)
+- 最大トレースリンク: 100,000件 / Max trace links: 100,000
+- 同時レビューセッション: 10並列 / Concurrent review sessions: 10 in parallel
 
 ### 15.3 Compatibility
 

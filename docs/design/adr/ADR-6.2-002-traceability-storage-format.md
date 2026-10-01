@@ -11,12 +11,13 @@
 ## Context
 
 MUSUBIのトレーサビリティ機能（IMP-6.2-004）では、要件ID（REQ-XXX-NNN、IMP-X.X-XXX-NN）とコード、テスト、コミットの対応関係を自動抽出・保存する必要があります。
+The MUSUBI traceability feature (IMP-6.2-004) must automatically extract and store the mapping between requirement IDs (REQ-XXX-NNN, IMP-X.X-XXX-NN) and code, tests, and commits.
 
-保存形式の選択は以下の要件に影響します：
-- 読みやすさ（人間による確認）
-- Gitでのdiff表示
-- クエリ性能
-- スケーラビリティ
+保存形式の選択は以下の要件に影響します： / Choice of storage format affects the following requirements:
+- 読みやすさ（人間による確認） / Readability (human review)
+- Gitでのdiff表示 / Diff display in Git
+- クエリ性能 / Query performance
+- スケーラビリティ / Scalability
 
 ---
 
@@ -25,6 +26,7 @@ MUSUBIのトレーサビリティ機能（IMP-6.2-004）では、要件ID（REQ-
 ### Primary Storage: YAML Format
 
 トレーサビリティマトリクスをYAML形式で`storage/traceability/matrix.yml`に保存します。
+Store the traceability matrix in YAML format at `storage/traceability/matrix.yml`.
 
 ```yaml
 # storage/traceability/matrix.yml
@@ -75,6 +77,7 @@ summary:
 ### Index Files for Performance
 
 大規模プロジェクト向けに、クイックルックアップ用のインデックスファイルを生成：
+For large projects, generate an index file for quick lookups:
 
 ```yaml
 # storage/traceability/index.yml
@@ -111,15 +114,15 @@ byStatus:
 ```
 
 **Pros**:
-- プログラムでの解析が容易
-- 広くサポートされている
+- プログラムでの解析が容易 / Easy to parse programmatically
+- 広くサポートされている / Widely supported
 
 **Cons**:
-- コメントをサポートしない
-- 可読性が低い
-- Gitでのdiffが見にくい
+- コメントをサポートしない / No support for comments
+- 可読性が低い / Low readability
+- Gitでのdiffが見にくい / Diffs are hard to read in Git
 
-**Rejected**: 可読性とGit互換性を優先
+**Rejected**: 可読性とGit互換性を優先 / Readability and Git compatibility take priority
 
 ### Alternative 2: SQLite Database
 
@@ -133,16 +136,16 @@ CREATE TABLE traceability_links (
 ```
 
 **Pros**:
-- 高速クエリ
-- 大規模データに対応
-- 複雑なクエリが可能
+- 高速クエリ / Fast queries
+- 大規模データに対応 / Handles large data volumes
+- 複雑なクエリが可能 / Supports complex queries
 
 **Cons**:
-- バイナリファイルでGit diffが不可
-- 追加の依存関係
-- オーバーエンジニアリング
+- バイナリファイルでGit diffが不可 / Binary file, so no Git diff
+- 追加の依存関係 / Additional dependency
+- オーバーエンジニアリング / Over-engineering
 
-**Rejected**: Article VII（Simplicity）違反、Git互換性の欠如
+**Rejected**: Article VII（Simplicity）違反、Git互換性の欠如 / Violates Article VII (Simplicity); lacks Git compatibility
 
 ### Alternative 3: Markdown Tables
 
@@ -153,15 +156,15 @@ CREATE TABLE traceability_links (
 ```
 
 **Pros**:
-- 高い可読性
-- GitHub/GitLabでレンダリング可能
+- 高い可読性 / High readability
+- GitHub/GitLabでレンダリング可能 / Renders on GitHub/GitLab
 
 **Cons**:
-- プログラムでの解析が困難
-- 詳細情報を含められない
-- 自動更新が困難
+- プログラムでの解析が困難 / Hard to parse programmatically
+- 詳細情報を含められない / Cannot include detailed information
+- 自動更新が困難 / Hard to update automatically
 
-**Rejected**: 自動化との相性が悪い
+**Rejected**: 自動化との相性が悪い / Poor fit for automation
 
 ---
 
@@ -169,22 +172,22 @@ CREATE TABLE traceability_links (
 
 ### Positive
 
-1. **可読性**: 人間が直接ファイルを確認・編集可能
-2. **Git互換**: diffが明確に表示される
-3. **一貫性**: 既存のMUSUBI設定ファイル（project.yml等）と同形式
-4. **コメント**: YAML形式はコメントをサポート
+1. **可読性**: 人間が直接ファイルを確認・編集可能 / Readability: humans can review and edit the file directly
+2. **Git互換**: diffが明確に表示される / Git compatible: diffs display clearly
+3. **一貫性**: 既存のMUSUBI設定ファイル（project.yml等）と同形式 / Consistency: same format as existing MUSUBI config files (project.yml, etc.)
+4. **コメント**: YAML形式はコメントをサポート / Comments: the YAML format supports comments
 
 ### Negative
 
-1. **性能**: 10,000件以上の要件では読み込みが遅くなる可能性
-2. **複雑なクエリ**: SQLのような柔軟なクエリは困難
-3. **型安全性**: スキーマ検証が必要
+1. **性能**: 10,000件以上の要件では読み込みが遅くなる可能性 / Performance: loading may become slow with 10,000+ requirements
+2. **複雑なクエリ**: SQLのような柔軟なクエリは困難 / Complex queries: flexible SQL-like queries are difficult
+3. **型安全性**: スキーマ検証が必要 / Type safety: schema validation is required
 
 ### Mitigations
 
-- **性能**: インデックスファイルでクイックルックアップを提供
-- **将来の拡張**: 必要に応じてSQLiteへの移行パスを用意
-- **スキーマ検証**: JSON Schemaでバリデーション
+- **性能**: インデックスファイルでクイックルックアップを提供 / Performance: index files provide quick lookups
+- **将来の拡張**: 必要に応じてSQLiteへの移行パスを用意 / Future extension: a migration path to SQLite is prepared if needed
+- **スキーマ検証**: JSON Schemaでバリデーション / Schema validation: validated with JSON Schema
 
 ---
 
@@ -244,11 +247,12 @@ properties:
 ## Migration Path
 
 将来的にSQLiteが必要になった場合の移行計画：
+Migration plan in case SQLite becomes necessary in the future:
 
-1. YAML→SQLiteインポーター作成
-2. 両形式での並行運用期間
-3. SQLiteをプライマリに切り替え
-4. YAMLエクスポート機能を維持（可読性用）
+1. YAML→SQLiteインポーター作成 / Build a YAML→SQLite importer
+2. 両形式での並行運用期間 / Period of running both formats in parallel
+3. SQLiteをプライマリに切り替え / Switch SQLite to primary
+4. YAMLエクスポート機能を維持（可読性用） / Keep YAML export (for readability)
 
 ---
 

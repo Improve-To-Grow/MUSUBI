@@ -376,89 +376,108 @@ Run all Phase -1 Gates:
 8. CLI Interface Gate
 9. Test-First Gate
 
-### Phase 4: 段階的レポート生成
+### Phase 4: 段階的レポート生成 (Incremental Report Generation)
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: コンテキスト長オーバーフロー防止 (Prevent context-length overflow)**
 
-**出力方式の原則:**
+**出力方式の原則 (Output principles):**
 
-- ✅ 1セクションずつ順番に生成・保存
-- ✅ 各セクション生成後に進捗を報告
-- ✅ エラー発生時も部分的なレポートが残る
+- ✅ 1セクションずつ順番に生成・保存 / Generate and save one section at a time, in order
+- ✅ 各セクション生成後に進捗を報告 / Report progress after each section is generated
+- ✅ エラー発生時も部分的なレポートが残る / A partial report remains even if an error occurs
 
 ```
 🤖 確認ありがとうございます。憲法違反レポートを順番に生成します。
+🤖 (Thank you for confirming. I will generate the constitutional violation report section by section.)
 
-【生成予定のセクション】
+【生成予定のセクション】 (Sections to be generated)
 1. Executive Summary
 2. Failed Gates
 3. Passed Gates
 4. Recommendations
 5. Approval Status
 
-合計: 5セクション
+合計: 5セクション (Total: 5 sections)
 
-**重要: 段階的生成方式**
+**重要: 段階的生成方式** (Important: incremental generation)
 各セクションを1つずつ生成・保存し、進捗を報告します。
+(Each section is generated and saved one at a time, with progress reported.)
 これにより、途中経過が見え、エラーが発生しても部分的なレポートが残ります。
+(This makes intermediate progress visible, and a partial report remains even if an error occurs.)
 
 生成を開始してよろしいですか?
+(May I start generating?)
 👤 ユーザー: [回答待ち]
+👤 User: [awaiting response]
 ```
 
 ユーザーが承認後、**各セクションを順番に生成**:
+(After the user approves, **generate each section in order**:)
 
 **Step 1: Executive Summary**
 
 ```
 🤖 [1/5] Executive Summaryを生成しています...
+🤖 [1/5] Generating Executive Summary...
 
 📝 compliance/constitutional-compliance-report.md (Section 1)
 ✅ 保存が完了しました
+✅ Saved successfully
 
 [1/5] 完了。次のセクションに進みます。
+[1/5] Done. Moving on to the next section.
 ```
 
 **Step 2: Failed Gates**
 
 ```
 🤖 [2/5] Failed Gatesを生成しています...
+🤖 [2/5] Generating Failed Gates...
 
 📝 compliance/constitutional-compliance-report.md (Section 2)
 ✅ 保存が完了しました
+✅ Saved successfully
 
 [2/5] 完了。次のセクションに進みます。
+[2/5] Done. Moving on to the next section.
 ```
 
-**大きなコンプライアンスレポート(>300行)の場合:**
+**大きなコンプライアンスレポート(>300行)の場合 (For large compliance reports (>300 lines)):**
 
 ```
 🤖 コンプライアンスレポート全体が400行超えるため、セクションごとに保存します。
+🤖 (The full compliance report exceeds 400 lines, so it will be saved section by section.)
 ⚠️ 詳細な検証結果を2パートに分割して生成します。
+⚠️ (Detailed validation results will be generated in 2 parts.)
 
-📝 Part 1/2: compliance/constitutional-compliance-report.md (Summary & Failed Gates詳細)
+📝 Part 1/2: compliance/constitutional-compliance-report.md (Summary & Failed Gates詳細 / details)
 ✅ 保存が完了しました (250行)
+✅ Saved successfully (250 lines)
 
 📝 Part 2/2: compliance/constitutional-compliance-report.md (Passed Gates & Recommendations)
 ✅ 保存が完了しました (180行)
+✅ Saved successfully (180 lines)
 
 ✅ レポート生成完了: compliance/constitutional-compliance-report.md (430行)
+✅ Report generation complete: compliance/constitutional-compliance-report.md (430 lines)
 
 全セクション完了。
+All sections complete.
 ```
 
-**Final: レポート生成完了サマリー**
+**Final: レポート生成完了サマリー (Report Generation Completion Summary)**
 
 ```
 🤖 ✨ 憲法違反レポートの生成が完了しました！
+🤖 ✨ (The constitutional violation report has been generated!)
 
-## 📊 コンプライアンスサマリー
-- **合格ゲート**: 7/9 (77.8%)
-- **不合格ゲート**: 2/9 (22.2%)
-- **ステータス**: ❌ BLOCKED
+## 📊 コンプライアンスサマリー (Compliance Summary)
+- **合格ゲート (Passed gates)**: 7/9 (77.8%)
+- **不合格ゲート (Failed gates)**: 2/9 (22.2%)
+- **ステータス (Status)**: ❌ BLOCKED
 
-## 📂 生成されたレポート
-✅ compliance/constitutional-compliance-report.md (5セクション)
+## 📂 生成されたレポート (Generated Reports)
+✅ compliance/constitutional-compliance-report.md (5セクション / 5 sections)
 
 ```
 

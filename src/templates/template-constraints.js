@@ -1,6 +1,7 @@
 /**
  * Template Constraints Engine
  * LLM制約テンプレート構文と不確実性マーカー
+ * LLM constraint template syntax and uncertainty markers
  *
  * @module templates/template-constraints
  */

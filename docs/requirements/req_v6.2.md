@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [req_v6.2.en.md](./req_v6.2.en.md)
+
 # MUSUBI SDD 改善要求
 
 **Document Type**: 改善要求仕様書 (Improvement Requirements Specification)

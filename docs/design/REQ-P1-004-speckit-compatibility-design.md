@@ -1,19 +1,21 @@
-# REQ-P1-004: Spec Kit Compatibility - 詳細設計書
+# REQ-P1-004: Spec Kit Compatibility - 詳細設計書 (Detailed Design)
 
-## 概要
+## 概要 (Overview)
 
 本ドキュメントは、MUSUBI と GitHub Spec Kit 間の双方向変換機能の詳細設計を定義します。
 
-### 設計目標
+This document defines the detailed design of the bidirectional conversion feature between MUSUBI and GitHub Spec Kit.
 
-1. **完全な双方向変換**: MUSUBI ↔ Spec Kit の相互変換
-2. **情報損失最小化**: 変換時のデータ保持率 > 95%
-3. **ラウンドトリップ保証**: A → B → A' で A ≈ A'
-4. **拡張性**: 将来的に他フォーマット対応可能
+### 設計目標 (Design Goals)
 
-## アーキテクチャ
+1. **完全な双方向変換**: MUSUBI ↔ Spec Kit の相互変換 / Full bidirectional conversion: MUSUBI ↔ Spec Kit
+2. **情報損失最小化**: 変換時のデータ保持率 > 95% / Minimize information loss: data retention during conversion > 95%
+3. **ラウンドトリップ保証**: A → B → A' で A ≈ A' / Round-trip guarantee: A → B → A' yields A ≈ A'
+4. **拡張性**: 将来的に他フォーマット対応可能 / Extensibility: can support other formats in the future
 
-### コンポーネント構成
+## アーキテクチャ (Architecture)
+
+### コンポーネント構成 (Component Structure)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -38,7 +40,7 @@
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Intermediate Representation (IR) スキーマ
+### Intermediate Representation (IR) スキーマ (Schema)
 
 ```typescript
 // src/converters/ir/types.ts
@@ -332,46 +334,46 @@ interface MemoryIR {
 }
 ```
 
-## ファイル構造
+## ファイル構造 (File Structure)
 
 ```
 src/
 ├── converters/
-│   ├── index.js                    # エントリーポイント
-│   ├── cli.js                      # CLI インターフェース
+│   ├── index.js                    # エントリーポイント / Entry point
+│   ├── cli.js                      # CLI インターフェース / CLI interface
 │   │
 │   ├── ir/
-│   │   ├── types.js                # IR 型定義
-│   │   └── schema.js               # JSON Schema 定義
+│   │   ├── types.js                # IR 型定義 / IR type definitions
+│   │   └── schema.js               # JSON Schema 定義 / JSON Schema definitions
 │   │
 │   ├── parsers/
-│   │   ├── index.js                # パーサー共通インターフェース
+│   │   ├── index.js                # パーサー共通インターフェース / Common parser interface
 │   │   ├── musubi-parser.js        # MUSUBI → IR
 │   │   └── speckit-parser.js       # Spec Kit → IR
 │   │
 │   ├── writers/
-│   │   ├── index.js                # ライター共通インターフェース
+│   │   ├── index.js                # ライター共通インターフェース / Common writer interface
 │   │   ├── musubi-writer.js        # IR → MUSUBI
 │   │   └── speckit-writer.js       # IR → Spec Kit
 │   │
 │   ├── mappers/
-│   │   ├── constitution-mapper.js  # 憲法マッピング
-│   │   ├── requirements-mapper.js  # 要件マッピング (EARS ↔ User Stories)
-│   │   ├── tasks-mapper.js         # タスクマッピング
-│   │   └── structure-mapper.js     # ディレクトリ構造マッピング
+│   │   ├── constitution-mapper.js  # 憲法マッピング / Constitution mapping
+│   │   ├── requirements-mapper.js  # 要件マッピング (EARS ↔ User Stories) / Requirements mapping (EARS ↔ User Stories)
+│   │   ├── tasks-mapper.js         # タスクマッピング / Task mapping
+│   │   └── structure-mapper.js     # ディレクトリ構造マッピング / Directory structure mapping
 │   │
 │   ├── validators/
-│   │   ├── ir-validator.js         # IR 検証
-│   │   ├── musubi-validator.js     # MUSUBI 形式検証
-│   │   └── speckit-validator.js    # Spec Kit 形式検証
+│   │   ├── ir-validator.js         # IR 検証 / IR validation
+│   │   ├── musubi-validator.js     # MUSUBI 形式検証 / MUSUBI format validation
+│   │   └── speckit-validator.js    # Spec Kit 形式検証 / Spec Kit format validation
 │   │
 │   └── utils/
-│       ├── markdown-utils.js       # Markdown 処理
-│       ├── yaml-utils.js           # YAML 処理
-│       └── file-utils.js           # ファイル操作
+│       ├── markdown-utils.js       # Markdown 処理 / Markdown processing
+│       ├── yaml-utils.js           # YAML 処理 / YAML processing
+│       └── file-utils.js           # ファイル操作 / File operations
 │
 ├── bin/
-│   └── musubi-convert.js           # CLI エントリーポイント
+│   └── musubi-convert.js           # CLI エントリーポイント / CLI entry point
 │
 └── tests/
     └── converters/
@@ -385,28 +387,28 @@ src/
             └── musubi-sample/
 ```
 
-## 変換マッピング
+## 変換マッピング (Conversion Mapping)
 
-### 1. ディレクトリ構造マッピング
+### 1. ディレクトリ構造マッピング (1. Directory Structure Mapping)
 
-| Spec Kit パス | MUSUBI パス | 備考 |
+| Spec Kit パス (Spec Kit path) | MUSUBI パス (MUSUBI path) | 備考 (Notes) |
 |--------------|-------------|------|
-| `.specify/memory/constitution.md` | `steering/rules/constitution.md` | 内容マッピングあり |
-| `.specify/specs/###-feature/spec.md` | `storage/specs/feature/spec.md` | EARS 変換 |
-| `.specify/specs/###-feature/plan.md` | `storage/specs/feature/plan.md` | 構造変換 |
-| `.specify/specs/###-feature/tasks.md` | `storage/specs/feature/tasks.md` | フォーマット変換 |
-| `.specify/specs/###-feature/research.md` | `storage/specs/feature/research.md` | ほぼ直接コピー |
-| `.specify/specs/###-feature/data-model.md` | `storage/specs/feature/data-model.md` | ほぼ直接コピー |
-| `.specify/specs/###-feature/contracts/` | `storage/specs/feature/contracts/` | 直接コピー |
-| `.specify/templates/` | `steering/templates/` | テンプレート変換 |
-| (なし) | `steering/product.md` | MUSUBI 固有（生成） |
-| (なし) | `steering/structure.md` | MUSUBI 固有（生成） |
-| (なし) | `steering/tech.md` | plan.md から抽出 |
-| (なし) | `steering/project.yml` | メタデータから生成 |
+| `.specify/memory/constitution.md` | `steering/rules/constitution.md` | 内容マッピングあり / With content mapping |
+| `.specify/specs/###-feature/spec.md` | `storage/specs/feature/spec.md` | EARS 変換 / EARS conversion |
+| `.specify/specs/###-feature/plan.md` | `storage/specs/feature/plan.md` | 構造変換 / Structural conversion |
+| `.specify/specs/###-feature/tasks.md` | `storage/specs/feature/tasks.md` | フォーマット変換 / Format conversion |
+| `.specify/specs/###-feature/research.md` | `storage/specs/feature/research.md` | ほぼ直接コピー / Nearly direct copy |
+| `.specify/specs/###-feature/data-model.md` | `storage/specs/feature/data-model.md` | ほぼ直接コピー / Nearly direct copy |
+| `.specify/specs/###-feature/contracts/` | `storage/specs/feature/contracts/` | 直接コピー / Direct copy |
+| `.specify/templates/` | `steering/templates/` | テンプレート変換 / Template conversion |
+| (なし / none) | `steering/product.md` | MUSUBI 固有（生成） / MUSUBI-specific (generated) |
+| (なし / none) | `steering/structure.md` | MUSUBI 固有（生成） / MUSUBI-specific (generated) |
+| (なし / none) | `steering/tech.md` | plan.md から抽出 / Extracted from plan.md |
+| (なし / none) | `steering/project.yml` | メタデータから生成 / Generated from metadata |
 
-### 2. 憲法マッピング
+### 2. 憲法マッピング (2. Constitution Mapping)
 
-#### Spec Kit → MUSUBI 変換
+#### Spec Kit → MUSUBI 変換 (Spec Kit → MUSUBI Conversion)
 
 ```javascript
 // src/converters/mappers/constitution-mapper.js
@@ -457,9 +459,9 @@ function mapSpeckitToMusubiConstitution(speckitConstitution) {
 }
 ```
 
-### 3. 要件マッピング (User Stories ↔ EARS)
+### 3. 要件マッピング (User Stories ↔ EARS) (3. Requirements Mapping (User Stories ↔ EARS))
 
-#### User Story → EARS 変換
+#### User Story → EARS 変換 (User Story → EARS Conversion)
 
 ```javascript
 // src/converters/mappers/requirements-mapper.js
@@ -509,7 +511,7 @@ function determineEARSPattern(userStory) {
 }
 ```
 
-#### EARS → User Story 変換
+#### EARS → User Story 変換 (EARS → User Story Conversion)
 
 ```javascript
 function earsToUserStory(requirement) {
@@ -536,14 +538,14 @@ function earsToUserStory(requirement) {
 }
 ```
 
-### 4. タスクフォーマット変換
+### 4. タスクフォーマット変換 (4. Task Format Conversion)
 
-#### Spec Kit タスク形式
+#### Spec Kit タスク形式 (Spec Kit Task Format)
 ```markdown
 - [ ] T001 [P] [US1] Create user authentication module at src/auth/
 ```
 
-#### MUSUBI タスク形式
+#### MUSUBI タスク形式 (MUSUBI Task Format)
 ```markdown
 - [ ] T001: Create user authentication module
   - Path: src/auth/
@@ -577,9 +579,9 @@ function musubiTaskToSpeckit(task) {
 }
 ```
 
-## CLI インターフェース
+## CLI インターフェース (CLI Interface)
 
-### コマンド仕様
+### コマンド仕様 (Command Specification)
 
 ```bash
 # bin/musubi-convert.js
@@ -608,7 +610,7 @@ Examples:
   musubi-convert roundtrip ./speckit-project --verbose
 ```
 
-### CLI 実装
+### CLI 実装 (CLI Implementation)
 
 ```javascript
 // bin/musubi-convert.js
@@ -707,9 +709,9 @@ program
 program.parse();
 ```
 
-## 検証スキーマ
+## 検証スキーマ (Validation Schema)
 
-### Spec Kit 形式検証
+### Spec Kit 形式検証 (Spec Kit Format Validation)
 
 ```javascript
 // src/converters/validators/speckit-validator.js
@@ -762,48 +764,48 @@ async function validateSpeckitProject(projectPath) {
 }
 ```
 
-## 実装フェーズ
+## 実装フェーズ (Implementation Phases)
 
-### Phase 1: 基盤（2週間）
+### Phase 1: 基盤（2週間） (Phase 1: Foundation (2 weeks))
 
-| タスク | 成果物 | 優先度 |
+| タスク (Task) | 成果物 (Deliverable) | 優先度 (Priority) |
 |--------|--------|--------|
-| IR スキーマ定義 | `src/converters/ir/types.js` | P0 |
-| CLI 基盤実装 | `bin/musubi-convert.js` | P0 |
-| ファイルユーティリティ | `src/converters/utils/` | P0 |
-| 検証スキーマ | `src/converters/validators/` | P1 |
+| IR スキーマ定義 / IR schema definition | `src/converters/ir/types.js` | P0 |
+| CLI 基盤実装 / CLI foundation implementation | `bin/musubi-convert.js` | P0 |
+| ファイルユーティリティ / File utilities | `src/converters/utils/` | P0 |
+| 検証スキーマ / Validation schema | `src/converters/validators/` | P1 |
 
-### Phase 2: Spec Kit → MUSUBI（2週間）
+### Phase 2: Spec Kit → MUSUBI（2週間） (Phase 2: Spec Kit → MUSUBI (2 weeks))
 
-| タスク | 成果物 | 優先度 |
+| タスク (Task) | 成果物 (Deliverable) | 優先度 (Priority) |
 |--------|--------|--------|
-| Spec Kit パーサー | `src/converters/parsers/speckit-parser.js` | P0 |
-| 憲法マッパー | `src/converters/mappers/constitution-mapper.js` | P0 |
-| 要件マッパー | `src/converters/mappers/requirements-mapper.js` | P0 |
-| MUSUBI ライター | `src/converters/writers/musubi-writer.js` | P0 |
-| テスト | `tests/converters/speckit-*.test.js` | P1 |
+| Spec Kit パーサー / Spec Kit parser | `src/converters/parsers/speckit-parser.js` | P0 |
+| 憲法マッパー / Constitution mapper | `src/converters/mappers/constitution-mapper.js` | P0 |
+| 要件マッパー / Requirements mapper | `src/converters/mappers/requirements-mapper.js` | P0 |
+| MUSUBI ライター / MUSUBI writer | `src/converters/writers/musubi-writer.js` | P0 |
+| テスト / Tests | `tests/converters/speckit-*.test.js` | P1 |
 
-### Phase 3: MUSUBI → Spec Kit（1週間）
+### Phase 3: MUSUBI → Spec Kit（1週間） (Phase 3: MUSUBI → Spec Kit (1 week))
 
-| タスク | 成果物 | 優先度 |
+| タスク (Task) | 成果物 (Deliverable) | 優先度 (Priority) |
 |--------|--------|--------|
-| MUSUBI パーサー | `src/converters/parsers/musubi-parser.js` | P0 |
-| Spec Kit ライター | `src/converters/writers/speckit-writer.js` | P0 |
-| 逆マッピング実装 | マッパー拡張 | P0 |
-| テスト | `tests/converters/musubi-*.test.js` | P1 |
+| MUSUBI パーサー / MUSUBI parser | `src/converters/parsers/musubi-parser.js` | P0 |
+| Spec Kit ライター / Spec Kit writer | `src/converters/writers/speckit-writer.js` | P0 |
+| 逆マッピング実装 / Reverse mapping implementation | マッパー拡張 / Mapper extensions | P0 |
+| テスト / Tests | `tests/converters/musubi-*.test.js` | P1 |
 
-### Phase 4: 検証と最適化（1週間）
+### Phase 4: 検証と最適化（1週間） (Phase 4: Validation and Optimization (1 week))
 
-| タスク | 成果物 | 優先度 |
+| タスク (Task) | 成果物 (Deliverable) | 優先度 (Priority) |
 |--------|--------|--------|
-| ラウンドトリップテスト | `tests/converters/roundtrip.test.js` | P0 |
-| エッジケース対応 | バグ修正 | P1 |
-| ドキュメント | `docs/guides/speckit-migration.md` | P1 |
-| パフォーマンス最適化 | 最適化 | P2 |
+| ラウンドトリップテスト / Round-trip tests | `tests/converters/roundtrip.test.js` | P0 |
+| エッジケース対応 / Edge case handling | バグ修正 / Bug fixes | P1 |
+| ドキュメント / Documentation | `docs/guides/speckit-migration.md` | P1 |
+| パフォーマンス最適化 / Performance optimization | 最適化 / Optimization | P2 |
 
-## テスト戦略
+## テスト戦略 (Test Strategy)
 
-### ユニットテスト
+### ユニットテスト (Unit Tests)
 
 ```javascript
 // tests/converters/requirements-mapper.test.js
@@ -866,7 +868,7 @@ describe('RequirementsMapper', () => {
 });
 ```
 
-### 統合テスト
+### 統合テスト (Integration Tests)
 
 ```javascript
 // tests/converters/roundtrip.test.js
@@ -901,16 +903,16 @@ describe('Roundtrip Conversion', () => {
 });
 ```
 
-## 受入基準
+## 受入基準 (Acceptance Criteria)
 
-| 基準 | 検証方法 | ターゲット |
+| 基準 (Criterion) | 検証方法 (Verification method) | ターゲット (Target) |
 |------|----------|-----------|
-| `musubi-convert --to-speckit` が有効な Spec Kit 形式を出力 | Spec Kit validate | ✓ |
-| `musubi-convert --from-speckit` が Spec Kit プロジェクトをインポート | MUSUBI validate | ✓ |
-| ラウンドトリップ変換で全ての要件データを保持 | roundtrip テスト | > 95% |
-| 形式検証が Spec Kit スキーマをパス | スキーマ検証 | ✓ |
+| `musubi-convert --to-speckit` が有効な Spec Kit 形式を出力 / outputs valid Spec Kit format | Spec Kit validate | ✓ |
+| `musubi-convert --from-speckit` が Spec Kit プロジェクトをインポート / imports a Spec Kit project | MUSUBI validate | ✓ |
+| ラウンドトリップ変換で全ての要件データを保持 / Round-trip conversion preserves all requirements data | roundtrip テスト / roundtrip test | > 95% |
+| 形式検証が Spec Kit スキーマをパス / Format validation passes the Spec Kit schema | スキーマ検証 / Schema validation | ✓ |
 
-## 関連ドキュメント
+## 関連ドキュメント (Related Documents)
 
 - [ADR-P1-004: Spec Kit Compatibility](./adr/ADR-P1-004-speckit-compatibility.md)
 - [SRS v3.0.0 REQ-P1-004](../requirements/srs/srs-musubi-v3.0.0.md#req-p1-004-spec-kit-compatibility)

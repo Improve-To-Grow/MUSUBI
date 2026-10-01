@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [INTERACTIVE-TUTORIALS.en.md](./INTERACTIVE-TUTORIALS.en.md)
+
 # MUSUBI Interactive Tutorials
 
 ガイド付きオンボーディングで MUSUBI SDD をマスターしましょう。

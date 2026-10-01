@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [SDD-RESEARCH-2024.en.md](./SDD-RESEARCH-2024.en.md)
+
 # Specification Driven Development (SDD) 調査レポート
 
 **調査日:** 2024年12月9日  

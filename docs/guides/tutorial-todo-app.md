@@ -1,3 +1,5 @@
+> 🇬🇧 English version: [tutorial-todo-app.en.md](./tutorial-todo-app.en.md)
+
 # 📱 実践チュートリアル: ToDoアプリ開発
 
 **MUSUBI v3.5.1** | 最終更新: 2025-12-08

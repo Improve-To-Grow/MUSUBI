@@ -24,12 +24,15 @@ All agents must meet these criteria:
 ```markdown
 **📋 Steering Context (Project Memory):**
 このプロジェクトにsteeringファイルが存在する場合は、**必ず最初に参照**してください：
-- `steering/structure.md` - アーキテクチャパターン、ディレクトリ構造、命名規則
-- `steering/tech.md` - 技術スタック、フレームワーク、開発ツール
-- `steering/product.md` - ビジネスコンテキスト、製品目的、ユーザー
+(If steering files exist in this project, **always reference them first**:)
+- `steering/structure.md` - アーキテクチャパターン、ディレクトリ構造、命名規則 / Architecture patterns, directory structure, naming conventions
+- `steering/tech.md` - 技術スタック、フレームワーク、開発ツール / Tech stack, frameworks, development tools
+- `steering/product.md` - ビジネスコンテキスト、製品目的、ユーザー / Business context, product purpose, users
 
 これらのファイルはプロジェクト全体の「記憶」であり、一貫性のある開発に不可欠です。
+(These files are the "memory" of the entire project and are essential for consistent development.)
 ファイルが存在しない場合はスキップして通常通り進めてください。
+(If the files do not exist, skip them and proceed as usual.)
 ```
 
 ---
@@ -48,7 +51,7 @@ All agents must meet these criteria:
 ```markdown
 ## Documentation Language Policy
 
-**CRITICAL: 英語版と日本語版の両方を必ず作成**
+**CRITICAL: 英語版と日本語版の両方を必ず作成 / Always create both English and Japanese versions**
 
 ### Document Creation
 1. **Primary Language**: Create all documentation in **English** first
@@ -74,16 +77,16 @@ All agents must meet these criteria:
 ```markdown
 ### Document Reference
 
-**CRITICAL: 他のエージェントの成果物を参照する際の必須ルール**
+**CRITICAL: 他のエージェントの成果物を参照する際の必須ルール / Mandatory rules when referencing other agents' deliverables**
 
 1. **Always reference English documentation** when reading or analyzing existing documents
-2. **他のエージェントが作成した成果物を読み込む場合は、必ず英語版（`.md`）を参照する**
+2. **他のエージェントが作成した成果物を読み込む場合は、必ず英語版（`.md`）を参照する / When reading deliverables created by other agents, always reference the English version (`.md`)**
 3. When citing documentation in your deliverables, reference the English version
 
-**参照例:**
+**参照例 (Reference examples):**
 ```
-✅ 正しい: requirements/srs/srs-project-v1.0.md
-❌ 間違い: requirements/srs/srs-project-v1.0.ja.md
+✅ 正しい (Correct): requirements/srs/srs-project-v1.0.md
+❌ 間違い (Incorrect): requirements/srs/srs-project-v1.0.ja.md
 ```
 ```
 
@@ -107,7 +110,7 @@ All agents must meet these criteria:
 **Check**:
 - [ ] Has structured dialogue phases
 - [ ] Each question is asked one at a time
-- [ ] Includes `👤 ユーザー: [回答待ち]` after each question
+- [ ] Includes `👤 ユーザー: [回答待ち]` (User: [awaiting answer]) after each question
 - [ ] Prohibits asking multiple questions at once
 
 ---
