@@ -908,50 +908,50 @@
 const ACTION_PATTERNS = <span class="cstat-no" title="statement not covered" >{</span>
   navigate: {
     patterns: [
-      /(?:に)?移動|開く|アクセス/,
+      /(?:to)?navigate|open|access/,
       /(?:go to|navigate|open|visit)/i,
     ],
     urlPattern: /(https?:\/\/[^\s]+)/,
   },
   click: {
     patterns: [
-      /クリック|押す|タップ|選択/,
+      /click|press|tap|select/,
       /click|press|tap|select/i,
     ],
   },
   fill: {
     patterns: [
-      /(?:に|を)?入力|記入|タイプ/,
+      /(?:to|into)?enter|fill|type/,
       /fill|type|enter|input/i,
     ],
-    valuePattern: /[「「]([^」」]+)[」」]|"([^"]+)"|'([^']+)'/,
+    valuePattern: /["]([^"]+)["]|"([^"]+)"|'([^']+)'/,
   },
   select: {
     patterns: [
-      /ドロップダウン.*選択|選択.*オプション/,
+      /dropdown.*select|select.*option/,
       /select.*dropdown|choose.*option/i,
     ],
   },
   wait: {
     patterns: [
-      /秒?待つ|待機/,
+      /wait(?: for)?|standby/,
       /wait|pause|delay/i,
     ],
-    durationPattern: /(\d+)\s*秒|(\d+)\s*(?:seconds?|ms|milliseconds?)/i,
+    durationPattern: /(\d+)\s*(?:sec|s)|(\d+)\s*(?:seconds?|ms|milliseconds?)/i,
   },
   screenshot: {
     patterns: [
-      /スクリーンショット|画面.*(?:保存|撮|キャプチャ)/,
+      /screenshot|screen.*(?:save|capture|shot)/,
       /screenshot|capture|save.*screen/i,
     ],
-    namePattern: /[「「]([^」」]+)[」」]|"([^"]+)"|として\s*(\S+)/,
+    namePattern: /["]([^"]+)["]|"([^"]+)"|as\s*(\S+)/,
   },
   assert: {
     patterns: [
-      /(?:が)?表示|確認|検証|存在/,
+      /(?:is)?displayed|verify|check|exists/,
       /(?:is )?visible|assert|verify|check|exists?/i,
     ],
-    textPattern: /[「「]([^」」]+)[」」]|"([^"]+)"/,
+    textPattern: /["]([^"]+)["]|"([^"]+)"/,
   },
 };
 &nbsp;
@@ -960,11 +960,11 @@ const ACTION_PATTERNS = <span class="cstat-no" title="statement not covered" >{<
  */
 const ELEMENT_PATTERNS = <span class="cstat-no" title="statement not covered" >{</span>
   // Japanese element names
-  'ログインボタン': 'button:has-text("ログイン"), [data-testid="login-button"], button[type="submit"]',
-  '送信ボタン': 'button:has-text("送信"), [data-testid="submit-button"], button[type="submit"]',
-  'メール': 'input[type="email"], input[name="email"], [data-testid="email-input"]',
-  'パスワード': 'input[type="password"], [data-testid="password-input"]',
-  '検索': 'input[type="search"], [data-testid="search-input"], input[name="q"]',
+  'login button': 'button:has-text("Login"), [data-testid="login-button"], button[type="submit"]',
+  'submit button': 'button:has-text("Submit"), [data-testid="submit-button"], button[type="submit"]',
+  'email': 'input[type="email"], input[name="email"], [data-testid="email-input"]',
+  'password': 'input[type="password"], [data-testid="password-input"]',
+  'search': 'input[type="search"], [data-testid="search-input"], input[name="q"]',
   // English element names
   'login button': 'button:has-text("Login"), [data-testid="login-button"], button[type="submit"]',
   'submit button': 'button:has-text("Submit"), [data-testid="submit-button"], button[type="submit"]',
@@ -1022,8 +1022,8 @@ class NLParser {
 <span class="cstat-no" title="statement not covered" >    return command</span>
       .trim()
       .replace(/\s+/g, ' ')
-      .replace(/、/g, ',')
-      .replace(/。/g, '.');
+      .replace(/,/g, ',')
+      .replace(/\./g, '.');
   }
 &nbsp;
   /**
@@ -1052,7 +1052,7 @@ class NLParser {
    */
 <span class="fstat-no" title="function not covered" >  sp</span>litCommand(command) {
     // Split by conjunctions and separators
-    const separators = <span class="cstat-no" title="statement not covered" >/[,、]|\s+(?:そして|して|and|then)\s+/i;</span>
+    const separators = <span class="cstat-no" title="statement not covered" >/[,]|\s+(?:and|then)\s+/i;</span>
 <span class="cstat-no" title="statement not covered" >    return command.split(separators).map(<span class="fstat-no" title="function not covered" >s </span>=&gt; <span class="cstat-no" title="statement not covered" >s.trim())</span>.filter(Boolean);</span>
   }
 &nbsp;
@@ -1205,7 +1205,7 @@ class NLParser {
 <span class="fstat-no" title="function not covered" >  pa</span>rseScreenshot(text) {
     const nameMatch = <span class="cstat-no" title="statement not covered" >text.match(this.actionPatterns.screenshot.namePattern);</span>
     const name = <span class="cstat-no" title="statement not covered" >nameMatch ? (nameMatch[1] || nameMatch[2] || nameMatch[3]) : undefined;</span>
-    const fullPage = <span class="cstat-no" title="statement not covered" >/全体|full\s*page/i.test(text);</span>
+    const fullPage = <span class="cstat-no" title="statement not covered" >/entire|full\s*page/i.test(text);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return {</span>
       type: 'screenshot',
@@ -1259,7 +1259,7 @@ class NLParser {
     }
 &nbsp;
     // Try to extract element description
-    const elementMatch = <span class="cstat-no" title="statement not covered" >text.match(/(?:の)?(?:ボタン|リンク|入力欄?|フィールド|テキスト|button|link|input|field|text)\s*[「「]?([^」」\s]*)[」」]?/i);</span>
+    const elementMatch = <span class="cstat-no" title="statement not covered" >text.match(/(?:the)?(?:button|link|input|field|text)\s*["]?([^"\s]*)["]?/i);</span>
 <span class="cstat-no" title="statement not covered" >    if (elementMatch &amp;&amp; elementMatch[1]) {</span>
 <span class="cstat-no" title="statement not covered" >      return `text="${elementMatch[1]}"`;</span>
     }

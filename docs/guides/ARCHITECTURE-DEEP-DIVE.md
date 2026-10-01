@@ -1,24 +1,24 @@
 # MUSUBI Architecture Deep Dive
 
-MUSUBI SDD の内部アーキテクチャと設計思想の詳細ガイド。
+A detailed guide to the internal architecture and design philosophy of MUSUBI SDD.
 
 ---
 
-## 📖 目次
+## 📖 Table of Contents
 
-1. [システム概要](#システム概要)
-2. [コアアーキテクチャ](#コアアーキテクチャ)
-3. [モジュール構成](#モジュール構成)
-4. [データフロー](#データフロー)
-5. [オーケストレーションエンジン](#オーケストレーションエンジン)
-6. [拡張ポイント](#拡張ポイント)
-7. [設計決定記録（ADR）](#設計決定記録adr)
+1. [System Overview](#system-overview)
+2. [Core Architecture](#core-architecture)
+3. [Module Structure](#module-structure)
+4. [Data Flow](#data-flow)
+5. [Orchestration Engine](#orchestration-engine)
+6. [Extension Points](#extension-points)
+7. [Architecture Decision Records (ADR)](#architecture-decision-records-adr)
 
 ---
 
-## システム概要
+## System Overview
 
-### ハイレベルアーキテクチャ
+### High-Level Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -78,21 +78,21 @@ MUSUBI SDD の内部アーキテクチャと設計思想の詳細ガイド。
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 設計原則
+### Design Principles
 
-| 原則 | 説明 | 実装例 |
+| Principle | Description | Implementation Example |
 |------|------|--------|
-| **Separation of Concerns** | 各レイヤーは独立した責務 | Generators / Validators / Analyzers |
-| **Dependency Inversion** | 上位レイヤーは抽象に依存 | LLM Provider Interface |
-| **Open-Closed** | 拡張に開き、修正に閉じる | Plugin Architecture |
-| **Single Responsibility** | 1クラス1責務 | 各 Skill が単一機能 |
-| **Interface Segregation** | 必要なインターフェースのみ公開 | Public API vs Internal |
+| **Separation of Concerns** | Each layer has an independent responsibility | Generators / Validators / Analyzers |
+| **Dependency Inversion** | Upper layers depend on abstractions | LLM Provider Interface |
+| **Open-Closed** | Open for extension, closed for modification | Plugin Architecture |
+| **Single Responsibility** | One responsibility per class | Each Skill has a single function |
+| **Interface Segregation** | Expose only the necessary interfaces | Public API vs Internal |
 
 ---
 
-## コアアーキテクチャ
+## Core Architecture
 
-### C4 コンテキスト図
+### C4 Context Diagram
 
 ```mermaid
 C4Context
@@ -116,7 +116,7 @@ C4Context
     Rel(musubi, mcp, "Discovers and invokes tools")
 ```
 
-### C4 コンテナ図
+### C4 Container Diagram
 
 ```mermaid
 C4Container
@@ -158,7 +158,7 @@ C4Container
     Rel(generators, storage, "Reads/Writes")
 ```
 
-### C4 コンポーネント図（オーケストレーション）
+### C4 Component Diagram (Orchestration)
 
 ```mermaid
 C4Component
@@ -191,240 +191,240 @@ C4Component
 
 ---
 
-## モジュール構成
+## Module Structure
 
-### ディレクトリ構造
+### Directory Structure
 
 ```
 src/
-├── index.js                    # Public API エントリポイント
-├── phase4-integration.js       # Phase 4 統合
-├── phase5-integration.js       # Phase 5 統合
+├── index.js                    # Public API entry point
+├── phase4-integration.js       # Phase 4 integration
+├── phase5-integration.js       # Phase 5 integration
 │
-├── agents/                     # エージェントシステム
-│   ├── index.js               # エージェントモジュールエクスポート
-│   ├── agent-loop.js          # エージェント実行ループ
-│   ├── function-tool.js       # ツール呼び出し抽象化
-│   ├── registry.js            # エージェントレジストリ
-│   ├── schema-generator.js    # JSONスキーマ生成
-│   ├── agentic/               # Agentic パターン実装
-│   │   ├── code-generator.js  # コード生成エージェント
-│   │   └── code-reviewer.js   # コードレビューエージェント
-│   └── browser/               # ブラウザエージェント
-│       ├── action-executor.js # ブラウザアクション実行
-│       ├── ai-comparator.js   # AI ベース比較
-│       ├── context-manager.js # コンテキスト管理
+├── agents/                     # Agent system
+│   ├── index.js               # Agent module exports
+│   ├── agent-loop.js          # Agent execution loop
+│   ├── function-tool.js       # Tool call abstraction
+│   ├── registry.js            # Agent registry
+│   ├── schema-generator.js    # JSON schema generation
+│   ├── agentic/               # Agentic pattern implementation
+│   │   ├── code-generator.js  # Code generation agent
+│   │   └── code-reviewer.js   # Code review agent
+│   └── browser/               # Browser agent
+│       ├── action-executor.js # Browser action execution
+│       ├── ai-comparator.js   # AI-based comparison
+│       ├── context-manager.js # Context management
 │       └── ...
 │
-├── ai/                         # AI 機能
-│   ├── index.js               # AI モジュールエクスポート
-│   └── advanced-ai.js         # 高度なAI機能
-│       ├── ModelRegistry      # モデルレジストリ
-│       ├── ModelRouter        # タスクベースルーティング
-│       ├── ContextWindowManager # コンテキストウィンドウ管理
-│       ├── SemanticChunker    # セマンティックチャンキング
-│       ├── CodeVectorStore    # コードベクトルストア
-│       └── RAGPipeline        # RAG パイプライン
+├── ai/                         # AI features
+│   ├── index.js               # AI module exports
+│   └── advanced-ai.js         # Advanced AI features
+│       ├── ModelRegistry      # Model registry
+│       ├── ModelRouter        # Task-based routing
+│       ├── ContextWindowManager # Context window management
+│       ├── SemanticChunker    # Semantic chunking
+│       ├── CodeVectorStore    # Code vector store
+│       └── RAGPipeline        # RAG pipeline
 │
-├── analyzers/                  # 分析エンジン
-│   ├── ast-extractor.js       # AST 抽出
-│   ├── codegraph-auto-update.js # コードグラフ自動更新
-│   ├── complexity-analyzer.js # 複雑度分析
-│   ├── context-optimizer.js   # コンテキスト最適化
-│   ├── gap-detector.js        # ギャップ検出
-│   ├── impact-analyzer.js     # 影響分析
-│   ├── large-project-analyzer.js # 大規模プロジェクト分析
-│   ├── repository-map.js      # リポジトリマッピング
-│   ├── security-analyzer.js   # セキュリティ分析
-│   ├── stuck-detector.js      # スタック検出
-│   └── traceability.js        # トレーサビリティ分析
+├── analyzers/                  # Analysis engines
+│   ├── ast-extractor.js       # AST extraction
+│   ├── codegraph-auto-update.js # Automatic code graph update
+│   ├── complexity-analyzer.js # Complexity analysis
+│   ├── context-optimizer.js   # Context optimization
+│   ├── gap-detector.js        # Gap detection
+│   ├── impact-analyzer.js     # Impact analysis
+│   ├── large-project-analyzer.js # Large project analysis
+│   ├── repository-map.js      # Repository mapping
+│   ├── security-analyzer.js   # Security analysis
+│   ├── stuck-detector.js      # Stuck detection
+│   └── traceability.js        # Traceability analysis
 │
-├── converters/                 # 仕様変換
-│   ├── index.js               # 変換エクスポート
-│   ├── ir/                    # 中間表現
-│   │   └── types.js           # IR 型定義
-│   ├── parsers/               # パーサー
-│   │   ├── musubi-parser.js   # MUSUBI フォーマット
+├── converters/                 # Spec conversion
+│   ├── index.js               # Converter exports
+│   ├── ir/                    # Intermediate representation
+│   │   └── types.js           # IR type definitions
+│   ├── parsers/               # Parsers
+│   │   ├── musubi-parser.js   # MUSUBI format
 │   │   ├── openapi-parser.js  # OpenAPI
 │   │   └── speckit-parser.js  # SpecKit
-│   └── writers/               # ライター
-│       ├── musubi-writer.js   # MUSUBI 出力
-│       └── speckit-writer.js  # SpecKit 出力
+│   └── writers/               # Writers
+│       ├── musubi-writer.js   # MUSUBI output
+│       └── speckit-writer.js  # SpecKit output
 │
-├── enterprise/                 # エンタープライズ機能
-│   ├── index.js               # エンタープライズエクスポート
-│   └── multi-tenant.js        # マルチテナント
-│       ├── TenantContext      # テナントコンテキスト
-│       ├── TenantIsolation    # データ分離
-│       ├── RBACManager        # ロールベースアクセス
-│       ├── UsageQuota         # 使用量クォータ
-│       └── AuditLogger        # 監査ログ
+├── enterprise/                 # Enterprise features
+│   ├── index.js               # Enterprise exports
+│   └── multi-tenant.js        # Multi-tenant
+│       ├── TenantContext      # Tenant context
+│       ├── TenantIsolation    # Data isolation
+│       ├── RBACManager        # Role-based access
+│       ├── UsageQuota         # Usage quotas
+│       └── AuditLogger        # Audit logging
 │
-├── generators/                 # ドキュメント生成
-│   ├── design.js              # 設計生成
-│   ├── requirements.js        # 要件生成
-│   ├── rust-migration-generator.js # Rust 移行
-│   └── tasks.js               # タスク生成
+├── generators/                 # Document generation
+│   ├── design.js              # Design generation
+│   ├── requirements.js        # Requirements generation
+│   ├── rust-migration-generator.js # Rust migration
+│   └── tasks.js               # Task generation
 │
 ├── gui/                        # Web GUI
-│   ├── server.js              # Express サーバー
-│   ├── public/                # 静的ファイル
-│   │   └── index.html         # SPA エントリ
-│   └── services/              # GUI サービス
-│       ├── file-watcher.js    # ファイル監視
-│       ├── project-scanner.js # プロジェクトスキャン
-│       ├── replanning-service.js # リプランニング
-│       ├── traceability-service.js # トレーサビリティ
-│       └── workflow-service.js # ワークフロー
+│   ├── server.js              # Express server
+│   ├── public/                # Static files
+│   │   └── index.html         # SPA entry
+│   └── services/              # GUI services
+│       ├── file-watcher.js    # File watching
+│       ├── project-scanner.js # Project scanning
+│       ├── replanning-service.js # Replanning
+│       ├── traceability-service.js # Traceability
+│       └── workflow-service.js # Workflow
 │
-├── integrations/               # 外部統合
-│   ├── index.js               # 統合エクスポート
-│   ├── cicd.js                # CI/CD 統合
+├── integrations/               # External integrations
+│   ├── index.js               # Integration exports
+│   ├── cicd.js                # CI/CD integration
 │   ├── codegraph-mcp.js       # CodeGraph MCP
-│   ├── documentation.js       # ドキュメント統合
-│   ├── enterprise-integrations.js # エンタープライズ統合
+│   ├── documentation.js       # Documentation integration
+│   ├── enterprise-integrations.js # Enterprise integrations
 │   │   ├── JiraIntegration    # JIRA
 │   │   ├── AzureDevOpsIntegration # Azure DevOps
 │   │   ├── GitLabIntegration  # GitLab
 │   │   ├── SlackIntegration   # Slack
 │   │   ├── TeamsIntegration   # Teams
 │   │   └── SSOIntegration     # SSO
-│   ├── examples.js            # サンプル統合
-│   ├── github-client.js       # GitHub クライアント
-│   ├── mcp-connector.js       # MCP 接続
-│   ├── mcp/                   # MCP サブモジュール
+│   ├── examples.js            # Sample integrations
+│   ├── github-client.js       # GitHub client
+│   ├── mcp-connector.js       # MCP connection
+│   ├── mcp/                   # MCP submodules
 │   │   ├── mcp-context-provider.js
 │   │   ├── mcp-discovery.js
 │   │   └── mcp-tool-registry.js
-│   ├── platforms.js           # プラットフォーム統合
-│   └── tool-discovery.js      # ツール検出
+│   ├── platforms.js           # Platform integrations
+│   └── tool-discovery.js      # Tool discovery
 │
-├── llm-providers/              # LLM プロバイダー
-│   ├── index.js               # プロバイダーエクスポート
-│   ├── base-provider.js       # ベースクラス
+├── llm-providers/              # LLM providers
+│   ├── index.js               # Provider exports
+│   ├── base-provider.js       # Base class
 │   ├── anthropic-provider.js  # Anthropic
 │   ├── copilot-provider.js    # GitHub Copilot
 │   ├── ollama-provider.js     # Ollama
 │   └── openai-provider.js     # OpenAI
 │
-├── managers/                   # マネージャー
-│   ├── index.js               # マネージャーエクスポート
-│   ├── agent-memory.js        # エージェントメモリ
-│   ├── change.js              # 変更管理
-│   ├── checkpoint-manager.js  # チェックポイント
-│   ├── delta-spec.js          # デルタ仕様
-│   ├── memory-condenser.js    # メモリ凝縮
-│   ├── repo-skill-manager.js  # リポジトリスキル
-│   ├── skill-loader.js        # スキルローダー
-│   ├── skill-tools.js         # スキルツール
-│   └── workflow.js            # ワークフロー管理
+├── managers/                   # Managers
+│   ├── index.js               # Manager exports
+│   ├── agent-memory.js        # Agent memory
+│   ├── change.js              # Change management
+│   ├── checkpoint-manager.js  # Checkpoints
+│   ├── delta-spec.js          # Delta specs
+│   ├── memory-condenser.js    # Memory condensation
+│   ├── repo-skill-manager.js  # Repository skills
+│   ├── skill-loader.js        # Skill loader
+│   ├── skill-tools.js         # Skill tools
+│   └── workflow.js            # Workflow management
 │
-├── monitoring/                 # 監視・モニタリング
-│   ├── index.js               # モニタリングエクスポート
-│   ├── cost-tracker.js        # コスト追跡
-│   ├── incident-manager.js    # インシデント管理
-│   ├── observability.js       # 可観測性
-│   ├── quality-dashboard.js   # 品質ダッシュボード
-│   └── release-manager.js     # リリース管理
+├── monitoring/                 # Monitoring
+│   ├── index.js               # Monitoring exports
+│   ├── cost-tracker.js        # Cost tracking
+│   ├── incident-manager.js    # Incident management
+│   ├── observability.js       # Observability
+│   ├── quality-dashboard.js   # Quality dashboard
+│   └── release-manager.js     # Release management
 │
-├── orchestration/              # オーケストレーション
-│   ├── index.js               # オーケストレーションエクスポート
-│   ├── orchestration-engine.js # メインエンジン
-│   ├── workflow-executor.js   # ワークフロー実行
-│   ├── workflow-orchestrator.js # オーケストレーター
-│   ├── skill-executor.js      # スキル実行
-│   ├── skill-registry.js      # スキルレジストリ
-│   ├── pattern-registry.js    # パターンレジストリ
-│   ├── mcp-tool-adapters.js   # MCP ツールアダプター
-│   ├── agent-skill-binding.js # エージェント-スキルバインディング
-│   ├── error-handler.js       # エラーハンドリング
-│   ├── workflow-examples.js   # ワークフロー例
-│   ├── guardrails/            # ガードレール
-│   │   ├── base-guardrail.js  # ベースガードレール
-│   │   ├── guardrail-rules.js # ルール定義
-│   │   ├── input-guardrail.js # 入力ガードレール
-│   │   ├── output-guardrail.js # 出力ガードレール
-│   │   └── safety-check.js    # 安全チェック
-│   ├── patterns/              # オーケストレーションパターン
-│   │   ├── auto.js            # 自動選択
-│   │   ├── group-chat.js      # グループチャット
-│   │   ├── handoff.js         # ハンドオフ
+├── orchestration/              # Orchestration
+│   ├── index.js               # Orchestration exports
+│   ├── orchestration-engine.js # Main engine
+│   ├── workflow-executor.js   # Workflow execution
+│   ├── workflow-orchestrator.js # Orchestrator
+│   ├── skill-executor.js      # Skill execution
+│   ├── skill-registry.js      # Skill registry
+│   ├── pattern-registry.js    # Pattern registry
+│   ├── mcp-tool-adapters.js   # MCP tool adapters
+│   ├── agent-skill-binding.js # Agent-skill binding
+│   ├── error-handler.js       # Error handling
+│   ├── workflow-examples.js   # Workflow examples
+│   ├── guardrails/            # Guardrails
+│   │   ├── base-guardrail.js  # Base guardrail
+│   │   ├── guardrail-rules.js # Rule definitions
+│   │   ├── input-guardrail.js # Input guardrail
+│   │   ├── output-guardrail.js # Output guardrail
+│   │   └── safety-check.js    # Safety check
+│   ├── patterns/              # Orchestration patterns
+│   │   ├── auto.js            # Automatic selection
+│   │   ├── group-chat.js      # Group chat
+│   │   ├── handoff.js         # Handoff
 │   │   ├── human-in-loop.js   # Human-in-the-Loop
-│   │   ├── nested.js          # ネスト
-│   │   ├── sequential.js      # シーケンシャル
-│   │   ├── swarm.js           # スウォーム
-│   │   └── triage.js          # トリアージ
-│   ├── reasoning/             # 推論エンジン
-│   │   ├── planning-engine.js # プランニング
-│   │   ├── reasoning-engine.js # 推論
-│   │   └── self-correction.js # 自己修正
-│   └── replanning/            # リプランニング
-│       ├── adaptive-goal-modifier.js # 適応的目標修正
-│       ├── alternative-generator.js # 代替案生成
-│       ├── config.js          # 設定
-│       ├── goal-progress-tracker.js # 目標進捗追跡
-│       ├── plan-evaluator.js  # プラン評価
-│       ├── plan-monitor.js    # プラン監視
-│       ├── proactive-path-optimizer.js # 事前最適化
-│       ├── replan-history.js  # リプラン履歴
-│       └── replanning-engine.js # リプランニングエンジン
+│   │   ├── nested.js          # Nested
+│   │   ├── sequential.js      # Sequential
+│   │   ├── swarm.js           # Swarm
+│   │   └── triage.js          # Triage
+│   ├── reasoning/             # Reasoning engine
+│   │   ├── planning-engine.js # Planning
+│   │   ├── reasoning-engine.js # Reasoning
+│   │   └── self-correction.js # Self-correction
+│   └── replanning/            # Replanning
+│       ├── adaptive-goal-modifier.js # Adaptive goal modification
+│       ├── alternative-generator.js # Alternative generation
+│       ├── config.js          # Configuration
+│       ├── goal-progress-tracker.js # Goal progress tracking
+│       ├── plan-evaluator.js  # Plan evaluation
+│       ├── plan-monitor.js    # Plan monitoring
+│       ├── proactive-path-optimizer.js # Proactive optimization
+│       ├── replan-history.js  # Replan history
+│       └── replanning-engine.js # Replanning engine
 │
-├── performance/                # パフォーマンス最適化
-│   ├── index.js               # パフォーマンスエクスポート
-│   ├── cache-manager.js       # キャッシュ管理
-│   ├── lazy-loader.js         # 遅延ロード
-│   ├── memory-optimizer.js    # メモリ最適化
-│   └── startup-optimizer.js   # 起動最適化
+├── performance/                # Performance optimization
+│   ├── index.js               # Performance exports
+│   ├── cache-manager.js       # Cache management
+│   ├── lazy-loader.js         # Lazy loading
+│   ├── memory-optimizer.js    # Memory optimization
+│   └── startup-optimizer.js   # Startup optimization
 │
-├── reporters/                  # レポート生成
-│   ├── coverage-report.js     # カバレッジレポート
-│   ├── hierarchical-reporter.js # 階層レポート
-│   └── traceability-matrix-report.js # トレーサビリティマトリクス
+├── reporters/                  # Report generation
+│   ├── coverage-report.js     # Coverage report
+│   ├── hierarchical-reporter.js # Hierarchical report
+│   └── traceability-matrix-report.js # Traceability matrix
 │
-├── resolvers/                  # 問題解決
-│   └── issue-resolver.js      # 課題解決
+├── resolvers/                  # Problem resolution
+│   └── issue-resolver.js      # Issue resolution
 │
-├── steering/                   # ステアリング（プロジェクトメモリ）
-│   ├── index.js               # ステアリングエクスポート
-│   ├── advanced-validation.js # 高度な検証
-│   ├── auto-updater.js        # 自動更新
-│   ├── quality-metrics.js     # 品質メトリクス
-│   ├── steering-auto-update.js # ステアリング自動更新
-│   ├── steering-validator.js  # ステアリング検証
-│   └── template-constraints.js # テンプレート制約
+├── steering/                   # Steering (project memory)
+│   ├── index.js               # Steering exports
+│   ├── advanced-validation.js # Advanced validation
+│   ├── auto-updater.js        # Automatic updates
+│   ├── quality-metrics.js     # Quality metrics
+│   ├── steering-auto-update.js # Steering auto-update
+│   ├── steering-validator.js  # Steering validation
+│   └── template-constraints.js # Template constraints
 │
-├── templates/                  # テンプレート
-│   ├── index.js               # テンプレートエクスポート
-│   ├── locale-manager.js      # 多言語管理
-│   ├── template-constraints.js # 制約定義
-│   ├── agents/                # エージェントテンプレート
+├── templates/                  # Templates
+│   ├── index.js               # Template exports
+│   ├── locale-manager.js      # Multi-language management
+│   ├── template-constraints.js # Constraint definitions
+│   ├── agents/                # Agent templates
 │   │   ├── claude-code/       # Claude Code
 │   │   ├── codex/             # Codex
 │   │   ├── cursor/            # Cursor
 │   │   ├── gemini-cli/        # Gemini CLI
 │   │   ├── github-copilot/    # GitHub Copilot
 │   │   ├── qwen-code/         # Qwen Code
-│   │   ├── shared/            # 共通
+│   │   ├── shared/            # Shared
 │   │   └── windsurf/          # Windsurf
-│   ├── architectures/         # アーキテクチャテンプレート
-│   ├── memories/              # メモリテンプレート
-│   ├── shared/                # 共有テンプレート
-│   └── skills/                # スキルテンプレート
+│   ├── architectures/         # Architecture templates
+│   ├── memories/              # Memory templates
+│   ├── shared/                # Shared templates
+│   └── skills/                # Skill templates
 │
-└── validators/                 # 検証エンジン
-    ├── advanced-validation.js # 高度な検証
-    ├── constitution.js        # 憲法検証
-    ├── constitutional-validator.js # 憲法バリデーター
-    ├── critic-system.js       # クリティックシステム
-    ├── delta-format.js        # デルタフォーマット検証
-    └── traceability-validator.js # トレーサビリティ検証
+└── validators/                 # Validation engines
+    ├── advanced-validation.js # Advanced validation
+    ├── constitution.js        # Constitution validation
+    ├── constitutional-validator.js # Constitutional validator
+    ├── critic-system.js       # Critic system
+    ├── delta-format.js        # Delta format validation
+    └── traceability-validator.js # Traceability validation
 ```
 
-### モジュール依存関係
+### Module Dependencies
 
 ```
                     ┌──────────────┐
-                    │   bin/*.js   │ ← CLI エントリポイント
+                    │   bin/*.js   │ ← CLI entry points
                     └──────┬───────┘
                            │
                            ▼
@@ -443,7 +443,7 @@ src/
                          │
                          ▼
                   ┌─────────────┐
-                  │orchestration│ ← 中央調整
+                  │orchestration│ ← Central coordination
                   └──────┬──────┘
                          │
          ┌───────────────┼───────────────┐
@@ -467,9 +467,9 @@ src/
 
 ---
 
-## データフロー
+## Data Flow
 
-### SDD ワークフロー
+### SDD Workflow
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -537,7 +537,7 @@ src/
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### データ変換フロー
+### Data Transformation Flow
 
 ```
                     Input (Natural Language)
@@ -583,40 +583,40 @@ src/
 
 ---
 
-## オーケストレーションエンジン
+## Orchestration Engine
 
-### パターン選択ロジック
+### Pattern Selection Logic
 
 ```javascript
-// src/orchestration/pattern-registry.js (概念図)
+// src/orchestration/pattern-registry.js (conceptual diagram)
 
 class PatternSelector {
   selectPattern(task, context) {
     const analysis = this.analyzeTask(task);
     
-    // 複雑度に基づく選択
+    // Selection based on complexity
     if (analysis.complexity === 'high' && analysis.requiresExpertise) {
-      return 'triage';  // ルーターが専門エージェントに振り分け
+      return 'triage';  // Router dispatches to specialist agents
     }
     
     if (analysis.parallelizable && analysis.independentSubtasks > 3) {
-      return 'swarm';   // 並列実行
+      return 'swarm';   // Parallel execution
     }
     
     if (analysis.requiresHumanApproval) {
-      return 'human-in-loop';  // 人間の承認を挟む
+      return 'human-in-loop';  // Insert human approval
     }
     
     if (analysis.steps && analysis.steps.length > 1) {
-      return 'sequential';  // 順次実行
+      return 'sequential';  // Sequential execution
     }
     
-    return 'auto';  // 自動選択
+    return 'auto';  // Automatic selection
   }
 }
 ```
 
-### エージェントループ
+### Agent Loop
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -652,7 +652,7 @@ class PatternSelector {
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### ガードレールアーキテクチャ
+### Guardrail Architecture
 
 ```
                          Input
@@ -688,24 +688,24 @@ class PatternSelector {
 
 ---
 
-## 拡張ポイント
+## Extension Points
 
-### 1. LLM プロバイダー拡張
+### 1. LLM Provider Extension
 
 ```javascript
 // src/llm-providers/base-provider.js
 class BaseLLMProvider {
-  // 必須メソッド
+  // Required methods
   async complete(prompt, options) { throw new Error('Not implemented'); }
   async chat(messages, options) { throw new Error('Not implemented'); }
   async embed(text) { throw new Error('Not implemented'); }
   
-  // オプションメソッド
+  // Optional methods
   async stream(prompt, options) { /* ... */ }
   getTokenCount(text) { /* ... */ }
 }
 
-// カスタムプロバイダー例
+// Custom provider example
 class MyCustomProvider extends BaseLLMProvider {
   async complete(prompt, options) {
     const response = await fetch('https://my-llm-api.com/complete', {
@@ -717,10 +717,10 @@ class MyCustomProvider extends BaseLLMProvider {
 }
 ```
 
-### 2. バリデーター拡張
+### 2. Validator Extension
 
 ```javascript
-// カスタムバリデーターの追加
+// Add a custom validator
 const { ValidatorRegistry } = require('musubi-sdd');
 
 ValidatorRegistry.register('my-custom-validator', {
@@ -730,8 +730,8 @@ ValidatorRegistry.register('my-custom-validator', {
   async validate(content, context) {
     const errors = [];
     
-    // カスタム検証ロジック
-    if (!content.includes('必須キーワード')) {
+    // Custom validation logic
+    if (!content.includes('required keyword')) {
       errors.push({
         code: 'MISSING_KEYWORD',
         message: 'Required keyword not found',
@@ -744,10 +744,10 @@ ValidatorRegistry.register('my-custom-validator', {
 });
 ```
 
-### 3. オーケストレーションパターン拡張
+### 3. Orchestration Pattern Extension
 
 ```javascript
-// カスタムパターンの追加
+// Add a custom pattern
 const { PatternRegistry } = require('musubi-sdd');
 
 PatternRegistry.register('my-custom-pattern', {
@@ -755,14 +755,14 @@ PatternRegistry.register('my-custom-pattern', {
   description: 'A custom orchestration pattern',
   
   async execute(task, agents, context) {
-    // カスタムオーケストレーションロジック
+    // Custom orchestration logic
     const results = [];
     
     for (const agent of agents) {
       const result = await agent.execute(task, context);
       results.push(result);
       
-      // カスタム条件でハンドオフ
+      // Hand off on custom condition
       if (result.needsExpert) {
         const expert = context.findExpert(result.expertType);
         const expertResult = await expert.execute(task, context);
@@ -775,10 +775,10 @@ PatternRegistry.register('my-custom-pattern', {
 });
 ```
 
-### 4. スキル拡張
+### 4. Skill Extension
 
 ```javascript
-// カスタムスキルの追加
+// Add a custom skill
 const { SkillRegistry } = require('musubi-sdd');
 
 SkillRegistry.register('my-custom-skill', {
@@ -799,7 +799,7 @@ SkillRegistry.register('my-custom-skill', {
     'my-action': {
       description: 'Perform my custom action',
       async execute(params, context) {
-        // アクションロジック
+        // Action logic
         return { success: true, result: 'Action completed' };
       }
     }
@@ -809,104 +809,104 @@ SkillRegistry.register('my-custom-skill', {
 
 ---
 
-## 設計決定記録（ADR）
+## Architecture Decision Records (ADR)
 
-### ADR-001: モジュラーアーキテクチャ
+### ADR-001: Modular Architecture
 
-**ステータス**: 採用  
-**日付**: 2024-01-01  
+**Status**: Adopted  
+**Date**: 2024-01-01  
 
-**コンテキスト**:  
-MUSUBI は多様なユースケース（CLI、GUI、VSCode 拡張、MCP サーバー）をサポートする必要がある。
+**Context**:  
+MUSUBI must support diverse use cases (CLI, GUI, VSCode extension, MCP server).
 
-**決定**:  
-レイヤードアーキテクチャを採用し、各レイヤーを独立したモジュールとして実装。
+**Decision**:  
+Adopt a layered architecture and implement each layer as an independent module.
 
-**結果**:
-- ✅ 各コンポーネントが独立してテスト可能
-- ✅ 新しいインターフェース（API、VSCode等）を容易に追加
-- ✅ 依存関係が明確で保守性が高い
-- ⚠️ モジュール間の連携にインターフェース定義が必要
-
----
-
-### ADR-002: LLM プロバイダー抽象化
-
-**ステータス**: 採用  
-**日付**: 2024-01-15  
-
-**コンテキスト**:  
-複数の LLM（OpenAI、Anthropic、Ollama）をサポートし、将来の新しいモデルにも対応したい。
-
-**決定**:  
-`BaseLLMProvider` 抽象クラスを定義し、各プロバイダーは継承して実装。
-
-**結果**:
-- ✅ 新しい LLM プロバイダーを容易に追加
-- ✅ ユーザーは設定変更のみでプロバイダーを切り替え可能
-- ✅ プロバイダー固有の機能も `options` で対応
-- ⚠️ 各プロバイダーの API 差異を吸収するオーバーヘッド
+**Consequences**:
+- ✅ Each component can be tested independently
+- ✅ New interfaces (API, VSCode, etc.) can be added easily
+- ✅ Dependencies are clear and maintainability is high
+- ⚠️ Interface definitions are required for inter-module coordination
 
 ---
 
-### ADR-003: ガードレールシステム
+### ADR-002: LLM Provider Abstraction
 
-**ステータス**: 採用  
-**日付**: 2024-03-01  
+**Status**: Adopted  
+**Date**: 2024-01-15  
 
-**コンテキスト**:  
-LLM 出力の品質と安全性を確保する必要がある。プロンプトインジェクション対策も必要。
+**Context**:  
+We want to support multiple LLMs (OpenAI, Anthropic, Ollama) and also accommodate future new models.
 
-**決定**:  
-入力・出力の両方にガードレールを配置。Constitution ベースの検証を必須化。
+**Decision**:  
+Define a `BaseLLMProvider` abstract class; each provider inherits from it and implements it.
 
-**結果**:
-- ✅ 不正な入力をブロック
-- ✅ 出力が Constitution に準拠していることを保証
-- ✅ PII 漏洩リスクを軽減
-- ⚠️ ガードレール処理による若干のレイテンシ増加
-
----
-
-### ADR-004: リプランニングエンジン
-
-**ステータス**: 採用  
-**日付**: 2024-06-01  
-
-**コンテキスト**:  
-長時間の自律実行中に問題が発生した場合、自動的に対処する仕組みが必要。
-
-**決定**:  
-`ReplanningEngine` を導入し、目標進捗追跡・代替案生成・適応的目標修正を実装。
-
-**結果**:
-- ✅ エラー発生時に自動リカバリー
-- ✅ 人間の介入を最小化
-- ✅ 複雑なタスクでも完了率が向上
-- ⚠️ リプランニングロジックの複雑性増加
+**Consequences**:
+- ✅ New LLM providers can be added easily
+- ✅ Users can switch providers with configuration changes only
+- ✅ Provider-specific features are handled via `options`
+- ⚠️ Overhead of absorbing API differences between providers
 
 ---
 
-### ADR-005: マルチテナント対応
+### ADR-003: Guardrail System
 
-**ステータス**: 採用  
-**日付**: 2025-12-01  
+**Status**: Adopted  
+**Date**: 2024-03-01  
 
-**コンテキスト**:  
-エンタープライズ顧客向けに、テナント間のデータ分離と RBAC が必要。
+**Context**:  
+We need to ensure the quality and safety of LLM output. Prompt injection countermeasures are also needed.
 
-**決定**:  
-`TenantContext` をリクエストスコープで注入し、全サービスでテナント分離を実現。
+**Decision**:  
+Place guardrails on both input and output. Make Constitution-based validation mandatory.
 
-**結果**:
-- ✅ テナント間のデータ完全分離
-- ✅ RBAC による細かいアクセス制御
-- ✅ 使用量クォータと監査ログ
-- ⚠️ テナントコンテキストの伝播コスト
+**Consequences**:
+- ✅ Blocks invalid input
+- ✅ Guarantees that output complies with the Constitution
+- ✅ Reduces the risk of PII leakage
+- ⚠️ Slight latency increase due to guardrail processing
 
 ---
 
-## 📚 関連ドキュメント
+### ADR-004: Replanning Engine
+
+**Status**: Adopted  
+**Date**: 2024-06-01  
+
+**Context**:  
+A mechanism is needed to handle problems automatically when they occur during long-running autonomous execution.
+
+**Decision**:  
+Introduce a `ReplanningEngine` that implements goal progress tracking, alternative generation, and adaptive goal modification.
+
+**Consequences**:
+- ✅ Automatic recovery when errors occur
+- ✅ Minimizes human intervention
+- ✅ Improved completion rate even for complex tasks
+- ⚠️ Increased complexity of replanning logic
+
+---
+
+### ADR-005: Multi-Tenant Support
+
+**Status**: Adopted  
+**Date**: 2025-12-01  
+
+**Context**:  
+Enterprise customers need data isolation between tenants and RBAC.
+
+**Decision**:  
+Inject `TenantContext` at request scope to achieve tenant isolation across all services.
+
+**Consequences**:
+- ✅ Complete data isolation between tenants
+- ✅ Fine-grained access control via RBAC
+- ✅ Usage quotas and audit logging
+- ⚠️ Propagation cost of the tenant context
+
+---
+
+## 📚 Related Documents
 
 - [API Reference](../API-REFERENCE.md)
 - [Interactive Tutorials](./INTERACTIVE-TUTORIALS.md)

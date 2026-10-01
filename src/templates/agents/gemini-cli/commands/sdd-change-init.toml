@@ -23,9 +23,9 @@ Generate a change proposal specification that documents what will be added, modi
 
 **ALWAYS read steering files FIRST:**
 
-- Read `steering/structure.md` (English) - Current architecture
-- Read `steering/tech.md` (English) - Current technology stack
-- Read `steering/product.md` (English) - Current product context
+- Read `steering/structure.md` - Current architecture
+- Read `steering/tech.md` - Current technology stack
+- Read `steering/product.md` - Current product context
 
 Extract:
 - Current architecture patterns
@@ -248,12 +248,9 @@ Priority:
 - P2: Medium priority
 - P3: Low priority
 
-# Step 7: Save Documents (Bilingual)
+# Step 7: Save Documents
 
-Create TWO files:
-
-1. English (PRIMARY): `storage/changes/<change-name>-proposal.md`
-2. Japanese (TRANSLATION): `storage/changes/<change-name>-proposal.ja.md`
+Save to: `storage/changes/<change-name>-proposal.md`
 
 Update change log: `storage/changes/change-log.md`
 
@@ -279,7 +276,7 @@ Before completing:
 - Migration path documented
 - Rollback plan defined
 - Timeline estimated
-- Documents saved (bilingual)
+- Documents saved
 - Change log updated
 - Summary presented
 

@@ -50,7 +50,7 @@ detector.addEvent({ type: 'action', content: 'Read file.js' });
 const analysis = detector.detect();
 if (analysis) {
   console.log(analysis.getMessage());
-  // "エージェントが同じアクションを繰り返しています"
+  // "The agent is repeating the same action"
 }
 ```
 
@@ -127,8 +127,8 @@ await manager.initialize();
 
 // Extract learnings from session events
 const events = [
-  { content: 'npm run test で単体テストを実行しました' },
-  { content: 'Error: Module not found → npm install で解決' },
+  { content: 'Ran unit tests with npm run test' },
+  { content: 'Error: Module not found → resolved with npm install' },
 ];
 const learnings = manager.extractLearnings(events);
 
@@ -184,9 +184,9 @@ const markdown = await manager.exportToMarkdown();
 
 Before beginning work, **ALWAYS** read the following files if they exist in the `steering/` directory:
 
-- **`steering/structure.md`** (English) - Architecture patterns
-- **`steering/tech.md`** (English) - Technology stack
-- **`steering/product.md`** (English) - Business context
+- **`steering/structure.md`** - Architecture patterns
+- **`steering/tech.md`** - Technology stack
+- **`steering/product.md`** - Business context
 
 ---
 
@@ -214,7 +214,7 @@ musubi-analyze learnings --session ./session.log --export markdown
 
 **Pattern Detected**: repeating_action
 **Confidence**: 0.95
-**Message**: エージェントが同じアクションを繰り返しています
+**Message**: The agent is repeating the same action
 
 ### Event History
 
@@ -236,16 +236,16 @@ musubi-analyze learnings --session ./session.log --export markdown
 
 ### Commands (2 items)
 
-- `npm run test` - 単体テストを実行
-- `npm install` - 依存関係をインストール
+- `npm run test` - Run unit tests
+- `npm install` - Install dependencies
 
 ### Error Solutions (1 item)
 
 - **Error**: Module not found
-- **Solution**: npm install で解決
+- **Solution**: Resolved with npm install
 - **Confidence**: 0.85
 
 ### Project Structure (1 item)
 
-- テストファイルは `tests/` ディレクトリに配置
+- Place test files in the `tests/` directory
 ```

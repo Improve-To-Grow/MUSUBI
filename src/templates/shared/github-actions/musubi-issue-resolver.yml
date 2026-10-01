@@ -21,7 +21,7 @@ jobs:
   analyze-issue:
     name: Analyze Issue
     runs-on: ubuntu-latest
-    # 手動実行、ラベル追加（musubi-resolve）、またはコメント（/musubi resolve）でトリガー
+    # Triggered manually, by adding the label (musubi-resolve), or by a comment (/musubi resolve)
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'musubi-resolve')) ||

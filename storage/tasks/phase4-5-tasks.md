@@ -1,11 +1,11 @@
 # Phase 4 & 5 Tasks Document
 
-## メタデータ
-- **ドキュメント種別**: タスク定義書 (SDD Stage 4)
-- **作成日**: 2025-12-10
-- **プロジェクト**: MUSUBI v5.0.0
-- **関連要件**: [phase4-5-requirements.md](./phase4-5-requirements.md)
-- **関連設計**: [phase4-5-design.md](./phase4-5-design.md)
+## Metadata
+- **Document type**: Task definition document (SDD Stage 4)
+- **Created**: 2025-12-10
+- **Project**: MUSUBI v5.0.0
+- **Related requirements**: [phase4-5-requirements.md](./phase4-5-requirements.md)
+- **Related design**: [phase4-5-design.md](./phase4-5-design.md)
 - **Constitutional Compliance**: Article IV (Tasks), Article V (Traceability)
 
 ---

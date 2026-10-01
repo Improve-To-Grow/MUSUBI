@@ -1,7 +1,7 @@
 /**
  * MUSUBI Repository Skill Manager
  *
- * リポジトリ固有スキル（.musubi/skills/）の管理と自動生成
+ * Manages and auto-generates repository-specific skills (.musubi/skills/)
  *
  * @module src/managers/repo-skill-manager
  * @see REQ-P0-B003
@@ -12,13 +12,13 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * リポジトリスキルマネージャー
+ * Repository skill manager
  */
 class RepoSkillManager {
   /**
    * @param {Object} options
-   * @param {string} options.projectRoot - プロジェクトルート
-   * @param {boolean} options.autoGenerate - 存在しない場合に自動生成
+   * @param {string} options.projectRoot - Project root
+   * @param {boolean} options.autoGenerate - Auto-generate when it does not exist
    */
   constructor(options = {}) {
     this.projectRoot = options.projectRoot || process.cwd();
@@ -27,8 +27,8 @@ class RepoSkillManager {
   }
 
   /**
-   * .musubi/skills/ ディレクトリを初期化
-   * @returns {Object} 初期化結果
+   * Initialize the .musubi/skills/ directory
+   * @returns {Object} Initialization result
    */
   async initialize() {
     const results = {
@@ -37,13 +37,13 @@ class RepoSkillManager {
       errors: [],
     };
 
-    // ディレクトリ作成
+    // Create the directory
     if (!fs.existsSync(this.skillsDir)) {
       fs.mkdirSync(this.skillsDir, { recursive: true });
       results.created.push('.musubi/skills/');
     }
 
-    // repo.md 生成
+    // Generate repo.md
     const repoMdPath = path.join(this.skillsDir, 'repo.md');
     if (!fs.existsSync(repoMdPath)) {
       try {
@@ -61,7 +61,7 @@ class RepoSkillManager {
   }
 
   /**
-   * repo.md を自動生成
+   * Auto-generate repo.md
    * @returns {string}
    */
   async generateRepoMd() {
@@ -136,7 +136,7 @@ ${analysis.conventions.map(c => `- ${c}`).join('\n')}
   }
 
   /**
-   * プロジェクトを分析
+   * Analyze the project
    * @returns {Object}
    */
   async analyzeProject() {
@@ -152,7 +152,7 @@ ${analysis.conventions.map(c => `- ${c}`).join('\n')}
       conventions: [],
     };
 
-    // package.json の分析
+    // Analyze package.json
     const packageJsonPath = path.join(this.projectRoot, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
       try {
@@ -160,10 +160,10 @@ ${analysis.conventions.map(c => `- ${c}`).join('\n')}
         analysis.name = pkg.name || analysis.name;
         analysis.description = pkg.description || '';
 
-        // セットアップコマンド
+        // Setup commands
         analysis.setupCommands.push('npm install');
 
-        // スクリプト
+        // Scripts
         if (pkg.scripts) {
           const scriptMapping = {
             start: 'Start the application',
@@ -184,7 +184,7 @@ ${analysis.conventions.map(c => `- ${c}`).join('\n')}
           }
         }
 
-        // 依存関係からパターンを検出
+        // Detect patterns from dependencies
         const deps = { ...pkg.dependencies, ...pkg.devDependencies };
         if (deps['jest'] || deps['vitest']) {
           analysis.patterns.push({
@@ -220,11 +220,11 @@ ${analysis.conventions.map(c => `- ${c}`).join('\n')}
           });
         }
       } catch (error) {
-        // 無視
+        // Ignore
       }
     }
 
-    // Python プロジェクトの分析
+    // Analyze Python projects
     const requirementsPath = path.join(this.projectRoot, 'requirements.txt');
     const pyprojectPath = path.join(this.projectRoot, 'pyproject.toml');
     if (fs.existsSync(requirementsPath)) {
@@ -239,7 +239,7 @@ ${analysis.conventions.map(c => `- ${c}`).join('\n')}
       analysis.patterns.push({ name: 'Packaging', description: 'pyproject.toml' });
     }
 
-    // CI/CD の検出
+    // Detect CI/CD
     const cicdPaths = [
       { path: '.github/workflows', desc: 'GitHub Actions workflows' },
       { path: '.gitlab-ci.yml', desc: 'GitLab CI configuration' },
@@ -255,10 +255,10 @@ ${analysis.conventions.map(c => `- ${c}`).join('\n')}
       }
     }
 
-    // ディレクトリ構造
+    // Directory structure
     analysis.structureTree = this._generateTreeStructure();
 
-    // 規約の検出
+    // Detect conventions
     if (fs.existsSync(path.join(this.projectRoot, '.editorconfig'))) {
       analysis.conventions.push('Follow .editorconfig settings');
     }
@@ -276,7 +276,7 @@ ${analysis.conventions.map(c => `- ${c}`).join('\n')}
   }
 
   /**
-   * ディレクトリツリー構造を生成
+   * Generate the directory tree structure
    * @returns {string}
    */
   _generateTreeStructure() {
@@ -307,12 +307,12 @@ ${analysis.conventions.map(c => `- ${c}`).join('\n')}
         return;
       }
 
-      // フィルタリングとソート
+      // Filter and sort
       entries = entries
         .filter(e => !e.name.startsWith('.') || e.name === '.musubi')
         .filter(e => !ignoreDirs.includes(e.name))
         .sort((a, b) => {
-          // ディレクトリ優先
+          // Directories first
           if (a.isDirectory() !== b.isDirectory()) {
             return a.isDirectory() ? -1 : 1;
           }
@@ -346,10 +346,10 @@ ${analysis.conventions.map(c => `- ${c}`).join('\n')}
   }
 
   /**
-   * カスタムスキルを追加
-   * @param {string} name スキル名
-   * @param {Object} options スキルオプション
-   * @returns {string} 作成されたファイルパス
+   * Add a custom skill
+   * @param {string} name Skill name
+   * @param {Object} options Skill options
+   * @returns {string} Path of the created file
    */
   async addSkill(name, options = {}) {
     const filename = `${name.toLowerCase().replace(/\s+/g, '-')}.md`;
@@ -373,7 +373,7 @@ priority: ${options.priority || 50}
 ${options.content || '<!-- Add skill content here -->'}
 `;
 
-    // ディレクトリ作成
+    // Create the directory
     if (!fs.existsSync(this.skillsDir)) {
       fs.mkdirSync(this.skillsDir, { recursive: true });
     }
@@ -383,7 +383,7 @@ ${options.content || '<!-- Add skill content here -->'}
   }
 
   /**
-   * スキル一覧を取得
+   * List skills
    * @returns {Object[]}
    */
   listSkills() {
@@ -400,7 +400,7 @@ ${options.content || '<!-- Add skill content here -->'}
   }
 
   /**
-   * repo.md を更新
+   * Update repo.md
    * @returns {boolean}
    */
   async updateRepoMd() {
@@ -411,7 +411,7 @@ ${options.content || '<!-- Add skill content here -->'}
   }
 
   /**
-   * スキルを削除
+   * Remove a skill
    * @param {string} name
    * @returns {boolean}
    */
@@ -425,8 +425,8 @@ ${options.content || '<!-- Add skill content here -->'}
   }
 
   /**
-   * サンプルスキルを生成
-   * @returns {Object} 作成結果
+   * Generate sample skills
+   * @returns {Object} Creation result
    */
   async generateSampleSkills() {
     const results = { created: [], skipped: [] };
@@ -434,7 +434,7 @@ ${options.content || '<!-- Add skill content here -->'}
     const sampleSkills = [
       {
         name: 'testing',
-        triggers: ['test', 'テスト', '/\\bspec\\b/i'],
+        triggers: ['test', '/\\bspec\\b/i'],
         content: `## Testing Guidelines
 
 When writing tests for this project:
@@ -463,7 +463,7 @@ describe('FeatureName', () => {
       },
       {
         name: 'debugging',
-        triggers: ['debug', 'デバッグ', 'error', 'bug', 'issue'],
+        triggers: ['debug', 'error', 'bug', 'issue'],
         content: `## Debugging Guidelines
 
 When debugging issues in this project:
@@ -493,7 +493,7 @@ When debugging issues in this project:
         });
         results.created.push(skill.name);
       } catch (error) {
-        // スキップ
+        // Skip
       }
     }
 

@@ -1285,7 +1285,7 @@ class ProjectScanner {
    */
 <span class="fstat-no" title="function not covered" >  pa</span>rseConstitutionArticles(content) {
     const articles = <span class="cstat-no" title="statement not covered" >[];</span>
-    const articleRegex = <span class="cstat-no" title="statement not covered" >/#{2,3}\s+(?:Article|第)\s*(\d+)[:\s]+(.+?)(?=\n#{2,3}|\n##|$)/gs;</span>
+    const articleRegex = <span class="cstat-no" title="statement not covered" >/#{2,3}\s+(?:Article)\s*(\d+)[:\s]+(.+?)(?=\n#{2,3}|\n##|$)/gs;</span>
 &nbsp;
     let match;
 <span class="cstat-no" title="statement not covered" >    while ((match = articleRegex.exec(content)) !== null) {</span>

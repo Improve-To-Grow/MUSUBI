@@ -1,6 +1,6 @@
 # FAQ & Troubleshooting Guide
 
-よくある質問とトラブルシューティングガイド
+FAQ and Troubleshooting Guide
 
 ---
 
@@ -21,25 +21,25 @@
 
 ### General
 
-#### Q: MUSUBIとは何ですか？
+#### Q: What is MUSUBI?
 
-**A:** MUSUBI (結び) は、仕様駆動開発 (SDD) フレームワークです。コードを書く前に仕様を定義し、その仕様から設計、実装、テストを自動生成・管理します。
+**A:** MUSUBI (musubi, "connection/binding") is a Specification Driven Development (SDD) framework. It defines specifications before code is written, then automatically generates and manages design, implementation, and tests from those specifications.
 
-#### Q: 既存プロジェクトでも使えますか？
+#### Q: Can I use it with an existing project?
 
-**A:** はい。`musubi init --mode brownfield` でDelta仕様を使用し、段階的に導入できます。
+**A:** Yes. Use `musubi init --mode brownfield` to adopt it incrementally with Delta specifications.
 
 ```bash
-# 既存プロジェクトへの導入
+# Adopting in an existing project
 cd existing-project
 npx musubi-sdd init --mode brownfield
 ```
 
-#### Q: どのAIコーディングアシスタントと互換性がありますか？
+#### Q: Which AI coding assistants are compatible?
 
-**A:** 13以上のプラットフォームに対応しています：
+**A:** 13+ platforms are supported:
 
-| プラットフォーム | サポート状況 |
+| Platform | Support Status |
 |---------------|------------|
 | Claude Code | ✅ Primary |
 | GitHub Copilot | ✅ Full |
@@ -49,49 +49,49 @@ npx musubi-sdd init --mode brownfield
 | Codex CLI | ✅ Full |
 | Aider | ✅ Basic |
 | Continue | ✅ Basic |
-| その他 | ✅ Universal via AGENTS.md |
+| Others | ✅ Universal via AGENTS.md |
 
-#### Q: 無料で使えますか？
+#### Q: Is it free?
 
-**A:** はい。MUSUBIはMITライセンスで完全無料・オープンソースです。
+**A:** Yes. MUSUBI is completely free and open source under the MIT license.
 
 ---
 
 ### Concepts
 
-#### Q: EARS形式とは何ですか？
+#### Q: What is the EARS format?
 
-**A:** EARS (Easy Approach to Requirements Syntax) は、要件を標準的なパターンで記述する方法です：
+**A:** EARS (Easy Approach to Requirements Syntax) is a way to write requirements using standard patterns:
 
-| タイプ | パターン | 例 |
+| Type | Pattern | Example |
 |-------|---------|-----|
 | Ubiquitous | The system shall... | The system shall encrypt passwords |
 | Event-Driven | When X, the system shall... | When login fails, the system shall log |
 | State-Driven | While X, the system shall... | While offline, the system shall queue |
 | Optional | Where X, the system shall... | Where enabled, the system shall show |
 
-#### Q: 9条とは何ですか？
+#### Q: What are the 9 Articles?
 
-**A:** MUSUBI Constitutionの9つの不変ルールです：
+**A:** The 9 immutable rules of the MUSUBI Constitution:
 
-1. 仕様優先
-2. 憲法優位
-3. EARS準拠
-4. トレーサビリティ
-5. 変更追跡
-6. 品質ゲート
-7. ドキュメント
-8. テスト
-9. 継続的改善
+1. Specification First
+2. Constitution Supremacy
+3. EARS Compliance
+4. Traceability
+5. Change Tracking
+6. Quality Gates
+7. Documentation
+8. Testing
+9. Continuous Improvement
 
-#### Q: P-Labelとは何ですか？
+#### Q: What is a P-Label?
 
-**A:** タスクの優先度を示すラベルです：
+**A:** A label that indicates task priority:
 
-- **P0**: クリティカル（すべてをブロック）
-- **P1**: 高優先度（すぐに実行）
-- **P2**: 中優先度（通常）
-- **P3**: 低優先度（バックグラウンド/オプション）
+- **P0**: Critical (blocks everything)
+- **P1**: High priority (execute immediately)
+- **P2**: Medium priority (normal)
+- **P3**: Low priority (background/optional)
 
 ---
 
@@ -99,58 +99,58 @@ npx musubi-sdd init --mode brownfield
 
 ### Issue: npm install fails
 
-**症状:**
+**Symptoms:**
 ```
 npm ERR! code EACCES
 npm ERR! syscall mkdir
 ```
 
-**解決策:**
+**Solution:**
 ```bash
-# 方法1: npxを使用
+# Option 1: Use npx
 npx musubi-sdd init
 
-# 方法2: ユーザーディレクトリにインストール
+# Option 2: Install in the user directory
 npm install -g musubi-sdd --prefix ~/.npm-global
 
-# 方法3: sudoを使用（推奨しない）
+# Option 3: Use sudo (not recommended)
 sudo npm install -g musubi-sdd
 ```
 
 ### Issue: Node.js version error
 
-**症状:**
+**Symptoms:**
 ```
 Error: musubi-sdd requires Node.js >= 18.0.0
 ```
 
-**解決策:**
+**Solution:**
 ```bash
-# nvmでバージョン管理
+# Manage versions with nvm
 nvm install 20
 nvm use 20
 
-# または直接インストール
-# https://nodejs.org/ から LTS をダウンロード
+# Or install directly
+# Download the LTS version from https://nodejs.org/
 ```
 
 ### Issue: Command not found
 
-**症状:**
+**Symptoms:**
 ```bash
 $ musubi-sdd
 bash: musubi-sdd: command not found
 ```
 
-**解決策:**
+**Solution:**
 ```bash
-# PATHを確認
+# Check PATH
 echo $PATH
 
-# npm global binディレクトリを追加
+# Add the npm global bin directory
 export PATH="$PATH:$(npm config get prefix)/bin"
 
-# または npx を使用
+# Or use npx
 npx musubi-sdd --help
 ```
 
@@ -160,23 +160,23 @@ npx musubi-sdd --help
 
 ### Issue: EARS validation failed
 
-**症状:**
+**Symptoms:**
 ```
 EARS Validation Error: Requirement does not match EARS pattern
 Line 15: "Users can login with email"
 ```
 
-**解決策:**
+**Solution:**
 
 ```markdown
-# ❌ 間違った形式
+# ❌ Incorrect format
 Users can login with email
 
-# ✅ 正しい形式（Event-Driven）
+# ✅ Correct format (Event-Driven)
 When a user submits login credentials, the system shall authenticate using email and password.
 ```
 
-**有効なEARSパターン:**
+**Valid EARS patterns:**
 - `The system shall...`
 - `When <trigger>, the system shall...`
 - `While <state>, the system shall...`
@@ -184,20 +184,20 @@ When a user submits login credentials, the system shall authenticate using email
 
 ### Issue: Constitution violation
 
-**症状:**
+**Symptoms:**
 ```
 Constitutional Violation: Article 4 - Missing traceability
 Files without requirement links: src/auth.js, src/user.js
 ```
 
-**解決策:**
+**Solution:**
 ```javascript
-// ❌ リンクなし
+// ❌ No link
 function authenticate(user, password) {
   // ...
 }
 
-// ✅ 要件リンクあり
+// ✅ With requirement link
 /**
  * Authenticates user credentials
  * @requirement REQ-AUTH-001
@@ -210,7 +210,7 @@ function authenticate(user, password) {
 
 ### Issue: Traceability gap
 
-**症状:**
+**Symptoms:**
 ```
 Traceability Gap: 5 requirements without implementation
 - REQ-AUTH-003
@@ -218,29 +218,29 @@ Traceability Gap: 5 requirements without implementation
 - REQ-USER-002
 ```
 
-**解決策:**
+**Solution:**
 ```bash
-# 詳細を確認
+# Check details
 npx musubi-gaps --verbose
 
-# 出力例:
+# Example output:
 # REQ-AUTH-003: Not implemented
 #   Expected in: src/auth/mfa.js
 #   Action: Implement MFA functionality
 
-# 実装後に再検証
+# Re-validate after implementation
 npx musubi-trace
 ```
 
 ### Issue: Delta spec validation failed
 
-**症状:**
+**Symptoms:**
 ```
 Delta Specification Error: Missing impact analysis
 Change: auth-v2.md
 ```
 
-**解決策:**
+**Solution:**
 ```markdown
 # storage/changes/auth-v2.md
 
@@ -249,7 +249,7 @@ Change: auth-v2.md
 ### Summary
 Add OAuth2 support
 
-### Impact Analysis  <!-- 必須セクション -->
+### Impact Analysis  <!-- Required section -->
 - Affected Files: src/auth/*, tests/auth/*
 - Risk Level: Medium
 - Dependencies: oauth2-client library
@@ -258,7 +258,7 @@ Add OAuth2 support
 - REQ-AUTH-001: Modified
 - REQ-AUTH-010: New
 
-### Rollback Plan  <!-- 推奨 -->
+### Rollback Plan  <!-- Recommended -->
 Revert commit abc123
 ```
 
@@ -268,16 +268,16 @@ Revert commit abc123
 
 ### Issue: Skill not found
 
-**症状:**
+**Symptoms:**
 ```
 Error: Skill 'my-custom-skill' not found in registry
 ```
 
-**解決策:**
+**Solution:**
 ```javascript
 const { SkillRegistry } = require('musubi-sdd');
 
-// スキルを登録
+// Register the skill
 const registry = new SkillRegistry();
 registry.registerSkill({
   id: 'my-custom-skill',
@@ -288,26 +288,26 @@ registry.registerSkill({
   }
 });
 
-// 登録済みスキルを確認
+// Check registered skills
 console.log(registry.listSkills());
 ```
 
 ### Issue: Parallel execution timeout
 
-**症状:**
+**Symptoms:**
 ```
 Error: Parallel execution timed out after 30000ms
 ```
 
-**解決策:**
+**Solution:**
 ```javascript
-// タイムアウトを延長
+// Extend the timeout
 const engine = new OrchestrationEngine({
-  timeout: 120000, // 2分
+  timeout: 120000, // 2 minutes
   retryAttempts: 3
 });
 
-// または個別に設定
+// Or set individually
 await engine.executePattern('parallel', {
   skills: ['skill-a', 'skill-b'],
   options: {
@@ -319,15 +319,15 @@ await engine.executePattern('parallel', {
 
 ### Issue: Handoff context lost
 
-**症状:**
+**Symptoms:**
 ```
 Warning: Handoff context incomplete
 Missing: previous_analysis, requirements
 ```
 
-**解決策:**
+**Solution:**
 ```javascript
-// ハンドオフ時にコンテキストを明示的に渡す
+// Pass context explicitly on handoff
 await engine.executePattern('handoff', {
   from: 'requirements-analyst',
   to: 'system-architect',
@@ -350,15 +350,15 @@ await engine.executePattern('handoff', {
 
 #### Issue: /sdd commands not recognized
 
-**症状:**
+**Symptoms:**
 ```
 Unknown command: /sdd-requirements
 ```
 
-**解決策:**
-1. `CLAUDE.md` が存在することを確認
-2. セッションを再起動
-3. 適切な接頭辞を使用:
+**Solution:**
+1. Verify that `CLAUDE.md` exists
+2. Restart the session
+3. Use the appropriate prefix:
 ```
 # Claude Code uses slash commands
 /sdd-requirements feature-name
@@ -368,13 +368,13 @@ Unknown command: /sdd-requirements
 
 #### Issue: #sdd prompts not working
 
-**症状:**
+**Symptoms:**
 Agent doesn't recognize #sdd commands
 
-**解決策:**
-1. `AGENTS.md` がルートに存在することを確認
-2. Copilot Chat を使用（コード補完ではなく）
-3. 正しい構文:
+**Solution:**
+1. Verify that `AGENTS.md` exists in the root
+2. Use Copilot Chat (not code completion)
+3. Correct syntax:
 ```
 #sdd-requirements Create user authentication
 ```
@@ -383,12 +383,12 @@ Agent doesn't recognize #sdd commands
 
 #### Issue: Rules not applied
 
-**症状:**
+**Symptoms:**
 Cursor ignores MUSUBI rules
 
-**解決策:**
-1. `.cursor/rules` ディレクトリを確認
-2. ルールファイルの形式を確認:
+**Solution:**
+1. Check the `.cursor/rules` directory
+2. Check the rule file format:
 ```markdown
 # .cursor/rules/musubi.md
 
@@ -402,9 +402,9 @@ Check constitution compliance before code changes.
 
 #### Issue: Custom rules not loaded
 
-**解決策:**
+**Solution:**
 ```bash
-# Windsurf設定を再生成
+# Regenerate Windsurf settings
 npx musubi-sdd init --platform windsurf --force
 ```
 
@@ -416,12 +416,12 @@ npx musubi-sdd init --platform windsurf --force
 
 #### Issue: Action fails with "No specs found"
 
-**症状:**
+**Symptoms:**
 ```
 Error: No specification files found in storage/specs/
 ```
 
-**解決策:**
+**Solution:**
 ```yaml
 # .github/workflows/musubi.yml
 jobs:
@@ -429,7 +429,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 全履歴を取得
+          fetch-depth: 0  # Fetch full history
       
       - name: Check specs exist
         run: |
@@ -441,7 +441,7 @@ jobs:
 
 #### Issue: Traceability report not generated
 
-**解決策:**
+**Solution:**
 ```yaml
 - name: Generate Traceability
   run: npx musubi-trace --output reports/traceability.md
@@ -457,7 +457,7 @@ jobs:
 
 #### Issue: Cache not working
 
-**解決策:**
+**Solution:**
 ```yaml
 # .gitlab-ci.yml
 cache:
@@ -474,26 +474,26 @@ cache:
 
 ### Issue: Validation is slow
 
-**症状:**
+**Symptoms:**
 ```
 Validation took 45s (expected < 10s)
 ```
 
-**解決策:**
+**Solution:**
 ```bash
-# 特定のファイルのみ検証
+# Validate specific files only
 npx musubi-validate ears --file storage/specs/auth.md
 
-# 並列検証を有効化
+# Enable parallel validation
 npx musubi-validate all --parallel
 
-# キャッシュを使用
+# Use cache
 npx musubi-validate all --cache
 ```
 
 ### Issue: Large project performance
 
-**大規模プロジェクト向け設定:**
+**Settings for large projects:**
 ```javascript
 // musubi.config.js
 module.exports = {
@@ -502,7 +502,7 @@ module.exports = {
     workers: 4,
     cache: {
       enabled: true,
-      ttl: 3600 // 1時間
+      ttl: 3600 // 1 hour
     }
   },
   traceability: {
@@ -529,17 +529,17 @@ module.exports = {
 
 **Migration Script:**
 ```bash
-# 自動マイグレーション
+# Automatic migration
 npx musubi-sdd migrate --from 2 --to 3
 
-# 手動確認
+# Manual check
 npx musubi-validate all --verbose
 ```
 
 ### From other SDD tools
 
 ```bash
-# 既存の仕様をインポート
+# Import existing specifications
 npx musubi-convert import --format openapi --file api-spec.yaml
 npx musubi-convert import --format gherkin --dir features/
 ```
@@ -548,35 +548,35 @@ npx musubi-convert import --format gherkin --dir features/
 
 ## Getting More Help
 
-### リソース
+### Resources
 
 - **Documentation**: https://nahisaho.github.io/musubi
 - **GitHub Issues**: https://github.com/nahisaho/MUSUBI/issues
 - **Discussions**: https://github.com/nahisaho/MUSUBI/discussions
 
-### デバッグモード
+### Debug Mode
 
 ```bash
-# 詳細ログを有効化
+# Enable verbose logging
 DEBUG=musubi:* npx musubi-validate all
 
-# 特定のモジュールのみ
+# Specific modules only
 DEBUG=musubi:validator npx musubi-validate ears
 ```
 
-### バグ報告
+### Bug Reports
 
 ```bash
-# 診断情報を収集
+# Collect diagnostic information
 npx musubi-sdd diagnose > musubi-diagnostic.txt
 
-# GitHub Issueを作成
+# Create a GitHub Issue
 # https://github.com/nahisaho/MUSUBI/issues/new
-# diagnostic.txtを添付
+# Attach diagnostic.txt
 ```
 
 ---
 
 **MUSUBI v3.12.0** - Specification Driven Development
 
-[ドキュメント](../USER-GUIDE.md) | [GitHub](https://github.com/nahisaho/MUSUBI) | [npm](https://www.npmjs.com/package/musubi-sdd)
+[Documentation](../USER-GUIDE.md) | [GitHub](https://github.com/nahisaho/MUSUBI) | [npm](https://www.npmjs.com/package/musubi-sdd)

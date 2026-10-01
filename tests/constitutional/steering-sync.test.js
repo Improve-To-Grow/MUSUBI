@@ -201,7 +201,7 @@ describe('SteeringSync', () => {
       const result = await sync.autoFix(issues);
 
       expect(result.failed).toBe(1);
-      expect(result.details.failed[0].reason).toContain('手動');
+      expect(result.details.failed[0].reason).toContain('manual review');
     });
 
     it('should include timestamp', async () => {

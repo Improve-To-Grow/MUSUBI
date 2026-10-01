@@ -1,46 +1,46 @@
-# ADR-P0-B001: OpenHands由来機能の導入
+# ADR-P0-B001: Adoption of OpenHands-Derived Features
 
-| 項目 | 内容 |
+| Item | Content |
 |------|------|
 | **ADR ID** | ADR-P0-B001 |
-| **ステータス** | 承認 |
-| **決定日** | 2025-12-07 |
-| **決定者** | MUSUBIチーム |
-| **対象要件** | REQ-P0-B001 〜 REQ-P0-B008 |
+| **Status** | Approved |
+| **Decision Date** | 2025-12-07 |
+| **Decision Makers** | MUSUBI Team |
+| **Target Requirements** | REQ-P0-B001 ~ REQ-P0-B008 |
 
 ---
 
-## 1. コンテキスト
+## 1. Context
 
-MUSUBIはSpecification Driven Development (SDD)フレームワークとして成熟してきたが、AIエージェントの実行品質向上に関する機能が不足していた。競合分析の結果、OpenHands（SWE-Bench 72.8%達成）から以下の機能を導入することで、MUSUBIの競争力を大幅に向上できることが判明した。
+MUSUBI has matured as a Specification Driven Development (SDD) framework, but it lacked features to improve the execution quality of AI agents. Competitive analysis showed that adopting the following features from OpenHands (which achieved 72.8% on SWE-Bench) would significantly improve MUSUBI's competitiveness.
 
-### 導入対象機能
+### Features to Adopt
 
-1. **スタック検出システム** - エージェントの無限ループ検出
-2. **キーワードトリガー型スキル** - 会話ベースのスキル活性化
-3. **リポジトリ固有スキル** - プロジェクト固有の知識管理
-4. **メモリコンデンサー** - コンテキスト圧縮
-5. **クリティック（評価）システム** - 出力品質のスコアリング
-6. **GitHub Issue自動解決** - 自動PR生成
-7. **セキュリティリスクアナライザー** - セキュリティ評価
-8. **エージェントメモリ** - セッション学習の永続化
+1. **Stuck Detection System** - Detect infinite loops in agents
+2. **Keyword-Triggered Skills** - Conversation-based skill activation
+3. **Repository-Specific Skills** - Project-specific knowledge management
+4. **Memory Condenser** - Context compression
+5. **Critic (Evaluation) System** - Scoring of output quality
+6. **Automatic GitHub Issue Resolution** - Automatic PR generation
+7. **Security Risk Analyzer** - Security evaluation
+8. **Agent Memory** - Persistence of session learnings
 
 ---
 
-## 2. 決定
+## 2. Decision
 
-OpenHandsの8つの機能をMUSUBI v2.2.0に導入する。
+Adopt the eight OpenHands features in MUSUBI v2.2.0.
 
-### 2.1 アーキテクチャ決定
+### 2.1 Architecture Decisions
 
-| 項目 | 決定 | 理由 |
+| Item | Decision | Reason |
 |------|------|------|
-| **言語** | JavaScript (Node.js) | 既存コードベースとの一貫性 |
-| **モジュール構造** | 新規ディレクトリなし | 既存の `src/analyzers/`, `src/managers/`, `src/validators/` に追加 |
-| **設定形式** | YAML (`project.yml`) | 既存の設定システムを拡張 |
-| **スキル形式** | Markdown + YAML frontmatter | OpenHandsと同一形式で互換性確保 |
+| **Language** | JavaScript (Node.js) | Consistency with the existing codebase |
+| **Module structure** | No new directories | Add to existing `src/analyzers/`, `src/managers/`, `src/validators/` |
+| **Configuration format** | YAML (`project.yml`) | Extend the existing configuration system |
+| **Skill format** | Markdown + YAML frontmatter | Same format as OpenHands to ensure compatibility |
 
-### 2.2 命名規則
+### 2.2 Naming Conventions
 
 | OpenHands | MUSUBI |
 |-----------|--------|
@@ -51,121 +51,121 @@ OpenHandsの8つの機能をMUSUBI v2.2.0に導入する。
 | resolver/ | issue-resolver.js |
 | security/ | security-analyzer.js |
 
-### 2.3 ディレクトリ構造
+### 2.3 Directory Structure
 
 ```
-.musubi/           # リポジトリ固有設定・スキル
+.musubi/           # Repository-specific configuration and skills
   └── skills/
       └── repo.md
 
-steering/          # プロジェクトメモリ（既存）
+steering/          # Project memory (existing)
   └── memories/
-      ├── quality_report.md   # Critic出力
-      └── session_learnings.md # AgentMemory出力
+      ├── quality_report.md   # Critic output
+      └── session_learnings.md # AgentMemory output
 ```
 
 ---
 
-## 3. 検討した選択肢
+## 3. Options Considered
 
-### 選択肢A: OpenHandsをそのまま依存関係として追加
+### Option A: Add OpenHands as-is as a dependency
 
-**メリット:**
-- 実装コスト最小
-- 自動アップデート
+**Benefits:**
+- Minimal implementation cost
+- Automatic updates
 
-**デメリット:**
-- Python依存（MUSUBIはNode.js）
-- OpenHandsの全機能が含まれる（過剰）
-- ライセンス複雑化
+**Disadvantages:**
+- Python dependency (MUSUBI uses Node.js)
+- Includes all OpenHands features (excessive)
+- Complicates licensing
 
-**判定:** 却下
+**Verdict:** Rejected
 
-### 選択肢B: OpenHandsの機能をJavaScriptで再実装
+### Option B: Reimplement OpenHands features in JavaScript
 
-**メリット:**
-- Node.jsエコシステムとの統合
-- MUSUBIのアーキテクチャに最適化
-- 必要な機能のみ導入
+**Benefits:**
+- Integration with the Node.js ecosystem
+- Optimized for MUSUBI's architecture
+- Adopt only the necessary features
 
-**デメリット:**
-- 実装コスト
-- メンテナンス負担
+**Disadvantages:**
+- Implementation cost
+- Maintenance burden
 
-**判定:** 採用
+**Verdict:** Adopted
 
-### 選択肢C: MCP (Model Context Protocol) 経由で連携
+### Option C: Integrate via MCP (Model Context Protocol)
 
-**メリット:**
-- 疎結合
-- 言語に依存しない
+**Benefits:**
+- Loose coupling
+- Language independent
 
-**デメリット:**
-- 追加の複雑性
-- ネットワーク依存
+**Disadvantages:**
+- Additional complexity
+- Network dependency
 
-**判定:** 将来検討
+**Verdict:** Consider in the future
 
 ---
 
-## 4. 影響
+## 4. Consequences
 
-### 4.1 ポジティブな影響
+### 4.1 Positive Consequences
 
-- エージェント品質の向上（スタック検出、クリティック）
-- 開発者体験の向上（キーワードトリガー、エージェントメモリ）
-- セキュリティの向上（セキュリティアナライザー）
-- 自動化の向上（Issue解決）
+- Improved agent quality (stuck detection, critic)
+- Improved developer experience (keyword triggers, agent memory)
+- Improved security (security analyzer)
+- Improved automation (issue resolution)
 
-### 4.2 リスクと緩和策
+### 4.2 Risks and Mitigations
 
-| リスク | 影響度 | 緩和策 |
+| Risk | Impact | Mitigation |
 |--------|-------|--------|
-| 実装遅延 | 中 | フェーズ分割、MVP優先 |
-| パフォーマンス低下 | 低 | 遅延評価、キャッシュ |
-| ユーザー混乱 | 低 | 段階的ロールアウト、ドキュメント |
+| Implementation delays | Medium | Phase splitting, MVP first |
+| Performance degradation | Low | Lazy evaluation, caching |
+| User confusion | Low | Incremental rollout, documentation |
 
-### 4.3 依存関係への影響
+### 4.3 Impact on Dependencies
 
-- `package.json` に新規依存なし（標準ライブラリのみ使用）
-- 既存のCLIコマンドに影響なし
-- 新規CLIコマンド: `musubi-resolve`, `musubi-remember`
-
----
-
-## 5. 実装計画
-
-### Phase 1 (Week 1-2): コア機能
-
-- [ ] REQ-P0-B001: スタック検出システム
-- [ ] REQ-P0-B002: キーワードトリガー型スキル
-- [ ] REQ-P0-B003: リポジトリ固有スキル
-
-### Phase 2 (Week 3-4): 品質機能
-
-- [ ] REQ-P0-B004: メモリコンデンサー
-- [ ] REQ-P0-B005: クリティック（評価）システム
-- [ ] REQ-P0-B008: エージェントメモリ
-
-### Phase 3 (Week 5-6): 自動化機能
-
-- [ ] REQ-P0-B006: GitHub Issue自動解決
-- [ ] REQ-P0-B007: セキュリティリスクアナライザー
+- No new dependencies in `package.json` (standard library only)
+- No impact on existing CLI commands
+- New CLI commands: `musubi-resolve`, `musubi-remember`
 
 ---
 
-## 6. 成功指標
+## 5. Implementation Plan
 
-| 指標 | 目標値 | 測定方法 |
+### Phase 1 (Week 1-2): Core Features
+
+- [ ] REQ-P0-B001: Stuck Detection System
+- [ ] REQ-P0-B002: Keyword-Triggered Skills
+- [ ] REQ-P0-B003: Repository-Specific Skills
+
+### Phase 2 (Week 3-4): Quality Features
+
+- [ ] REQ-P0-B004: Memory Condenser
+- [ ] REQ-P0-B005: Critic (Evaluation) System
+- [ ] REQ-P0-B008: Agent Memory
+
+### Phase 3 (Week 5-6): Automation Features
+
+- [ ] REQ-P0-B006: Automatic GitHub Issue Resolution
+- [ ] REQ-P0-B007: Security Risk Analyzer
+
+---
+
+## 6. Success Metrics
+
+| Metric | Target | Measurement Method |
 |------|--------|----------|
-| スタック検出精度 | 95%+ | テストケース |
-| スキル活性化精度 | 90%+ | ユーザーフィードバック |
-| クリティックスコア相関 | 0.8+ | 手動評価との比較 |
-| Issue解決成功率 | 60%+ | 自動PR承認率 |
+| Stuck detection accuracy | 95%+ | Test cases |
+| Skill activation accuracy | 90%+ | User feedback |
+| Critic score correlation | 0.8+ | Comparison with manual evaluation |
+| Issue resolution success rate | 60%+ | Automatic PR approval rate |
 
 ---
 
-## 7. 参考資料
+## 7. References
 
 - [OpenHands GitHub](https://github.com/OpenHands/OpenHands)
 - [OpenHands Skills README](https://github.com/OpenHands/OpenHands/blob/main/skills/README.md)
@@ -174,12 +174,12 @@ steering/          # プロジェクトメモリ（既存）
 
 ---
 
-## 8. 文書履歴
+## 8. Document History
 
-| バージョン | 日付 | 作成者 | 変更内容 |
+| Version | Date | Author | Changes |
 |-----------|------|--------|----------|
-| 1.0 | 2025-12-07 | MUSUBIチーム | 初版作成 |
+| 1.0 | 2025-12-07 | MUSUBI Team | Initial version |
 
 ---
 
-*― ADR終了 ―*
+*- End of ADR -*

@@ -102,16 +102,16 @@ describe('RequirementsCritic', () => {
         content: `
 # Requirements
 
-## 機能要件
+## Functional Requirements
 
 REQ-P0-001: When the user clicks submit, the system shall save the data.
 REQ-P0-002: The system shall respond within 200ms.
 
-## 非機能要件
+## Non-Functional Requirements
 
 The system should handle 1000 concurrent users.
 
-## 制約
+## Constraints
 
 Must use PostgreSQL database.
         `,
@@ -166,13 +166,13 @@ REQ-002: Another basic requirement.
     it('should check required sections', () => {
       const score = critic.checkCompleteness({
         content: `
-## 機能要件
+## Functional Requirements
 Some requirements.
 
-## 非機能要件
+## Non-Functional Requirements
 Performance requirements.
 
-## 制約
+## Constraints
 Technical constraints.
         `,
       });
@@ -181,10 +181,21 @@ Technical constraints.
 
     it('should return partial score for missing sections', () => {
       const score = critic.checkCompleteness({
-        content: '## 機能要件\nSome text.',
+        content: '## Functional Requirements\nSome text.',
       });
       expect(score).toBeGreaterThan(0);
       expect(score).toBeLessThan(1);
+    });
+
+    it('should fall back to the English SRS document when no content is given', () => {
+      const srsDir = path.join(tempDir, 'storage/specs/srs');
+      fs.mkdirSync(srsDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(srsDir, 'srs-musubi-v3.0.0.md'),
+        '## Functional Requirements\n\n## Non-Functional Requirements\n\n## Constraints\n'
+      );
+
+      expect(critic.checkCompleteness({})).toBe(1);
     });
   });
 

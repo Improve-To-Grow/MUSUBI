@@ -126,10 +126,10 @@ steering:
 
 ```yaml
 agents:
-  default_language: "ja"
+  default_language: "en"
   bilingual_output:
-    enabled: true
-    languages: ["en", "ja"]
+    enabled: false
+    languages: ["en"]
   
   output:
     gradual_generation: true
@@ -141,6 +141,10 @@ agents:
 ```
 
 **Purpose**: Defines how all agents should behave.
+
+**Bilingual output**: disabled by default (English only). `default_language` is the language agents use
+to chat with the user; `bilingual_output` adds a translated copy of every document. Enabling them also
+requires template changes — see [BILINGUAL-IMPLEMENTATION.md](../BILINGUAL-IMPLEMENTATION.md).
 
 **When to update**:
 - Change default language
@@ -512,11 +516,12 @@ project_name: "musubi-sdd"  # The project name
 ```javascript
 // Example: Agent reads bilingual setting
 const config = readYAML('steering/project.yml');
-const bilingualEnabled = config.agents.bilingual_output.enabled;
+const { enabled, languages } = config.agents.bilingual_output;
 
-if (bilingualEnabled) {
-  generateEnglishVersion();
-  generateJapaneseVersion();
+generateEnglishVersion();
+if (enabled) {
+  // e.g. languages = ["en", "ja"] -> also write <name>.ja.md
+  generateTranslation(languages.find(lang => lang !== 'en'));
 }
 ```
 

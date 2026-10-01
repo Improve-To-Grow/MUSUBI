@@ -23,13 +23,11 @@ Steering provides **project memory** for all Claude Code skills. It consists of 
 1. **Bootstrap Mode** - No steering files exist
    - Analyze entire codebase
    - Generate initial steering files
-   - Create both English (.md) and Japanese (.ja.md) versions
 
 2. **Sync Mode** - Steering files exist, codebase has changed
    - Compare current steering with codebase
    - Identify discrepancies
    - Update steering files to match reality
-   - Preserve both English and Japanese versions
 
 3. **Review Mode** - User wants to review/improve steering
    - Present current steering
@@ -64,24 +62,16 @@ Steering provides **project memory** for all Claude Code skills. It consists of 
    - Domain concepts from code
    - User types from code
 
-3. **Generate Steering Files** (Bilingual):
+3. **Generate Steering Files**:
 
-   **IMPORTANT**: Create BOTH English and Japanese versions for each file.
-
-   **English version is always the reference/source.**
-
-   Create `steering/structure.md` (English) with:
+   Create `steering/structure.md` with:
    - Architecture pattern (monolith, microservices, library-first, etc.)
    - Directory organization rules
    - Naming conventions
    - Component boundaries
    - Integration patterns
 
-   Create `steering/structure.ja.md` (Japanese) with:
-   - Translation of structure.md content
-   - All technical terms consistent with English version
-
-   Create `steering/tech.md` (English) with:
+   Create `steering/tech.md` with:
    - Primary language(s) and versions
    - Frameworks and versions
    - Database(s) and versions
@@ -90,28 +80,14 @@ Steering provides **project memory** for all Claude Code skills. It consists of 
    - Build/deployment tools
    - Development tools
 
-   Create `steering/tech.ja.md` (Japanese) with:
-   - Translation of tech.md content
-   - Technology names kept in English with Japanese explanations
-
-   Create `steering/product.md` (English) with:
+   Create `steering/product.md` with:
    - Product vision (inferred from README)
    - Target users (inferred from code)
    - Core capabilities
    - Business domain
    - Success metrics (if available)
 
-   Create `steering/product.ja.md` (Japanese) with:
-   - Translation of product.md content
-   - Product terminology consistent with English version
-
-4. **Bilingual File Generation**:
-   - Generate English version (.md) FIRST
-   - Then generate Japanese translation (.ja.md)
-   - English version is the reference for all skills
-   - Japanese version for Japanese-speaking team members
-
-5. **Create Rules Directory**:
+4. **Create Rules Directory**:
    - Copy constitutional governance files
    - Copy workflow guide
    - Copy EARS format guide
@@ -125,9 +101,9 @@ Present summary:
 
 Created steering files:
 
-- steering/structure.md (+ .ja.md)
-- steering/tech.md (+ .ja.md)
-- steering/product.md (+ .ja.md)
+- steering/structure.md
+- steering/tech.md
+- steering/product.md
 - steering/rules/ (constitution, workflow, EARS)
 
 ### Key Findings:
@@ -165,13 +141,10 @@ Please review the generated files and adjust as needed.
    - New components added?
    - Directory structure evolved?
 
-4. **Update Steering Files** (Bilingual):
-   - Update English version (.md) FIRST
+4. **Update Steering Files**:
    - Update sections that changed
    - Preserve sections that are still accurate
    - Add changelog entries
-   - Then update Japanese version (.ja.md) to match
-   - Ensure both versions stay synchronized
 
 5. **Generate Sync Report**:
 
@@ -185,8 +158,8 @@ Please review the generated files and adjust as needed.
 
    ### Updated Files:
 
-   - steering/structure.md (+ .ja.md)
-   - steering/tech.md (+ .ja.md)
+   - steering/structure.md
+   - steering/tech.md
 
    ### No Changes:
 
@@ -328,7 +301,6 @@ After generating/updating steering:
 
 1. **Completeness Check**:
    - [ ] All 3 core files present
-   - [ ] Both English and Japanese versions
    - [ ] Rules directory populated
 
 2. **Accuracy Check**:
@@ -337,7 +309,6 @@ After generating/updating steering:
    - [ ] Product context aligns with README
 
 3. **Consistency Check**:
-   - [ ] English and Japanese versions match
    - [ ] No contradictions between files
    - [ ] Steering aligns with constitutional articles
 

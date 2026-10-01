@@ -19,9 +19,6 @@ export const STEERING_FILES = [
   'product.md',
   'structure.md', 
   'tech.md',
-  'product.ja.md',
-  'structure.ja.md',
-  'tech.ja.md',
   'project.yml',
 ];
 

@@ -28,25 +28,21 @@ Implement the feature by executing tasks from the task breakdown document, follo
 
 **CRITICAL**: Read these files first:
 
-**IMPORTANT**: Always read ENGLISH versions (.md) as they are the reference/source.
-
 ```bash
-# Task Breakdown (English version)
+# Task Breakdown
 storage/tasks/{{feature-name}}-tasks.md
 
-# Design (English version)
+# Design
 storage/design/{{feature-name}}-design.md
 
-# Requirements (English version)
+# Requirements
 storage/specs/{{feature-name}}-requirements.md
 
-# Steering Context (English version)
+# Steering Context
 steering/structure.md
 steering/tech.md
 steering/product.md
 ```
-
-**Note**: Japanese versions (.ja.md) are translations only. Always use English versions for implementation.
 
 ---
 

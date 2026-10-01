@@ -172,12 +172,9 @@ Update steering files with new information:
 - Add new dependencies
 - Document technology choices
 
-# Step 12: Save Implementation Report (Bilingual)
+# Step 12: Save Implementation Report
 
-Create TWO files:
-
-1. English: `storage/changes/<change-name>-implementation.md`
-2. Japanese: `storage/changes/<change-name>-implementation.ja.md`
+Save to: `storage/changes/<change-name>-implementation.md`
 
 Include:
 - Metadata (Change ID, status, dates)
@@ -213,7 +210,7 @@ Before completing:
 - Traceability matrix updated
 - Constitutional compliance verified
 - Steering files updated
-- Implementation report saved (bilingual)
+- Implementation report saved
 - Summary presented
 
 Execute the change implementation now.

@@ -2,7 +2,7 @@
 
 ## Overview
 
-MUSUBI SDD は仕様駆動開発のための包括的なツールキットです。このドキュメントでは主要なモジュールとAPIについて説明します。
+MUSUBI SDD is a comprehensive toolkit for specification-driven development. This document describes the main modules and APIs.
 
 ## Installation
 
@@ -14,13 +14,13 @@ npm install musubi-sdd
 
 | Module | Description |
 |--------|-------------|
-| [Analyzers](#analyzers) | コード解析ツール |
-| [Generators](#generators) | 要件・設計・タスク生成 |
-| [Orchestration](#orchestration) | ワークフローオーケストレーション |
-| [Validators](#validators) | 憲法準拠検証 |
-| [Performance](#performance) | パフォーマンス最適化 |
-| [Enterprise](#enterprise) | マルチテナント・RBAC |
-| [AI](#ai) | 高度なAI機能 |
+| [Analyzers](#analyzers) | Code analysis tools |
+| [Generators](#generators) | Requirements, design, and task generation |
+| [Orchestration](#orchestration) | Workflow orchestration |
+| [Validators](#validators) | Constitutional compliance validation |
+| [Performance](#performance) | Performance optimization |
+| [Enterprise](#enterprise) | Multi-tenancy and RBAC |
+| [AI](#ai) | Advanced AI features |
 
 ---
 
@@ -28,7 +28,7 @@ npm install musubi-sdd
 
 ### LargeProjectAnalyzer
 
-大規模プロジェクト解析のためのクラス。
+A class for analyzing large projects.
 
 ```javascript
 const { LargeProjectAnalyzer } = require('musubi-sdd');
@@ -46,13 +46,13 @@ console.log(analysis.summary);
 **Options:**
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| maxFiles | number | 1000 | 解析する最大ファイル数 |
-| chunkSize | number | 50 | バッチ処理のチャンクサイズ |
-| enableParallel | boolean | true | 並列処理を有効化 |
+| maxFiles | number | 1000 | Maximum number of files to analyze |
+| chunkSize | number | 50 | Chunk size for batch processing |
+| enableParallel | boolean | true | Enable parallel processing |
 
 ### ComplexityAnalyzer
 
-コード複雑度を分析します。
+Analyzes code complexity.
 
 ```javascript
 const { ComplexityAnalyzer } = require('musubi-sdd');
@@ -66,7 +66,7 @@ console.log(`Cognitive Complexity: ${result.cognitive}`);
 
 ### GapDetector
 
-要件とコード間のギャップを検出します。
+Detects gaps between requirements and code.
 
 ```javascript
 const { GapDetector } = require('musubi-sdd');
@@ -88,7 +88,7 @@ gaps.forEach(gap => {
 
 ### RequirementsGenerator
 
-EARS形式で要件を生成します。
+Generates requirements in EARS format.
 
 ```javascript
 const { RequirementsGenerator } = require('musubi-sdd');
@@ -99,14 +99,14 @@ const generator = new RequirementsGenerator({
 });
 
 const requirements = await generator.generate({
-  feature: 'ユーザー認証',
-  context: 'Webアプリケーション'
+  feature: 'User Authentication',
+  context: 'Web Application'
 });
 ```
 
 ### DesignGenerator
 
-C4モデルベースの設計ドキュメントを生成します。
+Generates design documents based on the C4 model.
 
 ```javascript
 const { DesignGenerator } = require('musubi-sdd');
@@ -120,7 +120,7 @@ const design = await generator.generate({
 
 ### TaskGenerator
 
-設計からタスクを生成します。
+Generates tasks from the design.
 
 ```javascript
 const { TaskGenerator } = require('musubi-sdd');
@@ -139,7 +139,7 @@ const tasks = await generator.generate(design);
 
 ### OrchestrationEngine
 
-ワークフローを実行するメインエンジン。
+The main engine that executes workflows.
 
 ```javascript
 const { OrchestrationEngine } = require('musubi-sdd');
@@ -152,7 +152,7 @@ const engine = new OrchestrationEngine({
 
 const result = await engine.execute({
   workflow: 'full-sdd',
-  feature: 'ユーザー管理機能'
+  feature: 'User Management'
 });
 
 console.log(`Total cost: $${result.totalCost}`);
@@ -160,7 +160,7 @@ console.log(`Total cost: $${result.totalCost}`);
 
 ### WorkflowOrchestrator
 
-カスタムワークフローを定義・実行します。
+Defines and executes custom workflows.
 
 ```javascript
 const { WorkflowOrchestrator } = require('musubi-sdd');
@@ -182,7 +182,7 @@ await orchestrator.run('custom', context);
 
 ### ConstitutionalValidator
 
-9条憲法に準拠しているか検証します。
+Verifies compliance with the 9-Article Constitution.
 
 ```javascript
 const { ConstitutionalValidator } = require('musubi-sdd');
@@ -203,15 +203,15 @@ if (result.passed) {
 ```
 
 **9 Constitutional Articles:**
-1. 要件からの追跡可能性
-2. EARS形式の要件
-3. C4モデルベース設計
-4. ADR記録
-5. タスク粒度の適切性
-6. コード品質基準
-7. テストカバレッジ
-8. セキュリティ考慮
-9. ドキュメント完全性
+1. Traceability from requirements
+2. EARS-format requirements
+3. C4 model-based design
+4. ADR records
+5. Appropriate task granularity
+6. Code quality standards
+7. Test coverage
+8. Security considerations
+9. Documentation completeness
 
 ---
 
@@ -219,7 +219,7 @@ if (result.passed) {
 
 ### LazyLoader
 
-モジュールの遅延ロードを実現します。
+Provides lazy loading of modules.
 
 ```javascript
 const { performance } = require('musubi-sdd');
@@ -235,14 +235,14 @@ const module = await loader.load('heavyModule');
 
 ### CacheManager
 
-TTL付きLRUキャッシュを提供します。
+Provides an LRU cache with TTL.
 
 ```javascript
 const { CacheManager } = require('musubi-sdd').performance;
 
 const cache = new CacheManager({
   maxSize: 1000,
-  defaultTtl: 60000 // 1分
+  defaultTtl: 60000 // 1 minute
 });
 
 cache.set('key', value);
@@ -251,7 +251,7 @@ const cached = cache.get('key');
 
 ### StartupOptimizer
 
-起動時間を最適化します。
+Optimizes startup time.
 
 ```javascript
 const { StartupOptimizer, InitStage } = require('musubi-sdd').performance;
@@ -260,7 +260,7 @@ const optimizer = new StartupOptimizer();
 
 optimizer.register('core', {
   stage: InitStage.CORE,
-  init: async () => { /* 初期化処理 */ }
+  init: async () => { /* initialization */ }
 });
 
 await optimizer.initialize();
@@ -272,7 +272,7 @@ await optimizer.initialize();
 
 ### TenantManager
 
-マルチテナント環境を管理します。
+Manages multi-tenant environments.
 
 ```javascript
 const { enterprise } = require('musubi-sdd');
@@ -296,17 +296,17 @@ const context = manager.createContext(tenant.id, user.id);
 
 ### RBAC
 
-ロールベースアクセス制御。
+Role-based access control.
 
 ```javascript
 const { Permission, ROLE_PERMISSIONS } = require('musubi-sdd').enterprise;
 
 if (user.hasPermission(Permission.ORCHESTRATE)) {
-  // オーケストレーション実行可能
+  // Can run orchestration
 }
 
 if (user.hasAllPermissions([Permission.READ, Permission.WRITE])) {
-  // 読み書き両方可能
+  // Can both read and write
 }
 ```
 
@@ -316,7 +316,7 @@ if (user.hasAllPermissions([Permission.READ, Permission.WRITE])) {
 
 ### ModelRouter
 
-タスクに最適なモデルを選択します。
+Selects the optimal model for a task.
 
 ```javascript
 const { ai } = require('musubi-sdd');
@@ -335,7 +335,7 @@ console.log(`Selected model: ${model.name}`);
 
 ### RAGPipeline
 
-コード知識のRAG検索を実現します。
+Provides RAG search over code knowledge.
 
 ```javascript
 const { RAGPipeline } = require('musubi-sdd').ai;
@@ -355,7 +355,7 @@ const augmented = await rag.augment(
 
 ### ContextWindowManager
 
-大きなコンテキストを管理します。
+Manages large contexts.
 
 ```javascript
 const { ContextWindowManager } = require('musubi-sdd').ai;
@@ -371,25 +371,25 @@ const relevant = manager.prioritize(chunks, 'login function', 5);
 ## CLI Commands
 
 ```bash
-# 初期化
+# Initialize
 musubi init
 
-# 要件生成
+# Generate requirements
 musubi requirements <feature>
 
-# 設計生成
+# Generate design
 musubi design <feature>
 
-# タスク生成
+# Generate tasks
 musubi tasks <feature>
 
-# 憲法検証
+# Constitutional validation
 musubi validate <feature>
 
-# フルオーケストレーション
+# Full orchestration
 musubi orchestrate <feature>
 
-# コスト追跡
+# Cost tracking
 musubi costs --report
 ```
 

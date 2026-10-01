@@ -2354,10 +2354,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
- * AdaptiveGoalModifier - 状況に応じた目標の動的調整
+ * AdaptiveGoalModifier - Dynamic goal adjustment based on the situation
  *
- * Goal-Driven Replanning の完全実装 (Phase 2/3)
- * 目標の優先度・スコープ・タイムライン・成功基準を動的に調整
+ * Full implementation of Goal-Driven Replanning (Phase 2/3)
+ * Dynamically adjust goal priority, scope, timeline and success criteria
  *
  * @module orchestration/replanning/adaptive-goal-modifier
  */
@@ -2365,44 +2365,44 @@
 'use strict';
 &nbsp;
 /**
- * 目標調整の理由を分類
+ * Classify the reasons for goal adjustment
  */
 const ModificationReason = {
-  RESOURCE_CONSTRAINT: 'resource_constraint', // リソース制約
-  TIME_CONSTRAINT: 'time_constraint', // 時間制約
-  DEPENDENCY_FAILURE: 'dependency_failure', // 依存関係の失敗
-  PRIORITY_SHIFT: 'priority_shift', // 優先度の変更
-  SCOPE_CREEP: 'scope_creep', // スコープの拡大
-  EXTERNAL_CHANGE: 'external_change', // 外部要因の変化
-  PERFORMANCE_ISSUE: 'performance_issue', // パフォーマンス問題
-  USER_REQUEST: 'user_request', // ユーザーリクエスト
-  STRATEGIC_PIVOT: 'strategic_pivot', // 戦略的転換
+  RESOURCE_CONSTRAINT: 'resource_constraint', // Resource constraint
+  TIME_CONSTRAINT: 'time_constraint', // Time constraint
+  DEPENDENCY_FAILURE: 'dependency_failure', // Dependency failure
+  PRIORITY_SHIFT: 'priority_shift', // Priority change
+  SCOPE_CREEP: 'scope_creep', // Scope expansion
+  EXTERNAL_CHANGE: 'external_change', // Change in external factors
+  PERFORMANCE_ISSUE: 'performance_issue', // Performance issue
+  USER_REQUEST: 'user_request', // User request
+  STRATEGIC_PIVOT: 'strategic_pivot', // Strategic pivot
 };
 &nbsp;
 /**
- * 調整タイプ
+ * Adjustment types
  */
 const ModificationType = {
-  PRIORITY_ADJUSTMENT: 'priority_adjustment', // 優先度調整
-  SCOPE_REDUCTION: 'scope_reduction', // スコープ縮小
-  SCOPE_EXPANSION: 'scope_expansion', // スコープ拡大
-  TIMELINE_EXTENSION: 'timeline_extension', // タイムライン延長
-  TIMELINE_COMPRESSION: 'timeline_compression', // タイムライン圧縮
-  SUCCESS_CRITERIA_RELAXATION: 'criteria_relaxation', // 成功基準緩和
-  SUCCESS_CRITERIA_TIGHTENING: 'criteria_tightening', // 成功基準厳格化
-  GOAL_DECOMPOSITION: 'goal_decomposition', // 目標分解
-  GOAL_MERGE: 'goal_merge', // 目標統合
-  GOAL_DEFERRAL: 'goal_deferral', // 目標延期
-  GOAL_CANCELLATION: 'goal_cancellation', // 目標キャンセル
+  PRIORITY_ADJUSTMENT: 'priority_adjustment', // Priority adjustment
+  SCOPE_REDUCTION: 'scope_reduction', // Scope reduction
+  SCOPE_EXPANSION: 'scope_expansion', // Scope expansion
+  TIMELINE_EXTENSION: 'timeline_extension', // Timeline extension
+  TIMELINE_COMPRESSION: 'timeline_compression', // Timeline compression
+  SUCCESS_CRITERIA_RELAXATION: 'criteria_relaxation', // Relax success criteria
+  SUCCESS_CRITERIA_TIGHTENING: 'criteria_tightening', // Tighten success criteria
+  GOAL_DECOMPOSITION: 'goal_decomposition', // Goal decomposition
+  GOAL_MERGE: 'goal_merge', // Goal merge
+  GOAL_DEFERRAL: 'goal_deferral', // Goal deferral
+  GOAL_CANCELLATION: 'goal_cancellation', // Goal cancellation
 };
 &nbsp;
 /**
- * 影響分析エンジン
- * 目標変更による影響を分析
+ * Impact analysis engine
+ * Analyze the impact of goal changes
  */
 class ImpactAnalyzer {
   /**
-   * @param {Object} options - 設定オプション
+   * @param {Object} options - Configuration options
    */
   constructor(options = {}) {
     this.config = {
@@ -2413,11 +2413,11 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * 目標変更の影響を分析
-   * @param {Object} goal - 対象目標
-   * @param {Object} modification - 変更内容
-   * @param {Object} context - コンテキスト
-   * @returns {Object} 影響分析結果
+   * Analyze the impact of a goal change
+   * @param {Object} goal - Target goal
+   * @param {Object} modification - Change details
+   * @param {Object} context - Context
+   * @returns {Object} Impact analysis result
    */
   analyzeImpact(goal, modification, context) {
     const directImpact = this._analyzeDirectImpact(goal, modification);
@@ -2447,7 +2447,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * 直接的な影響を分析
+   * Analyze direct impact
    * @private
    */
   _analyzeDirectImpact(goal, modification) {
@@ -2476,7 +2476,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * カスケード影響を分析
+   * Analyze cascade impact
    * @private
    */
   _analyzeCascadeImpact(goal, modification, context) {
@@ -2505,7 +2505,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * リソース影響を分析
+   * Analyze resource impact
    * @private
    */
   _analyzeResourceImpact(goal, modification, context) {
@@ -2527,7 +2527,7 @@ class ImpactAnalyzer {
 <span class="cstat-no" title="statement not covered" >      resourceChanges.required = this._estimateAdditionalResources(goal, modification);</span>
     }
 &nbsp;
-    // リソース競合チェック
+    // Check for resource conflicts
     <span class="missing-if-branch" title="if path not taken" >I</span>if (context.resourcePool) {
 <span class="cstat-no" title="statement not covered" >      resourceChanges.conflicting = this._findConflicts(</span>
         resourceChanges.required,
@@ -2543,7 +2543,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * タイムライン影響を分析
+   * Analyze timeline impact
    * @private
    */
   _analyzeTimelineImpact(goal, modification, context) {
@@ -2572,7 +2572,7 @@ class ImpactAnalyzer {
     }
 &nbsp;
     return {
-      score: Math.min(1.0, Math.abs(shift) / 14), // 2週間を基準
+      score: Math.min(1.0, Math.abs(shift) / 14), // Based on 2 weeks
       shiftDays: shift,
       direction: shift &gt; 0 ? 'delay' : 'accelerate',
       affectedMilestones: affectedMilestones.length,
@@ -2580,7 +2580,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * 総合影響スコアを計算
+   * Calculate the overall impact score
    * @private
    */
   _calculateTotalImpact(direct, cascade, resource, timeline) {
@@ -2588,7 +2588,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * リスクレベルを分類
+   * Classify the risk level
    * @private
    */
   _categorizeRisk(score) {
@@ -2599,7 +2599,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * 影響を受けるエリアを特定
+   * Identify affected areas
    * @private
    */
   _identifyAffectedAreas(modificationType) {
@@ -2620,7 +2620,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * 依存関係の影響を計算
+   * Calculate dependency impact
    * @private
    */
   _calculateDependencyImpact(depGoal, modification) {
@@ -2635,7 +2635,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * カスケードアクションを決定
+   * Determine cascade actions
    * @private
    */
   _determineCascadeAction(impact) {
@@ -2645,7 +2645,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * 追加リソースを見積もり
+   * Estimate additional resources
    * @private
    */
 <span class="fstat-no" title="function not covered" >  _e</span>stimateAdditionalResources(goal, modification) {
@@ -2658,7 +2658,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * リソース競合を検出
+   * Detect resource conflicts
    * @private
    */
 <span class="fstat-no" title="function not covered" >  _f</span>indConflicts(required, pool) {
@@ -2669,7 +2669,7 @@ class ImpactAnalyzer {
   }
 &nbsp;
   /**
-   * 推奨事項を生成
+   * Generate recommendations
    * @private
    */
   _generateRecommendations(totalScore, modification) {
@@ -2704,12 +2704,12 @@ class ImpactAnalyzer {
 }
 &nbsp;
 /**
- * 目標調整ストラテジー
- * 状況に応じた調整戦略を決定
+ * Goal adjustment strategy
+ * Determine an adjustment strategy based on the situation
  */
 class ModificationStrategy {
   /**
-   * @param {Object} options - 設定オプション
+   * @param {Object} options - Configuration options
    */
   constructor(options = {}) {
     this.config = {
@@ -2720,11 +2720,11 @@ class ModificationStrategy {
   }
 &nbsp;
   /**
-   * 最適な調整戦略を決定
-   * @param {Object} goal - 対象目標
-   * @param {Object} trigger - トリガー情報
-   * @param {Object} context - コンテキスト
-   * @returns {Object} 調整戦略
+   * Determine the optimal adjustment strategy
+   * @param {Object} goal - Target goal
+   * @param {Object} trigger - Trigger information
+   * @param {Object} context - Context
+   * @returns {Object} Adjustment strategy
    */
   determineStrategy(goal, trigger, context) {
     const strategies = this._generateCandidateStrategies(goal, trigger, context);
@@ -2744,7 +2744,7 @@ class ModificationStrategy {
   }
 &nbsp;
   /**
-   * 候補戦略を生成
+   * Generate candidate strategies
    * @private
    */
   _generateCandidateStrategies(goal, trigger, _context) {
@@ -2810,37 +2810,37 @@ class ModificationStrategy {
   }
 &nbsp;
   /**
-   * 戦略を評価
+   * Evaluate strategies
    * @private
    */
   _evaluateStrategy(strategy, goal, _context) {
-    let score = 0.5; // ベーススコア
+    let score = 0.5; // Base score
 &nbsp;
-    // 目標優先度との整合性
+    // Consistency with goal priority
     if (goal.priority === 'critical' &amp;&amp; strategy.preservesCore) {
       score += 0.2;
     }
 &nbsp;
-    // リソース効率
+    // Resource efficiency
     if (strategy.resourceEfficiency === 'high') {
       score += 0.15;
     }
 &nbsp;
-    // リスクレベル
+    // Risk level
     score -= strategy.riskLevel === 'high' ? 0.2 : strategy.riskLevel === 'medium' ? 0.1 : 0;
 &nbsp;
-    // 保守的モードの場合
+    // In conservative mode
     if (this.config.conservativeMode &amp;&amp; strategy.conservative) {
       score += 0.1;
     }
 &nbsp;
-    // 実現可能性
+    // Feasibility
     score += strategy.feasibility * 0.15;
 &nbsp;
     return Math.max(0, Math.min(1, score));
   }
 &nbsp;
-  // 戦略生成メソッド群
+  // Strategy generation methods
   _createScopeReductionStrategy(goal, _trigger) {
     return {
       type: ModificationType.SCOPE_REDUCTION,
@@ -2946,7 +2946,7 @@ class ModificationStrategy {
   }
 &nbsp;
   /**
-   * 削減対象を特定
+   * Identify targets for reduction
    * @private
    */
   _identifyReductionTargets(goal) {
@@ -2961,7 +2961,7 @@ class ModificationStrategy {
   }
 &nbsp;
   /**
-   * サブゴールを提案
+   * Suggest sub-goals
    * @private
    */
   _suggestSubGoals(goal) {
@@ -2976,12 +2976,12 @@ class ModificationStrategy {
 }
 &nbsp;
 /**
- * 調整履歴マネージャー
- * 目標調整の履歴を管理・分析
+ * Adjustment history manager
+ * Manage and analyze the history of goal adjustments
  */
 class ModificationHistoryManager {
   /**
-   * @param {Object} options - 設定オプション
+   * @param {Object} options - Configuration options
    */
   constructor(options = {}) {
     this.history = new Map();
@@ -2992,10 +2992,10 @@ class ModificationHistoryManager {
   }
 &nbsp;
   /**
-   * 調整を記録
-   * @param {string} goalId - 目標ID
-   * @param {Object} modification - 調整内容
-   * @param {Object} impact - 影響分析結果
+   * Record an adjustment
+   * @param {string} goalId - Goal ID
+   * @param {Object} modification - Adjustment details
+   * @param {Object} impact - Impact analysis result
    */
   recordModification(goalId, modification, impact) {
     if (!this.history.has(goalId)) {
@@ -3011,25 +3011,25 @@ class ModificationHistoryManager {
       status: 'applied',
     });
 &nbsp;
-    // 履歴サイズ制限
+    // Limit history size
     if (history.length &gt; this.config.maxHistoryPerGoal) {
       history.shift();
     }
   }
 &nbsp;
   /**
-   * 目標の調整履歴を取得
-   * @param {string} goalId - 目標ID
-   * @returns {Array} 調整履歴
+   * Get the adjustment history for a goal
+   * @param {string} goalId - Goal ID
+   * @returns {Array} Adjustment history
    */
   getHistory(goalId) {
     return this.history.get(goalId) || [];
   }
 &nbsp;
   /**
-   * 調整パターンを分析
-   * @param {string} goalId - 目標ID
-   * @returns {Object} パターン分析結果
+   * Analyze adjustment patterns
+   * @param {string} goalId - Goal ID
+   * @returns {Object} Pattern analysis result
    */
   analyzePatterns(goalId) {
     const history = this.getHistory(goalId);
@@ -3083,10 +3083,10 @@ class ModificationHistoryManager {
   }
 &nbsp;
   /**
-   * 調整をロールバック
-   * @param {string} goalId - 目標ID
-   * @param {string} modificationId - 調整ID
-   * @returns {Object|null} ロールバックされた調整
+   * Roll back an adjustment
+   * @param {string} goalId - Goal ID
+   * @param {string} modificationId - Adjustment ID
+   * @returns {Object|null} The rolled-back adjustment
    */
   rollback(goalId, modificationId) {
     const history = this.history.get(goalId);
@@ -3105,11 +3105,11 @@ class ModificationHistoryManager {
 &nbsp;
 /**
  * AdaptiveGoalModifier
- * 状況に応じた目標の動的調整を行うメインクラス
+ * Main class that performs dynamic goal adjustment based on the situation
  */
 class AdaptiveGoalModifier {
   /**
-   * @param {Object} options - 設定オプション
+   * @param {Object} options - Configuration options
    */
   constructor(options = {}) {
     this.impactAnalyzer = new ImpactAnalyzer(options.impact);
@@ -3129,9 +3129,9 @@ class AdaptiveGoalModifier {
   }
 &nbsp;
   /**
-   * 目標を登録
-   * @param {Object} goal - 目標定義
-   * @returns {Object} 登録された目標
+   * Register a goal
+   * @param {Object} goal - Goal definition
+   * @returns {Object} The registered goal
    */
   registerGoal(goal) {
     const normalizedGoal = {
@@ -3155,10 +3155,10 @@ class AdaptiveGoalModifier {
   }
 &nbsp;
   /**
-   * 目標調整をトリガー
-   * @param {string} goalId - 目標ID
-   * @param {Object} trigger - トリガー情報
-   * @returns {Promise&lt;Object&gt;} 調整結果
+   * Trigger a goal adjustment
+   * @param {string} goalId - Goal ID
+   * @param {Object} trigger - Trigger information
+   * @returns {Promise&lt;Object&gt;} Adjustment result
    */
   async triggerModification(goalId, trigger) {
     const goal = this.goals.get(goalId);
@@ -3166,13 +3166,13 @@ class AdaptiveGoalModifier {
       throw new Error(`Goal not found: ${goalId}`);
     }
 &nbsp;
-    // コンテキスト構築
+    // Build context
     const context = this._buildContext(goalId);
 &nbsp;
-    // 戦略決定
+    // Determine strategy
     const strategyResult = this.strategy.determineStrategy(goal, trigger, context);
 &nbsp;
-    // 影響分析
+    // Impact analysis
     const impact = this.impactAnalyzer.analyzeImpact(
       goal,
       { type: strategyResult.recommended.type, ...strategyResult.recommended },
@@ -3191,7 +3191,7 @@ class AdaptiveGoalModifier {
       createdAt: new Date().toISOString(),
     };
 &nbsp;
-    // 自動承認チェック
+    // Auto-approval check
     if (
       !this.config.requireApproval ||
       (strategyResult.autoApprovable &amp;&amp; impact.totalScore &lt; this.config.autoModifyThreshold)
@@ -3199,7 +3199,7 @@ class AdaptiveGoalModifier {
       return this._applyModification(modification);
     }
 &nbsp;
-    // 承認待ち
+    // Awaiting approval
     this.pendingModifications.set(modification.id, modification);
     this._emit('modification_pending', modification);
 &nbsp;
@@ -3211,9 +3211,9 @@ class AdaptiveGoalModifier {
   }
 &nbsp;
   /**
-   * 調整を承認
-   * @param {string} modificationId - 調整ID
-   * @returns {Object} 適用結果
+   * Approve an adjustment
+   * @param {string} modificationId - Adjustment ID
+   * @returns {Object} Application result
    */
   approveModification(modificationId) {
     const modification = this.pendingModifications.get(modificationId);
@@ -3226,10 +3226,10 @@ class AdaptiveGoalModifier {
   }
 &nbsp;
   /**
-   * 調整を拒否
-   * @param {string} modificationId - 調整ID
-   * @param {string} reason - 拒否理由
-   * @returns {Object} 拒否結果
+   * Reject an adjustment
+   * @param {string} modificationId - Adjustment ID
+   * @param {string} reason - Rejection reason
+   * @returns {Object} Rejection result
    */
   rejectModification(modificationId, reason) {
     const modification = this.pendingModifications.get(modificationId);
@@ -3252,7 +3252,7 @@ class AdaptiveGoalModifier {
   }
 &nbsp;
   /**
-   * 調整を適用
+   * Apply an adjustment
    * @private
    */
   _applyModification(modification) {
@@ -3264,7 +3264,7 @@ class AdaptiveGoalModifier {
     const strategy = modification.strategy;
     const previousState = { ...goal };
 &nbsp;
-    // タイプに応じた調整適用
+    // Apply the adjustment according to its type
     switch (strategy.type) {
       case ModificationType.PRIORITY_ADJUSTMENT:
         goal.priority = strategy.newPriority;
@@ -3311,7 +3311,7 @@ class AdaptiveGoalModifier {
 <span class="cstat-no" title="statement not covered" >        break;</span>
 &nbsp;
 <span class="branch-7 cbranch-no" title="branch not covered" >      case ModificationType.GOAL_DECOMPOSITION:</span>
-        // サブゴール作成
+        // Create sub-goals
 <span class="cstat-no" title="statement not covered" >        for (const subGoal of strategy.suggestedSubGoals || []) {</span>
 <span class="cstat-no" title="statement not covered" >          this.registerGoal({</span>
             ...subGoal,
@@ -3333,11 +3333,11 @@ class AdaptiveGoalModifier {
 <span class="cstat-no" title="statement not covered" >        break;</span>
     }
 &nbsp;
-    // メタデータ更新
+    // Update metadata
     goal.modificationCount++;
     goal.lastModifiedAt = new Date().toISOString();
 &nbsp;
-    // 履歴記録
+    // Record history
     this.historyManager.recordModification(
       modification.goalId,
       { ...modification, previousState },
@@ -3363,7 +3363,7 @@ class AdaptiveGoalModifier {
   }
 &nbsp;
   /**
-   * コンテキストを構築
+   * Build the context
    * @private
    */
   _buildContext(goalId) {
@@ -3376,26 +3376,26 @@ class AdaptiveGoalModifier {
   }
 &nbsp;
   /**
-   * 目標を取得
-   * @param {string} goalId - 目標ID
-   * @returns {Object|undefined} 目標
+   * Get a goal
+   * @param {string} goalId - Goal ID
+   * @returns {Object|undefined} Goal
    */
   getGoal(goalId) {
     return this.goals.get(goalId);
   }
 &nbsp;
   /**
-   * 全目標を取得
-   * @returns {Array} 全目標リスト
+   * Get all goals
+   * @returns {Array} List of all goals
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tAllGoals() {
 <span class="cstat-no" title="statement not covered" >    return Array.from(this.goals.values());</span>
   }
 &nbsp;
   /**
-   * 目標の調整履歴を取得
-   * @param {string} goalId - 目標ID
-   * @returns {Object} 履歴と分析
+   * Get the adjustment history for a goal
+   * @param {string} goalId - Goal ID
+   * @returns {Object} History and analysis
    */
   getGoalHistory(goalId) {
     return {
@@ -3405,17 +3405,17 @@ class AdaptiveGoalModifier {
   }
 &nbsp;
   /**
-   * 保留中の調整を取得
-   * @returns {Array} 保留中の調整リスト
+   * Get pending adjustments
+   * @returns {Array} List of pending adjustments
    */
   getPendingModifications() {
     return Array.from(this.pendingModifications.values());
   }
 &nbsp;
   /**
-   * イベントハンドラーを登録
-   * @param {string} event - イベント名
-   * @param {Function} handler - ハンドラー関数
+   * Register an event handler
+   * @param {string} event - Event name
+   * @param {Function} handler - Handler function
    */
   on(event, handler) {
     <span class="missing-if-branch" title="else path not taken" >E</span>if (!this.eventHandlers.has(event)) {
@@ -3425,7 +3425,7 @@ class AdaptiveGoalModifier {
   }
 &nbsp;
   /**
-   * イベントを発火
+   * Emit an event
    * @private
    */
   _emit(event, data) {
@@ -3440,10 +3440,10 @@ class AdaptiveGoalModifier {
   }
 &nbsp;
   /**
-   * 調整提案を生成
-   * @param {string} goalId - 目標ID
-   * @param {Object} currentState - 現在の状態
-   * @returns {Object} 調整提案
+   * Generate adjustment suggestions
+   * @param {string} goalId - Goal ID
+   * @param {Object} currentState - Current state
+   * @returns {Object} Adjustment suggestions
    */
   generateSuggestions(goalId, currentState) {
     const goal = this.goals.get(goalId);
@@ -3454,7 +3454,7 @@ class AdaptiveGoalModifier {
     const suggestions = [];
     const patterns = this.historyManager.analyzePatterns(goalId);
 &nbsp;
-    // 進捗ベースの提案
+    // Progress-based suggestions
     <span class="missing-if-branch" title="else path not taken" >E</span>if (currentState.progress &lt; 0.3 &amp;&amp; currentState.timeElapsed &gt; 0.5) {
       suggestions.push({
         trigger: { reason: ModificationReason.TIME_CONSTRAINT, gap: 0.2 },
@@ -3463,7 +3463,7 @@ class AdaptiveGoalModifier {
       });
     }
 &nbsp;
-    // リソースベースの提案
+    // Resource-based suggestions
     <span class="missing-if-branch" title="if path not taken" >I</span>if (currentState.resourceUtilization &gt; 0.9) {
 <span class="cstat-no" title="statement not covered" >      suggestions.push({</span>
         trigger: { reason: ModificationReason.RESOURCE_CONSTRAINT },
@@ -3472,7 +3472,7 @@ class AdaptiveGoalModifier {
       });
     }
 &nbsp;
-    // パターンベースの提案
+    // Pattern-based suggestions
     <span class="missing-if-branch" title="if path not taken" >I</span>if (patterns.insights?.some(<span class="fstat-no" title="function not covered" >i </span>=&gt; <span class="cstat-no" title="statement not covered" >i.type === 'volatility')</span>) {
 <span class="cstat-no" title="statement not covered" >      suggestions.push({</span>
         trigger: { reason: ModificationReason.SCOPE_CREEP },

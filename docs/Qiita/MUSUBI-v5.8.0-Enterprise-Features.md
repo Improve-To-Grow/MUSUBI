@@ -1,26 +1,26 @@
-# 【MUSUBI v5.8.0】エンタープライズ対応！マルチテナント・AI最適化・統合プラットフォーム
+# [MUSUBI v5.8.0] Enterprise Ready! Multi-Tenant, AI Optimization, and an Integration Platform
 
-## はじめに
+## Introduction
 
-MUSUBI SDD v5.8.0 がリリースされました！このバージョンでは、**Phase 6: エンタープライズ機能**の実装が完了し、大規模組織でのSDD（仕様駆動開発）導入を支援する機能が追加されました。
+MUSUBI SDD v5.8.0 has been released! This version completes the implementation of **Phase 6: Enterprise Features**, adding capabilities that support the adoption of SDD (specification-driven development) in large organizations.
 
-## 🆕 v5.8.0 の新機能
+## 🆕 New Features in v5.8.0
 
-### 📊 新機能サマリー
+### 📊 New Features Summary
 
-| カテゴリ | 機能 | 優先度 |
+| Category | Feature | Priority |
 |---------|------|--------|
-| Enterprise | マルチテナントサポート | P0 |
-| AI | マルチモデルオーケストレーション | P1 |
-| Integration | JIRA/Azure DevOps/GitLab連携 | P1 |
-| Extension | VSCode ダッシュボード | P2 |
-| DX | API リファレンス | P2 |
+| Enterprise | Multi-tenant support | P0 |
+| AI | Multi-model orchestration | P1 |
+| Integration | JIRA/Azure DevOps/GitLab integration | P1 |
+| Extension | VSCode dashboard | P2 |
+| DX | API reference | P2 |
 
-## 🏢 マルチテナントサポート
+## 🏢 Multi-Tenant Support
 
-### テナント分離
+### Tenant Isolation
 
-組織ごとにデータとコンフィグを完全に分離：
+Completely separate data and configuration per organization:
 
 ```javascript
 const { enterprise } = require('musubi-sdd');
@@ -28,7 +28,7 @@ const { TenantManager, TenantRole } = enterprise;
 
 const manager = new TenantManager();
 
-// テナント作成
+// Create a tenant
 const tenant = manager.createTenant({
   name: 'Acme Corporation',
   plan: 'enterprise',
@@ -39,27 +39,27 @@ const tenant = manager.createTenant({
   }
 });
 
-// ユーザー追加
+// Add a user
 const admin = manager.addUser(tenant.id, {
   email: 'admin@acme.com',
   role: TenantRole.ADMIN
 });
 
-// コンテキスト作成
+// Create a context
 const context = manager.createContext(tenant.id, admin.id);
 ```
 
-### RBAC（ロールベースアクセス制御）
+### RBAC (Role-Based Access Control)
 
-5つの組み込みロールで細かなアクセス制御：
+Fine-grained access control with 5 built-in roles:
 
-| ロール | 権限 |
+| Role | Permissions |
 |--------|------|
-| OWNER | 全権限（請求含む） |
-| ADMIN | 管理権限（請求除く） |
-| MEMBER | 操作権限 |
-| VIEWER | 閲覧のみ |
-| GUEST | 最小限の閲覧 |
+| OWNER | Full permissions (including billing) |
+| ADMIN | Administrative permissions (excluding billing) |
+| MEMBER | Operational permissions |
+| VIEWER | View only |
+| GUEST | Minimal view access |
 
 ```javascript
 const { Permission } = enterprise;
@@ -73,56 +73,56 @@ if (user.hasAllPermissions([Permission.READ, Permission.WRITE])) {
 }
 ```
 
-### 使用量クォータ
+### Usage Quotas
 
-トークン使用量を組織単位で制限：
+Limit token usage per organization:
 
 ```javascript
-// 使用量追跡
+// Track usage
 manager.trackUsage('tokens', 5000);
 
-// クォータチェック
+// Check quota
 if (manager.checkQuota('tokens')) {
-  // 実行可能
+  // Can execute
 } else {
-  // 制限に達した
+  // Limit reached
 }
 
-// 残りクォータ確認
+// Check remaining quota
 const remaining = manager.getRemainingQuota('tokens');
 ```
 
-### 監査ログ
+### Audit Logs
 
-コンプライアンス対応の監査証跡：
+Audit trails for compliance:
 
 ```javascript
 const { AuditLogger } = enterprise;
 
 const logger = new AuditLogger({ maxLogs: 10000 });
 
-// 自動ログ
+// Automatic logging
 manager.audit('feature.created', {
   featureId: 'user-auth',
   createdBy: admin.id
 });
 
-// クエリ
+// Query
 const logs = logger.query({
   tenantId: tenant.id,
   action: 'feature.created',
   limit: 100
 });
 
-// エクスポート
+// Export
 const complianceLogs = logger.exportTenantLogs(tenant.id);
 ```
 
-## 🤖 高度なAI機能
+## 🤖 Advanced AI Features
 
-### マルチモデルオーケストレーション
+### Multi-Model Orchestration
 
-タスクに最適なモデルを自動選択：
+Automatically select the best model for each task:
 
 ```javascript
 const { ai } = require('musubi-sdd');
@@ -130,7 +130,7 @@ const { ModelRouter, TaskType } = ai;
 
 const router = new ModelRouter();
 
-// タスクに基づいてルーティング
+// Route based on the task
 const model = router.route({
   taskType: TaskType.CODE_GENERATION,
   complexity: 'high',
@@ -140,41 +140,41 @@ const model = router.route({
 console.log(`Selected: ${model.name}`); // Claude 3.5 Sonnet
 ```
 
-### カスタムルーティングルール
+### Custom Routing Rules
 
 ```javascript
-// コスト最適化ルール
+// Cost optimization rule
 router.addRule(
   task => task.tokens < 1000,
   'gpt-4o-mini'
 );
 
-// 高精度が必要な場合
+// When high accuracy is required
 router.addRule(
   task => task.taskType === TaskType.CODE_REVIEW,
   'claude-3-5-sonnet'
 );
 ```
 
-### コンテキストウィンドウ管理
+### Context Window Management
 
-大規模コードベースを賢くチャンク分割：
+Intelligently chunk large codebases:
 
 ```javascript
 const { ContextWindowManager } = ai;
 
 const manager = new ContextWindowManager();
 
-// セマンティックチャンキング
+// Semantic chunking
 const chunks = manager.chunkSemantic(largeCode, 4000);
 
-// 関連度でソート
+// Sort by relevance
 const relevant = manager.prioritize(chunks, 'login function', 5);
 ```
 
-### RAG パイプライン
+### RAG Pipeline
 
-コードナレッジのベクトル検索：
+Vector search over code knowledge:
 
 ```javascript
 const { RAGPipeline, CodeVectorStore } = ai;
@@ -186,24 +186,24 @@ const rag = new RAGPipeline({
   threshold: 0.7
 });
 
-// コードをインデックス
+// Index the code
 await rag.index([
   { id: 'auth', content: authCode, path: 'src/auth.ts' },
   { id: 'user', content: userCode, path: 'src/user.ts' }
 ]);
 
-// コンテキストで拡張
+// Augment with context
 const augmented = await rag.augment(
   'authentication',
-  'ログイン機能の実装方法を教えて'
+  'Tell me how to implement the login feature'
 );
 ```
 
-## 🔌 エンタープライズ統合
+## 🔌 Enterprise Integrations
 
-### JIRA連携
+### JIRA Integration
 
-要件をJIRAイシューに自動同期：
+Automatically sync requirements to JIRA issues:
 
 ```javascript
 const { JIRAIntegration } = require('musubi-sdd').integrations;
@@ -216,18 +216,18 @@ const jira = new JIRAIntegration({
 
 await jira.connect();
 
-// 要件を同期
+// Sync requirements
 const result = await jira.syncRequirements([
-  { id: 'REQ-001', title: 'ユーザー認証', priority: 'high' },
-  { id: 'REQ-002', title: 'パスワードリセット', priority: 'medium' }
+  { id: 'REQ-001', title: 'User Authentication', priority: 'high' },
+  { id: 'REQ-002', title: 'Password Reset', priority: 'medium' }
 ]);
 
 console.log(`${result.synced} issues created`);
 ```
 
-### Azure DevOps連携
+### Azure DevOps Integration
 
-ワークアイテムとパイプラインを管理：
+Manage work items and pipelines:
 
 ```javascript
 const { AzureDevOpsIntegration } = require('musubi-sdd').integrations;
@@ -240,19 +240,19 @@ const azdo = new AzureDevOpsIntegration({
 
 await azdo.connect();
 
-// ワークアイテム作成
+// Create a work item
 const workItem = await azdo.createWorkItem({
   title: 'Implement login feature',
   type: 'User Story'
 });
 
-// パイプライントリガー
+// Trigger a pipeline
 const run = await azdo.triggerPipeline(123, { branch: 'main' });
 ```
 
-### GitLab連携
+### GitLab Integration
 
-フルCI/CDサポート：
+Full CI/CD support:
 
 ```javascript
 const { GitLabIntegration } = require('musubi-sdd').integrations;
@@ -264,20 +264,20 @@ const gitlab = new GitLabIntegration({
 
 await gitlab.connect();
 
-// MR作成
+// Create an MR
 const mr = await gitlab.createMergeRequest({
   title: 'feat: User authentication',
   sourceBranch: 'feature/auth',
   targetBranch: 'main'
 });
 
-// パイプライントリガー
+// Trigger a pipeline
 await gitlab.triggerPipeline('main', { DEPLOY: 'true' });
 ```
 
-### Slack/Teams通知
+### Slack/Teams Notifications
 
-オーケストレーションイベントを自動通知：
+Automatically notify on orchestration events:
 
 ```javascript
 const { SlackIntegration, TeamsIntegration } = require('musubi-sdd').integrations;
@@ -306,9 +306,9 @@ await teams.notifyOrchestrationEvent({
 });
 ```
 
-### SSO認証
+### SSO Authentication
 
-SAML/OIDC対応のシングルサインオン：
+Single sign-on with SAML/OIDC support:
 
 ```javascript
 const { SSOIntegration, SSOProvider } = require('musubi-sdd').integrations;
@@ -321,33 +321,33 @@ const sso = new SSOIntegration({
 
 await sso.connect();
 
-// 認証URL生成
+// Generate the auth URL
 const authUrl = sso.getAuthorizationUrl(
   'random-state',
   'https://app.com/callback'
 );
 
-// トークン交換
+// Exchange the token
 const session = await sso.exchangeCode(code, redirectUri);
 
-// トークン検証
+// Verify the token
 const claims = await sso.validateToken(session.accessToken);
 ```
 
-## 🎨 VSCode拡張機能の強化
+## 🎨 VSCode Extension Enhancements
 
-### ダッシュボードビュー
+### Dashboard View
 
-オーケストレーション状態をリアルタイム表示：
+Display orchestration status in real time:
 
-- タスク進捗
-- トークン使用量
-- 推定コスト
-- ステータス表示（アイドル/実行中/完了/失敗）
+- Task progress
+- Token usage
+- Estimated cost
+- Status display (idle/running/complete/failed)
 
-### トレーサビリティビュー
+### Traceability View
 
-要件→設計→タスク→コード→テストの追跡を視覚化：
+Visualize the trace from requirements to design to tasks to code to tests:
 
 ```
 📕 REQ-001: User Authentication [✅ Implemented]
@@ -357,9 +357,9 @@ const claims = await sso.validateToken(session.accessToken);
           └─ 🧪 login.test.ts [✅]
 ```
 
-### コスト見積もり
+### Cost Estimation
 
-実行前にトークンコストを推定：
+Estimate token cost before execution:
 
 ```
 📊 Cost Estimate (gpt-4o)
@@ -374,7 +374,7 @@ Total Cost:  $0.1183
 ✅ Within context window (128K)
 ```
 
-## 📈 テスト状況
+## 📈 Test Status
 
 ```
 Test Suites: 137 passed
@@ -383,48 +383,48 @@ Snapshots:   0 total
 Time:        23.27s
 ```
 
-## 🚀 アップグレード方法
+## 🚀 How to Upgrade
 
 ```bash
 npm update musubi-sdd
-# または
+# or
 npm install musubi-sdd@5.8.0
 ```
 
-## 📊 パフォーマンス改善（v5.7.x から継続）
+## 📊 Performance Improvements (Continued from v5.7.x)
 
-| メトリクス | v5.6.0 | v5.8.0 | 改善率 |
+| Metric | v5.6.0 | v5.8.0 | Improvement |
 |-----------|--------|--------|--------|
-| 起動時間 | 1.2s | 0.4s | 67%↓ |
-| メモリ使用量 | 180MB | 95MB | 47%↓ |
-| 大規模解析 | 45s | 12s | 73%↓ |
+| Startup time | 1.2s | 0.4s | 67%↓ |
+| Memory usage | 180MB | 95MB | 47%↓ |
+| Large-scale analysis | 45s | 12s | 73%↓ |
 
-## 🔮 今後の予定
+## 🔮 Roadmap
 
-- Phase 7: グローバル展開
-  - 多言語サポート強化
-  - 地域別データセンター
-  - コンプライアンス認証（SOC2, ISO27001）
+- Phase 7: Global Expansion
+  - Enhanced multilingual support
+  - Regional data centers
+  - Compliance certifications (SOC2, ISO27001)
 
-## まとめ
+## Summary
 
-MUSUBI v5.8.0 は、エンタープライズ環境でのSDD導入を本格的にサポートします：
+MUSUBI v5.8.0 provides full-scale support for SDD adoption in enterprise environments:
 
-✅ **マルチテナント**: 組織ごとの完全分離  
-✅ **RBAC**: 細かなアクセス制御  
-✅ **AI最適化**: タスク別モデル選択  
-✅ **外部連携**: JIRA/Azure DevOps/GitLab  
-✅ **通知**: Slack/Teams  
-✅ **SSO**: エンタープライズ認証  
+✅ **Multi-tenant**: Complete isolation per organization  
+✅ **RBAC**: Fine-grained access control  
+✅ **AI optimization**: Per-task model selection  
+✅ **External integrations**: JIRA/Azure DevOps/GitLab  
+✅ **Notifications**: Slack/Teams  
+✅ **SSO**: Enterprise authentication  
 
-ぜひアップグレードして、チーム全体でのSDD導入を加速してください！
+Please upgrade and accelerate SDD adoption across your whole team!
 
 ---
 
-**関連記事**:
-- [MUSUBI SDD 入門ガイド](https://qiita.com/nahisaho/items/musubi-beginners)
-- [MUSUBI v3.0 エージェントとスキル](https://qiita.com/nahisaho/items/musubi-v3-agents)
-- [MUSUBI 進化の歴史](https://qiita.com/nahisaho/items/musubi-evolution)
+**Related articles**:
+- [MUSUBI SDD Beginner's Guide](https://qiita.com/nahisaho/items/musubi-beginners)
+- [MUSUBI v3.0 Agents and Skills](https://qiita.com/nahisaho/items/musubi-v3-agents)
+- [The Evolution of MUSUBI](https://qiita.com/nahisaho/items/musubi-evolution)
 
-**リポジトリ**: https://github.com/nahisaho/MUSUBI  
+**Repository**: https://github.com/nahisaho/MUSUBI  
 **npm**: https://www.npmjs.com/package/musubi-sdd

@@ -10,7 +10,6 @@ This project uses **MUSUBI** (Ultimate Specification Driven Development) configu
 - 📋 **Constitutional Governance** - 9 immutable articles + Phase -1 Gates
 - 📝 **EARS Requirements Format** - Unambiguous requirements with complete traceability
 - 🧭 **Auto-Updating Project Memory** - Steering system maintains architecture, tech stack, and product context
-- 🌐 **Bilingual Documentation** - All documents created in both English and Japanese
 
 ## 25 Skills Overview
 
@@ -140,30 +139,12 @@ MUSUBI enforces 9 immutable constitutional articles:
 8. **Anti-Abstraction Gate** - Use framework features directly
 9. **Integration-First Testing** - Real services over mocks
 
-## Bilingual Documentation
+## Documentation Language
 
-**All agent-generated documents are created in both English and Japanese.**
+All agent-generated documents are written in English, and agents communicate with the user in English.
 
-### Language Policy
-
-- **English**: Reference/source documents (`.md`)
-- **Japanese**: Translations (`.ja.md`)
-- **Skills**: Always read English versions for work
-- **Code References**: Requirement IDs, technical terms stay in English
-
-### Files Generated Bilingually
-
-**Steering Context**:
-
-- `steering/structure.md` + `steering/structure.ja.md`
-- `steering/tech.md` + `steering/tech.ja.md`
-- `steering/product.md` + `steering/product.ja.md`
-
-**Specifications**:
-
-- `storage/specs/[feature]-requirements.md` + `.ja.md`
-- `storage/design/[feature]-design.md` + `.ja.md`
-- `storage/tasks/[feature]-tasks.md` + `.ja.md`
+Bilingual output (an additional translation such as `.ja.md`, and chatting in that language) is optional
+and disabled by default. See `BILINGUAL-IMPLEMENTATION.md` in the MUSUBI repository for how to enable it.
 
 ## Quick Start
 
@@ -296,4 +277,4 @@ npx musubi-sdd <command>
 
 ---
 
-**MUSUBI for Claude Code** - むすび - Bringing specifications, design, and code together.
+**MUSUBI for Claude Code** - musubi - Bringing specifications, design, and code together.

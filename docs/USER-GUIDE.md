@@ -22,7 +22,7 @@
 
 ## Introduction
 
-MUSUBI (結び - "binding/connection") is a Specification Driven Development (SDD) framework that transforms software development from code-first to specification-first.
+MUSUBI (musubi - "binding/connection") is a Specification Driven Development (SDD) framework that transforms software development from code-first to specification-first.
 
 ### Key Features
 
@@ -32,7 +32,7 @@ MUSUBI (結び - "binding/connection") is a Specification Driven Development (SD
 - **Delta Specifications** - Brownfield change management
 - **Full Traceability** - Requirement ↔ Code ↔ Test mapping
 - **7 Platform Support** - Claude Code, GitHub Copilot, Cursor, Gemini CLI, Codex CLI, Qwen Code, Windsurf
-- **8 Language Support** - en, ja, zh, ko, de, fr, es, id
+- **Documentation Language** - English by default; optional bilingual output ([how to enable](../BILINGUAL-IMPLEMENTATION.md))
 
 ### Philosophy
 

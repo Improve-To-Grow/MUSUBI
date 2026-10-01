@@ -1,5 +1,9 @@
 # Agent Output Pattern - Gradual File Generation
 
+> Bilingual output (an additional translated copy of each deliverable) is optional. For the
+> template that adds translation steps, see
+> [BILINGUAL-IMPLEMENTATION.md](../BILINGUAL-IMPLEMENTATION.md) (Step 4.3).
+
 ## Purpose
 
 Prevent context length overflow errors by breaking agent output into small chunks with file saves.
@@ -9,57 +13,57 @@ Prevent context length overflow errors by breaking agent output into small chunk
 ### Phase 4: Gradual Output Generation
 
 ```markdown
-### Phase 4: 段階的成果物生成
+### Phase 4: Incremental Deliverable Generation
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: Prevent context length overflow**
 
-**出力方式:**
-- 1ファイルずつ順番に生成・保存
-- 各ファイル生成後に進捗を報告
-- 大きなファイル(>300行)は複数に分割
-- エラー発生時も部分的な成果物が残る
+**Output method:**
+- Generate and save one file at a time, in order
+- Report progress after each file is generated
+- Split large files (>300 lines) into multiple files
+- Partial deliverables remain even if an error occurs
 
 ```
-🤖 確認ありがとうございます。以下の成果物を順番に生成します。
+🤖 Thank you for confirming. I will generate the following deliverables in order.
 
-【生成予定の成果物】（英語版と日本語版の両方）
+[Deliverables to generate]
 1. [Document/Code 1]
 2. [Document/Code 2]
 3. [Document/Code 3]
 ...
 
-合計: Nファイル
+Total: N files
 
-**重要: 段階的生成方式**
-各ドキュメント/コードファイルを1つずつ生成・保存し、進捗を報告します。
-これにより、途中経過が見え、エラーが発生しても部分的な成果物が残ります。
+**Important: Incremental generation method**
+I will generate and save each document/code file one at a time and report progress.
+This lets you see intermediate progress, and partial deliverables remain even if an error occurs.
 
-生成を開始してよろしいですか？
-👤 ユーザー: [回答待ち]
+May I start generating?
+👤 User: [Awaiting response]
 ```
 
-ユーザーが承認後、**各ファイルを順番に生成**:
+After user approval, **generate each file in order**:
 
-**Step 1: [File 1 Name] - 英語版**
+**Step 1: [File 1 Name]**
 
 ```
-🤖 [1/N] [File 1 Name]英語版を生成しています...
+🤖 [1/N] Generating [File 1 Name]...
 
 📝 ./[path]/[filename]-[date].md
-✅ 保存が完了しました
+✅ Save complete
 
-[1/N] 完了。次のファイルに進みます。
+[1/N] Complete. Proceeding to the next file.
 ```
 
-**Step 2: [File 2 Name] - 英語版**
+**Step 2: [File 2 Name]**
 
 ```
-🤖 [2/N] [File 2 Name]英語版を生成しています...
+🤖 [2/N] Generating [File 2 Name]...
 
 📝 ./[path]/[filename]-[date].md
-✅ 保存が完了しました
+✅ Save complete
 
-[2/N] 完了。次のファイルに進みます。
+[2/N] Complete. Proceeding to the next file.
 ```
 
 ...
@@ -67,24 +71,22 @@ Prevent context length overflow errors by breaking agent output into small chunk
 **Final Step: All Files Completed**
 
 ```
-🤖 ✨ すべての成果物の生成が完了しました！
+🤖 ✨ All deliverables have been generated!
 
-## 📊 生成サマリー
-- **作成ファイル数**: N個
-- **英語版**: X個
-- **日本語版**: Y個
+## 📊 Generation Summary
+- **Files created**: N
 
-## 📂 生成されたファイル
+## 📂 Generated Files
 1. ✅ ./[path]/[file1]
 2. ✅ ./[path]/[file2]
 ...
 
-## 🔍 次のステップ
-1. 成果物を確認して、フィードバックをお願いします
-2. 不足や修正が必要な箇所があれば教えてください
-3. [関連エージェント]を呼び出して次の工程に進めます
+## 🔍 Next Steps
+1. Please review the deliverables and provide feedback
+2. Let me know if anything is missing or needs revision
+3. I can call [related agent] to proceed to the next stage
 
-👤 ユーザー: [フィードバック待ち]
+👤 User: [Awaiting feedback]
 ```
 ```
 
@@ -105,10 +107,10 @@ Prevent context length overflow errors by breaking agent output into small chunk
 - User can resume from file 6
 - No need to regenerate completed files
 
-### 4. Bilingual Output (English + Japanese)
-- Generate all English files first
-- Then generate all Japanese files
-- Each file saved separately
+### 4. Optional Bilingual Output
+- English only by default
+- When bilingual output is enabled, generate each translation right after its English file
+  (see [BILINGUAL-IMPLEMENTATION.md](../BILINGUAL-IMPLEMENTATION.md))
 
 ## Agent-Specific Adaptations
 
@@ -116,36 +118,36 @@ Prevent context length overflow errors by breaking agent output into small chunk
 ```
 **Step 1: [Component Name]**
 
-🤖 [1/N] [Component Name]を生成しています...
+🤖 [1/N] Generating [Component Name]...
 
 📝 src/[path]/[filename].ts
-✅ 保存が完了しました (150行)
+✅ Save complete (150 lines)
 
-[1/N] 完了。次のファイルに進みます。
+[1/N] Complete. Proceeding to the next file.
 ```
 
 ### Document Generators (technical-writer, requirements-analyst, etc.)
 ```
-**Step 1: [Document Title] - English Version**
+**Step 1: [Document Title]**
 
-🤖 [1/N] [Document Title]英語版を生成しています...
+🤖 [1/N] Generating [Document Title]...
 
 📝 docs/[path]/[filename]-[date].md
-✅ 保存が完了しました
+✅ Save complete
 
-[1/N] 完了。次のドキュメントに進みます。
+[1/N] Complete. Proceeding to the next document.
 ```
 
 ### Design Generators (system-architect, database-schema-designer, etc.)
 ```
-**Step 1: [Design Artifact] - English Version**
+**Step 1: [Design Artifact]**
 
-🤖 [1/N] [Design Artifact]英語版を生成しています...
+🤖 [1/N] Generating [Design Artifact]...
 
 📝 design/[category]/[filename]-[project]-[date].md
-✅ 保存が完了しました
+✅ Save complete
 
-[1/N] 完了。次の成果物に進みます。
+[1/N] Complete. Proceeding to the next deliverable.
 ```
 
 ## File Size Guidelines
@@ -161,7 +163,7 @@ Prevent context length overflow errors by breaking agent output into small chunk
 
 For each agent's SKILL.md:
 
-- [ ] Phase 4 has "段階的成果物生成" section
+- [ ] Phase 4 has "Incremental Deliverable Generation" section
 - [ ] Lists all files to be generated upfront
 - [ ] Asks user confirmation before generation
 - [ ] Generates files one-by-one with progress counter

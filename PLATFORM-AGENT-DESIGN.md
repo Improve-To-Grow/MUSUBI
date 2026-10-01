@@ -1,98 +1,98 @@
 # MUSUBI Multi-Agent Platform Design
 
-## 🎯 新しいアプローチ: Agent-Based Distribution
+## 🎯 New Approach: Agent-Based Distribution
 
-各プラットフォームの標準規約に従い、25の専門エージェント機能を配布します。
+Distribute the 25 specialized agent capabilities following each platform's standard conventions.
 
-### プラットフォーム別配置戦略
+### Placement Strategy by Platform
 
 #### 1. **GitHub Copilot**
-- **標準**: `.github/copilot-instructions.md` (リポジトリ全体) + `.github/instructions/*.instructions.md` (パス別)
-- **AGENTS.md サポート**: ✅ (.github/AGENTS.md または任意のディレクトリ)
-- **MUSUBI実装**:
+- **Standard**: `.github/copilot-instructions.md` (repository-wide) + `.github/instructions/*.instructions.md` (per path)
+- **AGENTS.md support**: ✅ (.github/AGENTS.md or any directory)
+- **MUSUBI implementation**:
   ```
   .github/
-    copilot-instructions.md         # メイン指示(ステアリング参照)
-    AGENTS.md                        # 25エージェント定義
-    prompts/                         # 9 SDDコマンド(既存)
+    copilot-instructions.md         # Main instructions (references steering)
+    AGENTS.md                        # 25 agent definitions
+    prompts/                         # 9 SDD commands (existing)
       sdd-steering.md
       sdd-requirements.md
-      ... (9コマンド)
+      ... (9 commands)
   ```
 
 #### 2. **Cursor IDE**  
-- **標準**: `.cursorrules` (シングルファイル) または `.cursor/` ディレクトリ
-- **MUSUBI実装**:
+- **Standard**: `.cursorrules` (single file) or `.cursor/` directory
+- **MUSUBI implementation**:
   ```
-  .cursorrules                       # メイン指示
+  .cursorrules                       # Main instructions
   .cursor/
-    AGENTS.md                        # 25エージェント定義
-    commands/                        # 9 SDDコマンド(既存)
+    AGENTS.md                        # 25 agent definitions
+    commands/                        # 9 SDD commands (existing)
       sdd-steering.md
-      ... (9コマンド)
+      ... (9 commands)
   ```
 
 #### 3. **Claude Code**
-- **標準**: `.claude/CLAUDE.md` + `.claude/skills/` (Skills API)
-- **MUSUBI実装**: 現状維持
+- **Standard**: `.claude/CLAUDE.md` + `.claude/skills/` (Skills API)
+- **MUSUBI implementation**: Keep as is
   ```
   .claude/
-    CLAUDE.md                        # メイン指示
-    skills/                          # 25 スキル(専用Skills API)
+    CLAUDE.md                        # Main instructions
+    skills/                          # 25 skills (dedicated Skills API)
       orchestrator/SKILL.md
-      ... (25スキル)
-    commands/                        # 9 SDDコマンド
+      ... (25 skills)
+    commands/                        # 9 SDD commands
       sdd-steering.md
-      ... (9コマンド)
+      ... (9 commands)
   ```
 
 #### 4. **Gemini CLI**
-- **標準**: `GEMINI.md` ルートファイル
-- **MUSUBI実装**:
+- **Standard**: `GEMINI.md` root file
+- **MUSUBI implementation**:
   ```
-  GEMINI.md                          # メイン指示 + 25エージェント定義
+  GEMINI.md                          # Main instructions + 25 agent definitions
   .gemini/
-    commands/                        # 9 SDDコマンド(TOML形式)
+    commands/                        # 9 SDD commands (TOML format)
       sdd-steering.toml
-      ... (9コマンド)
+      ... (9 commands)
   ```
 
 #### 5. **Windsurf IDE**
-- **標準**: `.windsurf/` ディレクトリ
-- **MUSUBI実装**:
+- **Standard**: `.windsurf/` directory
+- **MUSUBI implementation**:
   ```
   .windsurf/
-    AGENTS.md                        # 25エージェント定義
-    workflows/                       # 9 SDDコマンド
+    AGENTS.md                        # 25 agent definitions
+    workflows/                       # 9 SDD commands
       sdd-steering.md
-      ... (9コマンド)
+      ... (9 commands)
   ```
 
 #### 6. **Codex CLI**
-- **標準**: 不明(調査要) - GitHub Copilot類似と推定
-- **MUSUBI実装**:
+- **Standard**: Unknown (needs investigation) - presumed similar to GitHub Copilot
+- **MUSUBI implementation**:
   ```
   .codex/
-    AGENTS.md                        # 25エージェント定義
-    prompts/                         # 9 SDDコマンド
+    AGENTS.md                        # 25 agent definitions
+    prompts/                         # 9 SDD commands
       sdd-steering.md
-      ... (9コマンド)
+      ... (9 commands)
   ```
 
 #### 7. **Qwen Code**
-- **標準**: 不明(調査要) - 汎用Markdownと推定
-- **MUSUBI実装**:
+- **Standard**: Unknown (needs investigation) - presumed generic Markdown
+- **MUSUBI implementation**:
   ```
   .qwen/
-    AGENTS.md                        # 25エージェント定義
-    commands/                        # 9 SDDコマンド
+    AGENTS.md                        # 25 agent definitions
+    commands/                        # 9 SDD commands
       sdd-steering.md
-      ... (9コマンド)
+      ... (9 commands)
   ```
 
-## 📝 AGENTS.md フォーマット
+## 📝 AGENTS.md Format
 
-OpenAI agents.md仕様に準拠:
+Conforms to the OpenAI agents.md specification:
 
 ```markdown
 # MUSUBI - Specification Driven Development AI Agents
@@ -151,47 +151,47 @@ OpenAI agents.md仕様に準拠:
 
 ---
 
-(... 残り22エージェント ...)
+(... remaining 22 agents ...)
 ```
 
-## 🔄 実装手順
+## 🔄 Implementation Steps
 
-### Phase 1: AGENTS.md テンプレート作成
-1. `src/templates/agents/shared/AGENTS.md` に統一エージェント定義
-2. 25エージェントの役割・能力・使用例を記述
+### Phase 1: Create the AGENTS.md Template
+1. Unified agent definitions in `src/templates/agents/shared/AGENTS.md`
+2. Describe the role, capabilities, and usage examples of the 25 agents
 
-### Phase 2: プラットフォーム別配置ロジック
-1. `src/agents/registry.js` 更新: 各プラットフォームの `layout.agentsFile` 追加
-2. `src/init.js` 更新: AGENTS.mdコピーロジック追加
+### Phase 2: Per-Platform Placement Logic
+1. Update `src/agents/registry.js`: add `layout.agentsFile` for each platform
+2. Update `src/init.js`: add AGENTS.md copy logic
 
-### Phase 3: 既存スキルからAGENTS.md生成
-1. Claude Code の `skills/*/SKILL.md` を解析
-2. AGENTS.md フォーマットに変換
-3. 全プラットフォームで共有可能な形式に
+### Phase 3: Generate AGENTS.md from Existing Skills
+1. Parse Claude Code's `skills/*/SKILL.md`
+2. Convert to the AGENTS.md format
+3. Make it a format shareable across all platforms
 
-### Phase 4: ドキュメント更新
-1. README.md: エージェント起動方法更新
-2. PLATFORM-COMPARISON.md: 機能平等化を反映
+### Phase 4: Documentation Updates
+1. README.md: Update how to launch agents
+2. PLATFORM-COMPARISON.md: Reflect feature parity
 3. product.md: "25 Claude Code skills" → "25 specialized agents (all platforms)"
 
-## ✅ 期待される結果
+## ✅ Expected Results
 
-- **全プラットフォームで25エージェント利用可能**
-- **各プラットフォームの標準規約に準拠**
-- **Claude Code の Skills API は専用形式で継続**
-- **他プラットフォームは AGENTS.md 経由でエージェント起動**
+- **25 agents available on all platforms**
+- **Compliant with each platform's standard conventions**
+- **Claude Code's Skills API continues in its dedicated format**
+- **Other platforms launch agents via AGENTS.md**
 
-## 🎯 起動方法の違い
+## 🎯 Differences in Launch Methods
 
-| プラットフォーム | コマンド例 | 
+| Platform | Command Example |
 |------------------|------------|
 | Claude Code | `@orchestrator <task>` (Skills API) |
-| GitHub Copilot | `#` + チャットで "@orchestrator <task>" 参照 |
-| Cursor | `/` + チャットで "@orchestrator <task>" 参照 |
-| Gemini CLI | GEMINI.md読み込み後 "@orchestrator <task>" |
-| Windsurf | `/` + AGENTS.md参照で "@orchestrator <task>" |
-| Codex | `/prompts:` + AGENTS.md参照 |
-| Qwen Code | `/` + AGENTS.md参照 |
+| GitHub Copilot | `#` + refer to "@orchestrator <task>" in chat |
+| Cursor | `/` + refer to "@orchestrator <task>" in chat |
+| Gemini CLI | After loading GEMINI.md, "@orchestrator <task>" |
+| Windsurf | `/` + refer to AGENTS.md with "@orchestrator <task>" |
+| Codex | `/prompts:` + refer to AGENTS.md |
+| Qwen Code | `/` + refer to AGENTS.md |
 
-**注意**: Skills API(`@agent`)は Claude Code専用。他プラットフォームは
-自然言語でAGENTS.mdの定義を参照。
+**Note**: The Skills API (`@agent`) is exclusive to Claude Code. Other platforms
+refer to the AGENTS.md definitions in natural language.

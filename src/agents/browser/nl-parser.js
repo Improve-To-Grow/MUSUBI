@@ -22,37 +22,34 @@
  */
 
 /**
- * Action patterns for Japanese and English
+ * Action patterns (English)
  */
 const ACTION_PATTERNS = {
   navigate: {
-    patterns: [/(?:に)?移動|開く|アクセス/, /(?:go to|navigate|open|visit)/i],
+    patterns: [/(?:go to|navigate|open|visit)/i],
     urlPattern: /(https?:\/\/[^\s]+)/,
   },
   click: {
-    patterns: [/クリック|押す|タップ|選択/, /click|press|tap|select/i],
+    patterns: [/click|press|tap|select/i],
   },
   fill: {
-    patterns: [/(?:に|を)?入力|記入|タイプ/, /fill|type|enter|input/i],
-    valuePattern: /[「「]([^」」]+)[」」]|"([^"]+)"|'([^']+)'/,
+    patterns: [/fill|type|enter|input/i],
+    valuePattern: /"([^"]+)"|'([^']+)'/,
   },
   select: {
-    patterns: [/ドロップダウン.*選択|選択.*オプション/, /select.*dropdown|choose.*option/i],
+    patterns: [/select.*dropdown|choose.*option/i],
   },
   wait: {
-    patterns: [/秒?待つ|待機/, /wait|pause|delay/i],
-    durationPattern: /(\d+)\s*秒|(\d+)\s*(?:seconds?|ms|milliseconds?)/i,
+    patterns: [/wait|pause|delay/i],
+    durationPattern: /(\d+)\s*(?:seconds?|ms|milliseconds?)/i,
   },
   screenshot: {
-    patterns: [
-      /スクリーンショット|画面.*(?:保存|撮|キャプチャ)/,
-      /screenshot|capture|save.*screen/i,
-    ],
-    namePattern: /[「「]([^」」]+)[」」]|"([^"]+)"|として\s*(\S+)/,
+    patterns: [/screenshot|capture|save.*screen/i],
+    namePattern: /"([^"]+)"|\bas\s+(\S+)/i,
   },
   assert: {
-    patterns: [/(?:が)?表示|確認|検証|存在/, /(?:is )?visible|assert|verify|check|exists?/i],
-    textPattern: /[「「]([^」」]+)[」」]|"([^"]+)"/,
+    patterns: [/(?:is )?visible|assert|verify|check|exists?/i],
+    textPattern: /"([^"]+)"|'([^']+)'/,
   },
 };
 
@@ -60,14 +57,6 @@ const ACTION_PATTERNS = {
  * Common element selector patterns
  */
 const ELEMENT_PATTERNS = {
-  // Japanese element names
-  ログインボタン:
-    'button:has-text("ログイン"), [data-testid="login-button"], button[type="submit"]',
-  送信ボタン: 'button:has-text("送信"), [data-testid="submit-button"], button[type="submit"]',
-  メール: 'input[type="email"], input[name="email"], [data-testid="email-input"]',
-  パスワード: 'input[type="password"], [data-testid="password-input"]',
-  検索: 'input[type="search"], [data-testid="search-input"], input[name="q"]',
-  // English element names
   'login button': 'button:has-text("Login"), [data-testid="login-button"], button[type="submit"]',
   'submit button':
     'button:has-text("Submit"), [data-testid="submit-button"], button[type="submit"]',
@@ -122,7 +111,7 @@ class NLParser {
    * @returns {string}
    */
   normalizeCommand(command) {
-    return command.trim().replace(/\s+/g, ' ').replace(/、/g, ',').replace(/。/g, '.');
+    return command.trim().replace(/\s+/g, ' ');
   }
 
   /**
@@ -151,7 +140,7 @@ class NLParser {
    */
   splitCommand(command) {
     // Split by conjunctions and separators
-    const separators = /[,、]|\s+(?:そして|して|and|then)\s+/i;
+    const separators = /,|\s+(?:and|then)\s+/i;
     return command
       .split(separators)
       .map(s => s.trim())
@@ -245,7 +234,7 @@ class NLParser {
   parseFill(text) {
     const selector = this.extractSelector(text);
     const valueMatch = text.match(this.actionPatterns.fill.valuePattern);
-    const value = valueMatch ? valueMatch[1] || valueMatch[2] || valueMatch[3] : '';
+    const value = valueMatch ? valueMatch[1] || valueMatch[2] : '';
 
     return {
       type: 'fill',
@@ -263,7 +252,7 @@ class NLParser {
   parseSelect(text) {
     const selector = this.extractSelector(text);
     const valueMatch = text.match(this.actionPatterns.fill.valuePattern);
-    const value = valueMatch ? valueMatch[1] || valueMatch[2] || valueMatch[3] : '';
+    const value = valueMatch ? valueMatch[1] || valueMatch[2] : '';
 
     return {
       type: 'select',
@@ -283,7 +272,7 @@ class NLParser {
     let delay = 1000; // Default 1 second
 
     if (durationMatch) {
-      const seconds = durationMatch[1] || durationMatch[2];
+      const seconds = durationMatch[1];
       delay = parseInt(seconds, 10) * 1000;
 
       // Check if it's milliseconds
@@ -306,8 +295,8 @@ class NLParser {
    */
   parseScreenshot(text) {
     const nameMatch = text.match(this.actionPatterns.screenshot.namePattern);
-    const name = nameMatch ? nameMatch[1] || nameMatch[2] || nameMatch[3] : undefined;
-    const fullPage = /全体|full\s*page/i.test(text);
+    const name = nameMatch ? nameMatch[1] || nameMatch[2] : undefined;
+    const fullPage = /full\s*page/i.test(text);
 
     return {
       type: 'screenshot',
@@ -361,9 +350,7 @@ class NLParser {
     }
 
     // Try to extract element description
-    const elementMatch = text.match(
-      /(?:の)?(?:ボタン|リンク|入力欄?|フィールド|テキスト|button|link|input|field|text)\s*[「「]?([^」」\s]*)[」」]?/i
-    );
+    const elementMatch = text.match(/(?:button|link|input|field|text)\s*["']?([^"'\s]*)["']?/i);
     if (elementMatch && elementMatch[1]) {
       return `text="${elementMatch[1]}"`;
     }

@@ -1,128 +1,128 @@
-title: MUSUBIの軌跡：Spec-CopilotからMUSUHI、そしてMUSUBIへの完全進化ガイド
+title: The Story of MUSUBI: A Complete Evolution Guide from Spec-Copilot to MUSUHI and MUSUBI
 
-# MUSUBIの軌跡：Spec-CopilotからMUSUHI、そしてMUSUBIへの完全進化ガイド
+# The Story of MUSUBI: A Complete Evolution Guide from Spec-Copilot to MUSUHI and MUSUBI
 
-## はじめに
+## Introduction
 
-**MUSUBI（Specification Driven Development）** は、AIエージェントを活用した仕様駆動開発フレームワークです。しかし、MUSUBIは突然生まれたわけではありません。**Spec-Copilot** → **MUSUHI** → **MUSUBI** という3つのプロジェクトを経て、現在の形に進化してきました。
+**MUSUBI (Specification Driven Development)** is a specification-driven development framework that leverages AI agents. However, MUSUBI was not born overnight. It evolved into its current form through three projects: **Spec-Copilot** → **MUSUHI** → **MUSUBI**.
 
-本記事では、2025年11月の最初のプロジェクトから現在のv5.9.0までの完全な変遷を振り返り、各段階で何が追加され、どのような開発体験が可能になったかを詳説します。
+This article looks back at the complete journey from the first project in November 2025 to the current v5.9.0, explaining in detail what was added at each stage and what development experiences became possible.
 
-**対象読者:**
-- MUSUBIを使用中/検討中の開発者
-- AI支援開発ツールの進化に興味のある方
-- 仕様駆動開発の効率化を目指すチーム
+**Target audience:**
+- Developers who are using or considering MUSUBI
+- Anyone interested in the evolution of AI-assisted development tools
+- Teams aiming to make specification-driven development more efficient
 
-**この記事で分かること:**
-- Spec-Copilot: 19エージェントのプロンプト集
-- MUSUHI: npmパッケージ化と20エージェント
-- MUSUBI v0.1.x: 25スキルと7プラットフォーム対応
-- MUSUBI v0.7.0-v1.0.0: 憲法ガバナンスとCLI基盤
-- MUSUBI v2.x-v3.0.0: MCP統合、ワークフロー、ブラウザ自動化
-- MUSUBI v3.3.0-v3.5.1: モニタリング、Steering高度化、CLI統合
-- MUSUBI v3.6.0-v3.6.1: Dynamic Replanning Engine、目標管理、パス最適化
-- MUSUBI v3.7.0: 多言語テンプレート、Ollama統合、コスト追跡、チェックポイント
-- MUSUBI v3.8.0-v3.10.0: Swarm Enhancement、Guardrails、Documentation
-- MUSUBI v3.11.0: Skill System Architecture、Advanced Workflows
-- MUSUBI v4.0.0: Agent Loop、Codebase Intelligence、Agentic Reasoning
-- MUSUBI v5.0.0: Advanced Features、Steering Auto-Update、Quality Dashboard
-- MUSUBI v5.2.0-v5.3.0: マルチ言語対応、言語推薦エンジン
-- MUSUBI v5.4.0: GitHubリポジトリ参照、パターン分析、改善提案
-- MUSUBI v5.5.0-v5.6.0: エンタープライズスケール分析、Rustマイグレーション支援
-- MUSUBI v5.7.0-v5.8.0: Performance Optimization、CodeGraph MCP v0.8.0統合
-- MUSUBI v5.9.0: Phase 1-4エンタープライズ機能（ワークフローモード、モノレポ対応、憲法レベル管理）
+**What you will learn in this article:**
+- Spec-Copilot: A collection of 19 agent prompts
+- MUSUHI: npm packaging and 20 agents
+- MUSUBI v0.1.x: 25 skills and 7-platform support
+- MUSUBI v0.7.0-v1.0.0: Constitutional governance and the CLI foundation
+- MUSUBI v2.x-v3.0.0: MCP integration, workflows, browser automation
+- MUSUBI v3.3.0-v3.5.1: Monitoring, advanced Steering, CLI integration
+- MUSUBI v3.6.0-v3.6.1: Dynamic Replanning Engine, goal management, path optimization
+- MUSUBI v3.7.0: Multilingual templates, Ollama integration, cost tracking, checkpoints
+- MUSUBI v3.8.0-v3.10.0: Swarm Enhancement, Guardrails, Documentation
+- MUSUBI v3.11.0: Skill System Architecture, Advanced Workflows
+- MUSUBI v4.0.0: Agent Loop, Codebase Intelligence, Agentic Reasoning
+- MUSUBI v5.0.0: Advanced Features, Steering Auto-Update, Quality Dashboard
+- MUSUBI v5.2.0-v5.3.0: Multi-language support, language recommendation engine
+- MUSUBI v5.4.0: GitHub repository reference, pattern analysis, improvement suggestions
+- MUSUBI v5.5.0-v5.6.0: Enterprise-scale analysis, Rust migration support
+- MUSUBI v5.7.0-v5.8.0: Performance Optimization, CodeGraph MCP v0.8.0 integration
+- MUSUBI v5.9.0: Phase 1-4 enterprise features (workflow modes, monorepo support, Constitution level management)
 
 ---
 
-# 第0章 前史：Spec-Copilot（2025年11月初旬）
+# Chapter 0 Prehistory: Spec-Copilot (Early November 2025)
 
-## 0.1 Spec-Copilotとは
+## 0.1 What Is Spec-Copilot?
 
-**リポジトリ:** [github.com/nahisaho/spec-copilot](https://github.com/nahisaho/spec-copilot)
+**Repository:** [github.com/nahisaho/spec-copilot](https://github.com/nahisaho/spec-copilot)
 
-Spec-Copilotは、MUSUBIの**原型**となったプロジェクトです。GitHub Copilotと連携し、仕様駆動開発を支援する**19種類の専門AIエージェントのプロンプト集**として誕生しました。
+Spec-Copilot is the **prototype** of MUSUBI. It was born as a **collection of prompts for 19 specialized AI agents** that integrate with GitHub Copilot to support specification-driven development.
 
 ```mermaid
 flowchart TB
     subgraph SpecCopilot["Spec-Copilot<br/>Interactive agent to support SDD"]
         direction TB
-        F1["19種類の専門AIエージェント"]
-        F2[".github/agents/ にMarkdownファイルとして配置"]
-        F3["GitHub Copilot Chat専用"]
-        F4["@workspace /agent-name で呼び出し"]
-        F5["5フェーズ対話フロー"]
+        F1["19 specialized AI agents"]
+        F2["Placed as Markdown files in .github/agents/"]
+        F3["GitHub Copilot Chat only"]
+        F4["Invoked with @workspace /agent-name"]
+        F5["5-phase dialogue flow"]
     end
 ```
 
-## 0.2 19のエージェント
+## 0.2 The 19 Agents
 
-| カテゴリ | エージェント |
+| Category | Agents |
 |---------|------------|
-| オーケストレーション | Orchestrator AI |
-| 要件・計画 | Requirements Analyst, Project Manager, Agile Coach |
-| 設計 | System Architect, API Designer, Database Schema Designer, UI/UX Designer |
-| 実装 | Software Developer, Code Reviewer, Bug Hunter |
-| テスト・品質 | Test Engineer, Quality Assurance, Performance Optimizer |
-| セキュリティ | Security Auditor |
-| インフラ | DevOps Engineer, Cloud Architect, Observability Engineer |
-| ドキュメント | Technical Writer |
+| Orchestration | Orchestrator AI |
+| Requirements & Planning | Requirements Analyst, Project Manager, Agile Coach |
+| Design | System Architect, API Designer, Database Schema Designer, UI/UX Designer |
+| Implementation | Software Developer, Code Reviewer, Bug Hunter |
+| Testing & Quality | Test Engineer, Quality Assurance, Performance Optimizer |
+| Security | Security Auditor |
+| Infrastructure | DevOps Engineer, Cloud Architect, Observability Engineer |
+| Documentation | Technical Writer |
 
-## 0.3 使用方法
+## 0.3 Usage
 
 ```bash
-# GitHub Copilot Chatでの使用
-@workspace /orchestrator ToDoを管理するWebアプリケーションを開発。要件定義から開始。
+# Usage in GitHub Copilot Chat
+@workspace /orchestrator Develop a web application for managing ToDos. Start with requirements definition.
 
-# 個別エージェント
-@workspace /api-designer ユーザー登録をおこなうAPIの設計をして
+# Individual agents
+@workspace /api-designer Design an API for user registration
 ```
 
-## 0.4 Spec-Copilotの限界
+## 0.4 Limitations of Spec-Copilot
 
-- ❌ **GitHub Copilot専用**: 他のAIツールでは使用不可
-- ❌ **手動コピー必要**: プロジェクトごとにファイルをコピー
-- ❌ **バージョン管理困難**: エージェント更新時の配布が煩雑
-- ❌ **プロジェクトコンテキストなし**: 各エージェントが独立
+- ❌ **GitHub Copilot only**: Cannot be used with other AI tools
+- ❌ **Manual copying required**: Files had to be copied for each project
+- ❌ **Hard to version**: Distributing agent updates was cumbersome
+- ❌ **No project context**: Each agent operated independently
 
 ---
 
-# 第1章 MUSUHI：パッケージ化と進化（2025年11月中旬）
+# Chapter 1 MUSUHI: Packaging and Evolution (Mid-November 2025)
 
-## 1.1 MUSUHIとは
+## 1.1 What Is MUSUHI?
 
-**リポジトリ:** [github.com/nahisaho/musuhi](https://github.com/nahisaho/musuhi)
+**Repository:** [github.com/nahisaho/musuhi](https://github.com/nahisaho/musuhi)
 
-MUSUHIは、Spec-Copilotの課題を解決するために生まれた**npmパッケージ**です。「結び」という名前は、開発者とAIエージェントを「結ぶ」という意味が込められています。
+MUSUHI is an **npm package** born to solve the problems of Spec-Copilot. The name "musuhi" carries the meaning of "connecting" developers and AI agents.
 
 ```mermaid
 flowchart TB
     subgraph MUSUHI["MUSUHI<br/>AI Agent Installer for SDD"]
         direction TB
-        E1["npxでワンコマンドインストール"]
-        E2["7つのAIプラットフォーム対応"]
-        E3["20エージェント（+1: Steering Agent）"]
-        E4["Project Memory（Steeringシステム）"]
-        E5["EARS形式要件サポート"]
+        E1["One-command install with npx"]
+        E2["Supports 7 AI platforms"]
+        E3["20 agents (+1: Steering Agent)"]
+        E4["Project Memory (Steering system)"]
+        E5["EARS-format requirements support"]
     end
 ```
 
-## 1.2 主要な新機能
+## 1.2 Key New Features
 
-### npmパッケージ化
+### npm Packaging
 
 ```bash
-# ワンコマンドインストール
+# One-command install
 npx musuhi
 
-# プラットフォーム指定
+# Specify platform
 npx musuhi install --tool claude-code
 npx musuhi install --tool github-copilot
 npx musuhi install --tool cursor
 ```
 
-### 7プラットフォーム対応
+### 7-Platform Support
 
-| プラットフォーム | 設定ファイル | エージェント配置 |
+| Platform | Config File | Agent Placement |
 |----------------|-------------|----------------|
 | Claude Code | CLAUDE.md | .claude/agents/ |
 | GitHub Copilot | copilot-instructions.md | .github/agents/ |
@@ -132,23 +132,23 @@ npx musuhi install --tool cursor
 | Codex CLI | codex-config.md | .codex/agents/ |
 | Qwen Code | qwen-config.md | .qwen/agents/ |
 
-### Project Memory（Steeringシステム）
+### Project Memory (Steering System)
 
 ```
 steering/
-├── structure.md    # アーキテクチャパターン、ディレクトリ構成
-├── tech.md         # 技術スタック、フレームワーク
-├── product.md      # ビジネスコンテキスト、製品目的
-├── rules/          # 開発ガイドライン
+├── structure.md    # Architecture patterns, directory layout
+├── tech.md         # Tech stack, frameworks
+├── product.md      # Business context, product purpose
+├── rules/          # Development guidelines
 │   ├── ears-format.md
 │   └── workflow.md
-└── templates/      # ドキュメントテンプレート
+└── templates/      # Document templates
 ```
 
-### EARS形式要件
+### EARS-Format Requirements
 
 ```
-# 5つのEARSパターン
+# The 5 EARS patterns
 1. Event-Driven: WHEN [event], the [system] SHALL [response]
 2. State-Driven: WHILE [state], the [system] SHALL [response]
 3. Unwanted:     IF [error], THEN the [system] SHALL [response]
@@ -156,77 +156,77 @@ steering/
 5. Ubiquitous:   The [system] SHALL [response]
 ```
 
-## 1.3 MUSUHIのバージョン履歴
+## 1.3 MUSUHI Version History
 
-| バージョン | 主要機能 |
+| Version | Key Features |
 |-----------|---------|
-| v0.3.0 | Project Memory（Steering）システム導入 |
-| v0.3.1 | EARS形式サポート |
-| v0.3.2 | SDDワークフローテンプレート |
-| v0.4.0 | 7プラットフォーム対応 |
-| v0.4.4 | 自動コンテキスト参照 |
-| v0.4.5 | インクリメンタルドキュメント生成 |
-| v0.4.9 | Steering自動更新機能 |
+| v0.3.0 | Introduced the Project Memory (Steering) system |
+| v0.3.1 | EARS format support |
+| v0.3.2 | SDD workflow templates |
+| v0.4.0 | 7-platform support |
+| v0.4.4 | Automatic context reference |
+| v0.4.5 | Incremental document generation |
+| v0.4.9 | Steering auto-update feature |
 
-## 1.4 MUSUHIからMUSUBIへ
+## 1.4 From MUSUHI to MUSUBI
 
-MUSUHIは優れたエージェントインストーラーでしたが、以下の機能が不足していました：
+MUSUHI was an excellent agent installer, but it lacked the following features:
 
-- ❌ **CLIコマンドなし**: 要件生成、設計、タスク管理がエージェント頼み
-- ❌ **検証機能なし**: 憲法準拠の自動検証ができない
-- ❌ **トレーサビリティなし**: 要件→設計→実装の追跡機能がない
-- ❌ **テストなし**: 品質保証のための自動テストがない
+- ❌ **No CLI commands**: Requirements generation, design, and task management depended on agents
+- ❌ **No validation**: Could not automatically validate Constitution compliance
+- ❌ **No traceability**: No way to track requirements → design → implementation
+- ❌ **No tests**: No automated tests for quality assurance
 
-これらを解決するため、**MUSUBI**が誕生しました。
+To solve these problems, **MUSUBI** was born.
 
 ---
 
-# 第2章 MUSUBI黎明期：v0.1.0 - v0.1.4（2025年11月）
+# Chapter 2 The Dawn of MUSUBI: v0.1.0 - v0.1.4 (November 2025)
 
-## 2.1 v0.1.0 - 最初の一歩
+## 2.1 v0.1.0 - The First Step
 
-**リリース日:** 2025-11-08
+**Release date:** 2025-11-08
 
-MUSUBIの最初のバージョンは、Proof of Concept（概念実証）として誕生しました。
+The first version of MUSUBI was born as a Proof of Concept.
 
 ```
-v0.1.0 初期機能
-├── 基本的なスキル構造
-├── プロジェクトスキャフォールディング
-└── Claude Code専用設計
+v0.1.0 Initial Features
+├── Basic skill structure
+├── Project scaffolding
+└── Claude Code-only design
 ```
 
-## 2.2 v0.1.2 - 25スキルの誕生
+## 2.2 v0.1.2 - The Birth of 25 Skills
 
-**リリース日:** 2025-11-15
+**Release date:** 2025-11-15
 
-**MUSUBIの核心機能が形になった重要なリリース:**
+**An important release in which MUSUBI's core features took shape:**
 
-| カテゴリ | スキル数 | 内容 |
+| Category | Skills | Contents |
 |---------|---------|------|
-| オーケストレーション | 2 | Orchestrator, Steering |
-| 要件・設計 | 4 | Requirements Analyst, System Architect等 |
-| 開発 | 5 | Software Developer, Code Reviewer等 |
-| 品質・テスト | 4 | Test Engineer, Bug Hunter等 |
-| セキュリティ | 2 | Security Auditor, Penetration Tester |
-| インフラ | 4 | DevOps Engineer, SRE等 |
-| ドキュメント | 4 | Technical Writer, API Designer等 |
+| Orchestration | 2 | Orchestrator, Steering |
+| Requirements & Design | 4 | Requirements Analyst, System Architect, etc. |
+| Development | 5 | Software Developer, Code Reviewer, etc. |
+| Quality & Testing | 4 | Test Engineer, Bug Hunter, etc. |
+| Security | 2 | Security Auditor, Penetration Tester |
+| Infrastructure | 4 | DevOps Engineer, SRE, etc. |
+| Documentation | 4 | Technical Writer, API Designer, etc. |
 
-### 主要機能
+### Key Features
 
-- ✅ **9つの憲法条項（Constitutional Articles）**: 開発ルールの明文化
-- ✅ **EARS形式サポート**: 曖昧さのない要件記述
-- ✅ **Steeringシステム**: プロジェクトメモリの管理
-- ✅ **8ステージSDDワークフロー**: 開発プロセスの標準化
-- ✅ **トレーサビリティマトリクス**: 要件から実装への追跡
+- ✅ **9 Constitutional Articles**: Codified development rules
+- ✅ **EARS format support**: Unambiguous requirements descriptions
+- ✅ **Steering system**: Project memory management
+- ✅ **8-stage SDD workflow**: Standardized development process
+- ✅ **Traceability matrix**: Tracking from requirements to implementation
 
-## 2.3 v0.1.3 - マルチプラットフォーム革命
+## 2.3 v0.1.3 - The Multi-Platform Revolution
 
-**リリース日:** 2025-11-17
+**Release date:** 2025-11-17
 
-**業界初：7つのAIプラットフォームで25エージェントを統一サポート**
+**Industry first: unified support for 25 agents on 7 AI platforms**
 
-**Multi-Platform Support（業界初）**
+**Multi-Platform Support (Industry First)**
 
 | Platform | Agent Format | Location |
 |----------|-------------|----------|
@@ -238,145 +238,145 @@ v0.1.0 初期機能
 | Codex | AGENTS.md | `.codex/AGENTS.md` |
 | Qwen Code | AGENTS.md | `.qwen/AGENTS.md` |
 
-この時点で、MUSUBIは「Claude Code専用ツール」から「ユニバーサルSDD フレームワーク」へと進化しました。
+At this point, MUSUBI evolved from a "Claude Code-only tool" into a "universal SDD framework".
 
 ---
 
-# 第3章 基盤構築期：v0.7.0 - v0.9.x（2025年11月）
+# Chapter 3 Foundation Building: v0.7.0 - v0.9.x (November 2025)
 
-## 3.1 v0.7.0 - 憲法ガバナンスシステム
+## 3.1 v0.7.0 - Constitutional Governance System
 
-**リリース日:** 2025-11-23
+**Release date:** 2025-11-23
 
-**開発プロセスを統治する9つの不変条項を導入:**
+**Introduced 9 immutable articles that govern the development process:**
 
 ```bash
-# 憲法バリデーション
-musubi-validate constitution    # 全9条項の検証
-musubi-validate article 3       # 特定条項の検証
-musubi-validate gates           # Phase -1 ゲート検証
-musubi-validate complexity      # 複雑度制限検証
-musubi-validate all             # 包括的検証
+# Constitution validation
+musubi-validate constitution    # Validate all 9 Articles
+musubi-validate article 3       # Validate a specific Article
+musubi-validate gates           # Validate Phase -1 Gates
+musubi-validate complexity      # Validate complexity limits
+musubi-validate all             # Comprehensive validation
 ```
 
-### 9つの憲法条項
+### The 9 Constitutional Articles
 
-| 条項 | 名称 | 内容 |
+| Article | Name | Description |
 |------|------|------|
-| I | Library-First | ライブラリ優先原則 |
-| II | CLI Interface Mandate | CLIインターフェース義務 |
-| III | Test-First Imperative | テストファースト（Red-Green-Blue） |
-| IV | EARS Requirements Format | EARS形式要件 |
-| V | Traceability Mandate | トレーサビリティ義務 |
-| VI | Project Memory | Steeringシステム |
-| VII | Simplicity Gate | シンプルさの門（≤3サブプロジェクト） |
-| VIII | Anti-Abstraction Gate | 抽象化禁止の門 |
-| IX | Integration-First Testing | 統合テスト優先 |
+| I | Library-First | Library-first principle |
+| II | CLI Interface Mandate | CLI interface mandate |
+| III | Test-First Imperative | Test-first (Red-Green-Blue) |
+| IV | EARS Requirements Format | EARS-format requirements |
+| V | Traceability Mandate | Traceability mandate |
+| VI | Project Memory | Steering system |
+| VII | Simplicity Gate | Simplicity gate (≤3 subprojects) |
+| VIII | Anti-Abstraction Gate | Anti-abstraction gate |
+| IX | Integration-First Testing | Integration-test-first |
 
-## 3.2 v0.8.0 - EARS要件ジェネレーター
+## 3.2 v0.8.0 - EARS Requirements Generator
 
-**リリース日:** 2025-11-23
+**Release date:** 2025-11-23
 
-**曖昧さのない要件仕様を自動生成:**
+**Automatically generate unambiguous requirements specifications:**
 
 ```bash
-# EARS要件管理
-musubi-requirements init <feature>   # 要件ドキュメント初期化
-musubi-requirements add              # 対話的に要件追加
-musubi-requirements list             # 要件一覧表示
-musubi-requirements validate         # EARS形式検証
-musubi-requirements trace            # トレーサビリティマトリクス
+# EARS requirements management
+musubi-requirements init <feature>   # Initialize requirements document
+musubi-requirements add              # Add requirements interactively
+musubi-requirements list             # List requirements
+musubi-requirements validate         # Validate EARS format
+musubi-requirements trace            # Traceability matrix
 ```
 
-### 5つのEARSパターン
+### The 5 EARS Patterns
 
-| パターン | 構文 | 用途 |
+| Pattern | Syntax | Use |
 |---------|------|------|
-| Ubiquitous | `The [system] SHALL [requirement]` | 常時適用 |
-| Event-Driven | `WHEN [event], THEN [system] SHALL [response]` | イベント駆動 |
-| State-Driven | `WHILE [state], [system] SHALL [response]` | 状態駆動 |
-| Unwanted Behavior | `IF [error], THEN [system] SHALL [response]` | 異常系 |
-| Optional Feature | `WHERE [feature], [system] SHALL [response]` | オプション機能 |
+| Ubiquitous | `The [system] SHALL [requirement]` | Always applies |
+| Event-Driven | `WHEN [event], THEN [system] SHALL [response]` | Event-driven |
+| State-Driven | `WHILE [state], [system] SHALL [response]` | State-driven |
+| Unwanted Behavior | `IF [error], THEN [system] SHALL [response]` | Error cases |
+| Optional Feature | `WHERE [feature], [system] SHALL [response]` | Optional features |
 
-## 3.3 v0.8.2 - 設計ドキュメントジェネレーター
+## 3.3 v0.8.2 - Design Document Generator
 
-**C4モデルとADR（Architecture Decision Record）の自動生成:**
-
-```bash
-# 設計ドキュメント管理
-musubi-design init <feature>           # 設計ドキュメント初期化
-musubi-design add-c4 <level>           # C4図追加（context|container|component|code）
-musubi-design add-adr <decision>       # ADR追加
-musubi-design validate                 # 設計の完全性検証
-musubi-design trace                    # 要件→設計トレーサビリティ
-```
-
-## 3.4 v0.8.4 - タスク分解システム
-
-**設計からアクション可能なタスクへ分解:**
+**Automatically generate C4 models and ADRs (Architecture Decision Records):**
 
 ```bash
-# タスク管理
-musubi-tasks init <feature>           # タスクドキュメント初期化
-musubi-tasks add <title>              # タスク追加
-musubi-tasks list                     # タスク一覧
-musubi-tasks update <id> <status>     # ステータス更新
-musubi-tasks graph                    # 依存関係グラフ生成
+# Design document management
+musubi-design init <feature>           # Initialize design document
+musubi-design add-c4 <level>           # Add C4 diagram (context|container|component|code)
+musubi-design add-adr <decision>       # Add ADR
+musubi-design validate                 # Validate design completeness
+musubi-design trace                    # Requirements → design traceability
 ```
 
-### 優先度システム
+## 3.4 v0.8.4 - Task Breakdown System
 
-| 優先度 | 名称 | 用途 |
+**Break designs down into actionable tasks:**
+
+```bash
+# Task management
+musubi-tasks init <feature>           # Initialize task document
+musubi-tasks add <title>              # Add task
+musubi-tasks list                     # List tasks
+musubi-tasks update <id> <status>     # Update status
+musubi-tasks graph                    # Generate dependency graph
+```
+
+### Priority System
+
+| Priority | Name | Use |
 |--------|------|------|
-| P0 | Critical | ローンチブロッカー |
-| P1 | High | コア機能 |
+| P0 | Critical | Launch blocker |
+| P1 | High | Core features |
 | P2 | Medium | Nice-to-have |
-| P3 | Low | 将来機能 |
+| P3 | Low | Future features |
 
-## 3.5 v0.8.5-v0.8.8 - トレーサビリティ＆変更管理
+## 3.5 v0.8.5-v0.8.8 - Traceability & Change Management
 
-**Phase 2完成：ブラウンフィールドプロジェクト対応**
+**Phase 2 complete: brownfield project support**
 
 ```bash
-# トレーサビリティ
-musubi-trace matrix                   # 完全トレーサビリティマトリクス
-musubi-trace coverage                 # カバレッジ統計
-musubi-trace gaps                     # ギャップ検出
-musubi-trace impact <req-id>          # 影響分析
+# Traceability
+musubi-trace matrix                   # Full traceability matrix
+musubi-trace coverage                 # Coverage statistics
+musubi-trace gaps                     # Gap detection
+musubi-trace impact <req-id>          # Impact analysis
 
-# 変更管理
-musubi-change init <change-id>        # 変更提案作成
-musubi-change apply <change-id>       # 変更適用
-musubi-change archive <change-id>     # 変更アーカイブ
+# Change management
+musubi-change init <change-id>        # Create change proposal
+musubi-change apply <change-id>       # Apply change
+musubi-change archive <change-id>     # Archive change
 
-# ギャップ検出
-musubi-gaps detect                    # 全ギャップ検出
-musubi-gaps coverage                  # カバレッジ統計
+# Gap detection
+musubi-gaps detect                    # Detect all gaps
+musubi-gaps coverage                  # Coverage statistics
 ```
 
-## 3.6 v0.9.x - 品質向上と機能強化
+## 3.6 v0.9.x - Quality Improvements and Enhancements
 
-| バージョン | 追加機能 |
+| Version | Added Features |
 |-----------|---------|
-| v0.9.0 | Phase -1 ゲートプロセス、80%テストカバレッジ強制 |
-| v0.9.1 | CLIバージョン同期、憲法条項参照 |
-| v0.9.2 | --dry-run、--verbose、--json オプション |
-| v0.9.3 | EARS厳格検証、品質メトリクスコマンド |
-| v0.9.4 | 双方向トレーサビリティ、影響分析、統計 |
-| v0.9.5 | オーケストレーター強化（25エージェント対応） |
-| v0.9.6-7 | トレーサビリティバグ修正、要件IDパターン拡張 |
+| v0.9.0 | Phase -1 Gate process, 80% test coverage enforcement |
+| v0.9.1 | CLI version sync, Constitutional Article references |
+| v0.9.2 | --dry-run, --verbose, --json options |
+| v0.9.3 | Strict EARS validation, quality metrics command |
+| v0.9.4 | Bidirectional traceability, impact analysis, statistics |
+| v0.9.5 | Orchestrator enhancements (25-agent support) |
+| v0.9.6-7 | Traceability bug fixes, extended requirement ID patterns |
 
 ---
 
-# 第4章 本番リリース：v1.0.0（2025年11月23日）
+# Chapter 4 Production Release: v1.0.0 (November 23, 2025)
 
-## 4.1 プロダクションレディ
+## 4.1 Production Ready
 
-**テスト数:** 213 | **CLIコマンド:** 12 | **プラットフォーム:** 7
+**Tests:** 213 | **CLI commands:** 12 | **Platforms:** 7
 
 **MUSUBI v1.0.0 - Production Ready**
 
-| 項目 | ステータス |
+| Item | Status |
 |------|----------|
 | Core Framework | ✅ Complete |
 | CLI Infrastructure | ✅ 12 commands operational |
@@ -385,43 +385,43 @@ musubi-gaps coverage                  # カバレッジ統計
 | Testing | ✅ 213/213 tests passing |
 | Documentation | ✅ Comprehensive guides |
 
-### 12のCLIコマンド
+### The 12 CLI Commands
 
-| コマンド | 機能 |
+| Command | Function |
 |---------|------|
-| `musubi-init` | マルチプラットフォーム初期化 |
-| `musubi-requirements` | EARS要件生成 |
-| `musubi-design` | C4 + ADR設計ドキュメント |
-| `musubi-tasks` | タスク分解 |
-| `musubi-trace` | トレーサビリティシステム |
-| `musubi-change` | 変更管理 |
-| `musubi-gaps` | ギャップ検出 |
-| `musubi-validate` | 憲法準拠検証 |
-| `musubi-onboard` | プロジェクト自動分析 |
-| `musubi-sync` | Steering同期 |
-| `musubi-analyze` | コード品質分析 |
-| `musubi-share` | チーム協働・メモリ共有 |
+| `musubi-init` | Multi-platform initialization |
+| `musubi-requirements` | EARS requirements generation |
+| `musubi-design` | C4 + ADR design documents |
+| `musubi-tasks` | Task breakdown |
+| `musubi-trace` | Traceability system |
+| `musubi-change` | Change management |
+| `musubi-gaps` | Gap detection |
+| `musubi-validate` | Constitution compliance validation |
+| `musubi-onboard` | Automatic project analysis |
+| `musubi-sync` | Steering synchronization |
+| `musubi-analyze` | Code quality analysis |
+| `musubi-share` | Team collaboration and memory sharing |
 
-### v1.0.0で可能になったこと
+### What v1.0.0 Made Possible
 
-- ✅ **完全なSDDワークフロー**: 要件→設計→タスク→実装→テスト
-- ✅ **100%トレーサビリティ**: 孤立した成果物がゼロ
-- ✅ **7プラットフォーム対応**: どのAI環境でも同じ体験
-- ✅ **CI/CD統合**: 終了コードによる自動化対応
+- ✅ **Complete SDD workflow**: Requirements → design → tasks → implementation → testing
+- ✅ **100% traceability**: Zero orphaned deliverables
+- ✅ **7-platform support**: The same experience in any AI environment
+- ✅ **CI/CD integration**: Automation via exit codes
 
 ---
 
-# 第5章 v2.0.0 - MCP Server Integration
+# Chapter 5 v2.0.0 - MCP Server Integration
 
-## 5.1 概要
+## 5.1 Overview
 
-**リリース日:** 2025-12-03
+**Release date:** 2025-12-03
 
-v2.0.0は、**CodeGraphMCPServer統合**を導入した大規模アップデートです。Model Context Protocol（MCP）を通じて、14種類の高度なコード解析ツールが利用可能になりました。
+v2.0.0 is a major update that introduced **CodeGraphMCPServer integration**. Through the Model Context Protocol (MCP), 14 advanced code analysis tools became available.
 
-## 5.2 主要な新機能
+## 5.2 Key New Features
 
-### CodeGraphMCPServer統合
+### CodeGraphMCPServer Integration
 
 ```mermaid
 flowchart TB
@@ -454,29 +454,29 @@ flowchart TB
     end
 ```
 
-### 11の強化されたエージェント
+### 11 Enhanced Agents
 
-| エージェント | 使用MCPツール | 用途 |
+| Agent | MCP Tools Used | Purpose |
 |------------|--------------|------|
-| `@change-impact-analyzer` | `find_dependencies`, `find_callers` | 変更影響分析 |
-| `@traceability-auditor` | `query_codebase`, `find_callers` | トレーサビリティ検証 |
-| `@system-architect` | `analyze_module_structure`, `global_search` | アーキテクチャ分析 |
-| `@code-reviewer` | `suggest_refactoring`, `get_code_snippet` | コードレビュー |
-| `@security-auditor` | `find_callers`, `query_codebase` | セキュリティ脆弱性検出 |
-| `@orchestrator` | `query_codebase`, `global_search` | プロジェクト統括 |
-| `@test-engineer` | `find_callers`, `get_code_snippet` | テスト設計 |
-| `@bug-hunter` | `find_callers`, `local_search` | バグ調査 |
-| `@software-developer` | `get_code_snippet`, `local_search` | 実装支援 |
-| `@steering` | `query_codebase`, `analyze_module_structure` | プロジェクトメモリ管理 |
-| `@constitution-enforcer` | `find_dependencies`, `analyze_module_structure` | 憲法準拠検証 |
+| `@change-impact-analyzer` | `find_dependencies`, `find_callers` | Change impact analysis |
+| `@traceability-auditor` | `query_codebase`, `find_callers` | Traceability validation |
+| `@system-architect` | `analyze_module_structure`, `global_search` | Architecture analysis |
+| `@code-reviewer` | `suggest_refactoring`, `get_code_snippet` | Code review |
+| `@security-auditor` | `find_callers`, `query_codebase` | Security vulnerability detection |
+| `@orchestrator` | `query_codebase`, `global_search` | Project coordination |
+| `@test-engineer` | `find_callers`, `get_code_snippet` | Test design |
+| `@bug-hunter` | `find_callers`, `local_search` | Bug investigation |
+| `@software-developer` | `get_code_snippet`, `local_search` | Implementation support |
+| `@steering` | `query_codebase`, `analyze_module_structure` | Project memory management |
+| `@constitution-enforcer` | `find_dependencies`, `analyze_module_structure` | Constitution compliance validation |
 
-### GraphRAG対応
+### GraphRAG Support
 
-- **Louvain community detection**: コード構造のコミュニティ分析
-- **12言語サポート**: Python, TypeScript, JavaScript, Java, Go, Rust, C++など
-- **セマンティック検索**: コードの意味を理解した検索
+- **Louvain community detection**: Community analysis of code structure
+- **12-language support**: Python, TypeScript, JavaScript, Java, Go, Rust, C++, and more
+- **Semantic search**: Search that understands the meaning of code
 
-## 5.3 セットアップ例
+## 5.3 Setup Example
 
 ```bash
 # Claude Code
@@ -494,47 +494,47 @@ claude mcp add codegraph -- codegraph-mcp serve --repo .
 }
 ```
 
-## 5.4 v2.0.0で可能になったこと
+## 5.4 What v2.0.0 Made Possible
 
-- ✅ **コード依存関係の可視化**: 変更前に影響範囲を正確に把握
-- ✅ **セマンティック検索**: 「認証処理」などの概念でコードを検索
-- ✅ **リファクタリング提案**: コード品質改善の自動提案
-- ✅ **アーキテクチャ分析**: モジュール構造の自動把握
+- ✅ **Code dependency visualization**: Accurately understand the impact scope before making changes
+- ✅ **Semantic search**: Search code by concepts such as "authentication handling"
+- ✅ **Refactoring suggestions**: Automatic suggestions for improving code quality
+- ✅ **Architecture analysis**: Automatic understanding of module structure
 
 ---
 
-# 第6章 v2.1.0 - Workflow Engine
+# Chapter 6 v2.1.0 - Workflow Engine
 
-## 6.1 概要
+## 6.1 Overview
 
-**リリース日:** 2025-12-05
+**Release date:** 2025-12-05
 
-v2.1.0は、**ワークフローエンジン**を導入し、SDD開発プロセスの状態管理とメトリクス追跡を実現しました。
+v2.1.0 introduced the **workflow engine**, enabling state management and metrics tracking for the SDD development process.
 
-## 6.2 新CLI: musubi-workflow
+## 6.2 New CLI: musubi-workflow
 
 ```bash
-# ワークフロー初期化
+# Initialize workflow
 musubi-workflow init <feature-name>
 
-# 現在のステータス確認
+# Check current status
 musubi-workflow status
 
-# 次のステージへ遷移
+# Transition to the next stage
 musubi-workflow next design
 
-# フィードバックループ記録
-musubi-workflow feedback review implementation -r "リファクタリング必要"
+# Record feedback loop
+musubi-workflow feedback review implementation -r "Refactoring needed"
 
-# ワークフロー完了
+# Complete workflow
 musubi-workflow complete
 
-# 履歴とメトリクス表示
+# Show history and metrics
 musubi-workflow history
 musubi-workflow metrics
 ```
 
-## 6.3 新しいSDDステージ
+## 6.3 New SDD Stages
 
 ```mermaid
 flowchart LR
@@ -550,192 +550,192 @@ flowchart LR
     S9 -.->|Feedback Loop| S1
 ```
 
-| Stage | 名称 | 説明 |
+| Stage | Name | Description |
 |-------|------|------|
-| 0 | Spike/PoC | 要件前のリサーチとプロトタイピング |
-| 1 | Requirements | 要件定義 |
-| 2 | Design | 設計 |
-| 3 | Tasks | タスク分解 |
-| 4 | Implementation | 実装 |
-| 5 | Testing | テスト |
-| 5.5 | Code Review | ★NEW: 構造化コードレビュー |
-| 6 | Deployment | デプロイ |
-| 7 | Monitoring | 監視 |
-| 9 | Retrospective | ★NEW: 継続的改善 |
+| 0 | Spike/PoC | Research and prototyping before requirements |
+| 1 | Requirements | Requirements definition |
+| 2 | Design | Design |
+| 3 | Tasks | Task breakdown |
+| 4 | Implementation | Implementation |
+| 5 | Testing | Testing |
+| 5.5 | Code Review | ★NEW: Structured code review |
+| 6 | Deployment | Deployment |
+| 7 | Monitoring | Monitoring |
+| 9 | Retrospective | ★NEW: Continuous improvement |
 
-## 6.4 ワークフロー機能
+## 6.4 Workflow Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| **状態管理** | `storage/workflow-state.yml`でフィーチャーごとのステージを追跡 |
-| **メトリクス収集** | ステージごとの所要時間、イテレーション回数、フィードバックループ |
-| **遷移バリデーション** | 有効なステージ遷移の強制とフィードバックループサポート |
-| **ステージ検証ガイド** | 各ステージ遷移のチェックリスト |
+| **State management** | Tracks the stage of each feature in `storage/workflow-state.yml` |
+| **Metrics collection** | Time spent per stage, iteration counts, feedback loops |
+| **Transition validation** | Enforces valid stage transitions and supports feedback loops |
+| **Stage validation guide** | Checklist for each stage transition |
 
-## 6.5 v2.1.0で可能になったこと
+## 6.5 What v2.1.0 Made Possible
 
-- ✅ **プロセス可視化**: 開発プロセスの進捗を明確に追跡
-- ✅ **メトリクス駆動改善**: 各ステージの所要時間を分析
-- ✅ **フィードバックループ**: イテレーションを正式に記録
-- ✅ **Spike/PoCステージ**: 要件前の調査を正式にサポート
-- ✅ **Retrospective**: 振り返りによる継続的改善
+- ✅ **Process visualization**: Clearly track the progress of the development process
+- ✅ **Metrics-driven improvement**: Analyze the time spent in each stage
+- ✅ **Feedback loops**: Formally record iterations
+- ✅ **Spike/PoC stage**: Formal support for investigation before requirements
+- ✅ **Retrospective**: Continuous improvement through reflection
 
 ---
 
-# 第7章 v2.2.0 - OpenHands由来モジュール
+# Chapter 7 v2.2.0 - OpenHands-Derived Modules
 
-## 7.1 概要
+## 7.1 Overview
 
-**リリース日:** 2025-12-07
+**Release date:** 2025-12-07
 
-v2.2.0は、**OpenHandsプロジェクト**にインスパイアされた8つの高度なモジュールを統合しました。テスト数は483に増加し、より堅牢なフレームワークになりました。
+v2.2.0 integrated 8 advanced modules inspired by the **OpenHands project**. The test count grew to 483, making the framework more robust.
 
-## 7.2 8つの新モジュール
+## 7.2 The 8 New Modules
 
 ```mermaid
 flowchart TB
     subgraph OpenHands["OpenHands-Inspired Modules"]
         direction TB
         subgraph Core["Core Modules"]
-            M1["StuckDetector<br/>エージェントの行き詰まり検出"]
-            M2["SkillsLoader<br/>動的スキルのロードと管理"]
-            M3["MemoryCondenser<br/>長期記憶の効率的な圧縮"]
-            M4["CriticSystem<br/>エージェント出力の品質評価"]
+            M1["StuckDetector<br/>Detects when an agent is stuck"]
+            M2["SkillsLoader<br/>Dynamic skill loading and management"]
+            M3["MemoryCondenser<br/>Efficient compression of long-term memory"]
+            M4["CriticSystem<br/>Quality evaluation of agent output"]
         end
         subgraph Integration["Integration Modules"]
-            M5["IssueResolver<br/>GitHub Issue自動分析"]
-            M6["SecurityAnalyzer<br/>脆弱性自動検出"]
-            M7["AgentMemoryManager<br/>エージェント間メモリ共有"]
-            M8["GitHubClient<br/>GitHub API統合"]
+            M5["IssueResolver<br/>Automatic GitHub Issue analysis"]
+            M6["SecurityAnalyzer<br/>Automatic vulnerability detection"]
+            M7["AgentMemoryManager<br/>Memory sharing between agents"]
+            M8["GitHubClient<br/>GitHub API integration"]
         end
     end
 ```
 
 ### 3.2.1 StuckDetector
 
-エージェントが同じ操作を繰り返したり、進捗がない状態を自動検出します。
+Automatically detects when an agent repeats the same operation or makes no progress.
 
 ```javascript
-// 行き詰まり検出のパターン
-- 同じコマンドの繰り返し実行
-- エラーループ（同じエラーが連続）
-- 進捗なしの長時間待機
+// Stuck detection patterns
+- Repeated execution of the same command
+- Error loops (the same error occurring repeatedly)
+- Long waits with no progress
 ```
 
 ### 3.2.2 SkillsLoader
 
-必要に応じてスキル（エージェント）を動的にロードします。
+Dynamically loads skills (agents) as needed.
 
 ```javascript
-// 動的スキルロード
+// Dynamic skill loading
 const skill = await skillsLoader.load('code-reviewer');
 ```
 
 ### 3.2.3 MemoryCondenser
 
-長期コンテキストを効率的に圧縮し、重要な情報を保持します。
+Efficiently compresses long-term context while retaining important information.
 
 ### 3.2.4 CriticSystem
 
-エージェントの出力を評価し、品質スコアを算出します。
+Evaluates agent output and calculates a quality score.
 
 ```javascript
-// 品質評価
+// Quality evaluation
 const critique = await criticSystem.evaluate(agentOutput);
 // { score: 0.85, feedback: [...], improvements: [...] }
 ```
 
 ### 3.2.5 IssueResolver
 
-GitHub Issueを分析し、解決に必要なタスクを自動生成します。
+Analyzes GitHub Issues and automatically generates the tasks needed to resolve them.
 
 ### 3.2.6 SecurityAnalyzer
 
-コードのセキュリティ脆弱性を自動検出します。
+Automatically detects security vulnerabilities in code.
 
 ```javascript
-// セキュリティ分析
+// Security analysis
 const vulnerabilities = await securityAnalyzer.scan(codebase);
 // [{ type: 'SQL Injection', severity: 'high', location: '...' }]
 ```
 
 ### 3.2.7 AgentMemoryManager
 
-複数エージェント間でメモリを共有・同期します。
+Shares and synchronizes memory between multiple agents.
 
 ### 3.2.8 GitHubClient
 
-GitHub APIとの統合により、Issue/PR操作を自動化します。
+Integration with the GitHub API automates Issue/PR operations.
 
-## 7.3 v2.2.0で可能になったこと
+## 7.3 What v2.2.0 Made Possible
 
-- ✅ **自己回復**: 行き詰まったエージェントの自動リカバリー
-- ✅ **動的拡張**: 必要なスキルのオンデマンドロード
-- ✅ **品質保証**: エージェント出力の自動評価
-- ✅ **Issue自動解決**: GitHubIssueからタスク自動生成
-- ✅ **セキュリティ**: コードの脆弱性自動検出
-- ✅ **メモリ効率化**: 長期コンテキストの圧縮管理
+- ✅ **Self-recovery**: Automatic recovery of stuck agents
+- ✅ **Dynamic extension**: On-demand loading of required skills
+- ✅ **Quality assurance**: Automatic evaluation of agent output
+- ✅ **Automatic Issue resolution**: Automatic task generation from GitHub Issues
+- ✅ **Security**: Automatic detection of code vulnerabilities
+- ✅ **Memory efficiency**: Compressed management of long-term context
 
 ---
 
-# 第8章 v3.0.0 - Browser Automation & Web GUI
+# Chapter 8 v3.0.0 - Browser Automation & Web GUI
 
-## 8.1 概要
+## 8.1 Overview
 
-**リリース日:** 2025-12-07
+**Release date:** 2025-12-07
 
-v3.0.0は、**Browser Automation Agent**と**Web GUI Dashboard**を追加した、MUSUBIの大型メジャーアップデートです。テスト数は673に増加し、27のAIエージェントを搭載しています。
+v3.0.0 is a major MUSUBI update that added the **Browser Automation Agent** and the **Web GUI Dashboard**. The test count grew to 673, and it ships with 27 AI agents.
 
 ## 8.2 Browser Automation Agent
 
-### 自然言語でブラウザを操作
+### Control the Browser with Natural Language
 
 ```bash
-# ブラウザエージェント起動
+# Start the browser agent
 musubi-browser
 
-# 使用例
-> "Googleで'MUSUBI SDD'を検索して結果を取得"
-> "ログインページにアクセスしてスクリーンショットを撮影"
-> "フォームに入力してSubmitボタンをクリック"
+# Usage examples
+> "Search Google for 'MUSUBI SDD' and get the results"
+> "Go to the login page and take a screenshot"
+> "Fill in the form and click the Submit button"
 ```
 
-### 主要機能
+### Key Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| **自然言語操作** | 日本語/英語でブラウザを操作 |
-| **スクリーンショット** | ページの自動キャプチャ |
-| **フォーム操作** | 入力、選択、クリック |
-| **ナビゲーション** | URL移動、戻る、進む |
-| **データ抽出** | ページからテキスト/リンク抽出 |
+| **Natural language control** | Control the browser in Japanese/English |
+| **Screenshots** | Automatic page capture |
+| **Form operations** | Input, select, click |
+| **Navigation** | Go to URL, back, forward |
+| **Data extraction** | Extract text/links from pages |
 
-### 技術スタック
+### Tech Stack
 
 ```
 Browser Agent
-├── Playwright (ブラウザ自動化)
-├── Natural Language Parser (自然言語解析)
-└── Action Executor (操作実行)
+├── Playwright (browser automation)
+├── Natural Language Parser (natural language analysis)
+└── Action Executor (action execution)
 ```
 
 ## 8.3 Web GUI Dashboard
 
-### リアルタイムダッシュボード
+### Real-Time Dashboard
 
 ```bash
-# GUIサーバー起動
+# Start the GUI server
 musubi-gui
 
-# ブラウザで開く
+# Open in browser
 http://localhost:3000
 ```
 
-### ダッシュボード機能
+### Dashboard Features
 
 **MUSUBI Web Dashboard**
 
-| セクション | 指標 | ステータス |
+| Section | Metric | Status |
 |----------|------|----------|
 | 📊 **Project Overview** | | |
 | Requirements Status | ██████████░░░░ | 75% |
@@ -751,149 +751,149 @@ http://localhost:3000
 | Backward Coverage | 88% | - |
 | Orphaned Items | 2 | - |
 
-## 8.4 その他の改善
+## 8.4 Other Improvements
 
-### Spec Kit互換
+### Spec Kit Compatibility
 
-GitHub Copilot Spec Kitとの相互変換をサポート。
+Supports two-way conversion with GitHub Copilot Spec Kit.
 
 ```bash
-# Spec KitからMUSUBI形式へ変換
+# Convert from Spec Kit to MUSUBI format
 musubi-convert from-speckit ./specs
 
-# MUSUBI形式からSpec Kitへ変換
+# Convert from MUSUBI format to Spec Kit
 musubi-convert to-speckit ./storage
 ```
 
-### エージェント数の増加
+### Increase in Number of Agents
 
-- **v2.2.0**: 19エージェント
-- **v3.0.0**: **27エージェント**（+8）
+- **v2.2.0**: 19 agents
+- **v3.0.0**: **27 agents** (+8)
 
-### テストカバレッジ
+### Test Coverage
 
-- **v2.2.0**: 483テスト
-- **v3.0.0**: **673テスト**（+190）
+- **v2.2.0**: 483 tests
+- **v3.0.0**: **673 tests** (+190)
 
-## 8.5 v3.0.0で可能になったこと
+## 8.5 What v3.0.0 Made Possible
 
-- ✅ **ブラウザ自動化**: E2Eテスト、スクレイピング、フォーム自動入力
-- ✅ **視覚的プロジェクト管理**: Webダッシュボードでリアルタイム監視
-- ✅ **Spec Kit相互運用**: 既存のSpec Kitプロジェクトと連携
-- ✅ **27エージェント**: 専門AIによる包括的な開発支援
+- ✅ **Browser automation**: E2E testing, scraping, automatic form filling
+- ✅ **Visual project management**: Real-time monitoring on a web dashboard
+- ✅ **Spec Kit interoperability**: Works with existing Spec Kit projects
+- ✅ **27 agents**: Comprehensive development support from specialized AI
 
 ---
 
-# 第9章 v3.3.0-v3.5.1 - モニタリング、Steering高度化、CLI統合
+# Chapter 9 v3.3.0-v3.5.1 - Monitoring, Advanced Steering, CLI Integration
 
-## 9.1 v3.3.0 - Phase 4 モニタリング＆運用
+## 9.1 v3.3.0 - Phase 4 Monitoring & Operations
 
-**リリース日:** 2025-06-14
+**Release date:** 2025-06-14
 
-Phase 4でSRE機能とモニタリング機能を完備しました。
+Phase 4 completed the SRE and monitoring capabilities.
 
-### 新モジュール
+### New Modules
 
-| モジュール | 説明 |
+| Module | Description |
 |-----------|------|
-| **Observability** | ログ、メトリクス、トレースの統合監視 |
-| **IncidentManager** | インシデント管理と対応フロー |
-| **ReleaseManager** | リリース管理とデプロイメント |
+| **Observability** | Integrated monitoring of logs, metrics, and traces |
+| **IncidentManager** | Incident management and response flow |
+| **ReleaseManager** | Release management and deployment |
 
-## 9.2 v3.4.0 - Phase 5 Steering高度化
+## 9.2 v3.4.0 - Phase 5 Advanced Steering
 
-**リリース日:** 2025-06-14
+**Release date:** 2025-06-14
 
-Phase 5でSteeringシステムの高度な機能を追加しました。
+Phase 5 added advanced features to the Steering system.
 
-### 新モジュール（233テスト追加）
+### New Modules (233 tests added)
 
-| スプリント | モジュール | 説明 |
+| Sprint | Module | Description |
 |-----------|-----------|------|
-| Sprint 5.1 | **Steering Auto-Update** | ファイル変更を検知してsteering自動更新 |
-| Sprint 5.2 | **Template Constraints** | LLM制約構文、不確実性マーカー |
-| Sprint 5.3 | **Quality Metrics Dashboard** | A-Fグレード品質スコア算出 |
-| Sprint 5.4 | **Advanced Validation** | クロスアーティファクト整合性検証 |
+| Sprint 5.1 | **Steering Auto-Update** | Detects file changes and automatically updates steering |
+| Sprint 5.2 | **Template Constraints** | LLM constraint syntax, uncertainty markers |
+| Sprint 5.3 | **Quality Metrics Dashboard** | Calculates A-F grade quality scores |
+| Sprint 5.4 | **Advanced Validation** | Cross-artifact consistency validation |
 
-### 詳細機能
+### Detailed Features
 
 ```javascript
 // Steering Auto-Update
-ChangeDetector       // ファイル変更検知
-SteeringUpdater      // structure/tech/product自動更新
-ProjectYmlSync       // package.jsonとの同期
+ChangeDetector       // File change detection
+SteeringUpdater      // Automatic update of structure/tech/product
+ProjectYmlSync       // Synchronization with package.json
 
 // Template Constraints
-Constraint           // カスタムバリデーション制約
-UncertaintyParser    // {?unknown?}, {~estimate~}, {!todo!} マーカー
-TemplateDefinition   // セクション定義とチェックリスト
+Constraint           // Custom validation constraints
+UncertaintyParser    // {?unknown?}, {~estimate~}, {!todo!} markers
+TemplateDefinition   // Section definitions and checklists
 
 // Quality Metrics Dashboard
-Metric               // 計測メトリクス
-HealthIndicator      // ヘルスステータス
-TrendAnalyzer        // トレンド分析（up/down/stable）
-QualityScoreCalculator // A-Fグレード算出
+Metric               // Measured metrics
+HealthIndicator      // Health status
+TrendAnalyzer        // Trend analysis (up/down/stable)
+QualityScoreCalculator // A-F grade calculation
 
 // Advanced Validation
-ConsistencyChecker   // クロスアーティファクト整合性
-GapDetector          // 要件/設計/テスト間ギャップ
-CompletenessChecker  // 必須フィールド検証
-DependencyValidator  // 循環依存検出
-ReferenceValidator   // REQ-xxx, DES-xxx参照検証
+ConsistencyChecker   // Cross-artifact consistency
+GapDetector          // Gaps between requirements/design/tests
+CompletenessChecker  // Required field validation
+DependencyValidator  // Circular dependency detection
+ReferenceValidator   // REQ-xxx, DES-xxx reference validation
 ```
 
-## 9.3 v3.5.0 - 20 CLIコマンド完備
+## 9.3 v3.5.0 - 20 CLI Commands Complete
 
-**リリース日:** 2025-12-08
+**Release date:** 2025-12-08
 
-全てのCLIコマンドが完備され、実用レベルに到達しました。
+All CLI commands are now complete, reaching a production-ready level.
 
-### 新CLIコマンド（6個追加）
+### New CLI Commands (6 added)
 
-| コマンド | 機能 | 例 |
+| Command | Function | Example |
 |---------|------|-----|
-| `musubi-orchestrate` | マルチスキルワークフロー | `musubi-orchestrate auto <task>` |
-| `musubi-browser` | ブラウザ自動化・E2Eテスト | `musubi-browser run "click login"` |
-| `musubi-gui` | Web GUIダッシュボード | `musubi-gui start` |
-| `musubi-remember` | エージェントメモリ管理 | `musubi-remember extract` |
-| `musubi-resolve` | GitHub Issue自動解決 | `musubi-resolve <issue-number>` |
-| `musubi-convert` | フォーマット変換 | `musubi-convert to-speckit` |
+| `musubi-orchestrate` | Multi-skill workflow | `musubi-orchestrate auto <task>` |
+| `musubi-browser` | Browser automation and E2E testing | `musubi-browser run "click login"` |
+| `musubi-gui` | Web GUI dashboard | `musubi-gui start` |
+| `musubi-remember` | Agent memory management | `musubi-remember extract` |
+| `musubi-resolve` | Automatic GitHub Issue resolution | `musubi-resolve <issue-number>` |
+| `musubi-convert` | Format conversion | `musubi-convert to-speckit` |
 
-### 20 CLIコマンド一覧
+### List of the 20 CLI Commands
 
-| カテゴリ | コマンド |
+| Category | Commands |
 |---------|---------|
-| **コアワークフロー** | `musubi`, `musubi-init`, `musubi-workflow` |
-| **ドキュメント生成** | `musubi-requirements`, `musubi-design`, `musubi-tasks` |
-| **トレーサビリティ** | `musubi-trace`, `musubi-gaps`, `musubi-change` |
-| **検証・分析** | `musubi-validate`, `musubi-analyze` |
-| **統合・共有** | `musubi-sync`, `musubi-share`, `musubi-onboard` |
-| **高度な機能** | `musubi-orchestrate`, `musubi-browser`, `musubi-gui`, `musubi-remember`, `musubi-resolve`, `musubi-convert` |
+| **Core workflow** | `musubi`, `musubi-init`, `musubi-workflow` |
+| **Document generation** | `musubi-requirements`, `musubi-design`, `musubi-tasks` |
+| **Traceability** | `musubi-trace`, `musubi-gaps`, `musubi-change` |
+| **Validation and analysis** | `musubi-validate`, `musubi-analyze` |
+| **Integration and sharing** | `musubi-sync`, `musubi-share`, `musubi-onboard` |
+| **Advanced features** | `musubi-orchestrate`, `musubi-browser`, `musubi-gui`, `musubi-remember`, `musubi-resolve`, `musubi-convert` |
 
-## 9.4 v3.5.1 - 全プラットフォームCLI統合
+## 9.4 v3.5.1 - CLI Integration Across All Platforms
 
-**リリース日:** 2025-12-08
+**Release date:** 2025-12-08
 
-全7プラットフォームからCLIコマンドにアクセス可能になりました。
+CLI commands are now accessible from all 7 platforms.
 
-### 変更内容
+### Changes
 
-**Claude Codeスキル更新（8スキル）:**
+**Claude Code skills updated (8 skills):**
 
-| スキル | 追加CLI |
+| Skill | Added CLI |
 |--------|---------|
-| `orchestrator` | 全20 CLIコマンドの詳細オプション |
-| `issue-resolver` | `musubi-resolve` クイックスタート |
-| `agent-assistant` | `musubi-remember` メモリ管理 |
-| `test-engineer` | `musubi-browser` E2Eテスト |
-| `ui-ux-designer` | `musubi-browser` UIテスト |
-| `site-reliability-engineer` | `musubi-gui` ダッシュボード |
-| `steering` | `musubi-remember` メモリCLI |
-| `project-manager` | `musubi-orchestrate` 統合 |
+| `orchestrator` | Detailed options for all 20 CLI commands |
+| `issue-resolver` | `musubi-resolve` quick start |
+| `agent-assistant` | `musubi-remember` memory management |
+| `test-engineer` | `musubi-browser` E2E testing |
+| `ui-ux-designer` | `musubi-browser` UI testing |
+| `site-reliability-engineer` | `musubi-gui` dashboard |
+| `steering` | `musubi-remember` memory CLI |
+| `project-manager` | `musubi-orchestrate` integration |
 
-**他プラットフォーム対応（6プラットフォーム）:**
+**Other platform support (6 platforms):**
 
-| プラットフォーム | ファイル | CLI参照数 |
+| Platform | File | CLI References |
 |-----------------|---------|----------|
 | GitHub Copilot | `AGENTS.md` | 24 |
 | Cursor | `AGENTS.md` | 14 |
@@ -902,140 +902,140 @@ ReferenceValidator   // REQ-xxx, DES-xxx参照検証
 | Gemini CLI | `GEMINI.md` | 14 |
 | Qwen Code | `QWEN.md` | 14 |
 
-### v3.5.1で可能になったこと
+### What v3.5.1 Made Possible
 
-- ✅ **全プラットフォームからCLI利用**: どのAI環境でも同じCLI体験
-- ✅ **スキル内CLI統合**: 各スキルから関連CLIコマンドに直接アクセス
-- ✅ **詳細ドキュメント参照**: Learn Moreセクションから完全CLI参照へ誘導
+- ✅ **CLI use from every platform**: The same CLI experience in any AI environment
+- ✅ **CLI integration within skills**: Direct access to related CLI commands from each skill
+- ✅ **Detailed documentation references**: The Learn More section leads to the complete CLI reference
 
 ---
 
-# 第10章 v3.6.0-v3.6.1 - Dynamic Replanning Engine
+# Chapter 10 v3.6.0-v3.6.1 - Dynamic Replanning Engine
 
 ## 10.1 v3.6.0 - Dynamic Replanning Engine
 
-**リリース日:** 2025-12-09
+**Release date:** 2025-12-09
 
-AIエージェントがタスク失敗、タイムアウト、障害発生時に動的に実行計画を調整できる知的リプランニングシステムを追加しました。
+Added an intelligent replanning system that lets AI agents dynamically adjust execution plans when tasks fail, time out, or run into obstacles.
 
-### 新機能
+### New Features
 
 **LLM Provider Abstraction (`src/llm-providers/`)**
 
-| コンポーネント | 説明 |
+| Component | Description |
 |--------------|------|
-| `BaseLLMProvider` | 全LLMプロバイダーの抽象基底クラス |
-| `CopilotProvider` | GitHub Copilot LM API統合（優先プロバイダー） |
-| `AnthropicProvider` | Anthropic Claude API統合 |
-| `OpenAIProvider` | OpenAI GPT API統合 |
-| `LLMProviderFactory` | プロバイダーの自動検出とインスタンス化 |
+| `BaseLLMProvider` | Abstract base class for all LLM providers |
+| `CopilotProvider` | GitHub Copilot LM API integration (preferred provider) |
+| `AnthropicProvider` | Anthropic Claude API integration |
+| `OpenAIProvider` | OpenAI GPT API integration |
+| `LLMProviderFactory` | Automatic provider detection and instantiation |
 
 **Replanning Core (`src/orchestration/replanning/`)**
 
-| コンポーネント | 説明 |
+| Component | Description |
 |--------------|------|
-| `ReplanningEngine` | 動的リプランニングのコアエンジン |
-| `PlanMonitor` | リアルタイム実行監視とイベント発行 |
-| `PlanEvaluator` | 進捗評価、効率メトリクス、推奨事項 |
-| `AlternativeGenerator` | LLMによる代替パス生成 |
-| `ReplanHistory` | JSONL永続化による監査ログ |
-| `ReplanTrigger` | トリガータイプ（failure, timeout, quality, manual, dependency） |
-| `ReplanDecision` | 決定タイプ（continue, retry, alternative, abort, human） |
+| `ReplanningEngine` | Core engine for dynamic replanning |
+| `PlanMonitor` | Real-time execution monitoring and event emission |
+| `PlanEvaluator` | Progress evaluation, efficiency metrics, recommendations |
+| `AlternativeGenerator` | LLM-based alternative path generation |
+| `ReplanHistory` | Audit log with JSONL persistence |
+| `ReplanTrigger` | Trigger types (failure, timeout, quality, manual, dependency) |
+| `ReplanDecision` | Decision types (continue, retry, alternative, abort, human) |
 
-### v3.6.0で可能になったこと
+### What v3.6.0 Made Possible
 
-- ✅ **動的リプランニング**: タスク失敗時の自動代替プラン生成
-- ✅ **マルチLLMサポート**: Copilot、Anthropic、OpenAIの自動切替
-- ✅ **リアルタイム監視**: 失敗、タイムアウト、品質低下の検知
-- ✅ **信頼度ベース判断**: 閾値0.7で人間の承認を要求
-- ✅ **監査ログ**: 完全な監査証跡とエクスポート機能
+- ✅ **Dynamic replanning**: Automatic generation of alternative plans when a task fails
+- ✅ **Multi-LLM support**: Automatic switching between Copilot, Anthropic, and OpenAI
+- ✅ **Real-time monitoring**: Detection of failures, timeouts, and quality degradation
+- ✅ **Confidence-based decisions**: Requires human approval at a 0.7 threshold
+- ✅ **Audit log**: Complete audit trail and export functionality
 
 ---
 
-## 10.2 v3.6.1 - 高度リプランニングコンポーネント
+## 10.2 v3.6.1 - Advanced Replanning Components
 
-**リリース日:** 2025-12-09
+**Release date:** 2025-12-09
 
-v3.6.0のDynamic Replanning Engineをベースに、プロアクティブ最適化と目標管理のための3つの強力なコンポーネントを追加しました。
+Building on the Dynamic Replanning Engine from v3.6.0, added three powerful components for proactive optimization and goal management.
 
-### 新コンポーネント
+### New Components
 
 **ProactivePathOptimizer**
-- 成功実行中でも継続的なパス最適化
-- リソース利用分析とボトルネック検出
-- 並列実行機会の特定
-- 信頼度スコア付き最適化提案
+- Continuous path optimization even during successful execution
+- Resource utilization analysis and bottleneck detection
+- Identification of parallel execution opportunities
+- Optimization suggestions with confidence scores
 
 **GoalProgressTracker**
-- パーセンテージ追跡によるリアルタイム目標進捗監視
-- 自動進捗計算付きマイルストーン管理
-- 目標依存関係追跡とブロッキング検出
-- 進捗速度とETA推定
+- Real-time goal progress monitoring with percentage tracking
+- Milestone management with automatic progress calculation
+- Goal dependency tracking and blocking detection
+- Progress velocity and ETA estimation
 
 **AdaptiveGoalModifier**
-- 実行コンテキストに基づく動的目標調整
-- 達成不可能な目標の制約緩和
-- 複雑な目標の分割
-- 依存関係に基づく優先度再計算
+- Dynamic goal adjustment based on execution context
+- Constraint relaxation for unachievable goals
+- Splitting of complex goals
+- Priority recalculation based on dependencies
 
-### 新CLIコマンド
+### New CLI Commands
 
-| コマンド | 用途 |
+| Command | Purpose |
 |---------|------|
-| `musubi-orchestrate replan <context-id>` | 動的リプランニング実行 |
-| `musubi-orchestrate goal register` | 新規目標登録 |
-| `musubi-orchestrate goal update <goal-id>` | 目標進捗更新 |
-| `musubi-orchestrate goal status` | 目標状態表示 |
-| `musubi-orchestrate optimize run <path-id>` | パス最適化実行 |
-| `musubi-orchestrate optimize suggest <path-id>` | 最適化提案取得 |
-| `musubi-orchestrate path analyze <path-id>` | パス分析 |
-| `musubi-orchestrate path optimize <path-id>` | パス最適化 |
+| `musubi-orchestrate replan <context-id>` | Run dynamic replanning |
+| `musubi-orchestrate goal register` | Register a new goal |
+| `musubi-orchestrate goal update <goal-id>` | Update goal progress |
+| `musubi-orchestrate goal status` | Show goal status |
+| `musubi-orchestrate optimize run <path-id>` | Run path optimization |
+| `musubi-orchestrate optimize suggest <path-id>` | Get optimization suggestions |
+| `musubi-orchestrate path analyze <path-id>` | Analyze a path |
+| `musubi-orchestrate path optimize <path-id>` | Optimize a path |
 
-### v3.6.1で可能になったこと
+### What v3.6.1 Made Possible
 
-- ✅ **プロアクティブ最適化**: 成功時も継続的に最適パスを探索
-- ✅ **目標管理**: リアルタイム目標進捗トラッキング
-- ✅ **動的調整**: 状況に応じた目標の自動調整
-- ✅ **8つの新CLIコマンド**: リプランニング操作の完全CLI化
-- ✅ **全7プラットフォーム対応**: 全エージェントテンプレート更新
-- ✅ **1,841テスト**: 122リプランニングテスト追加
+- ✅ **Proactive optimization**: Continuously search for the optimal path even on success
+- ✅ **Goal management**: Real-time goal progress tracking
+- ✅ **Dynamic adjustment**: Automatic goal adjustment based on circumstances
+- ✅ **8 new CLI commands**: Replanning operations fully available via CLI
+- ✅ **All 7 platforms supported**: All agent templates updated
+- ✅ **1,841 tests**: 122 replanning tests added
 
 ---
 
-# 第11章 v3.7.0 - Advanced Integration & Monitoring
+# Chapter 11 v3.7.0 - Advanced Integration & Monitoring
 
-## 11.1 v3.7.0 - 統合強化とモニタリング
+## 11.1 v3.7.0 - Enhanced Integration and Monitoring
 
-**リリース日:** 2025-12-09
+**Release date:** 2025-12-09
 
-v3.7.0では8つの重要な機能を追加し、多言語サポート、ローカルLLM統合、コスト追跡、チェックポイント管理など、開発ワークフロー全体を強化しました。
+v3.7.0 added 8 important features, strengthening the entire development workflow with multilingual support, local LLM integration, cost tracking, and checkpoint management.
 
-### 新機能一覧
+### List of New Features
 
-| カテゴリ | 機能 | 説明 |
+| Category | Feature | Description |
 |---------|------|------|
-| **GUI** | WebSocket Replanning | GUIでリアルタイムリプランニング更新 |
-| **Browser** | musubi-browser完成 | 包括的なブラウザ自動化テスト |
-| **CI/CD** | GitHub Actions | musubi-action再利用可能ワークフロー |
-| **変換** | OpenAPI/Swagger変換 | REST APIからMUSUBI変換 |
-| **国際化** | 多言語テンプレート | 8言語対応テンプレートシステム |
-| **LLM** | Ollama Provider | ローカルLLM統合 |
-| **モニタリング** | Cost Tracker | LLM API使用コスト追跡 |
-| **状態管理** | Checkpoint Manager | 開発状態スナップショット |
+| **GUI** | WebSocket Replanning | Real-time replanning updates in the GUI |
+| **Browser** | musubi-browser completion | Comprehensive browser automation tests |
+| **CI/CD** | GitHub Actions | musubi-action reusable workflow |
+| **Conversion** | OpenAPI/Swagger conversion | Convert REST APIs to MUSUBI |
+| **Internationalization** | Multilingual templates | Template system supporting 8 languages |
+| **LLM** | Ollama Provider | Local LLM integration |
+| **Monitoring** | Cost Tracker | Track LLM API usage costs |
+| **State management** | Checkpoint Manager | Development state snapshots |
 
 ---
 
 ## 11.2 WebSocket Replanning Updates
 
-GUIダッシュボードにWebSocketベースのリアルタイム更新機能を追加しました。
+Added WebSocket-based real-time update capability to the GUI dashboard.
 
-### 機能
+### Features
 
 ```javascript
-// WebSocket接続
+// WebSocket connection
 const socket = new WebSocket('ws://localhost:3001');
 
-// リプランニングイベント
+// Replanning events
 socket.on('replan:started', (data) => {
   console.log('Replanning started:', data.contextId);
 });
@@ -1049,40 +1049,40 @@ socket.on('goal:progress', (data) => {
 });
 ```
 
-### 対応イベント
+### Supported Events
 
-| イベント | 説明 |
+| Event | Description |
 |---------|------|
-| `replan:started` | リプランニング開始 |
-| `replan:completed` | リプランニング完了 |
-| `replan:failed` | リプランニング失敗 |
-| `goal:progress` | 目標進捗更新 |
-| `task:status` | タスクステータス変更 |
+| `replan:started` | Replanning started |
+| `replan:completed` | Replanning completed |
+| `replan:failed` | Replanning failed |
+| `goal:progress` | Goal progress updated |
+| `task:status` | Task status changed |
 
 ---
 
-## 11.3 musubi-browser 完成
+## 11.3 musubi-browser Completion
 
-ブラウザ自動化エージェントの包括的なテストスイートを完備しました。
+Completed a comprehensive test suite for the browser automation agent.
 
-### テストカバレッジ
+### Test Coverage
 
-| カテゴリ | テスト数 | 説明 |
+| Category | Tests | Description |
 |---------|---------|------|
-| ナビゲーション | 8 | ページ遷移、URL検証 |
-| 要素操作 | 10 | クリック、入力、選択 |
-| データ抽出 | 6 | テキスト、属性、テーブル |
-| スクリーンショット | 4 | 画面キャプチャ |
-| 待機 | 5 | 要素表示、非表示待ち |
-| エラーハンドリング | 7 | タイムアウト、要素不在 |
+| Navigation | 8 | Page transitions, URL validation |
+| Element operations | 10 | Click, input, select |
+| Data extraction | 6 | Text, attributes, tables |
+| Screenshots | 4 | Screen capture |
+| Waiting | 5 | Waiting for elements to appear or disappear |
+| Error handling | 7 | Timeouts, missing elements |
 
 ---
 
 ## 11.4 GitHub Actions (musubi-action)
 
-MUSUBIをCI/CDパイプラインに統合するための再利用可能なGitHub Actionsを追加しました。
+Added reusable GitHub Actions for integrating MUSUBI into CI/CD pipelines.
 
-### 使用方法
+### Usage
 
 ```yaml
 # .github/workflows/musubi.yml
@@ -1111,117 +1111,117 @@ jobs:
           fail-on-gaps: true
 ```
 
-### 対応コマンド
+### Supported Commands
 
-| コマンド | 用途 |
+| Command | Purpose |
 |---------|------|
-| `init` | プロジェクト初期化 |
-| `validate` | 仕様検証 |
-| `trace` | トレーサビリティ確認 |
-| `gaps` | ギャップ検出 |
-| `analyze` | 品質分析 |
+| `init` | Project initialization |
+| `validate` | Specification validation |
+| `trace` | Traceability check |
+| `gaps` | Gap detection |
+| `analyze` | Quality analysis |
 
 ---
 
-## 11.5 OpenAPI/Swagger変換
+## 11.5 OpenAPI/Swagger Conversion
 
-OpenAPI/Swagger定義からMUSUBI仕様への自動変換機能を追加しました。
+Added automatic conversion from OpenAPI/Swagger definitions to MUSUBI specifications.
 
-### 使用方法
+### Usage
 
 ```bash
-# OpenAPI JSONから変換
+# Convert from OpenAPI JSON
 musubi-convert from-openapi openapi.json -o specs/
 
-# OpenAPI YAMLから変換
+# Convert from OpenAPI YAML
 musubi-convert from-openapi swagger.yaml -o specs/
 
-# URLから直接変換
+# Convert directly from a URL
 musubi-convert from-openapi https://api.example.com/openapi.json -o specs/
 ```
 
-### 変換マッピング
+### Conversion Mapping
 
 | OpenAPI | MUSUBI |
 |---------|--------|
-| `paths` | 要件ドキュメント |
-| `schemas` | 設計ドキュメント |
-| `securitySchemes` | セキュリティ要件 |
-| `tags` | カテゴリ分類 |
+| `paths` | Requirements document |
+| `schemas` | Design document |
+| `securitySchemes` | Security requirements |
+| `tags` | Category classification |
 
-### 生成ファイル
+### Generated Files
 
 ```
 specs/
 ├── requirements/
-│   └── api-requirements.md    # エンドポイント要件
+│   └── api-requirements.md    # Endpoint requirements
 ├── design/
-│   └── api-design.md          # スキーマ設計
+│   └── api-design.md          # Schema design
 └── specs/
-    └── api-spec.yml           # API仕様
+    └── api-spec.yml           # API specification
 ```
 
 ---
 
-## 11.6 多言語テンプレート (LocaleManager)
+## 11.6 Multilingual Templates (LocaleManager)
 
-8言語に対応したテンプレートローカライゼーションシステムを追加しました。
+Added a template localization system supporting 8 languages.
 
-### 対応言語
+### Supported Languages
 
-| 言語コード | 言語 | 完成度 |
+| Language Code | Language | Completeness |
 |-----------|------|--------|
 | `en` | English | 100% |
-| `ja` | 日本語 | 100% |
-| `zh` | 中文 | 100% |
-| `ko` | 한국어 | 100% |
+| `ja` | Japanese | 100% |
+| `zh` | Chinese | 100% |
+| `ko` | Korean | 100% |
 | `de` | Deutsch | 100% |
 | `fr` | Français | 100% |
 | `es` | Español | 100% |
 | `id` | Bahasa Indonesia | 100% |
 
-### 使用方法
+### Usage
 
 ```javascript
 const { LocaleManager } = require('musubi');
 
-// 言語設定
+// Language settings
 const locale = new LocaleManager('ja');
 
-// テンプレート取得
+// Get template
 const template = locale.getTemplate('requirements');
-console.log(template.sections.overview); // "概要"
+console.log(template.sections.overview); // "Overview"
 
-// 動的切替
+// Dynamic switching
 locale.setLocale('zh');
-console.log(template.sections.overview); // "概述"
+console.log(template.sections.overview); // "Overview" (Chinese)
 ```
 
-### 翻訳カテゴリ
+### Translation Categories
 
-| カテゴリ | 項目数 |
+| Category | Items |
 |---------|--------|
-| セクション名 | 15 |
-| ラベル | 25 |
-| ステータス | 8 |
-| エラーメッセージ | 20 |
+| Section names | 15 |
+| Labels | 25 |
+| Statuses | 8 |
+| Error messages | 20 |
 
 ---
 
-## 11.7 Ollama Provider (ローカルLLM)
+## 11.7 Ollama Provider (Local LLM)
 
-Ollamaを使用したローカルLLM統合を追加しました。プライバシー重視やオフライン環境での開発をサポートします。
+Added local LLM integration using Ollama. Supports privacy-focused and offline development environments.
 
-### 対応機能
+### Supported Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| テキスト生成 | ローカルLLMによる補完 |
-| ストリーミング | リアルタイム応答 |
-| 埋め込み | ベクトル埋め込み生成 |
-| マルチモデル | 複数モデル切替 |
+| Text generation | Completion with a local LLM |
+| Streaming | Real-time responses |
+| Embeddings | Vector embedding generation |
+| Multi-model | Switching between multiple models |
 
-### 使用方法
+### Usage
 
 ```javascript
 const { OllamaProvider } = require('musubi/llm-providers');
@@ -1231,49 +1231,49 @@ const ollama = new OllamaProvider({
   model: 'qwen2.5:7b'
 });
 
-// テキスト生成
+// Text generation
 const response = await ollama.complete('Explain MUSUBI in one sentence');
 
-// ストリーミング
+// Streaming
 await ollama.stream('Generate a user story', {
   onToken: (token) => process.stdout.write(token)
 });
 
-// 埋め込み
+// Embeddings
 const embeddings = await ollama.embed('MUSUBI specification');
-// 768次元ベクトル（nomic-embed-text使用時）
+// 768-dimensional vector (when using nomic-embed-text)
 ```
 
-### 動作確認済みモデル
+### Verified Models
 
-| モデル | パラメータ | 用途 |
+| Model | Parameters | Use |
 |--------|-----------|------|
-| `qwen2.5:7b` | 7.6B | 汎用（推奨） |
-| `codellama:7b` | 7B | コード生成 |
-| `mistral:7b` | 7B | 高速推論 |
-| `nomic-embed-text` | - | 埋め込み |
+| `qwen2.5:7b` | 7.6B | General purpose (recommended) |
+| `codellama:7b` | 7B | Code generation |
+| `mistral:7b` | 7B | Fast inference |
+| `nomic-embed-text` | - | Embeddings |
 
 ---
 
-## 11.8 Cost Tracker (LLMコスト追跡)
+## 11.8 Cost Tracker (LLM Cost Tracking)
 
-LLM API使用料金のリアルタイム追跡機能を追加しました。
+Added real-time tracking of LLM API usage charges.
 
-### 機能
+### Features
 
 ```javascript
 const { CostTracker } = require('musubi/monitoring');
 
 const tracker = new CostTracker();
 
-// 使用量記録
+// Record usage
 tracker.recordUsage('gpt-4', {
   inputTokens: 1500,
   outputTokens: 500,
   latencyMs: 2300
 });
 
-// コスト取得
+// Get cost
 const costs = tracker.getCosts();
 console.log(costs);
 // {
@@ -1282,16 +1282,16 @@ console.log(costs);
 //   byDay: { '2025-12-09': 0.075 }
 // }
 
-// 予算アラート
-tracker.setBudget(10.0); // $10 上限
+// Budget alert
+tracker.setBudget(10.0); // $10 limit
 tracker.on('budget:warning', (data) => {
   console.log(`Budget ${data.percentage}% used`);
 });
 ```
 
-### 対応プロバイダー
+### Supported Providers
 
-| プロバイダー | モデル | 入力単価 | 出力単価 |
+| Provider | Model | Input Price | Output Price |
 |-------------|--------|---------|---------|
 | OpenAI | gpt-4 | $0.03/1K | $0.06/1K |
 | OpenAI | gpt-4-turbo | $0.01/1K | $0.03/1K |
@@ -1299,33 +1299,33 @@ tracker.on('budget:warning', (data) => {
 | Anthropic | claude-3-opus | $0.015/1K | $0.075/1K |
 | Anthropic | claude-3-sonnet | $0.003/1K | $0.015/1K |
 
-### レポート出力
+### Report Output
 
 ```bash
-# コストレポート生成
+# Generate cost report
 musubi-analyze costs --period week --format markdown
 
-# 予算状況確認
+# Check budget status
 musubi-analyze budget --threshold 80
 ```
 
 ---
 
-## 11.9 Checkpoint Manager (状態スナップショット)
+## 11.9 Checkpoint Manager (State Snapshots)
 
-開発状態のスナップショット機能を追加しました。長時間作業の中間保存やロールバックをサポートします。
+Added development state snapshot capability. Supports intermediate saves and rollback for long-running work.
 
-### 機能
+### Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| 作成 | 現在の状態をスナップショット |
-| 復元 | 過去の状態に復元 |
-| 比較 | 2つのチェックポイント間の差分 |
-| アーカイブ | 古いチェックポイントの圧縮保存 |
-| タグ付け | チェックポイントの分類 |
+| Create | Snapshot the current state |
+| Restore | Restore a past state |
+| Compare | Diff between two checkpoints |
+| Archive | Compressed storage of old checkpoints |
+| Tag | Categorize checkpoints |
 
-### 使用方法
+### Usage
 
 ```javascript
 const { CheckpointManager } = require('musubi/managers');
@@ -1333,87 +1333,87 @@ const { CheckpointManager } = require('musubi/managers');
 const manager = new CheckpointManager({
   storageDir: '.musubi/checkpoints',
   maxCheckpoints: 50,
-  autoCheckpointInterval: 1800000 // 30分
+  autoCheckpointInterval: 1800000 // 30 minutes
 });
 
-// チェックポイント作成
+// Create checkpoint
 const checkpoint = await manager.create({
   name: 'before-refactoring',
   description: 'Pre-refactoring state',
   tags: ['milestone', 'refactoring']
 });
 
-// 一覧取得
+// Get list
 const checkpoints = await manager.list();
 
-// 復元
+// Restore
 await manager.restore(checkpoint.id);
 
-// 比較
+// Compare
 const diff = await manager.compare(checkpoint1.id, checkpoint2.id);
 console.log(diff.filesAdded);
 console.log(diff.filesModified);
 console.log(diff.filesDeleted);
 
-// アーカイブ
+// Archive
 await manager.archive({ olderThan: '7d' });
 ```
 
 ### CLI
 
 ```bash
-# チェックポイント作成
+# Create checkpoint
 musubi-checkpoint create "milestone-1" --tags feature,tested
 
-# 一覧表示
+# List
 musubi-checkpoint list
 
-# 復元
+# Restore
 musubi-checkpoint restore <checkpoint-id>
 
-# 比較
+# Compare
 musubi-checkpoint compare <id1> <id2>
 
-# アーカイブ
+# Archive
 musubi-checkpoint archive --older-than 7d
 ```
 
 ---
 
-## 11.10 v3.7.0で可能になったこと
+## 11.10 What v3.7.0 Made Possible
 
-- ✅ **リアルタイムGUI更新**: WebSocketでリプランニング状態をライブ表示
-- ✅ **CI/CD統合**: GitHub Actionsで自動仕様検証
-- ✅ **REST API移行**: OpenAPI/Swaggerから自動変換
-- ✅ **8言語対応**: 日本語、英語、中国語、インドネシア語など8言語でドキュメント生成
-- ✅ **ローカルLLM**: Ollamaでプライベート/オフラインAI開発
-- ✅ **コスト可視化**: LLM API使用料金のリアルタイム追跡
-- ✅ **状態管理**: チェックポイントで安全な開発作業
-- ✅ **181テスト追加**: 合計2,022テスト達成
+- ✅ **Real-time GUI updates**: Live display of replanning state via WebSocket
+- ✅ **CI/CD integration**: Automatic specification validation with GitHub Actions
+- ✅ **REST API migration**: Automatic conversion from OpenAPI/Swagger
+- ✅ **8-language support**: Document generation in 8 languages including Japanese, English, Chinese, and Indonesian
+- ✅ **Local LLM**: Private/offline AI development with Ollama
+- ✅ **Cost visibility**: Real-time tracking of LLM API usage charges
+- ✅ **State management**: Safe development work with checkpoints
+- ✅ **181 tests added**: Reached a total of 2,022 tests
 
 ---
 
-# 第12章 v3.8.0 - Swarm Enhancement Phase 1
+# Chapter 12 v3.8.0 - Swarm Enhancement Phase 1
 
-> **リリース日**: 2025-12-10
-> **テスト追加**: 73 → 合計2,095テスト
+> **Release date**: 2025-12-10
+> **Tests added**: 73 → total 2,095 tests
 
-v3.8.0では、OpenAI Swarmフレームワークに触発されたエージェント間連携パターンを導入しました。
+v3.8.0 introduced agent collaboration patterns inspired by the OpenAI Swarm framework.
 
-## 12.1 HandoffPattern（タスク委譲）
+## 12.1 HandoffPattern (Task Delegation)
 
-エージェント間でタスクをシームレスに引き継ぐパターンを実装しました。
+Implemented a pattern for seamlessly handing off tasks between agents.
 
-### 機能
+### Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| タスク委譲 | エージェント間のスムーズな引き継ぎ |
-| コンテキスト保持 | 引き継ぎ時の状態・履歴の維持 |
-| 条件付きハンドオフ | 条件に基づく動的ルーティング |
-| エスカレーション | 失敗時の上位エージェントへの委譲 |
+| Task delegation | Smooth handoff between agents |
+| Context retention | Maintains state and history during handoff |
+| Conditional handoff | Dynamic routing based on conditions |
+| Escalation | Delegation to a higher-level agent on failure |
 
-### 使用方法
+### Usage
 
 ```javascript
 const { HandoffPattern } = require('musubi/orchestration');
@@ -1430,27 +1430,27 @@ const handoff = new HandoffPattern({
   ]
 });
 
-// タスク委譲実行
+// Execute task delegation
 const result = await handoff.execute(task, {
   initialAgent: 'frontline',
   context: { userId: 'user-123', history: conversationHistory }
 });
 ```
 
-## 12.2 TriagePattern（リクエスト分類）
+## 12.2 TriagePattern (Request Classification)
 
-受信リクエストを適切なエージェントに自動ルーティングするパターンを実装しました。
+Implemented a pattern that automatically routes incoming requests to the appropriate agent.
 
-### 機能
+### Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| インテント分類 | リクエスト意図の自動判定 |
-| 優先度判定 | 緊急度に基づくキューイング |
-| ロードバランシング | エージェント負荷の分散 |
-| フォールバック | 分類不能時のデフォルトルート |
+| Intent classification | Automatic determination of request intent |
+| Priority determination | Queuing based on urgency |
+| Load balancing | Distribution of agent load |
+| Fallback | Default route when classification is not possible |
 
-### 使用方法
+### Usage
 
 ```javascript
 const { TriagePattern } = require('musubi/orchestration');
@@ -1465,45 +1465,45 @@ const triage = new TriagePattern({
   loadBalancing: 'round-robin'
 });
 
-// リクエスト分類・ルーティング
+// Request classification and routing
 const assignment = await triage.classify(request);
 console.log(assignment.selectedAgent);
 console.log(assignment.confidence);
 console.log(assignment.reasoning);
 ```
 
-## 12.3 v3.8.0で可能になったこと
+## 12.3 What v3.8.0 Made Possible
 
-- ✅ **自動タスク委譲**: 複雑なタスクを専門エージェントに自動引き継ぎ
-- ✅ **インテリジェントルーティング**: リクエスト内容に応じた最適エージェント選択
-- ✅ **コンテキスト保持**: 引き継ぎ時の会話履歴・状態の維持
-- ✅ **スケーラブルなエージェント構成**: ロードバランシングによる負荷分散
-- ✅ **73テスト追加**: 合計2,095テスト達成
+- ✅ **Automatic task delegation**: Complex tasks are automatically handed off to specialized agents
+- ✅ **Intelligent routing**: Selects the best agent based on request content
+- ✅ **Context retention**: Maintains conversation history and state during handoff
+- ✅ **Scalable agent configuration**: Load distribution through load balancing
+- ✅ **73 tests added**: Reached a total of 2,095 tests
 
 ---
 
-# 第13章 v3.9.0 - Guardrails System
+# Chapter 13 v3.9.0 - Guardrails System
 
-> **リリース日**: 2025-12-10
-> **テスト追加**: 183 → 合計2,278テスト
+> **Release date**: 2025-12-10
+> **Tests added**: 183 → total 2,278 tests
 
-v3.9.0では、OpenAI Agents SDKのGuardrails概念を参考に、入力・出力・安全性の3層検証システムを実装しました。
+v3.9.0 implemented a three-layer validation system for input, output, and safety, drawing on the Guardrails concept in the OpenAI Agents SDK.
 
 ## 13.1 BaseGuardrail & GuardrailChain
 
-Guardrailsの基盤クラスと連鎖実行機能を提供します。
+Provides the Guardrails base class and chained execution.
 
-### アーキテクチャ
+### Architecture
 
 ```
 ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
 │  InputGuardrail │→→→│ OutputGuardrail │→→→│ SafetyGuardrail │
 └─────────────────┘   └─────────────────┘   └─────────────────┘
          ↓                    ↓                     ↓
-    入力検証              出力サニタイズ        憲法準拠チェック
+    Input validation      Output sanitization   Constitution compliance check
 ```
 
-### 使用方法
+### Usage
 
 ```javascript
 const { GuardrailChain, InputGuardrail, OutputGuardrail } = require('musubi/guardrails');
@@ -1524,20 +1524,20 @@ try {
 }
 ```
 
-## 13.2 InputGuardrail（入力検証）
+## 13.2 InputGuardrail (Input Validation)
 
-ユーザー入力の検証とサニタイズを行います。
+Validates and sanitizes user input.
 
-### 機能
+### Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| PII検出 | 個人識別情報の検出・マスキング |
-| インジェクション防止 | プロンプトインジェクション攻撃の検出 |
-| 長さ制限 | 入力長の検証 |
-| 禁止パターン | カスタム禁止ワード/パターンの検出 |
+| PII detection | Detects and masks personally identifiable information |
+| Injection prevention | Detects prompt injection attacks |
+| Length limit | Validates input length |
+| Prohibited patterns | Detects custom prohibited words/patterns |
 
-### 使用方法
+### Usage
 
 ```javascript
 const { InputGuardrail } = require('musubi/guardrails');
@@ -1555,20 +1555,20 @@ if (!result.valid) {
 }
 ```
 
-## 13.3 OutputGuardrail（出力検証）
+## 13.3 OutputGuardrail (Output Validation)
 
-エージェント出力のサニタイズと品質保証を行います。
+Sanitizes agent output and ensures quality.
 
-### 機能
+### Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| 機密データ墨消し | API keys、パスワードなどの自動墨消し |
-| フォーマット検証 | 出力形式の検証 |
-| 長さ制限 | 出力長の制限 |
-| コンテンツフィルタ | 不適切コンテンツの除去 |
+| Sensitive data redaction | Automatic redaction of API keys, passwords, etc. |
+| Format validation | Validates output format |
+| Length limit | Limits output length |
+| Content filter | Removes inappropriate content |
 
-### 使用方法
+### Usage
 
 ```javascript
 const { OutputGuardrail } = require('musubi/guardrails');
@@ -1584,24 +1584,24 @@ const guardrail = new OutputGuardrail({
 });
 
 const sanitized = await guardrail.sanitize(agentOutput);
-console.log(sanitized.content);  // 墨消し済み出力
-console.log(sanitized.redactions);  // 墨消し箇所のログ
+console.log(sanitized.content);  // Redacted output
+console.log(sanitized.redactions);  // Log of redacted locations
 ```
 
-## 13.4 SafetyCheckGuardrail（安全性チェック）
+## 13.4 SafetyCheckGuardrail (Safety Check)
 
-憲法（Constitution）に基づくコンテンツ安全性検証を行います。
+Performs content safety validation based on the Constitution.
 
-### 機能
+### Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| 憲法準拠チェック | 9条項への準拠検証 |
-| リスクスコアリング | コンテンツのリスクレベル評価 |
-| エスカレーション | 高リスク時の自動エスカレーション |
-| 監査ログ | 検証結果の記録 |
+| Constitution compliance check | Validates compliance with the 9 Articles |
+| Risk scoring | Evaluates the risk level of content |
+| Escalation | Automatic escalation for high-risk content |
+| Audit log | Records validation results |
 
-### 使用方法
+### Usage
 
 ```javascript
 const { SafetyCheckGuardrail } = require('musubi/guardrails');
@@ -1615,13 +1615,13 @@ const guardrail = new SafetyCheckGuardrail({
 
 const result = await guardrail.check(content);
 console.log(result.riskScore);      // 0.0-1.0
-console.log(result.violations);     // 違反条項リスト
-console.log(result.recommendations); // 修正推奨
+console.log(result.violations);     // List of violated Articles
+console.log(result.recommendations); // Recommended fixes
 ```
 
 ## 13.5 GuardrailRules DSL
 
-ルールベースのGuardrail設定をコードで定義できるDSLを提供します。
+Provides a DSL that lets you define rule-based Guardrail configurations in code.
 
 ### RuleBuilder
 
@@ -1648,165 +1648,165 @@ const rules = new RuleBuilder()
 ```javascript
 const { SecurityPatterns } = require('musubi/guardrails');
 
-// 事前定義されたセキュリティパターン
+// Predefined security patterns
 const patterns = SecurityPatterns.getAll();
-console.log(patterns.API_KEYS);      // APIキーパターン
-console.log(patterns.CREDENTIALS);   // 認証情報パターン
-console.log(patterns.PII);           // 個人情報パターン
-console.log(patterns.INJECTION);     // インジェクションパターン
+console.log(patterns.API_KEYS);      // API key patterns
+console.log(patterns.CREDENTIALS);   // Credential patterns
+console.log(patterns.PII);           // Personal information patterns
+console.log(patterns.INJECTION);     // Injection patterns
 ```
 
-## 13.6 CLI統合
+## 13.6 CLI Integration
 
-GuardrailsをCLIから直接実行できます。
+Guardrails can be run directly from the CLI.
 
-### コマンド
+### Commands
 
 ```bash
-# 単一Guardrail実行
-musubi-validate guardrails "検証したいコンテンツ" --type input --level strict
+# Run a single Guardrail
+musubi-validate guardrails "Content to validate" --type input --level strict
 
-# PIIチェック
-musubi-validate guardrails "電話番号: 090-1234-5678" --type input --pii
+# PII check
+musubi-validate guardrails "Phone number: 090-1234-5678" --type input --pii
 
-# 出力墨消し
+# Output redaction
 musubi-validate guardrails "API Key: sk-abc123..." --type output --redact
 
-# 憲法準拠チェック
-musubi-validate guardrails "生成されたコンテンツ" --type safety --constitutional
+# Constitution compliance check
+musubi-validate guardrails "Generated content" --type safety --constitutional
 
-# Guardrailチェーン実行
-musubi-validate guardrails-chain "コンテンツ" --chain input,output,safety
+# Run a Guardrail chain
+musubi-validate guardrails-chain "Content" --chain input,output,safety
 
-# ファイルからの検証
+# Validate from a file
 musubi-validate guardrails-chain --file output.txt --chain input,output,safety
 ```
 
-### オプション
+### Options
 
-| オプション | 説明 |
+| Option | Description |
 |-----------|------|
-| `--type` | guardrailタイプ（input, output, safety） |
-| `--level` | 検証レベル（lenient, standard, strict） |
-| `--pii` | PII検出を有効化 |
-| `--redact` | 機密データ墨消しを有効化 |
-| `--constitutional` | 憲法準拠チェックを有効化 |
-| `--chain` | 複数Guardrailの連鎖実行 |
+| `--type` | Guardrail type (input, output, safety) |
+| `--level` | Validation level (lenient, standard, strict) |
+| `--pii` | Enable PII detection |
+| `--redact` | Enable sensitive data redaction |
+| `--constitutional` | Enable Constitution compliance check |
+| `--chain` | Chained execution of multiple Guardrails |
 
-## 13.7 v3.9.0で可能になったこと
+## 13.7 What v3.9.0 Made Possible
 
-- ✅ **入力検証**: PII検出、インジェクション防止
-- ✅ **出力サニタイズ**: 機密データの自動墨消し
-- ✅ **憲法準拠チェック**: 9条項への自動準拠検証
-- ✅ **DSL定義**: コードでルールを柔軟に定義
-- ✅ **CLI統合**: コマンドラインからGuardrail実行
-- ✅ **183テスト追加**: 合計2,278テスト達成
+- ✅ **Input validation**: PII detection, injection prevention
+- ✅ **Output sanitization**: Automatic redaction of sensitive data
+- ✅ **Constitution compliance check**: Automatic validation of compliance with the 9 Articles
+- ✅ **DSL definition**: Flexibly define rules in code
+- ✅ **CLI integration**: Run Guardrail from the command line
+- ✅ **183 tests added**: Reached 2,278 tests in total
 
 ---
 
-# 第14章 v3.10.0 - Phase 3 Documentation
+# Chapter 14: v3.10.0 - Phase 3 Documentation
 
-> **リリース日**: 2025-12-10
-> **テスト追加**: 54 → 合計2,332テスト
+> **Release date**: 2025-12-10
+> **Tests added**: 54 → 2,332 tests in total
 
-v3.10.0では、Multi-Skill Orchestration機能の包括的なドキュメントを作成しました。
+In v3.10.0, we created comprehensive documentation for the Multi-Skill Orchestration feature.
 
 ## 14.1 Orchestration Patterns Guide
 
-9つのオーケストレーションパターンを完全網羅したガイドを作成しました。
+We created a guide that fully covers the 9 orchestration patterns.
 
-### 対応パターン
+### Supported Patterns
 
-| パターン | 説明 | ユースケース |
+| Pattern | Description | Use Case |
 |----------|------|-------------|
-| auto | 自動モード選択 | 汎用タスク |
-| sequential | 順次実行 | 依存関係のあるタスク |
-| parallel | 並列実行 | 独立タスクの高速処理 |
-| nested | ネスト実行 | 階層的タスク構造 |
-| group-chat | グループチャット | 複数エージェント議論 |
-| swarm | スワーム協調 | 自律的タスク分散 |
-| human-in-loop | 人間介入 | 承認が必要なタスク |
-| handoff | タスク委譲 | エージェント間引き継ぎ |
-| triage | 分類・ルーティング | リクエスト振り分け |
+| auto | Automatic mode selection | General-purpose tasks |
+| sequential | Sequential execution | Tasks with dependencies |
+| parallel | Parallel execution | Fast processing of independent tasks |
+| nested | Nested execution | Hierarchical task structures |
+| group-chat | Group chat | Multi-agent discussion |
+| swarm | Swarm coordination | Autonomous task distribution |
+| human-in-loop | Human intervention | Tasks requiring approval |
+| handoff | Task delegation | Handover between agents |
+| triage | Classification and routing | Request dispatching |
 
-### ガイド内容
+### Guide Contents
 
-- 各パターンの概念説明
-- JavaScript/CLI使用例
-- ベストプラクティス
-- エラーハンドリング
-- パフォーマンス最適化
+- Conceptual explanation of each pattern
+- JavaScript/CLI usage examples
+- Best practices
+- Error handling
+- Performance optimization
 
 ## 14.2 P-Label Parallelization Tutorial
 
-優先度ラベル（P0-P3）を使用した並列実行のチュートリアルを作成しました。
+We created a tutorial on parallel execution using priority labels (P0-P3).
 
-### 優先度レベル
+### Priority Levels
 
-| レベル | 説明 | 実行戦略 |
+| Level | Description | Execution Strategy |
 |--------|------|----------|
-| P0 | Critical | 即時実行、他をブロック |
-| P1 | High | 優先実行、P2-P3に先行 |
-| P2 | Medium | 通常実行 |
-| P3 | Low | リソース余剰時に実行 |
+| P0 | Critical | Execute immediately, block others |
+| P1 | High | Execute with priority, ahead of P2-P3 |
+| P2 | Medium | Normal execution |
+| P3 | Low | Execute when resources are spare |
 
-### 内容
+### Contents
 
-- 優先度の設計指針
-- 依存関係の定義方法
-- 並列実行の最適化
-- デッドロック回避
-- 実行順序の制御
+- Priority design guidelines
+- How to define dependencies
+- Optimizing parallel execution
+- Deadlock avoidance
+- Controlling execution order
 
 ## 14.3 Guardrails Guide
 
-Guardrailsシステムの包括的なガイドを作成しました。
+We created a comprehensive guide to the Guardrails system.
 
-### ガイド内容
+### Guide Contents
 
-- Guardrailsアーキテクチャ
-- 各Guardrailタイプの詳細
-- カスタムルール定義
-- CLI完全リファレンス
-- トラブルシューティング
-- セキュリティベストプラクティス
+- Guardrails architecture
+- Details of each Guardrail type
+- Custom rule definition
+- Complete CLI reference
+- Troubleshooting
+- Security best practices
 
-## 14.4 作成ドキュメント
+## 14.4 Created Documents
 
-| ドキュメント | 行数 | 内容 |
+| Document | Lines | Contents |
 |-------------|------|------|
-| `docs/guides/orchestration-patterns.md` | 507 | 9パターン完全ガイド |
-| `docs/guides/p-label-parallelization.md` | 406 | P0-P3並列化チュートリアル |
-| `docs/guides/guardrails-guide.md` | 473 | Guardrailsシステムガイド |
+| `docs/guides/orchestration-patterns.md` | 507 | Complete guide to the 9 patterns |
+| `docs/guides/p-label-parallelization.md` | 406 | P0-P3 parallelization tutorial |
+| `docs/guides/guardrails-guide.md` | 473 | Guardrails system guide |
 
-## 14.5 v3.10.0で可能になったこと
+## 14.5 What v3.10.0 Made Possible
 
-- ✅ **9パターン理解**: オーケストレーションパターンの選択指針
-- ✅ **優先度設計**: P-Labelによる効率的なタスク並列化
-- ✅ **Guardrails活用**: セキュリティ検証の包括的な理解
-- ✅ **実装ガイド**: 具体的なコード例と使用方法
-- ✅ **54テスト追加**: 合計2,332テスト達成
+- ✅ **Understanding the 9 patterns**: Guidance for choosing an orchestration pattern
+- ✅ **Priority design**: Efficient task parallelization with P-Label
+- ✅ **Using Guardrails**: Comprehensive understanding of security validation
+- ✅ **Implementation guide**: Concrete code examples and usage
+- ✅ **54 tests added**: Reached 2,332 tests in total
 
 ---
 
-# 第14.5章 v3.11.0 - Skill System Architecture & Advanced Workflows
+# Chapter 14.5: v3.11.0 - Skill System Architecture & Advanced Workflows
 
-> **リリース日**: 2025-12-10
-> **テスト追加**: 242 → 合計2,574テスト
+> **Release date**: 2025-12-10
+> **Tests added**: 242 → 2,574 tests in total
 
-## 14.5.1 概要
+## 14.5.1 Overview
 
-v3.11.0は、**Phase 3の完全実装版**です。OpenAI Agents SDKにインスパイアされたSkill System Architectureと、高度なワークフロー実行エンジンを追加しました。
+v3.11.0 is the **complete implementation of Phase 3**. It adds a Skill System Architecture inspired by the OpenAI Agents SDK, plus an advanced workflow execution engine.
 
 ```mermaid
 flowchart TB
     subgraph V3_11["MUSUBI v3.11.0"]
         direction TB
-        SR["Skill Registry<br/>スキル登録・発見"]
-        SE["Skill Executor<br/>P-label並列実行"]
-        ASB["Agent-Skill Binding<br/>動的スキル割当"]
-        MCP["MCP Tool Adapters<br/>双方向連携"]
-        WE["Workflow Executor<br/>8ステップタイプ"]
+        SR["Skill Registry<br/>Skill registration and discovery"]
+        SE["Skill Executor<br/>P-label parallel execution"]
+        ASB["Agent-Skill Binding<br/>Dynamic skill assignment"]
+        MCP["MCP Tool Adapters<br/>Bidirectional integration"]
+        WE["Workflow Executor<br/>8 step types"]
         EH["Error Handler<br/>Circuit Breaker"]
     end
     
@@ -1819,13 +1819,13 @@ flowchart TB
 ## 14.5.2 Skill System Architecture
 
 ### Skill Registry
-スキルの集中管理と発見機能を提供：
+Provides centralized skill management and discovery:
 
 ```javascript
 const { SkillRegistry } = require('musubi-sdd');
 const registry = new SkillRegistry();
 
-// スキル登録
+// Register a skill
 registry.registerSkill({
   id: 'analyze-requirements',
   name: 'Requirements Analyzer',
@@ -1835,22 +1835,22 @@ registry.registerSkill({
   outputs: [{ name: 'requirements', type: 'array' }]
 });
 
-// カテゴリ・タグで検索
+// Search by category and tag
 const analysisSkills = registry.findByCategory('analysis');
 const earsSkills = registry.findByTags(['ears']);
 ```
 
 ### Skill Executor
-P-label優先度による並列実行：
+Parallel execution based on P-label priority:
 
 ```javascript
 const { SkillExecutor } = require('musubi-sdd');
 const executor = new SkillExecutor(registry);
 
-// P0: 最高優先度（単独実行）
-// P1: 高優先度（P0完了後）
-// P2: 中優先度（P1完了後）
-// P3: 低優先度（バックグラウンド）
+// P0: Highest priority (runs alone)
+// P1: High priority (after P0 completes)
+// P2: Medium priority (after P1 completes)
+// P3: Low priority (background)
 
 const result = await executor.executeParallel([
   { skillId: 'analyze', priority: 'P0' },
@@ -1860,34 +1860,34 @@ const result = await executor.executeParallel([
 ```
 
 ### Agent-Skill Binding
-エージェントの能力に基づく動的スキル割当：
+Dynamic skill assignment based on agent capabilities:
 
 ```javascript
 const { AgentSkillBinding } = require('musubi-sdd');
 const binding = new AgentSkillBinding(registry);
 
-// エージェント登録
+// Register an agent
 binding.registerAgent({
   id: 'architect-agent',
   capabilities: ['design', 'c4-diagram', 'adr'],
   maxConcurrentTasks: 3
 });
 
-// 最適なエージェント選択
+// Select the best agent
 const agent = binding.findBestAgentForSkill('create-c4-diagram');
 ```
 
 ### MCP Tool Adapters
-MCP（Model Context Protocol）との双方向連携：
+Bidirectional integration with MCP (Model Context Protocol):
 
 ```javascript
 const { MCPToSkillAdapter, SkillToMCPAdapter } = require('musubi-sdd');
 
-// 外部MCPツールをスキルとして利用
+// Use external MCP tools as skills
 const mcpAdapter = new MCPToSkillAdapter(mcpClient);
 const skill = mcpAdapter.adaptTool(mcpTool);
 
-// MUSUBIスキルをMCPツールとして公開
+// Expose MUSUBI skills as MCP tools
 const skillAdapter = new SkillToMCPAdapter(registry);
 const mcpTool = skillAdapter.adaptSkill('analyze-requirements');
 ```
@@ -1895,18 +1895,18 @@ const mcpTool = skillAdapter.adaptSkill('analyze-requirements');
 ## 14.5.3 Advanced Workflows
 
 ### Workflow Executor
-8種類のステップタイプをサポート：
+Supports 8 step types:
 
-| ステップタイプ | 説明 |
+| Step Type | Description |
 |--------------|------|
-| `task` | 単一タスク実行 |
-| `parallel` | 並列タスク実行 |
-| `conditional` | 条件分岐 |
-| `loop` | ループ処理 |
-| `human-approval` | 人間の承認待ち |
-| `error-handler` | エラーハンドリング |
-| `transform` | データ変換 |
-| `aggregate` | 結果集約 |
+| `task` | Single task execution |
+| `parallel` | Parallel task execution |
+| `conditional` | Conditional branching |
+| `loop` | Loop processing |
+| `human-approval` | Waiting for human approval |
+| `error-handler` | Error handling |
+| `transform` | Data transformation |
+| `aggregate` | Result aggregation |
 
 ```javascript
 const { WorkflowExecutor, WorkflowDefinition } = require('musubi-sdd');
@@ -1934,20 +1934,20 @@ const result = await executor.execute(workflow);
 ```
 
 ### Error Handler
-Circuit BreakerとGraceful Degradation：
+Circuit Breaker and Graceful Degradation:
 
 ```javascript
 const { ErrorHandler } = require('musubi-sdd');
 const handler = new ErrorHandler();
 
-// エラー分類
-handler.handle(error); // 自動分類（network, timeout, validation等）
+// Error classification
+handler.handle(error); // Automatic classification (network, timeout, validation, etc.)
 
 // Circuit Breaker
 const breaker = handler.getCircuitBreaker('external-api');
-// closed → open（障害時）→ half-open（回復テスト）→ closed
+// closed → open (on failure) → half-open (recovery test) → closed
 
-// リトライ with Exponential Backoff
+// Retry with Exponential Backoff
 const result = await handler.executeWithRetry(
   () => callExternalAPI(),
   { maxRetries: 3, backoffMs: 1000, backoffMultiplier: 2 }
@@ -1956,465 +1956,465 @@ const result = await handler.executeWithRetry(
 
 ## 14.5.4 Workflow Templates
 
-5つの実世界ワークフローテンプレートを提供：
+Provides 5 real-world workflow templates:
 
-| テンプレート | 説明 | ステップ数 |
+| Template | Description | Steps |
 |------------|------|-----------|
-| `feature-development` | 機能開発フロー | 8 |
-| `cicd-pipeline` | CI/CDパイプライン | 6 |
-| `code-review` | コードレビュー | 5 |
-| `incident-response` | インシデント対応 | 7 |
-| `documentation` | ドキュメント作成 | 4 |
+| `feature-development` | Feature development flow | 8 |
+| `cicd-pipeline` | CI/CD pipeline | 6 |
+| `code-review` | Code review | 5 |
+| `incident-response` | Incident response | 7 |
+| `documentation` | Documentation creation | 4 |
 
 ```javascript
 const { WorkflowExamples } = require('musubi-sdd');
 
-// テンプレート取得
+// Get template
 const featureWorkflow = WorkflowExamples.getFeatureDevelopmentWorkflow();
 const cicdWorkflow = WorkflowExamples.getCICDPipelineWorkflow();
 ```
 
-## 14.5.5 新規ファイル
+## 14.5.5 New Files
 
-| ファイル | 行数 | 説明 |
+| File | Lines | Description |
 |---------|-----|------|
-| `src/orchestration/skill-registry.js` | 450 | スキル登録・発見 |
-| `src/orchestration/skill-executor.js` | 520 | P-label並列実行 |
-| `src/orchestration/agent-skill-binding.js` | 380 | 動的スキル割当 |
-| `src/orchestration/mcp-tool-adapters.js` | 420 | MCP双方向連携 |
-| `src/orchestration/workflow-executor.js` | 780 | ワークフロー実行 |
-| `src/orchestration/error-handler.js` | 830 | エラーハンドリング |
-| `src/orchestration/workflow-examples.js` | 350 | テンプレート集 |
-| `docs/guides/incremental-adoption.md` | 300 | 移行ガイド |
+| `src/orchestration/skill-registry.js` | 450 | Skill registration and discovery |
+| `src/orchestration/skill-executor.js` | 520 | P-label parallel execution |
+| `src/orchestration/agent-skill-binding.js` | 380 | Dynamic skill assignment |
+| `src/orchestration/mcp-tool-adapters.js` | 420 | MCP bidirectional integration |
+| `src/orchestration/workflow-executor.js` | 780 | Workflow execution |
+| `src/orchestration/error-handler.js` | 830 | Error handling |
+| `src/orchestration/workflow-examples.js` | 350 | Template collection |
+| `docs/guides/incremental-adoption.md` | 300 | Migration guide |
 
-## 14.5.6 v3.11.0で可能になったこと
+## 14.5.6 What v3.11.0 Made Possible
 
-- ✅ **スキル管理**: 集中管理と動的発見
-- ✅ **P-label実行**: 優先度ベースの並列処理
-- ✅ **動的バインディング**: 能力ベースのエージェント選択
-- ✅ **MCP連携**: 外部ツールとの双方向統合
-- ✅ **ワークフロー実行**: 8ステップタイプのフロー制御
-- ✅ **エラー耐性**: Circuit BreakerとGraceful Degradation
-- ✅ **テンプレート**: 5つの実世界ワークフロー
-- ✅ **242テスト追加**: 合計2,574テスト達成
+- ✅ **Skill management**: Centralized management and dynamic discovery
+- ✅ **P-label execution**: Priority-based parallel processing
+- ✅ **Dynamic binding**: Capability-based agent selection
+- ✅ **MCP integration**: Bidirectional integration with external tools
+- ✅ **Workflow execution**: Flow control with 8 step types
+- ✅ **Error resilience**: Circuit Breaker and Graceful Degradation
+- ✅ **Templates**: 5 real-world workflows
+- ✅ **242 tests added**: Reached 2,574 tests in total
 
 ---
 
-# 第15章 バージョン比較まとめ
+# Chapter 15: Version Comparison Summary
 
-## 15.1 機能進化の概要
+## 15.1 Overview of Feature Evolution
 
-| プロジェクト/バージョン | リリース日 | 主要機能 | テスト数 | エージェント数 |
+| Project/Version | Release Date | Key Features | Tests | Agents |
 |----------------------|-----------|---------|---------|--------------|
-| **Spec-Copilot** | 2025-11-05 | プロンプト集 | - | 19 |
-| **MUSUHI** v0.4.9 | 2025-11-07 | npmパッケージ化、Steering | - | 20 |
-| **MUSUBI** v0.1.0 | 2025-11-08 | 初期PoC | - | - |
-| **MUSUBI** v0.1.2 | 2025-11-15 | 25スキル、9憲法条項 | - | 25 |
-| **MUSUBI** v0.1.3 | 2025-11-17 | 7プラットフォーム対応 | 53 | 25 |
-| **MUSUBI** v0.7.0 | 2025-11-23 | 憲法ガバナンスシステム | - | 25 |
-| **MUSUBI** v0.8.0 | 2025-11-23 | EARS要件ジェネレーター | 25 | 25 |
-| **MUSUBI** v0.8.2 | 2025-11-23 | C4 + ADR設計ジェネレーター | - | 25 |
-| **MUSUBI** v0.8.4 | 2025-11-22 | タスク分解システム | 159 | 25 |
-| **MUSUBI** v0.8.5-8 | 2025-11-23 | トレーサビリティ＆変更管理 | 199 | 25 |
-| **MUSUBI** v0.9.0-7 | 2025-11-23 | 品質強化、双方向トレース | 213 | 25 |
-| **MUSUBI** v1.0.0 | 2025-11-23 | 本番リリース（12 CLI） | 213 | 25 |
-| **MUSUBI** v2.0.0 | 2025-12-03 | MCP Server統合 | 213 | 25 |
+| **Spec-Copilot** | 2025-11-05 | Prompt collection | - | 19 |
+| **MUSUHI** v0.4.9 | 2025-11-07 | npm packaging, Steering | - | 20 |
+| **MUSUBI** v0.1.0 | 2025-11-08 | Initial PoC | - | - |
+| **MUSUBI** v0.1.2 | 2025-11-15 | 25 skills, 9 Constitutional Articles | - | 25 |
+| **MUSUBI** v0.1.3 | 2025-11-17 | 7-platform support | 53 | 25 |
+| **MUSUBI** v0.7.0 | 2025-11-23 | Constitutional governance system | - | 25 |
+| **MUSUBI** v0.8.0 | 2025-11-23 | EARS requirements generator | 25 | 25 |
+| **MUSUBI** v0.8.2 | 2025-11-23 | C4 + ADR design generator | - | 25 |
+| **MUSUBI** v0.8.4 | 2025-11-22 | Task breakdown system | 159 | 25 |
+| **MUSUBI** v0.8.5-8 | 2025-11-23 | Traceability and change management | 199 | 25 |
+| **MUSUBI** v0.9.0-7 | 2025-11-23 | Quality enhancements, bidirectional tracing | 213 | 25 |
+| **MUSUBI** v1.0.0 | 2025-11-23 | Production release (12 CLIs) | 213 | 25 |
+| **MUSUBI** v2.0.0 | 2025-12-03 | MCP Server integration | 213 | 25 |
 | **MUSUBI** v2.1.0 | 2025-12-05 | Workflow Engine | 213 | 25 |
-| **MUSUBI** v2.2.0 | 2025-12-07 | OpenHands 8モジュール | 483 | 19 |
+| **MUSUBI** v2.2.0 | 2025-12-07 | OpenHands 8 modules | 483 | 19 |
 | **MUSUBI** v3.0.0 | 2025-12-07 | Browser Agent + Web GUI | 673 | 27 |
-| **MUSUBI** v3.3.0 | 2025-06-14 | Phase 4 モニタリング | 1,024 | 27 |
-| **MUSUBI** v3.4.0 | 2025-06-14 | Phase 5 Steering高度化 | 1,490 | 27 |
-| **MUSUBI** v3.5.0 | 2025-12-08 | 20 CLIコマンド完備 | 1,490 | 27 |
-| **MUSUBI** v3.5.1 | 2025-12-08 | 全プラットフォームCLI統合 | 1,490 | 27 |
+| **MUSUBI** v3.3.0 | 2025-06-14 | Phase 4 Monitoring | 1,024 | 27 |
+| **MUSUBI** v3.4.0 | 2025-06-14 | Phase 5 Advanced Steering | 1,490 | 27 |
+| **MUSUBI** v3.5.0 | 2025-12-08 | Complete set of 20 CLI commands | 1,490 | 27 |
+| **MUSUBI** v3.5.1 | 2025-12-08 | CLI integration for all platforms | 1,490 | 27 |
 | **MUSUBI** v3.6.0 | 2025-12-09 | Dynamic Replanning Engine | 1,797 | 27 |
-| **MUSUBI** v3.6.1 | 2025-12-09 | 高度リプランニングコンポーネント | 1,841 | 27 |
-| **MUSUBI** v3.7.0 | 2025-12-09 | 多言語、Ollama、コスト追跡、チェックポイント | 2,022 | 27 |
-| **MUSUBI** v3.8.0 | 2025-12-10 | Swarm Enhancement Phase 1（Handoff/Triage） | 2,095 | 27 |
-| **MUSUBI** v3.9.0 | 2025-12-10 | Guardrails System（入力/出力/安全性チェック） | 2,278 | 27 |
-| **MUSUBI** v3.10.0 | 2025-12-10 | Phase 3 Documentation（9パターンガイド） | 2,332 | 27 |
+| **MUSUBI** v3.6.1 | 2025-12-09 | Advanced replanning components | 1,841 | 27 |
+| **MUSUBI** v3.7.0 | 2025-12-09 | Multilingual, Ollama, cost tracking, checkpoints | 2,022 | 27 |
+| **MUSUBI** v3.8.0 | 2025-12-10 | Swarm Enhancement Phase 1 (Handoff/Triage) | 2,095 | 27 |
+| **MUSUBI** v3.9.0 | 2025-12-10 | Guardrails System (input/output/safety checks) | 2,278 | 27 |
+| **MUSUBI** v3.10.0 | 2025-12-10 | Phase 3 Documentation (9-pattern guide) | 2,332 | 27 |
 | **MUSUBI** v3.11.0 | 2025-12-10 | Skill System & Advanced Workflows | 2,574 | 27 |
 
-## 15.2 各バージョンの「できること」
+## 15.2 What Each Version Can Do
 
 ### Spec-Copilot
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| 19の専門AIエージェント（プロンプト集） | ✅ |
-| 5フェーズ対話フロー | ✅ |
-| GitHub Copilot Chat連携 | ✅ |
-| 他プラットフォーム対応、手動コピー不要 | ❌ |
+| 19 specialized AI agents (prompt collection) | ✅ |
+| 5-phase dialogue flow | ✅ |
+| GitHub Copilot Chat integration | ✅ |
+| Support for other platforms, no manual copying | ❌ |
 
 ### MUSUHI
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| npmパッケージ化（npxでインストール） | ✅ |
-| 7つのAIプラットフォーム対応 | ✅ |
-| 20エージェント（+Steering Agent） | ✅ |
-| Project Memory（Steeringシステム） | ✅ |
-| EARS形式要件、SDDワークフローテンプレート | ✅ |
-| CLIコマンド、検証機能 | ❌ |
+| npm packaging (install via npx) | ✅ |
+| Support for 7 AI platforms | ✅ |
+| 20 agents (+Steering Agent) | ✅ |
+| Project Memory (Steering system) | ✅ |
+| EARS-format requirements, SDD workflow templates | ✅ |
+| CLI commands, validation features | ❌ |
 
 ### MUSUBI v0.1.x
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| 25の専門スキル（Claude Code） | ✅ |
-| 9つの憲法条項による開発ガバナンス | ✅ |
-| 7つのAIプラットフォーム対応（業界初） | ✅ |
-| AGENTS.md形式の統一エージェント定義 | ✅ |
+| 25 specialized skills (Claude Code) | ✅ |
+| Development governance via 9 Constitutional Articles | ✅ |
+| Support for 7 AI platforms (industry first) | ✅ |
+| Unified agent definitions in AGENTS.md format | ✅ |
 
 ### MUSUBI v0.7.0-v0.9.x
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| 憲法準拠バリデーション（9条項） | ✅ |
-| EARS形式要件の自動生成・検証 | ✅ |
-| C4モデル・ADR設計ドキュメント生成 | ✅ |
-| タスク分解と依存関係グラフ | ✅ |
-| トレーサビリティマトリクス | ✅ |
-| 変更管理（ブラウンフィールド対応） | ✅ |
-| ギャップ検出・カバレッジ計算 | ✅ |
+| Constitutional compliance validation (9 Articles) | ✅ |
+| Automatic generation and validation of EARS-format requirements | ✅ |
+| C4 model and ADR design document generation | ✅ |
+| Task breakdown and dependency graph | ✅ |
+| Traceability matrix | ✅ |
+| Change management (brownfield support) | ✅ |
+| Gap detection and coverage calculation | ✅ |
 
 ### MUSUBI v1.0.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| 12のCLIコマンド完全稼働 | ✅ |
-| 100%トレーサビリティ検証 | ✅ |
-| CI/CD統合（終了コード対応） | ✅ |
-| 本番プロジェクトでの実証 | ✅ |
+| 12 CLI commands fully operational | ✅ |
+| 100% traceability validation | ✅ |
+| CI/CD integration (exit code support) | ✅ |
+| Proven in production projects | ✅ |
 
 ### MUSUBI v2.0.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| コード依存関係の可視化 | ✅ |
-| セマンティックコード検索 | ✅ |
-| リファクタリング自動提案 | ✅ |
-| GraphRAGによる構造分析 | ✅ |
+| Code dependency visualization | ✅ |
+| Semantic code search | ✅ |
+| Automatic refactoring suggestions | ✅ |
+| Structural analysis with GraphRAG | ✅ |
 
 ### MUSUBI v2.1.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| 開発プロセスの状態管理 | ✅ |
-| ステージごとのメトリクス追跡 | ✅ |
-| Spike/PoC、Retrospectiveステージ | ✅ |
-| フィードバックループの正式サポート | ✅ |
+| Development process state management | ✅ |
+| Per-stage metrics tracking | ✅ |
+| Spike/PoC and Retrospective stages | ✅ |
+| Formal support for feedback loops | ✅ |
 
 ### MUSUBI v2.2.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| 行き詰まりエージェントの自動検出 | ✅ |
-| 動的スキルローディング | ✅ |
-| エージェント出力の品質評価 | ✅ |
-| セキュリティ脆弱性の自動検出 | ✅ |
-| Issue自動分析と解決提案 | ✅ |
+| Automatic detection of stuck agents | ✅ |
+| Dynamic skill loading | ✅ |
+| Quality evaluation of agent output | ✅ |
+| Automatic detection of security vulnerabilities | ✅ |
+| Automatic Issue analysis and resolution suggestions | ✅ |
 
 ### MUSUBI v3.0.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| 自然言語でブラウザ自動操作 | ✅ |
-| Web GUIダッシュボード | ✅ |
-| Spec Kit相互変換 | ✅ |
-| 27の専門AIエージェント | ✅ |
+| Browser automation via natural language | ✅ |
+| Web GUI dashboard | ✅ |
+| Spec Kit bidirectional conversion | ✅ |
+| 27 specialized AI agents | ✅ |
 
 ### MUSUBI v3.3.0-v3.4.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| SRE機能とモニタリング | ✅ |
-| インシデント管理 | ✅ |
-| Steering自動更新 | ✅ |
-| テンプレート制約と不確実性マーカー | ✅ |
-| 品質メトリクスダッシュボード（A-Fグレード） | ✅ |
-| 高度なバリデーション（クロスアーティファクト整合性） | ✅ |
-| 1,490テスト | ✅ |
+| SRE features and monitoring | ✅ |
+| Incident management | ✅ |
+| Automatic Steering updates | ✅ |
+| Template constraints and uncertainty markers | ✅ |
+| Quality metrics dashboard (A-F grades) | ✅ |
+| Advanced validation (cross-artifact consistency) | ✅ |
+| 1,490 tests | ✅ |
 
 ### MUSUBI v3.5.0-v3.5.1
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| 20 CLIコマンド完備 | ✅ |
-| マルチスキルオーケストレーション | ✅ |
-| ブラウザ自動化CLI | ✅ |
-| エージェントメモリ管理CLI | ✅ |
-| GitHub Issue自動解決CLI | ✅ |
-| 全7プラットフォームからCLI利用可能 | ✅ |
-| スキル内CLI統合 | ✅ |
+| Complete set of 20 CLI commands | ✅ |
+| Multi-skill orchestration | ✅ |
+| Browser automation CLI | ✅ |
+| Agent memory management CLI | ✅ |
+| GitHub Issue auto-resolution CLI | ✅ |
+| Available from all 7 platforms via CLI | ✅ |
+| In-skill CLI integration | ✅ |
 
 ### MUSUBI v3.6.0-v3.6.1
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
 | Dynamic Replanning Engine | ✅ |
-| マルチLLMプロバイダー（Copilot、Anthropic、OpenAI） | ✅ |
-| リアルタイムプラン監視 | ✅ |
-| LLMによる代替パス生成 | ✅ |
-| ProactivePathOptimizer（プロアクティブ最適化） | ✅ |
-| GoalProgressTracker（目標進捗トラッキング） | ✅ |
-| AdaptiveGoalModifier（動的目標調整） | ✅ |
-| 8つのリプランニングCLIコマンド | ✅ |
-| 1,841テスト（122リプランニングテスト） | ✅ |
+| Multi-LLM providers (Copilot, Anthropic, OpenAI) | ✅ |
+| Real-time plan monitoring | ✅ |
+| Alternative path generation by LLM | ✅ |
+| ProactivePathOptimizer (proactive optimization) | ✅ |
+| GoalProgressTracker (goal progress tracking) | ✅ |
+| AdaptiveGoalModifier (dynamic goal adjustment) | ✅ |
+| 8 replanning CLI commands | ✅ |
+| 1,841 tests (122 replanning tests) | ✅ |
 
 ### MUSUBI v3.7.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| WebSocketリアルタイムGUI更新 | ✅ |
-| musubi-browser完成（40テスト） | ✅ |
-| GitHub Actions（musubi-action） | ✅ |
-| OpenAPI/Swagger変換（29テスト） | ✅ |
-| 多言語テンプレート（8言語対応、31テスト） | ✅ |
-| Ollama Provider（ローカルLLM、38テスト） | ✅ |
-| Cost Tracker（LLMコスト追跡、39テスト） | ✅ |
-| Checkpoint Manager（状態スナップショット、44テスト） | ✅ |
-| 2,022テスト（181テスト追加） | ✅ |
+| WebSocket real-time GUI updates | ✅ |
+| musubi-browser complete (40 tests) | ✅ |
+| GitHub Actions (musubi-action) | ✅ |
+| OpenAPI/Swagger conversion (29 tests) | ✅ |
+| Multilingual templates (8 languages, 31 tests) | ✅ |
+| Ollama Provider (local LLM, 38 tests) | ✅ |
+| Cost Tracker (LLM cost tracking, 39 tests) | ✅ |
+| Checkpoint Manager (state snapshots, 44 tests) | ✅ |
+| 2,022 tests (181 tests added) | ✅ |
 
 ### MUSUBI v3.8.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| Swarm Enhancement Phase 1（Handoff/Triage） | ✅ |
-| HandoffPatternによるエージェント間タスク委譲 | ✅ |
-| TriagePatternによるリクエスト分類・ルーティング | ✅ |
-| Handoff統合テスト（73テスト追加） | ✅ |
-| 2,095テスト達成 | ✅ |
+| Swarm Enhancement Phase 1 (Handoff/Triage) | ✅ |
+| Inter-agent task delegation via HandoffPattern | ✅ |
+| Request classification and routing via TriagePattern | ✅ |
+| Handoff integration tests (73 tests added) | ✅ |
+| 2,095 tests reached | ✅ |
 
 ### MUSUBI v3.9.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| Guardrails System（Phase 2完成） | ✅ |
-| InputGuardrail（入力検証、PII検出） | ✅ |
-| OutputGuardrail（出力サニタイズ、墨消し） | ✅ |
-| SafetyCheckGuardrail（Constitutional連携） | ✅ |
-| GuardrailRules DSL（RuleBuilder、SecurityPatterns） | ✅ |
-| CLI統合（guardrails、guardrails-chain） | ✅ |
-| 183テスト追加、合計2,278テスト | ✅ |
+| Guardrails System (Phase 2 complete) | ✅ |
+| InputGuardrail (input validation, PII detection) | ✅ |
+| OutputGuardrail (output sanitization, redaction) | ✅ |
+| SafetyCheckGuardrail (Constitutional integration) | ✅ |
+| GuardrailRules DSL (RuleBuilder, SecurityPatterns) | ✅ |
+| CLI integration (guardrails, guardrails-chain) | ✅ |
+| 183 tests added, 2,278 tests in total | ✅ |
 
 ### MUSUBI v3.10.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
 | Phase 3 Multi-Skill Orchestration Documentation | ✅ |
-| 9オーケストレーションパターン完全ガイド | ✅ |
-| P0-P3並列化チュートリアル | ✅ |
-| Guardrailsシステム完全ガイド | ✅ |
-| 54テスト追加、合計2,332テスト | ✅ |
+| Complete guide to the 9 orchestration patterns | ✅ |
+| P0-P3 parallelization tutorial | ✅ |
+| Complete guide to the Guardrails system | ✅ |
+| 54 tests added, 2,332 tests in total | ✅ |
 
 ### MUSUBI v3.11.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| Skill Registry（スキル登録・発見） | ✅ |
-| Skill Executor（P-label並列実行） | ✅ |
-| Agent-Skill Binding（動的スキル割当） | ✅ |
-| MCP Tool Adapters（双方向連携） | ✅ |
-| Workflow Executor（8ステップタイプ） | ✅ |
-| Error Handler（Circuit Breaker） | ✅ |
+| Skill Registry (skill registration and discovery) | ✅ |
+| Skill Executor (P-label parallel execution) | ✅ |
+| Agent-Skill Binding (dynamic skill assignment) | ✅ |
+| MCP Tool Adapters (bidirectional integration) | ✅ |
+| Workflow Executor (8 step types) | ✅ |
+| Error Handler (Circuit Breaker) | ✅ |
 | 5 Workflow Templates | ✅ |
-| 242テスト追加、合計2,574テスト | ✅ |
+| 242 tests added, 2,574 tests in total | ✅ |
 
 ### MUSUBI v4.0.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| Agent Loop（エージェントループ統合） | ✅ |
-| RepositoryMap（リポジトリ構造解析） | ✅ |
-| ASTExtractor（AST抽出・解析） | ✅ |
-| ContextOptimizer（コンテキスト最適化） | ✅ |
-| ReasoningEngine（推論エンジン） | ✅ |
-| PlanningEngine（計画エンジン） | ✅ |
-| SelfCorrection（自己修正機能） | ✅ |
-| CodeGenerator（コード生成） | ✅ |
-| CodeReviewer（コードレビュー） | ✅ |
-| createIntegratedAgent（統合エージェント） | ✅ |
+| Agent Loop (agent loop integration) | ✅ |
+| RepositoryMap (repository structure analysis) | ✅ |
+| ASTExtractor (AST extraction and analysis) | ✅ |
+| ContextOptimizer (context optimization) | ✅ |
+| ReasoningEngine (reasoning engine) | ✅ |
+| PlanningEngine (planning engine) | ✅ |
+| SelfCorrection (self-correction) | ✅ |
+| CodeGenerator (code generation) | ✅ |
+| CodeReviewer (code review) | ✅ |
+| createIntegratedAgent (integrated agent) | ✅ |
 
 ### MUSUBI v5.0.0
 
-| 機能 | ステータス |
+| Feature | Status |
 |------|----------|
-| SteeringAutoUpdate（自動同期） | ✅ |
-| SteeringValidator（検証エンジン） | ✅ |
-| TemplateConstraints（テンプレート制約） | ✅ |
-| ThinkingChecklist（思考チェックリスト） | ✅ |
-| QualityDashboard（A-F品質メトリクス） | ✅ |
-| AdvancedValidation（クロスアーティファクト検証） | ✅ |
-| Phase5Integration（統合アクセス） | ✅ |
-| 227テスト追加、合計3,378テスト | ✅ |
+| SteeringAutoUpdate (automatic synchronization) | ✅ |
+| SteeringValidator (validation engine) | ✅ |
+| TemplateConstraints (template constraints) | ✅ |
+| ThinkingChecklist (thinking checklist) | ✅ |
+| QualityDashboard (A-F quality metrics) | ✅ |
+| AdvancedValidation (cross-artifact validation) | ✅ |
+| Phase5Integration (integrated access) | ✅ |
+| 227 tests added, 3,378 tests in total | ✅ |
 
 ---
 
-# 第16章 アップグレード方法
+# Chapter 16: How to Upgrade
 
-## 16.1 新規インストール
+## 16.1 New Installation
 
 ```bash
-# 常に最新版を使用（推奨）
+# Always use the latest version (recommended)
 npx musubi-sdd@latest init
 
-# プラットフォーム指定
+# Specify platform
 npx musubi-sdd@latest init --claude-code  # Claude Code
 npx musubi-sdd@latest init --copilot      # GitHub Copilot
 npx musubi-sdd@latest init --cursor       # Cursor IDE
 ```
 
-## 16.2 既存プロジェクトのアップグレード
+## 16.2 Upgrading an Existing Project
 
 ```bash
-# 同じコマンドで最新版に更新
+# Update to the latest version with the same command
 npx musubi-sdd@latest init
 
-# Skills、エージェント、CLIコマンドが自動更新されます
+# Skills, agents, and CLI commands are updated automatically
 ```
 
-## 16.3 CodeGraph MCP Server（v2.0.0機能）
+## 16.3 CodeGraph MCP Server (v2.0.0 feature)
 
 ```bash
-# pipxでインストール
+# Install with pipx
 pipx install --force codegraph-mcp-server
 
-# プロジェクトをインデックス
+# Index the project
 codegraph-mcp index /path/to/project --full
 ```
 
 ---
 
-# まとめ
+# Summary
 
-MUSUBIは、2025年11月5日に公開されたSpec-Copilotを起源とし、MUSUHI、そしてMUSUBIへと進化を遂げたプロジェクトです。約1ヶ月強でv0.1.0からv3.11.0まで劇的な成長を遂げました。
+MUSUBI is a project that originated from Spec-Copilot, released on November 5, 2025, and evolved into MUSUHI and then MUSUBI. In just over a month, it grew dramatically from v0.1.0 to v3.11.0.
 
 ```mermaid
 flowchart TB
-    subgraph Origin["🌱 Origin: Spec-Copilot（2025-11-05）"]
-        O1["19エージェント、GitHub Copilot専用"]
+    subgraph Origin["🌱 Origin: Spec-Copilot (2025-11-05)"]
+        O1["19 agents, GitHub Copilot only"]
     end
-    subgraph Evolution["🌿 Evolution: MUSUHI（2025-11）"]
-        E1["20エージェント、7プラットフォーム、Steeringシステム"]
+    subgraph Evolution["🌿 Evolution: MUSUHI (2025-11)"]
+        E1["20 agents, 7 platforms, Steering system"]
     end
-    subgraph Phase1["🌳 Phase 1: MUSUBI 黎明期（v0.1.x）"]
-        P1["25スキル誕生、npmパッケージ化、CLIの萌芽"]
+    subgraph Phase1["🌳 Phase 1: MUSUBI Dawn (v0.1.x)"]
+        P1["25 skills born, npm packaging, early CLI"]
     end
-    subgraph Phase2["🏗️ Phase 2: MUSUBI 基盤構築（v0.7.0-v0.9.x）"]
-        P2["憲法ガバナンス、EARS、C4、トレーサビリティ"]
+    subgraph Phase2["🏗️ Phase 2: MUSUBI Foundation Building (v0.7.0-v0.9.x)"]
+        P2["Constitutional governance, EARS, C4, traceability"]
     end
-    subgraph Phase3["🚀 Phase 3: MUSUBI 本番リリース（v1.0.0）"]
-        P3["12 CLIコマンド、213テスト、本番実証"]
+    subgraph Phase3["🚀 Phase 3: MUSUBI Production Release (v1.0.0)"]
+        P3["12 CLI commands, 213 tests, production proven"]
     end
-    subgraph Phase4["⚡ Phase 4: MUSUBI 高度化（v2.0-v2.2）"]
-        P4["MCP統合、ワークフロー、OpenHandsモジュール"]
+    subgraph Phase4["⚡ Phase 4: MUSUBI Advancement (v2.0-v2.2)"]
+        P4["MCP integration, workflows, OpenHands modules"]
     end
-    subgraph Phase5["✨ Phase 5: MUSUBI ユーザー体験革新（v3.0）"]
-        P5["ブラウザ自動化、Web GUI、27エージェント"]
+    subgraph Phase5["✨ Phase 5: MUSUBI User Experience Revolution (v3.0)"]
+        P5["Browser automation, Web GUI, 27 agents"]
     end
-    subgraph Phase6["🌐 Phase 6: MUSUBI CLI統合（v3.5.1）"]
-        P6["20 CLIコマンド、全プラットフォームCLI統合、1,490テスト"]
+    subgraph Phase6["🌐 Phase 6: MUSUBI CLI Integration (v3.5.1)"]
+        P6["20 CLI commands, CLI integration for all platforms, 1,490 tests"]
     end
-    subgraph Phase7["🧠 Phase 7: MUSUBI Dynamic Replanning（v3.6.1）"]
-        P7["リプランニングエンジン、目標管理、パス最適化、1,841テスト"]
+    subgraph Phase7["🧠 Phase 7: MUSUBI Dynamic Replanning (v3.6.1)"]
+        P7["Replanning engine, goal management, path optimization, 1,841 tests"]
     end
-    subgraph Phase8["🔧 Phase 8: MUSUBI Advanced Integration（v3.7.0）"]
-        P8["多言語、Ollama、コスト追跡、チェックポイント、2,022テスト"]
+    subgraph Phase8["🔧 Phase 8: MUSUBI Advanced Integration (v3.7.0)"]
+        P8["Multilingual, Ollama, cost tracking, checkpoints, 2,022 tests"]
     end
-    subgraph Phase9["🐝 Phase 9: MUSUBI Swarm Enhancement（v3.8.0）"]
-        P9["Handoff/Triageパターン、エージェント間連携、2,095テスト"]
+    subgraph Phase9["🐝 Phase 9: MUSUBI Swarm Enhancement (v3.8.0)"]
+        P9["Handoff/Triage patterns, inter-agent coordination, 2,095 tests"]
     end
-    subgraph Phase10["🛡️ Phase 10: MUSUBI Guardrails（v3.9.0）"]
-        P10["入力/出力/安全性Guardrails、Constitutional連携、2,278テスト"]
+    subgraph Phase10["🛡️ Phase 10: MUSUBI Guardrails (v3.9.0)"]
+        P10["Input/output/safety Guardrails, Constitutional integration, 2,278 tests"]
     end
-    subgraph Phase11["📚 Phase 11: MUSUBI Phase 3 Docs（v3.10.0）"]
-        P11["9パターンガイド、並列化チュートリアル、2,332テスト"]
+    subgraph Phase11["📚 Phase 11: MUSUBI Phase 3 Docs (v3.10.0)"]
+        P11["9-pattern guide, parallelization tutorial, 2,332 tests"]
     end
-    subgraph Phase12["🎯 Phase 12: MUSUBI Skill System（v3.11.0）"]
-        P12["Skill Registry、Workflow Executor、2,574テスト"]
+    subgraph Phase12["🎯 Phase 12: MUSUBI Skill System (v3.11.0)"]
+        P12["Skill Registry, Workflow Executor, 2,574 tests"]
     end
-    subgraph Phase13["🤖 Phase 13: MUSUBI Agent Loop（v4.0.0）"]
-        P13["Codebase Intelligence、Agentic Reasoning、統合エージェント"]
+    subgraph Phase13["🤖 Phase 13: MUSUBI Agent Loop (v4.0.0)"]
+        P13["Codebase Intelligence, Agentic Reasoning, integrated agent"]
     end
-    subgraph Phase14["🚀 Phase 14: MUSUBI Advanced Features（v5.0.0）"]
-        P14["Steering Auto-Update、Quality Dashboard、3,378テスト"]
+    subgraph Phase14["🚀 Phase 14: MUSUBI Advanced Features (v5.0.0)"]
+        P14["Steering Auto-Update, Quality Dashboard, 3,378 tests"]
     end
-    subgraph Phase15["🌐 Phase 15: MUSUBI マルチ言語対応（v5.3.0）"]
-        P15["言語推薦エンジン、10言語サポート、3,425テスト"]
+    subgraph Phase15["🌐 Phase 15: MUSUBI Multi-Language Support (v5.3.0)"]
+        P15["Language recommendation engine, 10-language support, 3,425 tests"]
     end
     Origin --> Evolution --> Phase1 --> Phase2 --> Phase3 --> Phase4 --> Phase5 --> Phase6 --> Phase7 --> Phase8 --> Phase9 --> Phase10 --> Phase11 --> Phase12 --> Phase13 --> Phase14 --> Phase15
 ```
 
 **Key Milestones:**
 
-| マイルストーン | プロジェクト/バージョン | 意義 |
+| Milestone | Project/Version | Significance |
 |--------------|------------------------|------|
-| プロジェクト誕生 | Spec-Copilot | 19エージェントでSDD構想実現 |
-| マルチプラットフォーム | MUSUHI | 7プラットフォーム対応 |
-| 25スキル誕生 | MUSUBI v0.1.2 | SDD専門エージェントの確立 |
-| 7プラットフォーム対応 | MUSUBI v0.1.3 | 業界初のユニバーサルSDD |
-| 憲法ガバナンス | MUSUBI v0.7.0 | 開発プロセスの法制化 |
-| 本番リリース | MUSUBI v1.0.0 | 実用レベルの品質達成 |
-| MCP統合 | MUSUBI v2.0.0 | 高度なコード解析能力 |
-| 673テスト | MUSUBI v3.0.0 | 堅牢な品質保証 |
-| Steering高度化 | MUSUBI v3.4.0 | 1,490テスト、Phase 5完了 |
-| 全プラットフォームCLI | MUSUBI v3.5.1 | 20 CLI、7プラットフォーム統合 |
-| Dynamic Replanning | MUSUBI v3.6.0 | LLMによる動的リプランニング |
-| 高度リプランニング | MUSUBI v3.6.1 | 目標管理、パス最適化、1,841テスト |
-| Advanced Integration | MUSUBI v3.7.0 | 多言語、Ollama、コスト追跡、2,022テスト |
-| Swarm Enhancement | MUSUBI v3.8.0 | Handoff/Triageパターン、2,095テスト |
-| Guardrails System | MUSUBI v3.9.0 | 入力/出力/安全性検証、2,278テスト |
-| Phase 3 Documentation | MUSUBI v3.10.0 | 9パターンガイド、完全ドキュメント化、2,332テスト |
-| Skill System | MUSUBI v3.11.0 | Skill Registry、Workflow Executor、2,574テスト |
-| Agent Loop | MUSUBI v4.0.0 | Codebase Intelligence、Agentic Reasoning |
-| Advanced Features | MUSUBI v5.0.0 | Steering Auto-Update、Quality Dashboard、3,378テスト |
-| マルチ言語対応 | MUSUBI v5.3.0 | 言語推薦エンジン、10言語サポート、3,425テスト |
+| Project birth | Spec-Copilot | SDD vision realized with 19 agents |
+| Multi-platform | MUSUHI | Support for 7 platforms |
+| 25 skills born | MUSUBI v0.1.2 | Establishment of SDD specialist agents |
+| 7-platform support | MUSUBI v0.1.3 | Industry-first universal SDD |
+| Constitutional governance | MUSUBI v0.7.0 | Codification of the development process |
+| Production release | MUSUBI v1.0.0 | Achieved production-grade quality |
+| MCP integration | MUSUBI v2.0.0 | Advanced code analysis capabilities |
+| 673 tests | MUSUBI v3.0.0 | Robust quality assurance |
+| Advanced Steering | MUSUBI v3.4.0 | 1,490 tests, Phase 5 complete |
+| CLI for all platforms | MUSUBI v3.5.1 | 20 CLIs, 7-platform integration |
+| Dynamic Replanning | MUSUBI v3.6.0 | Dynamic replanning via LLM |
+| Advanced replanning | MUSUBI v3.6.1 | Goal management, path optimization, 1,841 tests |
+| Advanced Integration | MUSUBI v3.7.0 | Multilingual, Ollama, cost tracking, 2,022 tests |
+| Swarm Enhancement | MUSUBI v3.8.0 | Handoff/Triage patterns, 2,095 tests |
+| Guardrails System | MUSUBI v3.9.0 | Input/output/safety validation, 2,278 tests |
+| Phase 3 Documentation | MUSUBI v3.10.0 | 9-pattern guide, complete documentation, 2,332 tests |
+| Skill System | MUSUBI v3.11.0 | Skill Registry, Workflow Executor, 2,574 tests |
+| Agent Loop | MUSUBI v4.0.0 | Codebase Intelligence, Agentic Reasoning |
+| Advanced Features | MUSUBI v5.0.0 | Steering Auto-Update, Quality Dashboard, 3,378 tests |
+| Multi-language support | MUSUBI v5.3.0 | Language recommendation engine, 10-language support, 3,425 tests |
 
-Spec-CopilotからMUSUHI、そしてMUSUBIへ。この進化の旅を通じて、MUSUBIは単なる仕様管理ツールから、**包括的なAI支援開発プラットフォーム**へと成長しました。v5.3.0では、マルチ言語対応と言語推薦エンジンを追加し、Rust、Python、Go、Java、C#など10言語のプロジェクトを適切に初期化できるようになりました。ODS-RAM（ウラノスデータスペース参照アーキテクチャモデル）を使ったRustプロジェクトでの実証を通じて、実際の複雑なプロジェクトでのMUSUBIの有効性を確認しました。3,425のテストと20のCLIコマンドで、堅牢で信頼性の高いSDD体験を提供します。
+From Spec-Copilot to MUSUHI, and then to MUSUBI. Through this journey of evolution, MUSUBI has grown from a mere specification management tool into a **comprehensive AI-assisted development platform**. v5.3.0 adds multi-language support and a language recommendation engine, so projects in 10 languages, including Rust, Python, Go, Java, and C#, can now be initialized appropriately. Through a demonstration on a Rust project using ODS-RAM (Ouranos Ecosystem Data Spaces Reference Architecture Model), we confirmed MUSUBI's effectiveness on real, complex projects. With 3,425 tests and 20 CLI commands, it delivers a robust and reliable SDD experience.
 
 ---
 
-# 第16章 MUSUBI v5.2.0 - v5.3.0: マルチ言語対応（2025年12月10日）
+# Chapter 16: MUSUBI v5.2.0 - v5.3.0: Multi-Language Support (December 10, 2025)
 
-## 16.1 ODS-RAM実証からの知見
+## 16.1 Insights from the ODS-RAM Demonstration
 
-MUSUBI v5.0.0のリリース後、**Ouranos Ecosystem Data Spaces（ウラノス）参照アーキテクチャモデル（ODS-RAM）** に準拠したRustプロジェクトを使ってMUSUBIを実証しました。この実証を通じて、以下の課題が明らかになりました：
+After the release of MUSUBI v5.0.0, we demonstrated MUSUBI using a Rust project that conforms to the **Ouranos Ecosystem Data Spaces Reference Architecture Model (ODS-RAM)**. This demonstration revealed the following issues:
 
-### 発見された課題
+### Issues Discovered
 
-1. **言語選択機能の不在**: JavaScript/Node.js以外のプロジェクトで`tech.md`を手動で書き直す必要があった
-2. **複数言語プロジェクトへの対応不足**: フロントエンド（TypeScript）+ バックエンド（Rust）のようなポリグロットプロジェクトに対応できなかった
-3. **言語未定状態のサポートなし**: 要件定義段階で技術スタックが決まっていないプロジェクトに対応できなかった
+1. **No language selection feature**: For projects other than JavaScript/Node.js, `tech.md` had to be rewritten manually
+2. **Insufficient support for multi-language projects**: Polyglot projects such as frontend (TypeScript) + backend (Rust) were not supported
+3. **No support for an undecided language state**: Projects whose technology stack was not yet decided at the requirements stage were not supported
 
-## 16.2 v5.2.0: ESLint/Prettier完全準拠
+## 16.2 v5.2.0: Full ESLint/Prettier Compliance
 
-**リリース日:** 2025-12-10
+**Release date:** 2025-12-10
 
-v5.2.0では、コードベース全体のESLintとPrettier準拠を完了しました：
+In v5.2.0, we completed ESLint and Prettier compliance across the entire codebase:
 
-- 282件のESLintエラーを修正
-- 242ファイルのPrettierフォーマットを修正
-- 3,409テスト全パス
+- Fixed 282 ESLint errors
+- Fixed Prettier formatting in 242 files
+- All 3,409 tests pass
 
-## 16.3 v5.3.0: マルチ言語対応
+## 16.3 v5.3.0: Multi-Language Support
 
-**リリース日:** 2025-12-10
+**Release date:** 2025-12-10
 
-### 技術スタックアプローチ選択
+### Technology Stack Approach Selection
 
 ```bash
 $ npx musubi-sdd init --copilot
 
 ? Technology stack approach:
-  ❯ Single language        # 1つの言語を選択
-    Multiple languages     # 複数言語を選択（ポリグロット）
-    Undecided             # 後で決定（プレースホルダー生成）
-    Help me decide        # 要件から言語を推薦
+  ❯ Single language        # Select one language
+    Multiple languages     # Select multiple languages (polyglot)
+    Undecided             # Decide later (generate placeholders)
+    Help me decide        # Recommend a language from requirements
 ```
 
-### 言語推薦エンジン
+### Language Recommendation Engine
 
-「Help me decide」モードを選択すると、3つの質問に基づいて最適な言語を推薦します：
+When you select "Help me decide" mode, the best language is recommended based on 3 questions:
 
 ```bash
 ? What type of application(s) are you building?
@@ -2437,7 +2437,7 @@ $ npx musubi-sdd init --copilot
   ◯ Python
 ```
 
-推薦結果：
+Recommendation result:
 
 ```
 📊 Recommended languages based on your requirements:
@@ -2447,9 +2447,9 @@ $ npx musubi-sdd init --copilot
   🐍 Python: Rapid development, extensive libraries
 ```
 
-### 10言語サポート
+### 10 Supported Languages
 
-| 言語 | バージョン | パッケージマネージャー | フレームワーク |
+| Language | Version | Package Manager | Framework |
 |------|----------|---------------------|---------------|
 | JavaScript/TypeScript | ES2022+ / TS 5.0+ | npm, pnpm, yarn | React, Next.js, Express |
 | Python | 3.11+ | pip, poetry, uv | FastAPI, Django |
@@ -2462,9 +2462,9 @@ $ npx musubi-sdd init --copilot
 | Ruby | 3.2+ | Bundler | Rails, Sinatra |
 | PHP | 8.2+ | Composer | Laravel, Symfony |
 
-### 動的 tech.md 生成
+### Dynamic tech.md Generation
 
-選択した言語に応じて、適切なフレームワーク、テストツール、開発環境が自動設定されます：
+Based on the selected language, the appropriate framework, test tools, and development environment are configured automatically:
 
 ```markdown
 # Technology Stack
@@ -2489,9 +2489,9 @@ $ npx musubi-sdd init --copilot
 - **Testing**: pytest, unittest
 ```
 
-### 「Undecided」モード
+### "Undecided" Mode
 
-言語が未定の場合、決定基準とTODOリストを含むプレースホルダーが生成されます：
+When the language is undecided, a placeholder containing decision criteria and a TODO list is generated:
 
 ```markdown
 # Technology Stack
@@ -2514,35 +2514,35 @@ When selecting technologies, consider:
 - [ ] Make final decision and update this document
 ```
 
-### テスト
+### Tests
 
-- 16件の新規テスト追加（言語推薦エンジン）
-- 全3,425テストパス
+- 16 new tests added (language recommendation engine)
+- All 3,425 tests pass
 
 ---
 
-# 第17章 MUSUBI v5.4.0: GitHub参照と改良提案（2025年12月10日）
+# Chapter 17: MUSUBI v5.4.0: GitHub References and Improvement Suggestions (December 10, 2025)
 
-## 17.1 概要
+## 17.1 Overview
 
-v5.4.0では、**GitHubリポジトリを参照して学習する機能**を追加しました。複数のリポジトリを分析し、アーキテクチャパターン、使用技術、ベストプラクティスを抽出して改良提案を生成します。
+v5.4.0 adds a **feature that learns by referencing GitHub repositories**. It analyzes multiple repositories, extracts architecture patterns, technologies used, and best practices, and generates improvement suggestions.
 
 ```mermaid
 flowchart LR
-    subgraph Input["入力"]
-        R1["リポジトリ1"]
-        R2["リポジトリ2"]
-        R3["リポジトリN"]
+    subgraph Input["Input"]
+        R1["Repository 1"]
+        R2["Repository 2"]
+        R3["Repository N"]
     end
     
-    subgraph Analysis["分析エンジン"]
-        F["GitHub API<br/>メタデータ取得"]
-        S["構造分析<br/>ディレクトリ構成"]
-        P["パターン検出<br/>アーキテクチャ"]
-        T["技術検出<br/>フレームワーク"]
+    subgraph Analysis["Analysis Engine"]
+        F["GitHub API<br/>Fetch metadata"]
+        S["Structure analysis<br/>Directory layout"]
+        P["Pattern detection<br/>Architecture"]
+        T["Technology detection<br/>Frameworks"]
     end
     
-    subgraph Output["出力"]
+    subgraph Output["Output"]
         O["steering/references/<br/>github-references-YYYY-MM-DD.md"]
     end
     
@@ -2552,43 +2552,43 @@ flowchart LR
     F --> S --> P --> T --> O
 ```
 
-## 17.2 新オプション: `--reference` / `-r`
+## 17.2 New Option: `--reference` / `-r`
 
-### 基本使用法
+### Basic Usage
 
 ```bash
-# 単一リポジトリ参照
+# Reference a single repository
 musubi init --reference facebook/react
 
-# 複数リポジトリ参照（短縮形）
+# Reference multiple repositories (short form)
 musubi init -r vercel/next.js -r facebook/react -r denoland/deno
 
-# フルURL形式
+# Full URL format
 musubi init --reference https://github.com/tokio-rs/tokio
 
-# ブランチ指定
+# Specify a branch
 musubi init -r owner/repo@develop
 
-# サブパス指定
+# Specify a subpath
 musubi init -r owner/repo#packages/core
 ```
 
-### サポートするフォーマット
+### Supported Formats
 
-| フォーマット | 例 |
+| Format | Example |
 |-------------|---|
 | owner/repo | `facebook/react` |
 | HTTPS URL | `https://github.com/owner/repo` |
 | SSH URL | `git@github.com:owner/repo.git` |
-| ブランチ指定 | `owner/repo@develop` |
-| サブパス指定 | `owner/repo#src/lib` |
+| Branch specification | `owner/repo@develop` |
+| Subpath specification | `owner/repo#src/lib` |
 
-## 17.3 GitHub API統合
+## 17.3 GitHub API Integration
 
-### メタデータ取得
+### Metadata Retrieval
 
 ```javascript
-// 取得される情報
+// Information retrieved
 {
   name: "react",
   description: "A JavaScript library for building user interfaces",
@@ -2601,37 +2601,37 @@ musubi init -r owner/repo#packages/core
 }
 ```
 
-### 主要ファイル分析
+### Key File Analysis
 
-以下のファイルを自動取得・分析:
-- `README.md` - プロジェクト概要
-- `package.json` - JS/TS依存関係
-- `Cargo.toml` - Rust依存関係
-- `pyproject.toml` - Python依存関係
-- `go.mod` - Go依存関係
-- `pom.xml` - Java依存関係
+The following files are automatically fetched and analyzed:
+- `README.md` - Project overview
+- `package.json` - JS/TS dependencies
+- `Cargo.toml` - Rust dependencies
+- `pyproject.toml` - Python dependencies
+- `go.mod` - Go dependencies
+- `pom.xml` - Java dependencies
 
-### GITHUB_TOKENサポート
+### GITHUB_TOKEN Support
 
 ```bash
-# レート制限回避のため環境変数設定
+# Set an environment variable to avoid rate limits
 export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
 musubi init -r facebook/react -r vercel/next.js
 ```
 
-## 17.4 パターン検出
+## 17.4 Pattern Detection
 
-### アーキテクチャパターン
+### Architecture Patterns
 
-| パターン | 検出条件 |
+| Pattern | Detection Condition |
 |---------|---------|
 | Clean Architecture | `domain/`, `application/`, `infrastructure/`, `interface/` |
 | Hexagonal Architecture | `adapters/`, `ports/`, `core/`, `hexagon/` |
 | Domain-Driven Design | `aggregates/`, `entities/`, `valueobjects/` |
 | Monorepo | `packages/`, `apps/`, `pnpm-workspace.yaml` |
-| Rust Workspace | `Cargo.toml`に`[workspace]` |
+| Rust Workspace | `[workspace]` in `Cargo.toml` |
 
-### テクノロジー検出
+### Technology Detection
 
 **JavaScript/TypeScript:**
 - React, Vue, Angular, Next.js
@@ -2646,9 +2646,9 @@ musubi init -r facebook/react -r vercel/next.js
 - FastAPI, Django, Flask
 - pytest
 
-## 17.5 改良提案生成
+## 17.5 Improvement Suggestion Generation
 
-### 出力例
+### Example Output
 
 ```markdown
 # GitHub Reference Repositories
@@ -2687,19 +2687,19 @@ musubi init -r facebook/react -r vercel/next.js
    - Used by 1 repository(ies): react
 ```
 
-## 17.6 実装詳細
+## 17.6 Implementation Details
 
-### 主要関数
+### Main Functions
 
-| 関数 | 説明 |
+| Function | Description |
 |------|------|
-| `parseGitHubRepo()` | リポジトリ参照を解析 |
-| `fetchGitHubRepo()` | GitHub APIからデータ取得 |
-| `fetchGitHubRepos()` | 複数リポジトリを順次取得 |
-| `analyzeReposForImprovements()` | パターン・技術を分析 |
-| `saveReferenceRepos()` | 分析結果をMarkdownで保存 |
+| `parseGitHubRepo()` | Parse a repository reference |
+| `fetchGitHubRepo()` | Fetch data from the GitHub API |
+| `fetchGitHubRepos()` | Fetch multiple repositories sequentially |
+| `analyzeReposForImprovements()` | Analyze patterns and technologies |
+| `saveReferenceRepos()` | Save analysis results as Markdown |
 
-### 出力ファイル
+### Output Files
 
 ```
 steering/
@@ -2707,42 +2707,42 @@ steering/
     └── github-references-2025-12-10.md
 ```
 
-## 17.7 テスト
+## 17.7 Tests
 
-- 59件の新規テスト追加
-- 全3,571テストパス
-- ESLint/Prettier準拠
-
----
+- 59 new tests added
+- All 3,571 tests pass
+- ESLint/Prettier compliant
 
 ---
 
-# 第18章 エンタープライズスケール分析：v5.5.0 - v5.6.0（2025年12月）
+---
 
-## 18.1 背景
+# Chapter 18: Enterprise-Scale Analysis: v5.5.0 - v5.6.0 (December 2025)
 
-**GCC（GNU Compiler Collection）の分析経験から生まれた機能強化**
+## 18.1 Background
 
-MUSUBIをGCC（1,000万行以上、100,000ファイル以上）のような超大規模プロジェクトに適用した際の課題を解決するため、エンタープライズスケールの機能が追加されました。
+**Enhancements born from experience analyzing GCC (GNU Compiler Collection)**
+
+Enterprise-scale features were added to solve the challenges encountered when applying MUSUBI to ultra-large projects such as GCC (over 10 million lines, over 100,000 files).
 
 ## 18.2 Large Project Analyzer
 
-**超大規模プロジェクト対応（10M+行）**
+**Support for ultra-large projects (10M+ lines)**
 
-`LargeProjectAnalyzer`クラスは、GCCのような超大規模プロジェクト（1,000万行以上）の分析に対応します。`maxMemoryMB`（メモリ上限）、`chunkSize`（チャンクサイズ）、`enableGC`（ガベージコレクション有効化）などのオプションを指定して初期化し、`analyze()`メソッドでプロジェクトパスを渡して分析を実行します。`onProgress`コールバックで進捗状況をリアルタイムで取得できます。
+The `LargeProjectAnalyzer` class supports analysis of ultra-large projects such as GCC (over 10 million lines). Initialize it with options such as `maxMemoryMB` (memory limit), `chunkSize` (chunk size), and `enableGC` (enable garbage collection), then call the `analyze()` method with the project path to run the analysis. The `onProgress` callback provides real-time progress updates.
 
-### スケールベース戦略
+### Scale-Based Strategy
 
-| スケール | ファイル数 | 戦略 |
+| Scale | Files | Strategy |
 |---------|-----------|------|
-| Small | ≤100 | バッチ分析 |
-| Medium | ≤1,000 | 最適化バッチ |
-| Large | ≤10,000 | チャンク分析 |
-| Massive | >10,000 | ストリーミング分析 |
+| Small | ≤100 | Batch analysis |
+| Medium | ≤1,000 | Optimized batch |
+| Large | ≤10,000 | Chunked analysis |
+| Massive | >10,000 | Streaming analysis |
 
-### 巨大関数検出
+### Giant Function Detection
 
-| 行数 | レベル |
+| Lines | Level |
 |------|--------|
 | 100+ | Warning |
 | 500+ | Critical |
@@ -2750,13 +2750,13 @@ MUSUBIをGCC（1,000万行以上、100,000ファイル以上）のような超�
 
 ## 18.3 Complexity Analyzer
 
-**循環的・認知的複雑度分析**
+**Cyclomatic and cognitive complexity analysis**
 
-`ComplexityAnalyzer`クラスは、コードの複雑度を多角的に分析します。`calculateCyclomaticComplexity()`メソッドでMcCabeの循環的複雑度を、`calculateCognitiveComplexity()`メソッドでSonarSource方式の認知的複雑度を計算できます。両メソッドともコードと言語（`'javascript'`、`'typescript'`など）を引数として受け取ります。
+The `ComplexityAnalyzer` class analyzes code complexity from multiple angles. Use the `calculateCyclomaticComplexity()` method to compute McCabe's cyclomatic complexity and the `calculateCognitiveComplexity()` method to compute SonarSource-style cognitive complexity. Both methods take the code and the language (such as `'javascript'` or `'typescript'`) as arguments.
 
-### 複雑度しきい値
+### Complexity Thresholds
 
-| レベル | 循環的 | 認知的 |
+| Level | Cyclomatic | Cognitive |
 |--------|--------|--------|
 | Ideal | ≤10 | ≤15 |
 | Warning | 11-20 | 16-30 |
@@ -2765,218 +2765,218 @@ MUSUBIをGCC（1,000万行以上、100,000ファイル以上）のような超�
 
 ## 18.4 CodeGraph MCP Integration
 
-**深層コードグラフ分析**
+**Deep code graph analysis**
 
-`CodeGraphMCP`クラスは、MCPサーバーと連携してコードグラフ分析を行います。`mcpEndpoint`でサーバーのURLを指定して初期化します。主要なメソッドは以下の通りです：
+The `CodeGraphMCP` class performs code graph analysis in cooperation with an MCP server. Initialize it by specifying the server URL with `mcpEndpoint`. The main methods are as follows:
 
-- **`generateCallGraph()`**: 指定ファイルのコールグラフを生成（`depth`で探索深度を指定）
-- **`analyzeImpact()`**: 指定ファイルの変更が他に与える影響を分析
-- **`detectCircularDependencies()`**: 指定ディレクトリ内の循環依存を検出
-- **`identifyHotspots()`**: 高接続度のエンティティ（ホットスポット）を特定（引数で件数を指定）
+- **`generateCallGraph()`**: Generate a call graph for the specified file (specify the search depth with `depth`)
+- **`analyzeImpact()`**: Analyze the impact that changes to the specified file have on other code
+- **`detectCircularDependencies()`**: Detect circular dependencies within the specified directory
+- **`identifyHotspots()`**: Identify highly connected entities (hotspots) (specify the count with an argument)
 
-### 機能一覧
+### Feature List
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| Call Graph | 呼び出し元・呼び出し先の追跡 |
-| Impact Analysis | コード変更時の影響範囲分析 |
-| Circular Dependencies | 循環依存の検出 |
-| Hotspots | 高接続度エンティティの特定 |
-| Community Detection | 関連モジュールのグループ化 |
+| Call Graph | Track callers and callees |
+| Impact Analysis | Analyze the scope of impact of code changes |
+| Circular Dependencies | Detect circular dependencies |
+| Hotspots | Identify highly connected entities |
+| Community Detection | Group related modules |
 
 ## 18.5 Rust Migration Generator
 
-**C/C++からRustへの移行支援**
+**Support for migrating from C/C++ to Rust**
 
-`RustMigrationGenerator`クラスは、C/C++コードをRustに移行する際のリスク分析を行います。`analyzeRustMigration()`メソッドにファイルパスを渡すと、以下の情報を含む分析結果を返します：
+The `RustMigrationGenerator` class performs risk analysis when migrating C/C++ code to Rust. Pass a file path to the `analyzeRustMigration()` method to get an analysis result containing the following information:
 
-- **`riskScore`**: 移行リスクスコア（0-100）
-- **`unsafePatterns`**: 検出された安全でないパターンの配列
-- **`securityComponents`**: セキュリティ関連コンポーネントの識別
+- **`riskScore`**: Migration risk score (0-100)
+- **`unsafePatterns`**: Array of detected unsafe patterns
+- **`securityComponents`**: Identification of security-related components
 
-### 検出する安全でないパターン（27種類）
+### Detected Unsafe Patterns (27 types)
 
-| カテゴリ | パターン |
+| Category | Patterns |
 |---------|----------|
-| メモリ管理 | malloc, calloc, realloc, free |
-| バッファオーバーフロー | strcpy, strcat, sprintf, gets |
-| ポインタ操作 | ポインタ算術、キャスト、ダブルポインタ |
-| 並行処理 | pthread、volatile誤用 |
-| フォーマット文字列 | 可変フォーマットのprintf |
+| Memory management | malloc, calloc, realloc, free |
+| Buffer overflow | strcpy, strcat, sprintf, gets |
+| Pointer operations | Pointer arithmetic, casts, double pointers |
+| Concurrency | pthread, volatile misuse |
+| Format strings | printf with variable format |
 
-### セキュリティコンポーネント識別
+### Security Component Identification
 
-- スタック保護
-- サニタイザー
-- 暗号化
-- 認証
+- Stack protection
+- Sanitizers
+- Encryption
+- Authentication
 
 ## 18.6 Hierarchical Reporter
 
-**階層的レポート生成**
+**Hierarchical report generation**
 
-`HierarchicalReporter`クラスは、プロジェクトの階層的な分析レポートを生成します。`generateReport()`メソッドにプロジェクトパスとオプションを渡して使用します：
+The `HierarchicalReporter` class generates hierarchical analysis reports for a project. Use it by passing the project path and options to the `generateReport()` method:
 
-- **`format`**: 出力形式（`'markdown'`、`'json'`、`'html'`）
-- **`includeHotspots`**: ホットスポット分析を含めるか
-- **`maxDepth`**: ディレクトリ探索の最大深度
+- **`format`**: Output format (`'markdown'`, `'json'`, `'html'`)
+- **`includeHotspots`**: Whether to include hotspot analysis
+- **`maxDepth`**: Maximum directory traversal depth
 
-### 出力フォーマット
+### Output Formats
 
 - Markdown
 - JSON
 - HTML
 
-### ホットスポット分析
+### Hotspot Analysis
 
-生成されるレポートには、ファイルごとの行数、複雑度、リスクレベル（Critical/Warning/Ideal）を示すホットスポット表が含まれます。
+The generated report includes a hotspot table showing the line count, complexity, and risk level (Critical/Warning/Ideal) for each file.
 
-## 18.7 バージョン履歴
+## 18.7 Version History
 
-| バージョン | リリース日 | 主要機能 |
+| Version | Release Date | Key Features |
 |-----------|-----------|----------|
-| v5.5.0 | 2025-12-10 | Large Project Analyzer、Complexity Analyzer、CodeGraph MCP、Rust Migration Generator、Hierarchical Reporter |
-| v5.6.0 | 2025-12-10 | v5.5.0のlintエラー修正、npm公開 |
+| v5.5.0 | 2025-12-10 | Large Project Analyzer, Complexity Analyzer, CodeGraph MCP, Rust Migration Generator, Hierarchical Reporter |
+| v5.6.0 | 2025-12-10 | Fixed lint errors from v5.5.0, npm publication |
 
-## 18.8 テスト
+## 18.8 Tests
 
-- 75件の新規テスト追加
-- 全3,645テストパス
-- ESLint/Prettier準拠
+- 75 new tests added
+- All 3,645 tests pass
+- ESLint/Prettier compliant
 
 ---
 
-# 第19章 Phase 1-4 エンタープライズ機能：v5.9.0（2025年12月）
+# Chapter 19: Phase 1-4 Enterprise Features: v5.9.0 (December 2025)
 
-## 19.1 背景
+## 19.1 Background
 
-**エンタープライズ開発における柔軟性と管理性の両立**
+**Balancing flexibility and manageability in enterprise development**
 
-大規模プロジェクトでは、固定的なワークフローでは対応しきれない多様なニーズがあります。v5.9.0では、4つのPhaseに分けてエンタープライズ機能を実装しました。
+Large projects have diverse needs that a fixed workflow cannot handle. In v5.9.0, we implemented enterprise features in four Phases.
 
-## 19.2 Phase 1: ワークフロー柔軟性
+## 19.2 Phase 1: Workflow Flexibility
 
-**プロジェクト規模に応じた3つのモード**
+**3 modes according to project size**
 
-新しいCLIコマンド`musubi-release`でリリース自動化を実行できます。`--dry-run`オプションでCHANGELOGの確認のみ行うことも可能です。`musubi-workflow mode --detect`でコミットメッセージからワークフローモードを自動検出します。
+The new CLI command `musubi-release` automates releases. The `--dry-run` option lets you only check the CHANGELOG. `musubi-workflow mode --detect` automatically detects the workflow mode from commit messages.
 
-### 3つのワークフローモード
+### 3 Workflow Modes
 
-| モード | 対象 | ステージ | EARS必須 | カバレッジ |
+| Mode | Target | Stages | EARS Required | Coverage |
 |--------|------|----------|----------|-----------|
-| **small** | バグ修正、typo | requirements → implement → validate | No | 60% |
-| **medium** | 新機能、改善 | requirements → design → tasks → implement → validate | Yes | 80% |
-| **large** | 設計変更、新API | steering → requirements → design → tasks → implement → validate → review → testing | Yes | 90% |
+| **small** | Bug fixes, typos | requirements → implement → validate | No | 60% |
+| **medium** | New features, improvements | requirements → design → tasks → implement → validate | Yes | 80% |
+| **large** | Design changes, new APIs | steering → requirements → design → tasks → implement → validate → review → testing | Yes | 90% |
 
 ### WorkflowModeManager
 
-`WorkflowModeManager`クラスは、プロジェクトパスを指定して初期化します。主要なメソッドは以下の通りです：
+The `WorkflowModeManager` class is initialized by specifying a project path. The main methods are as follows:
 
-- **`detectMode(featureName)`**: フィーチャー名/コミットメッセージからモード（`'small'`/`'medium'`/`'large'`）を自動検出
-- **`getMode(modeName)`**: 指定モードの設定を取得（`stages`配列、`requirements.ears`必須フラグ、`coverage.threshold`カバレッジ閾値など）
+- **`detectMode(featureName)`**: Automatically detect the mode (`'small'`/`'medium'`/`'large'`) from the feature name/commit message
+- **`getMode(modeName)`**: Get the configuration of the specified mode (the `stages` array, the `requirements.ears` required flag, the `coverage.threshold` coverage threshold, etc.)
 
-## 19.3 Phase 2: モノレポ対応
+## 19.3 Phase 2: Monorepo Support
 
-**複数パッケージの依存関係管理**
+**Dependency management across multiple packages**
 
-`steering/packages.yml`ファイルでモノレポのパッケージ構造を定義します。各パッケージには`name`（名前）、`path`（パス）、`dependencies`（依存パッケージ）を指定します。
+Define the monorepo's package structure in the `steering/packages.yml` file. For each package, specify `name`, `path`, and `dependencies` (dependent packages).
 
 ### PackageManager
 
-`PackageManager`クラスは、モノレポのパッケージ管理を行います。プロジェクトパスを指定して初期化し、以下のメソッドを使用します：
+The `PackageManager` class manages packages in a monorepo. Initialize it with a project path and use the following methods:
 
-- **`listPackages()`**: 全パッケージの一覧を取得
-- **`generateDependencyGraph('mermaid')`**: 依存関係グラフをMermaid形式で生成
-- **`validate()`**: パッケージ設定の検証（循環依存チェックなど）
+- **`listPackages()`**: Get a list of all packages
+- **`generateDependencyGraph('mermaid')`**: Generate a dependency graph in Mermaid format
+- **`validate()`**: Validate the package configuration (circular dependency check, etc.)
 
-## 19.4 Phase 3: 憲法レベル管理
+## 19.4 Phase 3: Constitution Level Management
 
-**条項の重要度に応じた柔軟な適用**
+**Flexible application according to the importance of each Article**
 
-`steering/rules/constitution-levels.yml`ファイルで、9つの憲法条項を3つのレベルに分類します：
+In the `steering/rules/constitution-levels.yml` file, the 9 Constitutional Articles are classified into 3 levels:
 
-| レベル | 強制 | 説明 |
+| Level | Enforcement | Description |
 |--------|------|------|
-| **critical** | blocking | 必須。違反時はビルド失敗 |
-| **advisory** | warning | 推奨。違反時は警告 |
-| **flexible** | suggestion | 柔軟。違反時は提案のみ |
+| **critical** | blocking | Required. A violation fails the build |
+| **advisory** | warning | Recommended. A violation produces a warning |
+| **flexible** | suggestion | Flexible. A violation produces only a suggestion |
 
 ### ConstitutionLevelManager
 
-`ConstitutionLevelManager`クラスは、憲法レベルの管理と検証を行います：
+The `ConstitutionLevelManager` class manages and validates Constitution levels:
 
-- **`getSummary()`**: 各レベルの条項一覧を取得（`critical`、`advisory`、`flexible`配列）
-- **`getArticleLevel(articleId)`**: 指定条項のレベルと`isBlocking`フラグを取得
-- **`validateWithLevels(results)`**: 検証結果を渡し、レベルに応じた判定を実行（`passed`フラグ、`blockingFailures`配列を返却）
+- **`getSummary()`**: Get the list of Articles at each level (`critical`, `advisory`, and `flexible` arrays)
+- **`getArticleLevel(articleId)`**: Get the level of the specified Article and the `isBlocking` flag
+- **`validateWithLevels(results)`**: Pass in validation results and perform level-based judgment (returns the `passed` flag and the `blockingFailures` array)
 
-## 19.5 Phase 4: プロジェクト設定
+## 19.5 Phase 4: Project Configuration
 
-**スキーマ検証と自動マイグレーション**
+**Schema validation and automatic migration**
 
-新しいCLIコマンド`musubi-config`で設定管理を行います：
+The new CLI command `musubi-config` manages configuration:
 
-| サブコマンド | 説明 |
+| Subcommand | Description |
 |-------------|------|
-| `validate` | project.ymlのスキーマ検証 |
-| `migrate` | v1.0からv2.0への自動マイグレーション |
-| `show` | 有効な設定（デフォルトとマージ済み）を表示 |
-| `init` | 新規プロジェクト用の設定ファイル作成 |
+| `validate` | Schema validation of project.yml |
+| `migrate` | Automatic migration from v1.0 to v2.0 |
+| `show` | Show the effective configuration (merged with defaults) |
+| `init` | Create a configuration file for a new project |
 
 ### ProjectValidator
 
-`ProjectValidator`クラスは、project.ymlのスキーマ検証とマイグレーションを行います：
+The `ProjectValidator` class performs schema validation and migration of project.yml:
 
-- **`validate()`**: JSON Schemaによる検証（`valid`フラグと`errors`配列を返却）
-- **`needsMigration()`**: v1.0からv2.0へのマイグレーションが必要かチェック
-- **`migrate({ dryRun })`**: マイグレーション実行（`dryRun: true`でプレビュー）
-- **`getEffectiveConfig()`**: デフォルト値とマージした有効な設定を取得
+- **`validate()`**: Validation using JSON Schema (returns the `valid` flag and the `errors` array)
+- **`needsMigration()`**: Check whether migration from v1.0 to v2.0 is needed
+- **`migrate({ dryRun })`**: Run the migration (preview with `dryRun: true`)
+- **`getEffectiveConfig()`**: Get the effective configuration merged with default values
 
-## 19.6 Orchestrator統合
+## 19.6 Orchestrator Integration
 
-**5つの組み込みスキル**
+**5 built-in skills**
 
-v5.9.0では、新機能をOrchestratorから利用できる5つの組み込みスキルが追加されました。各スキルは`execute()`メソッドで実行し、`action`パラメータで操作を指定します：
+v5.9.0 adds 5 built-in skills that make the new features available from the Orchestrator. Run each skill with the `execute()` method and specify the operation with the `action` parameter:
 
-| スキル | 主なアクション | 説明 |
+| Skill | Main Actions | Description |
 |--------|---------------|------|
-| `releaseSkill` | `generate`, `bump` | CHANGELOG生成、バージョン管理 |
-| `workflowModeSkill` | `detect`, `get`, `compare` | モード検出（`detectedMode`を返却） |
-| `packageManagerSkill` | `list`, `graph`, `validate` | 依存グラフ生成（`mermaid`形式） |
-| `constitutionLevelSkill` | `summary`, `validate`, `check` | レベルサマリー取得 |
-| `projectConfigSkill` | `validate`, `migrate`, `show` | 設定検証（`validation.valid`を返却） |
+| `releaseSkill` | `generate`, `bump` | CHANGELOG generation, version management |
+| `workflowModeSkill` | `detect`, `get`, `compare` | Mode detection (returns `detectedMode`) |
+| `packageManagerSkill` | `list`, `graph`, `validate` | Dependency graph generation (`mermaid` format) |
+| `constitutionLevelSkill` | `summary`, `validate`, `check` | Level summary retrieval |
+| `projectConfigSkill` | `validate`, `migrate`, `show` | Configuration validation (returns `validation.valid`) |
 
-### スキルカテゴリ
+### Skill Categories
 
-| カテゴリ | スキル | 用途 |
+| Category | Skill | Purpose |
 |---------|--------|------|
-| **release** | release-manager | CHANGELOG生成、バージョン管理 |
-| **workflow** | workflow-mode-manager | モード検出、設定取得、比較 |
-| **configuration** | package-manager, project-config-manager | パッケージ管理、設定管理 |
-| **validation** | constitution-level-manager | レベル対応検証 |
+| **release** | release-manager | CHANGELOG generation, version management |
+| **workflow** | workflow-mode-manager | Mode detection, configuration retrieval, comparison |
+| **configuration** | package-manager, project-config-manager | Package management, configuration management |
+| **validation** | constitution-level-manager | Level-aware validation |
 
-## 19.7 新規CLIコマンド
+## 19.7 New CLI Commands
 
 ### musubi-release
 
-リリース自動化コマンドです。基本実行でCHANGELOGを自動生成します。`--version`でバージョン指定、`--dry-run`でプレビュー、`--format json`でJSON出力が可能です。
+A release automation command. Running it with no options generates the CHANGELOG automatically. Use `--version` to specify the version, `--dry-run` to preview, and `--format json` for JSON output.
 
 ### musubi-config
 
-プロジェクト設定管理コマンドです。`validate`でスキーマ検証、`migrate`でv2.0へのマイグレーション（`--dry-run`でプレビュー）、`show`で有効設定表示、`init`で新規設定作成を行います。
+A project configuration management command. Use `validate` for schema validation, `migrate` for migration to v2.0 (preview with `--dry-run`), `show` to display the effective configuration, and `init` to create a new configuration.
 
-## 19.8 テスト
+## 19.8 Tests
 
-- 50件の新規テスト追加
-- 全4,408テストパス
-- ESLint/Prettier準拠
+- 50 new tests added
+- All 4,408 tests pass
+- ESLint/Prettier compliant
 
 ---
 
-## 関連リンク
+## Related Links
 
 - [MUSUBI GitHub](https://github.com/nahisaho/MUSUBI)
-- [MUSUHI GitHub](https://github.com/nahisaho/musuhi)（前身プロジェクト）
-- [Spec-Copilot GitHub](https://github.com/nahisaho/spec-copilot)（起源プロジェクト）
+- [MUSUHI GitHub](https://github.com/nahisaho/musuhi) (predecessor project)
+- [Spec-Copilot GitHub](https://github.com/nahisaho/spec-copilot) (origin project)
 - [MUSUBI v5.9.0 Enterprise Features Guide](https://qiita.com/nahisaho/items/musubi-v5-enterprise-features)
 - [MUSUBI v5.6.0 Enterprise Scale Guide](https://qiita.com/nahisaho/items/musubi-v5-enterprise-scale)
 - [MUSUBI v5.4.0 GitHub Reference Guide](https://qiita.com/nahisaho/items/musubi-v5-github-reference)
@@ -2988,10 +2988,10 @@ v5.9.0では、新機能をOrchestratorから利用できる5つの組み込み�
 - [MUSUBI v3.9.0 Guardrails Guide](https://qiita.com/nahisaho/items/musubi-v3-guardrails)
 - [MUSUBI v3.7.0 Integration Guide](https://qiita.com/nahisaho/items/musubi-v3-integration)
 - [MUSUBI v3.6.1 Replanning Guide](https://qiita.com/nahisaho/items/musubi-v3-replanning)
-- [MUSUBI v3.0.0 完全ガイド](https://qiita.com/nahisaho/items/musubi-v3-agents)
-- [MUSUBI v3.5.1 CLI統合ガイド](https://qiita.com/nahisaho/items/musubi-cli-integration)
-- [MUSUBI初心者ガイド](https://qiita.com/nahisaho/items/musubi-beginners-guide)
+- [MUSUBI v3.0.0 Complete Guide](https://qiita.com/nahisaho/items/musubi-v3-agents)
+- [MUSUBI v3.5.1 CLI Integration Guide](https://qiita.com/nahisaho/items/musubi-cli-integration)
+- [MUSUBI Beginner's Guide](https://qiita.com/nahisaho/items/musubi-beginners-guide)
 
-## タグ
+## Tags
 
-`#MUSUBI` `#MUSUHI` `#Spec-Copilot` `#SDD` `#仕様駆動開発` `#AIエージェント` `#ClaudeCode` `#GitHubCopilot` `#MCP` `#Replanning` `#Ollama` `#Guardrails` `#Swarm` `#Orchestration` `#SkillSystem` `#Workflow` `#AgentLoop` `#CodebaseIntelligence` `#QualityDashboard` `#MultiLanguage` `#Rust` `#ODS-RAM` `#GitHubReference` `#PatternDetection` `#EnterpriseScale` `#RustMigration` `#ComplexityAnalysis` `#CodeGraph` `#WorkflowModes` `#Monorepo` `#ConstitutionLevels`
+`#MUSUBI` `#MUSUHI` `#Spec-Copilot` `#SDD` `#SpecDrivenDevelopment` `#AIAgent` `#ClaudeCode` `#GitHubCopilot` `#MCP` `#Replanning` `#Ollama` `#Guardrails` `#Swarm` `#Orchestration` `#SkillSystem` `#Workflow` `#AgentLoop` `#CodebaseIntelligence` `#QualityDashboard` `#MultiLanguage` `#Rust` `#ODS-RAM` `#GitHubReference` `#PatternDetection` `#EnterpriseScale` `#RustMigration` `#ComplexityAnalysis` `#CodeGraph` `#WorkflowModes` `#Monorepo` `#ConstitutionLevels`

@@ -279,7 +279,7 @@ describe('StuckAnalysis', () => {
         loopType: LoopType.ERROR_LOOP,
         loopRepeatTimes: 3,
       });
-      expect(analysis.getMessage()).toContain('3回');
+      expect(analysis.getMessage()).toContain('3 times');
     });
   });
 

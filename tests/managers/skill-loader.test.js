@@ -56,9 +56,9 @@ describe('Skill', () => {
     });
 
     it('should match any trigger in array', () => {
-      const skill = new Skill({ triggers: ['test', 'spec', 'テスト'] });
+      const skill = new Skill({ triggers: ['test', 'spec', 'verify'] });
       expect(skill.matchesTrigger('write a spec')).toBe(true);
-      expect(skill.matchesTrigger('テストを書いて')).toBe(true);
+      expect(skill.matchesTrigger('please verify the output')).toBe(true);
     });
 
     it('should handle invalid regex gracefully', () => {
@@ -261,7 +261,7 @@ Repo version.
 name: testing
 triggers:
   - test
-  - テスト
+  - spec
 ---
 Testing content.
 `
@@ -296,8 +296,8 @@ Coding content.
       expect(skills.length).toBe(0);
     });
 
-    it('should match Japanese keywords', () => {
-      const skills = loader.activateByKeywords('テストを書いて');
+    it('should match any keyword in the trigger list', () => {
+      const skills = loader.activateByKeywords('Write a spec for this feature');
       expect(skills.length).toBe(1);
       expect(skills[0].name).toBe('testing');
     });

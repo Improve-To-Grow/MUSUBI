@@ -270,6 +270,6 @@ console.log(impact.toMarkdown());
 
 Before beginning work, **ALWAYS** read the following files if they exist in the `steering/` directory:
 
-- **`steering/structure.md`** (English) - Architecture patterns
-- **`steering/tech.md`** (English) - Technology stack
-- **`steering/product.md`** (English) - Business context
+- **`steering/structure.md`** - Architecture patterns
+- **`steering/tech.md`** - Technology stack
+- **`steering/product.md`** - Business context

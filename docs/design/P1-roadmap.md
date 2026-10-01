@@ -1,207 +1,207 @@
-# MUSUBI P1 ロードマップ - 機能差別化フェーズ
+# MUSUBI P1 Roadmap - Feature Differentiation Phase
 
-## 概要
+## Overview
 
-本ドキュメントは、MUSUBI v2.5.0 ～ v3.0.0 の P1（High Priority）要件の実装ロードマップを定義します。
+This document defines the implementation roadmap for the P1 (High Priority) requirements of MUSUBI v2.5.0 to v3.0.0.
 
-### P1 要件一覧
+### P1 Requirements List
 
-| ID | 要件名 | 工数 | 依存関係 | ターゲット | 状態 |
+| ID | Requirement | Effort | Dependencies | Target | Status |
 |----|--------|------|----------|-----------|------|
-| REQ-P1-001 | Browser Automation Agent | 4週間 | なし | v3.0.0 | ✅ 完了 |
-| REQ-P1-002 | Web GUI Dashboard | 4週間 | なし | v3.0.0 | ✅ 完了 |
-| REQ-P1-003 | VS Code Extension | 3週間 | なし | v2.2.0 | ✅ 完了 |
-| REQ-P1-004 | Spec Kit Compatibility | 3週間 | なし | v2.2.0 | ✅ 完了 |
+| REQ-P1-001 | Browser Automation Agent | 4 weeks | None | v3.0.0 | ✅ Complete |
+| REQ-P1-002 | Web GUI Dashboard | 4 weeks | None | v3.0.0 | ✅ Complete |
+| REQ-P1-003 | VS Code Extension | 3 weeks | None | v2.2.0 | ✅ Complete |
+| REQ-P1-004 | Spec Kit Compatibility | 3 weeks | None | v2.2.0 | ✅ Complete |
 
-**全 P1 要件完了** 🎉
+**All P1 requirements complete** 🎉
 
-## 完了サマリー
+## Completion Summary
 
 ### REQ-P1-001 Browser Automation Agent ✅
-- **コミット**: af4c26c
-- **成果物**:
-  - `src/agents/browser-agent.js` - Playwright統合
-  - `src/templates/skills/browser-agent.md` - Claude Codeスキル
-  - E2Eテスト生成、スクリーンショット比較機能
+- **Commit**: af4c26c
+- **Deliverables**:
+  - `src/agents/browser-agent.js` - Playwright integration
+  - `src/templates/skills/browser-agent.md` - Claude Code skill
+  - E2E test generation, screenshot comparison features
 
 ### REQ-P1-002 Web GUI Dashboard ✅
-- **コミット**: 9204e3f
-- **成果物**:
+- **Commit**: 9204e3f
+- **Deliverables**:
   - `bin/musubi-gui.js` - CLI (start, dev, status, matrix)
-  - `src/gui/server.js` - Express + WebSocket サーバー
+  - `src/gui/server.js` - Express + WebSocket server
   - `src/gui/services/` - ProjectScanner, FileWatcher, WorkflowService, TraceabilityService
   - REST API: /api/project, /api/specs, /api/traceability, /api/workflow, /api/steering
 
 ### REQ-P1-003 VS Code Extension ✅
-- **公開**: VS Code Marketplace
-- **成果物**:
-  - サイドバー、ステータスバー、コマンドパレット統合
-  - SDDワークフローコマンド
+- **Published**: VS Code Marketplace
+- **Deliverables**:
+  - Sidebar, status bar, command palette integration
+  - SDD workflow commands
 
 ### REQ-P1-004 Spec Kit Compatibility ✅
-- **コミット**: 86b3721
-- **成果物**:
-  - `src/managers/speckit-manager.js` - 変換マネージャー
-  - `musubi-convert` コマンド
-  - MUSUBI ↔ Spec Kit 双方向変換
+- **Commit**: 86b3721
+- **Deliverables**:
+  - `src/managers/speckit-manager.js` - Conversion manager
+  - `musubi-convert` command
+  - MUSUBI ↔ Spec Kit bidirectional conversion
 
 ---
 
-## タイムライン（実績）
+## Timeline (Actual)
 
 ```
 2025 Q1
-├── 1月: REQ-P1-003 VS Code Extension（3週間）
-│   ├── Week 1-2: 基盤 + サイドバー
-│   └── Week 3: ステータスバー + 公開
+├── Jan: REQ-P1-003 VS Code Extension (3 weeks)
+│   ├── Week 1-2: Foundation + sidebar
+│   └── Week 3: Status bar + publishing
 │
-├── 2月: REQ-P1-004 Spec Kit Compatibility（3週間）
-│   ├── Week 1: IR スキーマ + パーサー
-│   ├── Week 2: ライター + マッパー
-│   └── Week 3: 検証 + ラウンドトリップ
+├── Feb: REQ-P1-004 Spec Kit Compatibility (3 weeks)
+│   ├── Week 1: IR schema + parser
+│   ├── Week 2: Writer + mapper
+│   └── Week 3: Validation + round trip
 │
-└── 3月: REQ-P1-001 Browser Automation（4週間）
-    ├── Week 1-2: Playwright 統合
-    └── Week 3-4: スクリーンショット比較 + AI
+└── Mar: REQ-P1-001 Browser Automation (4 weeks)
+    ├── Week 1-2: Playwright integration
+    └── Week 3-4: Screenshot comparison + AI
 
 2025 Q2
-├── 4月: REQ-P1-002 Web GUI Dashboard（4週間）
-│   ├── Week 1-2: サーバー + 基本UI
-│   └── Week 3-4: ビジュアライゼーション
+├── Apr: REQ-P1-002 Web GUI Dashboard (4 weeks)
+│   ├── Week 1-2: Server + basic UI
+│   └── Week 3-4: Visualization
 │
-└── 5月: v3.0.0 リリース準備
-    ├── 統合テスト
-    ├── ドキュメント整備
-    └── リリース
+└── May: v3.0.0 release preparation
+    ├── Integration testing
+    ├── Documentation
+    └── Release
 ```
 
-## 実装順序の根拠
+## Rationale for Implementation Order
 
-### 1. REQ-P1-003 VS Code Extension（最優先）
+### 1. REQ-P1-003 VS Code Extension (Top Priority)
 
-**理由**:
-- ✅ 高インパクト: 開発者の日常ワークフローに直接統合
-- ✅ 中複雑度: 既存 CLI のラッパーとして実装可能
-- ✅ マーケティング効果: Marketplace 公開でリーチ拡大
-- ✅ 依存関係なし: 独立して開発可能
+**Reason**:
+- ✅ High impact: Integrates directly into developers' daily workflow
+- ✅ Medium complexity: Can be implemented as a wrapper around the existing CLI
+- ✅ Marketing effect: Expanded reach through Marketplace publishing
+- ✅ No dependencies: Can be developed independently
 
-**成果物**:
-- VS Code Marketplace 公開
-- サイドバー、ステータスバー、コマンドパレット
+**Deliverables**:
+- Published on VS Code Marketplace
+- Sidebar, status bar, command palette
 
-### 2. REQ-P1-004 Spec Kit Compatibility（2番目）
+### 2. REQ-P1-004 Spec Kit Compatibility (Second)
 
-**理由**:
-- ✅ エコシステム統合: GitHub 公式ツールとの互換性
-- ✅ 移行パス提供: Spec Kit ユーザーの獲得
-- ✅ 技術的学習: 変換システムの知見を他フォーマットに応用可能
-- ✅ 中規模工数: 3週間で完了可能
+**Reason**:
+- ✅ Ecosystem integration: Compatibility with GitHub's official tool
+- ✅ Migration path: Acquire Spec Kit users
+- ✅ Technical learning: Insights from the conversion system can be applied to other formats
+- ✅ Medium effort: Can be completed in 3 weeks
 
-**成果物**:
-- `musubi-convert` コマンド
-- MUSUBI ↔ Spec Kit 双方向変換
+**Deliverables**:
+- `musubi-convert` command
+- MUSUBI ↔ Spec Kit bidirectional conversion
 
-### 3. REQ-P1-001 Browser Automation（3番目）
+### 3. REQ-P1-001 Browser Automation (Third)
 
-**理由**:
-- ✅ 差別化機能: 競合ツールにない独自機能
-- ⚠️ 高複雑度: Playwright 統合、AI スクリーンショット比較
-- ⚠️ 4週間の工数が必要
-- ✅ E2E テスト自動化のニーズは高い
+**Reason**:
+- ✅ Differentiating feature: Unique capability not found in competing tools
+- ⚠️ High complexity: Playwright integration, AI screenshot comparison
+- ⚠️ Requires 4 weeks of effort
+- ✅ High demand for E2E test automation
 
-**成果物**:
-- `browser-agent` Claude Code スキル
-- Playwright テストコード生成
-- スクリーンショット比較（95%+ 精度）
+**Deliverables**:
+- `browser-agent` Claude Code skill
+- Playwright test code generation
+- Screenshot comparison (95%+ accuracy)
 
-### 4. REQ-P1-002 Web GUI Dashboard（最後）
+### 4. REQ-P1-002 Web GUI Dashboard (Last)
 
-**理由**:
-- ✅ CLI/Extension が完成後の補完機能
-- ⚠️ 最大工数: フロントエンド開発が必要
-- ✅ 可視化機能で MUSUBI の価値を直感的に伝達
-- ✅ 他の機能が完成していると UI 統合が容易
+**Reason**:
+- ✅ Complementary feature once CLI/Extension are complete
+- ⚠️ Largest effort: Requires frontend development
+- ✅ Visualization intuitively conveys MUSUBI's value
+- ✅ UI integration is easy once other features are complete
 
-**成果物**:
-- `musubi-gui` コマンド
-- ダッシュボード（localhost:3000）
-- トレーサビリティマトリクス可視化
+**Deliverables**:
+- `musubi-gui` command
+- Dashboard (localhost:3000)
+- Traceability matrix visualization
 
 ---
 
-## REQ-P1-003: VS Code Extension 詳細計画
+## REQ-P1-003: VS Code Extension Detailed Plan
 
-### 設計ドキュメント
+### Design Document
 
 - [ADR-P1-003: VS Code Extension](./adr/ADR-P1-003-vscode-extension.md)
-- [REQ-P1-003 設計書](./REQ-P1-003-vscode-extension-design.md)
+- [REQ-P1-003 Design Document](./REQ-P1-003-vscode-extension-design.md)
 
-### マイルストーン
+### Milestones
 
-| Week | 成果物 | 受入基準 |
+| Week | Deliverable | Acceptance Criteria |
 |------|--------|----------|
-| 1 | プロジェクト基盤 | TypeScript ビルド成功 |
-| 1 | サイドバー TreeView | steering/ 表示 |
-| 2 | ステータスバー | 憲法準拠率表示 |
-| 2 | コマンドパレット | /sdd-* コマンド動作 |
-| 3 | パッケージング | .vsix 生成 |
-| 3 | Marketplace 公開 | "MUSUBI SDD" 公開 |
+| 1 | Project foundation | TypeScript build succeeds |
+| 1 | Sidebar TreeView | steering/ displayed |
+| 2 | Status bar | Constitution compliance rate displayed |
+| 2 | Command palette | /sdd-* commands work |
+| 3 | Packaging | .vsix generated |
+| 3 | Marketplace publishing | "MUSUBI SDD" published |
 
-### 技術スタック
+### Tech Stack
 
-- **言語**: TypeScript 5.x
-- **フレームワーク**: VS Code Extension API
+- **Language**: TypeScript 5.x
+- **Framework**: VS Code Extension API
 - **Webview**: React 18
-- **ビルド**: esbuild
-- **テスト**: @vscode/test-electron
+- **Build**: esbuild
+- **Test**: @vscode/test-electron
 
-### リスク
+### Risks
 
-| リスク | 確率 | 影響 | 対策 |
+| Risk | Probability | Impact | Mitigation |
 |--------|------|------|------|
-| Marketplace 審査遅延 | 中 | 低 | 余裕を持ったスケジュール |
-| API 互換性問題 | 低 | 中 | VS Code 最新安定版をターゲット |
+| Marketplace review delays | Medium | Low | Schedule with buffer |
+| API compatibility issues | Low | Medium | Target the latest stable VS Code |
 
 ---
 
-## REQ-P1-004: Spec Kit Compatibility 詳細計画
+## REQ-P1-004: Spec Kit Compatibility Detailed Plan
 
-### 設計ドキュメント
+### Design Document
 
 - [ADR-P1-004: Spec Kit Compatibility](./adr/ADR-P1-004-speckit-compatibility.md)
-- [REQ-P1-004 設計書](./REQ-P1-004-speckit-compatibility-design.md)
+- [REQ-P1-004 Design Document](./REQ-P1-004-speckit-compatibility-design.md)
 
-### マイルストーン
+### Milestones
 
-| Week | 成果物 | 受入基準 |
+| Week | Deliverable | Acceptance Criteria |
 |------|--------|----------|
-| 1 | IR スキーマ | TypeScript 型定義完了 |
-| 1 | Spec Kit パーサー | constitution.md パース成功 |
-| 2 | MUSUBI ライター | steering/ 生成 |
-| 2 | 憲法マッパー | 9条項マッピング |
-| 2 | 要件マッパー | EARS ↔ User Stories |
-| 3 | CLI 実装 | musubi-convert 動作 |
-| 3 | ラウンドトリップテスト | 95%+ 類似度 |
+| 1 | IR schema | TypeScript type definitions complete |
+| 1 | Spec Kit parser | constitution.md parsing succeeds |
+| 2 | MUSUBI writer | steering/ generated |
+| 2 | Constitution mapper | 9 Articles mapped |
+| 2 | Requirements mapper | EARS ↔ User Stories |
+| 3 | CLI implementation | musubi-convert works |
+| 3 | Round-trip tests | 95%+ similarity |
 
-### 技術スタック
+### Tech Stack
 
-- **言語**: JavaScript (ES Modules)
+- **Language**: JavaScript (ES Modules)
 - **CLI**: Commander.js
-- **パーサー**: marked（Markdown）
-- **テスト**: Jest
+- **Parser**: marked (Markdown)
+- **Test**: Jest
 
-### リスク
+### Risks
 
-| リスク | 確率 | 影響 | 対策 |
+| Risk | Probability | Impact | Mitigation |
 |--------|------|------|------|
-| Spec Kit 仕様変更 | 中 | 中 | バージョン固定、抽象化層 |
-| 情報損失 | 低 | 高 | 徹底的なラウンドトリップテスト |
+| Spec Kit spec changes | Medium | Medium | Version pinning, abstraction layer |
+| Information loss | Low | High | Thorough round-trip tests |
 
 ---
 
-## REQ-P1-001: Browser Automation Agent 詳細計画
+## REQ-P1-001: Browser Automation Agent Detailed Plan
 
-### 概要設計
+### Overview Design
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -219,39 +219,39 @@
 └─────────────────────────────────────────────────────────┘
 ```
 
-### マイルストーン
+### Milestones
 
-| Week | 成果物 | 受入基準 |
+| Week | Deliverable | Acceptance Criteria |
 |------|--------|----------|
-| 1 | Playwright 統合基盤 | ブラウザ起動成功 |
-| 1 | NL コマンドパーサー | 基本操作パース |
-| 2 | ブラウザ操作実装 | click/type/navigate 動作 |
-| 2 | コンテキスト管理 | 複数タブ/ページ対応 |
-| 3 | スクリーンショット取得 | 自動キャプチャ |
-| 3 | AI 比較エンジン | GPT-4V 統合 |
-| 4 | E2E コード生成 | Playwright テスト出力 |
-| 4 | Claude Code スキル登録 | browser-agent 動作 |
+| 1 | Playwright integration foundation | Browser launch succeeds |
+| 1 | NL command parser | Basic operations parsed |
+| 2 | Browser operation implementation | click/type/navigate work |
+| 2 | Context management | Multiple tabs/pages supported |
+| 3 | Screenshot capture | Automatic capture |
+| 3 | AI comparison engine | GPT-4V integration |
+| 4 | E2E code generation | Playwright test output |
+| 4 | Claude Code skill registration | browser-agent works |
 
-### 技術スタック
+### Tech Stack
 
-- **ブラウザ自動化**: Playwright
-- **AI ビジョン**: GPT-4V / Claude 3 Vision
-- **テスト生成**: Playwright Test 形式
-- **スキル統合**: Claude Code Skills API
+- **Browser automation**: Playwright
+- **AI vision**: GPT-4V / Claude 3 Vision
+- **Test generation**: Playwright Test format
+- **Skill integration**: Claude Code Skills API
 
-### リスク
+### Risks
 
-| リスク | 確率 | 影響 | 対策 |
+| Risk | Probability | Impact | Mitigation |
 |--------|------|------|------|
-| AI 比較精度不足 | 中 | 高 | 複数モデル併用、閾値調整 |
-| Playwright バージョン互換 | 低 | 中 | バージョン固定 |
-| コスト（Vision API） | 中 | 中 | キャッシュ、バッチ処理 |
+| Insufficient AI comparison accuracy | Medium | High | Use multiple models, tune thresholds |
+| Playwright version compatibility | Low | Medium | Version pinning |
+| Cost (Vision API) | Medium | Medium | Caching, batch processing |
 
 ---
 
-## REQ-P1-002: Web GUI Dashboard 詳細計画
+## REQ-P1-002: Web GUI Dashboard Detailed Plan
 
-### 概要設計
+### Overview Design
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -275,133 +275,133 @@
 └─────────────────────────────────────────────────────────┘
 ```
 
-### マイルストーン
+### Milestones
 
-| Week | 成果物 | 受入基準 |
+| Week | Deliverable | Acceptance Criteria |
 |------|--------|----------|
-| 1 | Express サーバー | localhost:3000 起動 |
-| 1 | REST API 基盤 | /api/steering GET |
-| 2 | React フロントエンド | ダッシュボード表示 |
-| 2 | ファイルウォッチャー | 変更リアルタイム反映 |
-| 3 | ワークフローエディタ | ドラッグ＆ドロップ |
-| 3 | WebSocket 統合 | ライブアップデート |
-| 4 | トレーサビリティ可視化 | D3.js グラフ |
-| 4 | 統合テスト | E2E テスト通過 |
+| 1 | Express server | localhost:3000 starts |
+| 1 | REST API foundation | /api/steering GET |
+| 2 | React frontend | Dashboard displayed |
+| 2 | File watcher | Changes reflected in real time |
+| 3 | Workflow editor | Drag & drop |
+| 3 | WebSocket integration | Live updates |
+| 4 | Traceability visualization | D3.js graph |
+| 4 | Integration tests | E2E tests pass |
 
-### 技術スタック
+### Tech Stack
 
-- **バックエンド**: Express.js, WebSocket
-- **フロントエンド**: React 18, Tailwind CSS
-- **可視化**: D3.js, React Flow
-- **ビルド**: Vite
-- **テスト**: Playwright (E2E)
+- **Backend**: Express.js, WebSocket
+- **Frontend**: React 18, Tailwind CSS
+- **Visualization**: D3.js, React Flow
+- **Build**: Vite
+- **Test**: Playwright (E2E)
 
-### リスク
+### Risks
 
-| リスク | 確率 | 影響 | 対策 |
+| Risk | Probability | Impact | Mitigation |
 |--------|------|------|------|
-| フロントエンド工数超過 | 中 | 中 | MVP 優先、段階リリース |
-| ブラウザ互換性 | 低 | 低 | 主要ブラウザのみサポート |
+| Frontend effort overrun | Medium | Medium | Prioritize MVP, staged release |
+| Browser compatibility | Low | Low | Support major browsers only |
 
 ---
 
-## マイルストーン・リリース計画
+## Milestones and Release Plan
 
-### v2.5.0（2025年1月末）
+### v2.5.0 (End of January 2025)
 
-**主要機能**: VS Code Extension
-- ✅ VS Code Marketplace 公開
-- ✅ サイドバー TreeView
-- ✅ ステータスバー
-- ✅ コマンドパレット統合
+**Main feature**: VS Code Extension
+- ✅ Published on VS Code Marketplace
+- ✅ Sidebar TreeView
+- ✅ Status bar
+- ✅ Command palette integration
 
-### v2.6.0（2025年2月中旬）
+### v2.6.0 (Mid-February 2025)
 
-**主要機能**: Spec Kit Compatibility
+**Main feature**: Spec Kit Compatibility
 - ✅ musubi-convert CLI
-- ✅ MUSUBI → Spec Kit エクスポート
-- ✅ Spec Kit → MUSUBI インポート
-- ✅ ラウンドトリップ検証
+- ✅ MUSUBI → Spec Kit export
+- ✅ Spec Kit → MUSUBI import
+- ✅ Round-trip validation
 
-### v2.7.0（2025年3月末）
+### v2.7.0 (End of March 2025)
 
-**主要機能**: Browser Automation Agent
-- ✅ browser-agent スキル
-- ✅ Playwright 統合
-- ✅ スクリーンショット比較
-- ✅ E2E テストコード生成
+**Main feature**: Browser Automation Agent
+- ✅ browser-agent skill
+- ✅ Playwright integration
+- ✅ Screenshot comparison
+- ✅ E2E test code generation
 
-### v2.8.0（2025年4月末）
+### v2.8.0 (End of April 2025)
 
-**主要機能**: Web GUI Dashboard
-- ✅ musubi-gui コマンド
-- ✅ ダッシュボード
-- ✅ ワークフローエディタ
-- ✅ トレーサビリティ可視化
+**Main feature**: Web GUI Dashboard
+- ✅ musubi-gui command
+- ✅ Dashboard
+- ✅ Workflow editor
+- ✅ Traceability visualization
 
-### v3.0.0（2025年5月）
+### v3.0.0 (May 2025)
 
-**メジャーリリース**: 全 P1 機能統合
-- 全 P1 機能の統合テスト
-- ドキュメント整備
-- パフォーマンス最適化
-- 正式リリース
+**Major release**: Integration of all P1 features
+- Integration testing of all P1 features
+- Documentation
+- Performance optimization
+- Official release
 
 ---
 
-## リソース計画
+## Resource Plan
 
-### 開発リソース
+### Development Resources
 
-| 役割 | 工数 | 担当フェーズ |
+| Role | Effort | Phase |
 |------|------|-------------|
-| コア開発 | 100% | 全フェーズ |
-| フロントエンド | 40% | P1-002, P1-003 |
-| テスト/QA | 20% | 全フェーズ |
+| Core development | 100% | All phases |
+| Frontend | 40% | P1-002, P1-003 |
+| Testing/QA | 20% | All phases |
 
-### 外部リソース
+### External Resources
 
-| リソース | 用途 | コスト |
+| Resource | Purpose | Cost |
 |----------|------|--------|
-| VS Code Marketplace | 拡張機能公開 | 無料 |
-| GitHub Actions | CI/CD | 無料 (OSS) |
-| OpenAI API | Vision 比較 | 従量課金 |
+| VS Code Marketplace | Extension publishing | Free |
+| GitHub Actions | CI/CD | Free (OSS) |
+| OpenAI API | Vision comparison | Pay-as-you-go |
 
 ---
 
-## 成功指標 (KPI)
+## Success Metrics (KPI)
 
-### P1 完了基準
+### P1 Completion Criteria
 
-| 指標 | ターゲット | 測定方法 |
+| Metric | Target | Measurement Method |
 |------|-----------|----------|
-| VS Code インストール数 | 1,000+ | Marketplace 統計 |
-| Spec Kit 変換成功率 | 95%+ | ラウンドトリップテスト |
-| Browser Agent 精度 | 95%+ | スクリーンショット比較テスト |
-| GUI ユーザー満足度 | 4.0+/5.0 | フィードバック調査 |
+| VS Code installs | 1,000+ | Marketplace statistics |
+| Spec Kit conversion success rate | 95%+ | Round-trip tests |
+| Browser Agent accuracy | 95%+ | Screenshot comparison tests |
+| GUI user satisfaction | 4.0+/5.0 | Feedback survey |
 
-### v3.0.0 リリース基準
+### v3.0.0 Release Criteria
 
-| 基準 | 状態 |
+| Criterion | Status |
 |------|------|
-| 全 P1 要件の受入基準達成 | ☐ |
-| 全ユニットテスト通過 | ☐ |
-| 全統合テスト通過 | ☐ |
-| ドキュメント完備 | ☐ |
-| セキュリティレビュー完了 | ☐ |
+| Acceptance criteria met for all P1 requirements | ☐ |
+| All unit tests pass | ☐ |
+| All integration tests pass | ☐ |
+| Documentation complete | ☐ |
+| Security review complete | ☐ |
 
 ---
 
-## 次のアクション
+## Next Actions
 
-1. **即時**: REQ-P1-003 VS Code Extension 実装開始
-2. **Week 1**: プロジェクト構造作成、TypeScript 設定
-3. **Week 2**: サイドバー TreeView 実装
-4. **Week 3**: Marketplace 公開準備
+1. **Immediate**: Start implementing REQ-P1-003 VS Code Extension
+2. **Week 1**: Create project structure, TypeScript configuration
+3. **Week 2**: Implement sidebar TreeView
+4. **Week 3**: Prepare for Marketplace publishing
 
 ---
 
-## 関連ドキュメント
+## Related Documents
 
 - [SRS v3.0.0](../requirements/srs/srs-musubi-v3.0.0.md)
 - [Project Plan v3.0.0](../plans/project-plan-v3.0.0.md)

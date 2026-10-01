@@ -171,7 +171,7 @@ describe('GapDetector', () => {
       const gaps = detector.detectGaps(links);
       const testGap = gaps.find(g => g.gapType === 'no-test');
 
-      expect(testGap.suggestion).toContain('テスト');
+      expect(testGap.suggestion).toContain('tests');
     });
 
     it('should provide suggestion for no-code gap', () => {
@@ -188,7 +188,7 @@ describe('GapDetector', () => {
       const gaps = detector.detectGaps(links);
       const codeGap = gaps.find(g => g.gapType === 'no-code');
 
-      expect(codeGap.suggestion).toContain('実装');
+      expect(codeGap.suggestion).toContain('implement');
     });
   });
 

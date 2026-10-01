@@ -1,55 +1,55 @@
-# CodeGraph MCP Server セットアップ
+# CodeGraph MCP Server Setup
 
-CodeGraph MCP Server をインストール・設定します。
+Install and configure the CodeGraph MCP Server.
 
-## トリガーフレーズ
+## Trigger Phrases
 
-以下のいずれかのフレーズで実行できます：
+You can run this with any of the following phrases:
 
-- `CodeGraph MCP Server をインストールして`
-- `CodeGraph MCP をインストールして`
-- `CodeGraph MCP を設定して`
-- `CodeGraph をセットアップして`
+- `Install CodeGraph MCP Server`
+- `Install CodeGraph MCP`
+- `Configure CodeGraph MCP`
+- `Set up CodeGraph`
 
-## 自動実行手順
+## Automatic Execution Steps
 
-### 1. Python 環境確認
+### 1. Check Python Environment
 
 ```bash
 python3 --version
 which pipx || which pip3
 ```
 
-### 2. CodeGraph MCP Server インストール
+### 2. Install CodeGraph MCP Server
 
-**pipx がある場合（推奨）:**
+**If pipx is available (recommended):**
 
 ```bash
 pipx install --force codegraph-mcp-server
 ```
 
-**pipx がない場合（venv 使用）:**
+**If pipx is not available (using venv):**
 
 ```bash
 python3 -m venv ~/.codegraph-mcp
 ~/.codegraph-mcp/bin/pip install codegraph-mcp-server
 ```
 
-### 3. プロジェクトのインデックス作成
+### 3. Create the Project Index
 
 ```bash
 codegraph-mcp index . --full
 ```
 
-または venv の場合:
+Or, when using venv:
 
 ```bash
 ~/.codegraph-mcp/bin/codegraph-mcp index . --full
 ```
 
-### 4. VS Code MCP 設定ファイル作成
+### 4. Create the VS Code MCP Configuration File
 
-`.vscode/mcp.json` を作成:
+Create `.vscode/mcp.json`:
 
 ```json
 {
@@ -62,7 +62,7 @@ codegraph-mcp index . --full
 }
 ```
 
-**注意**: pipx ではなく venv を使用した場合は、`command` をフルパスに変更:
+**Note**: If you used venv instead of pipx, change `command` to the full path:
 
 ```json
 {
@@ -75,30 +75,30 @@ codegraph-mcp index . --full
 }
 ```
 
-### 5. 完了メッセージ
+### 5. Completion Message
 
-設定完了後、以下を報告:
+After setup is complete, report the following:
 
-- インデックス結果（Entities, Relations, Files, Communities）
-- 作成した設定ファイル
-- 利用可能な MCP ツール一覧
+- Index results (Entities, Relations, Files, Communities)
+- Configuration files created
+- List of available MCP tools
 
-## 利用可能な CodeGraph MCP ツール
+## Available CodeGraph MCP Tools
 
-| ツール | 説明 |
+| Tool | Description |
 |--------|------|
-| `find_dependencies` | 依存関係分析 |
-| `find_callers` | 呼び出し元追跡 |
-| `find_callees` | 呼び出し先追跡 |
-| `local_search` | ローカルコンテキスト検索 |
-| `global_search` | グローバル検索 |
-| `query_codebase` | 自然言語クエリ |
-| `analyze_module_structure` | モジュール構造分析 |
-| `get_code_snippet` | ソースコード取得 |
-| `stats` | コードベース統計 |
-| `community` | コミュニティ検出 |
+| `find_dependencies` | Dependency analysis |
+| `find_callers` | Caller tracing |
+| `find_callees` | Callee tracing |
+| `local_search` | Local context search |
+| `global_search` | Global search |
+| `query_codebase` | Natural language query |
+| `analyze_module_structure` | Module structure analysis |
+| `get_code_snippet` | Source code retrieval |
+| `stats` | Codebase statistics |
+| `community` | Community detection |
 
-## 関連リンク
+## Related Links
 
 - [CodeGraph MCP Server GitHub](https://github.com/nahisaho/CodeGraphMCPServer)
-- [MUSUBI × CodeGraph 統合ガイド](../docs/Qiita/MUSUBI-CodeGraph-MCP-Integration.md)
+- [MUSUBI × CodeGraph Integration Guide](../docs/Qiita/MUSUBI-CodeGraph-MCP-Integration.md)

@@ -650,7 +650,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * MUSUBI GitHub Client
  * 
- * GitHub API 統合クライアント
+ * GitHub API integration client
  * 
  * @module src/integrations/github-client
  * @see REQ-P0-B006
@@ -659,14 +659,14 @@
 const { Octokit } = <span class="cstat-no" title="statement not covered" >require('@octokit/rest');</span>
 &nbsp;
 /**
- * GitHub API クライアント
+ * GitHub API client
  */
 class GitHubClient {
   /**
    * @param {Object} options
    * @param {string} options.token - GitHub Personal Access Token
-   * @param {string} options.owner - リポジトリオーナー
-   * @param {string} options.repo - リポジトリ名
+   * @param {string} options.owner - Repository owner
+   * @param {string} options.repo - Repository name
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    this.token = options.token || process.env.GITHUB_TOKEN;</span>
@@ -683,7 +683,7 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * Issue を取得
+   * Get an Issue
    * @param {number} issueNumber 
    * @returns {Promise&lt;Object&gt;}
    */
@@ -697,7 +697,7 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * Issue のコメントを取得
+   * Get comments on an Issue
    * @param {number} issueNumber 
    * @returns {Promise&lt;Object[]&gt;}
    */
@@ -711,7 +711,7 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * Issue にコメントを追加
+   * Add a comment to an Issue
    * @param {number} issueNumber 
    * @param {string} body 
    * @returns {Promise&lt;Object&gt;}
@@ -727,7 +727,7 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * Issue にラベルを追加
+   * Add labels to an Issue
    * @param {number} issueNumber 
    * @param {string[]} labels 
    * @returns {Promise&lt;Object&gt;}
@@ -743,20 +743,20 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * ブランチを作成
+   * Create a branch
    * @param {string} branchName 
-   * @param {string} baseBranch - ベースブランチ (default: 'main')
+   * @param {string} baseBranch - Base branch (default: 'main')
    * @returns {Promise&lt;Object&gt;}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync createBranch(branchName, baseBranch = <span class="branch-0 cbranch-no" title="branch not covered" >'main')</span> {
-    // ベースブランチの最新コミットを取得
+    // Get the latest commit of the base branch
     const { data: baseRef } = <span class="cstat-no" title="statement not covered" >await this.octokit.git.getRef({</span>
       owner: this.owner,
       repo: this.repo,
       ref: `heads/${baseBranch}`,
     });
 &nbsp;
-    // 新しいブランチを作成
+    // Create the new branch
     const { data } = <span class="cstat-no" title="statement not covered" >await this.octokit.git.createRef({</span>
       owner: this.owner,
       repo: this.repo,
@@ -768,17 +768,17 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * ファイルを作成/更新
-   * @param {string} path - ファイルパス
-   * @param {string} content - ファイル内容
-   * @param {string} message - コミットメッセージ
-   * @param {string} branch - ブランチ名
+   * Create/update a file
+   * @param {string} path - File path
+   * @param {string} content - File content
+   * @param {string} message - Commit message
+   * @param {string} branch - Branch name
    * @returns {Promise&lt;Object&gt;}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync createOrUpdateFile(path, content, message, branch) {
     let sha;
     
-    // 既存ファイルの SHA を取得（更新の場合に必要）
+    // Get the SHA of the existing file (required for updates)
 <span class="cstat-no" title="statement not covered" >    try {</span>
       const { data: existingFile } = <span class="cstat-no" title="statement not covered" >await this.octokit.repos.getContent({</span>
         owner: this.owner,
@@ -788,7 +788,7 @@ class GitHubClient {
       });
 <span class="cstat-no" title="statement not covered" >      sha = existingFile.sha;</span>
     } catch (e) {
-      // ファイルが存在しない場合は無視
+      // Ignore if the file does not exist
     }
 &nbsp;
     const { data } = <span class="cstat-no" title="statement not covered" >await this.octokit.repos.createOrUpdateFileContents({</span>
@@ -805,13 +805,13 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * Pull Request を作成
+   * Create a Pull Request
    * @param {Object} options
-   * @param {string} options.title - PR タイトル
-   * @param {string} options.body - PR 説明
-   * @param {string} options.head - ソースブランチ
-   * @param {string} options.base - ターゲットブランチ
-   * @param {boolean} options.draft - Draft PR フラグ
+   * @param {string} options.title - PR title
+   * @param {string} options.body - PR description
+   * @param {string} options.head - Source branch
+   * @param {string} options.base - Target branch
+   * @param {boolean} options.draft - Draft PR flag
    * @returns {Promise&lt;Object&gt;}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync createPullRequest(options) {
@@ -829,7 +829,7 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * PR にレビュアーを追加
+   * Add reviewers to a PR
    * @param {number} pullNumber 
    * @param {string[]} reviewers 
    * @returns {Promise&lt;Object&gt;}
@@ -845,7 +845,7 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * Issue を Close
+   * Close an Issue
    * @param {number} issueNumber 
    * @returns {Promise&lt;Object&gt;}
    */
@@ -860,11 +860,11 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * Issue 一覧を取得
+   * Get the Issue list
    * @param {Object} options
-   * @param {string} options.state - 状態 ('open', 'closed', 'all')
-   * @param {string[]} options.labels - フィルタするラベル
-   * @param {number} options.perPage - 1ページあたりの件数
+   * @param {string} options.state - State ('open', 'closed', 'all')
+   * @param {string[]} options.labels - Labels to filter by
+   * @param {number} options.perPage - Number of items per page
    * @returns {Promise&lt;Object[]&gt;}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync listIssues(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -879,7 +879,7 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * リポジトリ情報を取得
+   * Get repository information
    * @returns {Promise&lt;Object&gt;}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync getRepository() {
@@ -891,10 +891,10 @@ class GitHubClient {
   }
 &nbsp;
   /**
-   * GitHub Actions ワークフローを手動実行
-   * @param {string} workflowId - ワークフロー ID またはファイル名
-   * @param {string} ref - ブランチ名
-   * @param {Object} inputs - ワークフロー入力
+   * Manually trigger a GitHub Actions workflow
+   * @param {string} workflowId - Workflow ID or file name
+   * @param {string} ref - Branch name
+   * @param {Object} inputs - Workflow inputs
    * @returns {Promise&lt;void&gt;}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync dispatchWorkflow(workflowId, ref, inputs = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -909,7 +909,7 @@ class GitHubClient {
 }
 &nbsp;
 /**
- * URL からリポジトリ情報を抽出
+ * Extract repository information from a URL
  * @param {string} url 
  * @returns {Object|null}
  */
@@ -925,7 +925,7 @@ function <span class="fstat-no" title="function not covered" >parseGitHubUrl(</s
 }
 &nbsp;
 /**
- * Issue URL から番号を抽出
+ * Extract the number from an Issue URL
  * @param {string} url 
  * @returns {number|null}
  */

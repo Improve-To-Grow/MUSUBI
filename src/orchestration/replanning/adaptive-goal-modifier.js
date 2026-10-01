@@ -1,8 +1,8 @@
 /**
- * AdaptiveGoalModifier - 状況に応じた目標の動的調整
+ * AdaptiveGoalModifier - Dynamic, context-aware goal adjustment
  *
- * Goal-Driven Replanning の完全実装 (Phase 2/3)
- * 目標の優先度・スコープ・タイムライン・成功基準を動的に調整
+ * Full implementation of Goal-Driven Replanning (Phase 2/3)
+ * Dynamically adjusts goal priority, scope, timeline and success criteria
  *
  * @module orchestration/replanning/adaptive-goal-modifier
  */
@@ -10,44 +10,44 @@
 'use strict';
 
 /**
- * 目標調整の理由を分類
+ * Categories of goal modification reasons
  */
 const ModificationReason = {
-  RESOURCE_CONSTRAINT: 'resource_constraint', // リソース制約
-  TIME_CONSTRAINT: 'time_constraint', // 時間制約
-  DEPENDENCY_FAILURE: 'dependency_failure', // 依存関係の失敗
-  PRIORITY_SHIFT: 'priority_shift', // 優先度の変更
-  SCOPE_CREEP: 'scope_creep', // スコープの拡大
-  EXTERNAL_CHANGE: 'external_change', // 外部要因の変化
-  PERFORMANCE_ISSUE: 'performance_issue', // パフォーマンス問題
-  USER_REQUEST: 'user_request', // ユーザーリクエスト
-  STRATEGIC_PIVOT: 'strategic_pivot', // 戦略的転換
+  RESOURCE_CONSTRAINT: 'resource_constraint', // Resource constraint
+  TIME_CONSTRAINT: 'time_constraint', // Time constraint
+  DEPENDENCY_FAILURE: 'dependency_failure', // Dependency failure
+  PRIORITY_SHIFT: 'priority_shift', // Priority change
+  SCOPE_CREEP: 'scope_creep', // Scope expansion
+  EXTERNAL_CHANGE: 'external_change', // External change
+  PERFORMANCE_ISSUE: 'performance_issue', // Performance issue
+  USER_REQUEST: 'user_request', // User request
+  STRATEGIC_PIVOT: 'strategic_pivot', // Strategic pivot
 };
 
 /**
- * 調整タイプ
+ * Modification types
  */
 const ModificationType = {
-  PRIORITY_ADJUSTMENT: 'priority_adjustment', // 優先度調整
-  SCOPE_REDUCTION: 'scope_reduction', // スコープ縮小
-  SCOPE_EXPANSION: 'scope_expansion', // スコープ拡大
-  TIMELINE_EXTENSION: 'timeline_extension', // タイムライン延長
-  TIMELINE_COMPRESSION: 'timeline_compression', // タイムライン圧縮
-  SUCCESS_CRITERIA_RELAXATION: 'criteria_relaxation', // 成功基準緩和
-  SUCCESS_CRITERIA_TIGHTENING: 'criteria_tightening', // 成功基準厳格化
-  GOAL_DECOMPOSITION: 'goal_decomposition', // 目標分解
-  GOAL_MERGE: 'goal_merge', // 目標統合
-  GOAL_DEFERRAL: 'goal_deferral', // 目標延期
-  GOAL_CANCELLATION: 'goal_cancellation', // 目標キャンセル
+  PRIORITY_ADJUSTMENT: 'priority_adjustment', // Priority adjustment
+  SCOPE_REDUCTION: 'scope_reduction', // Scope reduction
+  SCOPE_EXPANSION: 'scope_expansion', // Scope expansion
+  TIMELINE_EXTENSION: 'timeline_extension', // Timeline extension
+  TIMELINE_COMPRESSION: 'timeline_compression', // Timeline compression
+  SUCCESS_CRITERIA_RELAXATION: 'criteria_relaxation', // Relax success criteria
+  SUCCESS_CRITERIA_TIGHTENING: 'criteria_tightening', // Tighten success criteria
+  GOAL_DECOMPOSITION: 'goal_decomposition', // Goal decomposition
+  GOAL_MERGE: 'goal_merge', // Goal merge
+  GOAL_DEFERRAL: 'goal_deferral', // Goal deferral
+  GOAL_CANCELLATION: 'goal_cancellation', // Goal cancellation
 };
 
 /**
- * 影響分析エンジン
- * 目標変更による影響を分析
+ * Impact analysis engine
+ * Analyzes the impact of goal changes
  */
 class ImpactAnalyzer {
   /**
-   * @param {Object} options - 設定オプション
+   * @param {Object} options - Configuration options
    */
   constructor(options = {}) {
     this.config = {
@@ -58,11 +58,11 @@ class ImpactAnalyzer {
   }
 
   /**
-   * 目標変更の影響を分析
-   * @param {Object} goal - 対象目標
-   * @param {Object} modification - 変更内容
-   * @param {Object} context - コンテキスト
-   * @returns {Object} 影響分析結果
+   * Analyze the impact of a goal change
+   * @param {Object} goal - Target goal
+   * @param {Object} modification - Modification details
+   * @param {Object} context - Context
+   * @returns {Object} Impact analysis result
    */
   analyzeImpact(goal, modification, context) {
     const directImpact = this._analyzeDirectImpact(goal, modification);
@@ -92,7 +92,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * 直接的な影響を分析
+   * Analyze direct impact
    * @private
    */
   _analyzeDirectImpact(goal, modification) {
@@ -121,7 +121,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * カスケード影響を分析
+   * Analyze cascade impact
    * @private
    */
   _analyzeCascadeImpact(goal, modification, context) {
@@ -150,7 +150,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * リソース影響を分析
+   * Analyze resource impact
    * @private
    */
   _analyzeResourceImpact(goal, modification, context) {
@@ -172,7 +172,7 @@ class ImpactAnalyzer {
       resourceChanges.required = this._estimateAdditionalResources(goal, modification);
     }
 
-    // リソース競合チェック
+    // Check for resource conflicts
     if (context.resourcePool) {
       resourceChanges.conflicting = this._findConflicts(
         resourceChanges.required,
@@ -188,7 +188,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * タイムライン影響を分析
+   * Analyze timeline impact
    * @private
    */
   _analyzeTimelineImpact(goal, modification, context) {
@@ -217,7 +217,7 @@ class ImpactAnalyzer {
     }
 
     return {
-      score: Math.min(1.0, Math.abs(shift) / 14), // 2週間を基準
+      score: Math.min(1.0, Math.abs(shift) / 14), // Two weeks as the baseline
       shiftDays: shift,
       direction: shift > 0 ? 'delay' : 'accelerate',
       affectedMilestones: affectedMilestones.length,
@@ -225,7 +225,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * 総合影響スコアを計算
+   * Calculate the overall impact score
    * @private
    */
   _calculateTotalImpact(direct, cascade, resource, timeline) {
@@ -233,7 +233,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * リスクレベルを分類
+   * Categorize the risk level
    * @private
    */
   _categorizeRisk(score) {
@@ -244,7 +244,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * 影響を受けるエリアを特定
+   * Identify affected areas
    * @private
    */
   _identifyAffectedAreas(modificationType) {
@@ -265,7 +265,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * 依存関係の影響を計算
+   * Calculate dependency impact
    * @private
    */
   _calculateDependencyImpact(depGoal, modification) {
@@ -280,7 +280,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * カスケードアクションを決定
+   * Determine the cascade action
    * @private
    */
   _determineCascadeAction(impact) {
@@ -290,7 +290,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * 追加リソースを見積もり
+   * Estimate additional resources
    * @private
    */
   _estimateAdditionalResources(goal, modification) {
@@ -303,7 +303,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * リソース競合を検出
+   * Detect resource conflicts
    * @private
    */
   _findConflicts(required, pool) {
@@ -314,7 +314,7 @@ class ImpactAnalyzer {
   }
 
   /**
-   * 推奨事項を生成
+   * Generate recommendations
    * @private
    */
   _generateRecommendations(totalScore, modification) {
@@ -349,12 +349,12 @@ class ImpactAnalyzer {
 }
 
 /**
- * 目標調整ストラテジー
- * 状況に応じた調整戦略を決定
+ * Goal modification strategy
+ * Determines the adjustment strategy for the current situation
  */
 class ModificationStrategy {
   /**
-   * @param {Object} options - 設定オプション
+   * @param {Object} options - Configuration options
    */
   constructor(options = {}) {
     this.config = {
@@ -365,11 +365,11 @@ class ModificationStrategy {
   }
 
   /**
-   * 最適な調整戦略を決定
-   * @param {Object} goal - 対象目標
-   * @param {Object} trigger - トリガー情報
-   * @param {Object} context - コンテキスト
-   * @returns {Object} 調整戦略
+   * Determine the best modification strategy
+   * @param {Object} goal - Target goal
+   * @param {Object} trigger - Trigger information
+   * @param {Object} context - Context
+   * @returns {Object} Modification strategy
    */
   determineStrategy(goal, trigger, context) {
     const strategies = this._generateCandidateStrategies(goal, trigger, context);
@@ -389,7 +389,7 @@ class ModificationStrategy {
   }
 
   /**
-   * 候補戦略を生成
+   * Generate candidate strategies
    * @private
    */
   _generateCandidateStrategies(goal, trigger, _context) {
@@ -455,37 +455,37 @@ class ModificationStrategy {
   }
 
   /**
-   * 戦略を評価
+   * Evaluate a strategy
    * @private
    */
   _evaluateStrategy(strategy, goal, _context) {
-    let score = 0.5; // ベーススコア
+    let score = 0.5; // Base score
 
-    // 目標優先度との整合性
+    // Alignment with goal priority
     if (goal.priority === 'critical' && strategy.preservesCore) {
       score += 0.2;
     }
 
-    // リソース効率
+    // Resource efficiency
     if (strategy.resourceEfficiency === 'high') {
       score += 0.15;
     }
 
-    // リスクレベル
+    // Risk level
     score -= strategy.riskLevel === 'high' ? 0.2 : strategy.riskLevel === 'medium' ? 0.1 : 0;
 
-    // 保守的モードの場合
+    // Conservative mode
     if (this.config.conservativeMode && strategy.conservative) {
       score += 0.1;
     }
 
-    // 実現可能性
+    // Feasibility
     score += strategy.feasibility * 0.15;
 
     return Math.max(0, Math.min(1, score));
   }
 
-  // 戦略生成メソッド群
+  // Strategy factory methods
   _createScopeReductionStrategy(goal, _trigger) {
     return {
       type: ModificationType.SCOPE_REDUCTION,
@@ -591,7 +591,7 @@ class ModificationStrategy {
   }
 
   /**
-   * 削減対象を特定
+   * Identify reduction targets
    * @private
    */
   _identifyReductionTargets(goal) {
@@ -606,7 +606,7 @@ class ModificationStrategy {
   }
 
   /**
-   * サブゴールを提案
+   * Suggest sub-goals
    * @private
    */
   _suggestSubGoals(goal) {
@@ -621,12 +621,12 @@ class ModificationStrategy {
 }
 
 /**
- * 調整履歴マネージャー
- * 目標調整の履歴を管理・分析
+ * Modification history manager
+ * Tracks and analyzes goal modification history
  */
 class ModificationHistoryManager {
   /**
-   * @param {Object} options - 設定オプション
+   * @param {Object} options - Configuration options
    */
   constructor(options = {}) {
     this.history = new Map();
@@ -637,10 +637,10 @@ class ModificationHistoryManager {
   }
 
   /**
-   * 調整を記録
-   * @param {string} goalId - 目標ID
-   * @param {Object} modification - 調整内容
-   * @param {Object} impact - 影響分析結果
+   * Record a modification
+   * @param {string} goalId - Goal ID
+   * @param {Object} modification - Modification details
+   * @param {Object} impact - Impact analysis result
    */
   recordModification(goalId, modification, impact) {
     if (!this.history.has(goalId)) {
@@ -656,25 +656,25 @@ class ModificationHistoryManager {
       status: 'applied',
     });
 
-    // 履歴サイズ制限
+    // Enforce history size limit
     if (history.length > this.config.maxHistoryPerGoal) {
       history.shift();
     }
   }
 
   /**
-   * 目標の調整履歴を取得
-   * @param {string} goalId - 目標ID
-   * @returns {Array} 調整履歴
+   * Get the modification history of a goal
+   * @param {string} goalId - Goal ID
+   * @returns {Array} Modification history
    */
   getHistory(goalId) {
     return this.history.get(goalId) || [];
   }
 
   /**
-   * 調整パターンを分析
-   * @param {string} goalId - 目標ID
-   * @returns {Object} パターン分析結果
+   * Analyze modification patterns
+   * @param {string} goalId - Goal ID
+   * @returns {Object} Pattern analysis result
    */
   analyzePatterns(goalId) {
     const history = this.getHistory(goalId);
@@ -728,10 +728,10 @@ class ModificationHistoryManager {
   }
 
   /**
-   * 調整をロールバック
-   * @param {string} goalId - 目標ID
-   * @param {string} modificationId - 調整ID
-   * @returns {Object|null} ロールバックされた調整
+   * Roll back a modification
+   * @param {string} goalId - Goal ID
+   * @param {string} modificationId - Modification ID
+   * @returns {Object|null} The rolled-back modification
    */
   rollback(goalId, modificationId) {
     const history = this.history.get(goalId);
@@ -750,11 +750,11 @@ class ModificationHistoryManager {
 
 /**
  * AdaptiveGoalModifier
- * 状況に応じた目標の動的調整を行うメインクラス
+ * Main class for dynamic, context-aware goal adjustment
  */
 class AdaptiveGoalModifier {
   /**
-   * @param {Object} options - 設定オプション
+   * @param {Object} options - Configuration options
    */
   constructor(options = {}) {
     this.impactAnalyzer = new ImpactAnalyzer(options.impact);
@@ -774,9 +774,9 @@ class AdaptiveGoalModifier {
   }
 
   /**
-   * 目標を登録
-   * @param {Object} goal - 目標定義
-   * @returns {Object} 登録された目標
+   * Register a goal
+   * @param {Object} goal - Goal definition
+   * @returns {Object} The registered goal
    */
   registerGoal(goal) {
     const normalizedGoal = {
@@ -800,10 +800,10 @@ class AdaptiveGoalModifier {
   }
 
   /**
-   * 目標調整をトリガー
-   * @param {string} goalId - 目標ID
-   * @param {Object} trigger - トリガー情報
-   * @returns {Promise<Object>} 調整結果
+   * Trigger a goal modification
+   * @param {string} goalId - Goal ID
+   * @param {Object} trigger - Trigger information
+   * @returns {Promise<Object>} Modification result
    */
   async triggerModification(goalId, trigger) {
     const goal = this.goals.get(goalId);
@@ -811,13 +811,13 @@ class AdaptiveGoalModifier {
       throw new Error(`Goal not found: ${goalId}`);
     }
 
-    // コンテキスト構築
+    // Build context
     const context = this._buildContext(goalId);
 
-    // 戦略決定
+    // Determine strategy
     const strategyResult = this.strategy.determineStrategy(goal, trigger, context);
 
-    // 影響分析
+    // Analyze impact
     const impact = this.impactAnalyzer.analyzeImpact(
       goal,
       { type: strategyResult.recommended.type, ...strategyResult.recommended },
@@ -836,7 +836,7 @@ class AdaptiveGoalModifier {
       createdAt: new Date().toISOString(),
     };
 
-    // 自動承認チェック
+    // Auto-approval check
     if (
       !this.config.requireApproval ||
       (strategyResult.autoApprovable && impact.totalScore < this.config.autoModifyThreshold)
@@ -844,7 +844,7 @@ class AdaptiveGoalModifier {
       return this._applyModification(modification);
     }
 
-    // 承認待ち
+    // Awaiting approval
     this.pendingModifications.set(modification.id, modification);
     this._emit('modification_pending', modification);
 
@@ -856,9 +856,9 @@ class AdaptiveGoalModifier {
   }
 
   /**
-   * 調整を承認
-   * @param {string} modificationId - 調整ID
-   * @returns {Object} 適用結果
+   * Approve a modification
+   * @param {string} modificationId - Modification ID
+   * @returns {Object} Application result
    */
   approveModification(modificationId) {
     const modification = this.pendingModifications.get(modificationId);
@@ -871,10 +871,10 @@ class AdaptiveGoalModifier {
   }
 
   /**
-   * 調整を拒否
-   * @param {string} modificationId - 調整ID
-   * @param {string} reason - 拒否理由
-   * @returns {Object} 拒否結果
+   * Reject a modification
+   * @param {string} modificationId - Modification ID
+   * @param {string} reason - Rejection reason
+   * @returns {Object} Rejection result
    */
   rejectModification(modificationId, reason) {
     const modification = this.pendingModifications.get(modificationId);
@@ -897,7 +897,7 @@ class AdaptiveGoalModifier {
   }
 
   /**
-   * 調整を適用
+   * Apply a modification
    * @private
    */
   _applyModification(modification) {
@@ -909,7 +909,7 @@ class AdaptiveGoalModifier {
     const strategy = modification.strategy;
     const previousState = { ...goal };
 
-    // タイプに応じた調整適用
+    // Apply the modification according to its type
     switch (strategy.type) {
       case ModificationType.PRIORITY_ADJUSTMENT:
         goal.priority = strategy.newPriority;
@@ -956,7 +956,7 @@ class AdaptiveGoalModifier {
         break;
 
       case ModificationType.GOAL_DECOMPOSITION:
-        // サブゴール作成
+        // Create sub-goals
         for (const subGoal of strategy.suggestedSubGoals || []) {
           this.registerGoal({
             ...subGoal,
@@ -978,11 +978,11 @@ class AdaptiveGoalModifier {
         break;
     }
 
-    // メタデータ更新
+    // Update metadata
     goal.modificationCount++;
     goal.lastModifiedAt = new Date().toISOString();
 
-    // 履歴記録
+    // Record history
     this.historyManager.recordModification(
       modification.goalId,
       { ...modification, previousState },
@@ -1008,7 +1008,7 @@ class AdaptiveGoalModifier {
   }
 
   /**
-   * コンテキストを構築
+   * Build context
    * @private
    */
   _buildContext(goalId) {
@@ -1021,26 +1021,26 @@ class AdaptiveGoalModifier {
   }
 
   /**
-   * 目標を取得
-   * @param {string} goalId - 目標ID
-   * @returns {Object|undefined} 目標
+   * Get a goal
+   * @param {string} goalId - Goal ID
+   * @returns {Object|undefined} The goal
    */
   getGoal(goalId) {
     return this.goals.get(goalId);
   }
 
   /**
-   * 全目標を取得
-   * @returns {Array} 全目標リスト
+   * Get all goals
+   * @returns {Array} List of all goals
    */
   getAllGoals() {
     return Array.from(this.goals.values());
   }
 
   /**
-   * 目標の調整履歴を取得
-   * @param {string} goalId - 目標ID
-   * @returns {Object} 履歴と分析
+   * Get the modification history of a goal
+   * @param {string} goalId - Goal ID
+   * @returns {Object} History and analysis
    */
   getGoalHistory(goalId) {
     return {
@@ -1050,17 +1050,17 @@ class AdaptiveGoalModifier {
   }
 
   /**
-   * 保留中の調整を取得
-   * @returns {Array} 保留中の調整リスト
+   * Get pending modifications
+   * @returns {Array} List of pending modifications
    */
   getPendingModifications() {
     return Array.from(this.pendingModifications.values());
   }
 
   /**
-   * イベントハンドラーを登録
-   * @param {string} event - イベント名
-   * @param {Function} handler - ハンドラー関数
+   * Register an event handler
+   * @param {string} event - Event name
+   * @param {Function} handler - Handler function
    */
   on(event, handler) {
     if (!this.eventHandlers.has(event)) {
@@ -1070,7 +1070,7 @@ class AdaptiveGoalModifier {
   }
 
   /**
-   * イベントを発火
+   * Emit an event
    * @private
    */
   _emit(event, data) {
@@ -1085,10 +1085,10 @@ class AdaptiveGoalModifier {
   }
 
   /**
-   * 調整提案を生成
-   * @param {string} goalId - 目標ID
-   * @param {Object} currentState - 現在の状態
-   * @returns {Object} 調整提案
+   * Generate modification suggestions
+   * @param {string} goalId - Goal ID
+   * @param {Object} currentState - Current state
+   * @returns {Object} Modification suggestions
    */
   generateSuggestions(goalId, currentState) {
     const goal = this.goals.get(goalId);
@@ -1099,7 +1099,7 @@ class AdaptiveGoalModifier {
     const suggestions = [];
     const patterns = this.historyManager.analyzePatterns(goalId);
 
-    // 進捗ベースの提案
+    // Progress-based suggestions
     if (currentState.progress < 0.3 && currentState.timeElapsed > 0.5) {
       suggestions.push({
         trigger: { reason: ModificationReason.TIME_CONSTRAINT, gap: 0.2 },
@@ -1108,7 +1108,7 @@ class AdaptiveGoalModifier {
       });
     }
 
-    // リソースベースの提案
+    // Resource-based suggestions
     if (currentState.resourceUtilization > 0.9) {
       suggestions.push({
         trigger: { reason: ModificationReason.RESOURCE_CONSTRAINT },
@@ -1117,7 +1117,7 @@ class AdaptiveGoalModifier {
       });
     }
 
-    // パターンベースの提案
+    // Pattern-based suggestions
     if (patterns.insights?.some(i => i.type === 'volatility')) {
       suggestions.push({
         trigger: { reason: ModificationReason.SCOPE_CREEP },

@@ -1,88 +1,88 @@
-# MUSUBI 改善プラン v0.8
+# MUSUBI Improvement Plan v0.8
 
-**作成日**: 2025-12-12
-**ソース**: References/requirements/requirement-cobol2java-20251212.md
-**ステータス**: ✅ Phase 1-4 実装完了
+**Created**: 2025-12-12
+**Source**: References/requirements/requirement-cobol2java-20251212.md
+**Status**: ✅ Phase 1-4 implementation complete
 
 ---
 
-## 実装状況
+## Implementation Status
 
-| Phase | 内容 | ステータス | 完了日 |
+| Phase | Content | Status | Completed |
 |-------|------|----------|--------|
-| Phase 1 | ワークフロー柔軟性 + プロンプト | ✅ 完了 | 2025-12-12 |
-| Phase 2 | Monorepo対応強化 | ✅ 完了 | 2025-12-12 |
-| Phase 3 | Constitution段階化 | ✅ 完了 | 2025-12-12 |
-| Phase 4 | project.yml拡張 | ✅ 完了 | 2025-12-12 |
-| Phase 5 | LLMプロジェクト対応 | ⏳ 未着手 | - |
+| Phase 1 | Workflow flexibility + prompts | ✅ Complete | 2025-12-12 |
+| Phase 2 | Enhanced Monorepo support | ✅ Complete | 2025-12-12 |
+| Phase 3 | Constitution leveling | ✅ Complete | 2025-12-12 |
+| Phase 4 | project.yml extension | ✅ Complete | 2025-12-12 |
+| Phase 5 | LLM project support | ⏳ Not Started | - |
 
-### 作成されたファイル
+### Files Created
 
-**Phase 1: ワークフロー柔軟性**
-- `steering/rules/workflow-modes.yml` - ワークフローモード定義
-- `src/managers/workflow-mode-manager.js` - モード管理クラス
-- `src/generators/changelog-generator.js` - CHANGELOG生成
-- `bin/musubi-release.js` - リリースCLIコマンド
-- `tests/workflow-modes.test.js` - テスト
+**Phase 1: Workflow Flexibility**
+- `steering/rules/workflow-modes.yml` - Workflow mode definitions
+- `src/managers/workflow-mode-manager.js` - Mode management class
+- `src/generators/changelog-generator.js` - CHANGELOG generation
+- `bin/musubi-release.js` - Release CLI command
+- `tests/workflow-modes.test.js` - Tests
 
-**Phase 2: Monorepo対応**
-- `steering/packages.yml` - パッケージ設定
-- `src/managers/package-manager.js` - パッケージ管理クラス
-- `tests/package-manager.test.js` - テスト
+**Phase 2: Monorepo Support**
+- `steering/packages.yml` - Package configuration
+- `src/managers/package-manager.js` - Package management class
+- `tests/package-manager.test.js` - Tests
 
-**Phase 3: Constitution段階化**
-- `steering/rules/constitution-levels.yml` - レベル定義
-- `src/validators/constitution-level-manager.js` - レベル管理クラス
-- `tests/constitution-levels.test.js` - テスト
-- `src/validators/constitutional-validator.js` (更新) - レベル対応
+**Phase 3: Constitution Leveling**
+- `steering/rules/constitution-levels.yml` - Level definitions
+- `src/validators/constitution-level-manager.js` - Level management class
+- `tests/constitution-levels.test.js` - Tests
+- `src/validators/constitutional-validator.js` (updated) - Level support
 
-**Phase 4: project.yml拡張**
-- `src/schemas/project-schema.json` - JSONスキーマ (v2.0)
-- `src/validators/project-validator.js` - バリデーター
-- `bin/musubi-config.js` - 設定CLIコマンド
-- `tests/project-validator.test.js` - テスト
-
----
-
-## エグゼクティブサマリー
-
-COBOL2Javaプロジェクトでの実践を通じて発見された改善要件に基づき、MUSUBIフレームワークの次期バージョン（v0.8）の改善プランを策定します。
-
-### 主要な改善領域
-
-1. **ワークフローの柔軟性** - 機能規模に応じたライトウェイトモード
-2. **Monorepo対応の強化** - モダンなパッケージ構成のサポート
-3. **プロンプトの拡張** - リリース・ベンチマーク・セキュリティ対応
-4. **Constitutional Governanceの段階化** - レベル別の適用
-5. **project.yml の拡張** - 機械可読な設定の充実
-6. **LLMプロジェクト対応** - AI/ML特有のニーズへの対応
+**Phase 4: project.yml Extension**
+- `src/schemas/project-schema.json` - JSON schema (v2.0)
+- `src/validators/project-validator.js` - Validator
+- `bin/musubi-config.js` - Configuration CLI command
+- `tests/project-validator.test.js` - Tests
 
 ---
 
-## Phase 1: ワークフローとプロンプトの改善（優先度：高）
+## Executive Summary
 
-### 1.1 ライトウェイトワークフローモード
+Based on improvement requirements discovered through hands-on use in the COBOL2Java project, we are drafting an improvement plan for the next version (v0.8) of the MUSUBI framework.
 
-**課題**: 8段階ワークフローが小規模機能には過剰
+### Key Improvement Areas
 
-**改善内容**:
+1. **Workflow flexibility** - Lightweight modes scaled to feature size
+2. **Enhanced Monorepo support** - Support for modern package structures
+3. **Prompt extensions** - Release, benchmark, and security support
+4. **Tiered Constitutional Governance** - Level-based application
+5. **project.yml extension** - Richer machine-readable configuration
+6. **LLM project support** - Addressing AI/ML-specific needs
+
+---
+
+## Phase 1: Workflow and Prompt Improvements (Priority: High)
+
+### 1.1 Lightweight Workflow Modes
+
+**Problem**: The 8-stage workflow is excessive for small features
+
+**Improvements**:
 
 ```yaml
 # steering/rules/workflow-modes.yml
 workflow_modes:
   small:
-    description: "1-2時間の作業（バグ修正、小機能）"
+    description: "1-2 hours of work (bug fixes, small features)"
     stages:
-      - requirements   # 簡易要件定義
-      - implement      # 実装
-      - validate       # 検証
+      - requirements   # Simplified requirements definition
+      - implement      # Implementation
+      - validate       # Validation
     skip_artifacts:
       - design.md
       - tasks.md
     coverage_threshold: 60%
     
   medium:
-    description: "1-2日の作業（中規模機能）"
+    description: "1-2 days of work (medium-sized features)"
     stages:
       - requirements
       - design
@@ -92,9 +92,9 @@ workflow_modes:
     coverage_threshold: 70%
     
   large:
-    description: "1週間以上（大規模機能、新モジュール）"
+    description: "1 week or more (large features, new modules)"
     stages:
-      - steering       # プロジェクト記憶更新
+      - steering       # Update project memory
       - requirements
       - design
       - tasks
@@ -104,73 +104,73 @@ workflow_modes:
     coverage_threshold: 80%
 ```
 
-**実装タスク**:
+**Implementation tasks**:
 
-| タスク | ファイル | 工数 |
+| Task | File | Effort |
 |--------|----------|------|
-| ワークフローモード定義 | `steering/rules/workflow-modes.yml` | 2h |
-| ワークフローエージェント更新 | `src/agents/workflow-navigator.js` | 4h |
-| プロンプト拡張 | `packages/vscode-extension/src/prompts/` | 2h |
-| ドキュメント更新 | `docs/USER-GUIDE.md` | 2h |
-| テスト追加 | `tests/workflow-modes.test.js` | 3h |
+| Workflow mode definition | `steering/rules/workflow-modes.yml` | 2h |
+| Update workflow agent | `src/agents/workflow-navigator.js` | 4h |
+| Prompt extensions | `packages/vscode-extension/src/prompts/` | 2h |
+| Documentation update | `docs/USER-GUIDE.md` | 2h |
+| Add tests | `tests/workflow-modes.test.js` | 3h |
 
-### 1.2 新規プロンプトの追加
+### 1.2 Adding New Prompts
 
-**課題**: リリース、セキュリティ、ベンチマークプロセスがない
+**Problem**: No release, security, or benchmark processes
 
-**追加プロンプト**:
+**Prompts to add**:
 
-| プロンプト | 目的 | 実装優先度 |
+| Prompt | Purpose | Implementation Priority |
 |-----------|------|------------|
-| `#sdd-release` | npm/Docker公開、CHANGELOG更新、タグ付け | 🔴 高 |
-| `#sdd-implement-test` | テストのみ実装（TDD Red Phase） | 🔴 高 |
-| `#sdd-implement-code` | コードのみ実装（TDD Green Phase） | 🔴 高 |
-| `#sdd-security` | セキュリティ監査 | 🟡 中 |
-| `#sdd-benchmark` | パフォーマンスベンチマーク | 🟡 中 |
-| `#sdd-migrate` | 破壊的変更のマイグレーション | 🟢 低 |
+| `#sdd-release` | npm/Docker publishing, CHANGELOG update, tagging | 🔴 High |
+| `#sdd-implement-test` | Implement tests only (TDD Red Phase) | 🔴 High |
+| `#sdd-implement-code` | Implement code only (TDD Green Phase) | 🔴 High |
+| `#sdd-security` | Security audit | 🟡 Medium |
+| `#sdd-benchmark` | Performance benchmark | 🟡 Medium |
+| `#sdd-migrate` | Migration for breaking changes | 🟢 Low |
 
-**#sdd-release プロンプト仕様**:
+**#sdd-release Prompt Specification**:
 
 ```markdown
 ## #sdd-release
 
-### 使用方法
+### Usage
 #sdd-release <version-type>
 
-### パラメータ
+### Parameters
 - version-type: patch | minor | major | <specific-version>
 
-### 実行内容
-1. バージョン番号の更新（package.json, project.yml）
-2. CHANGELOG.md の自動生成
-3. npm publish / Docker push の実行
-4. Git タグの作成とプッシュ
-5. GitHub Release の作成（オプション）
+### Execution Steps
+1. Update version numbers (package.json, project.yml)
+2. Auto-generate CHANGELOG.md
+3. Run npm publish / Docker push
+4. Create and push Git tag
+5. Create GitHub Release (optional)
 
-### 前提条件
-- すべてのテストがパス
-- カバレッジ基準を満たす
-- 未コミットの変更がない
+### Prerequisites
+- All tests pass
+- Coverage criteria met
+- No uncommitted changes
 ```
 
-**実装タスク**:
+**Implementation tasks**:
 
-| タスク | ファイル | 工数 |
+| Task | File | Effort |
 |--------|----------|------|
-| release プロンプト実装 | `src/agents/release-manager.js` | 6h |
-| implement-test/code 分割 | `src/agents/software-developer.js` | 4h |
-| CHANGELOG生成ロジック | `src/generators/changelog-generator.js` | 4h |
-| テスト追加 | `tests/release.test.js` | 3h |
+| Implement release prompt | `src/agents/release-manager.js` | 6h |
+| Split implement-test/code | `src/agents/software-developer.js` | 4h |
+| CHANGELOG generation logic | `src/generators/changelog-generator.js` | 4h |
+| Add tests | `tests/release.test.js` | 3h |
 
 ---
 
-## Phase 2: Monorepo対応の強化（優先度：高）
+## Phase 2: Enhanced Monorepo Support (Priority: High)
 
-### 2.1 packages.yml の導入
+### 2.1 Introducing packages.yml
 
-**課題**: `lib/{feature}/` 固定パスがモダンなMonorepoに合わない
+**Problem**: The fixed `lib/{feature}/` path does not fit modern Monorepos
 
-**改善内容**:
+**Improvements**:
 
 ```yaml
 # steering/packages.yml
@@ -216,57 +216,57 @@ packages:
     dependencies:
       - "@musubi/core"
 
-# パッケージ間依存グラフの自動生成
+# Auto-generate inter-package dependency graph
 dependency_graph:
   enabled: true
   output: docs/architecture/dependency-graph.md
 ```
 
-**実装タスク**:
+**Implementation tasks**:
 
-| タスク | ファイル | 工数 |
+| Task | File | Effort |
 |--------|----------|------|
-| packages.yml スキーマ定義 | `src/schemas/packages-schema.json` | 2h |
-| パッケージローダー | `src/managers/package-manager.js` | 6h |
-| 依存グラフ生成 | `src/analyzers/dependency-graph.js` | 4h |
-| カバレッジ集計 | `src/validators/coverage-validator.js` | 4h |
-| テスト追加 | `tests/packages.test.js` | 3h |
+| packages.yml schema definition | `src/schemas/packages-schema.json` | 2h |
+| Package loader | `src/managers/package-manager.js` | 6h |
+| Dependency graph generation | `src/analyzers/dependency-graph.js` | 4h |
+| Coverage aggregation | `src/validators/coverage-validator.js` | 4h |
+| Add tests | `tests/packages.test.js` | 3h |
 
-### 2.2 パッケージタイプ別テンプレート
+### 2.2 Templates by Package Type
 
-**新規テンプレート**:
+**New templates**:
 
 ```
 steering/templates/packages/
-├── library/           # ライブラリテンプレート
+├── library/           # Library template
 │   ├── package.json
 │   ├── tsconfig.json
 │   └── jest.config.js
-├── cli/               # CLIテンプレート
+├── cli/               # CLI template
 │   ├── package.json
 │   └── bin/
-├── application/       # アプリケーションテンプレート
+├── application/       # Application template
 │   └── package.json
-└── extension/         # VSCode拡張テンプレート
+└── extension/         # VSCode extension template
     └── package.json
 ```
 
 ---
 
-## Phase 3: Constitutional Governance の段階化（優先度：中）
+## Phase 3: Tiered Constitutional Governance (Priority: Medium)
 
-### 3.1 Constitution レベル分け
+### 3.1 Constitution Levels
 
-**課題**: 9条すべてを常時チェックは重い、Article IX（モック禁止）が厳しすぎる
+**Problem**: Checking all 9 Articles at all times is heavy, and Article IX (no mocks) is too strict
 
-**改善内容**:
+**Improvements**:
 
 ```yaml
 # steering/rules/constitution-levels.yml
 constitution:
   levels:
     critical:
-      description: "違反時はブロック（必須）"
+      description: "Blocks on violation (required)"
       enforcement: block
       articles:
         - name: Article I - Library-First Principle
@@ -280,25 +280,25 @@ constitution:
           required: true
           
     advisory:
-      description: "違反時は警告のみ"
+      description: "Warning only on violation"
       enforcement: warn
       articles:
         - name: Article II - CLI Interface Mandate
           id: CONST-002
-          reason: "内部ライブラリにはCLI不要な場合がある"
+          reason: "Internal libraries may not need a CLI"
         - name: Article IX - Real Service Testing
           id: CONST-009
-          reason: "LLM/外部API呼び出しのモックは許容"
+          reason: "Mocking LLM/external API calls is acceptable"
           
     flexible:
-      description: "プロジェクト設定で上書き可能"
+      description: "Can be overridden in project settings"
       enforcement: configurable
       settings:
         coverage_threshold:
           default: 80
           min: 50
           max: 100
-          per_package: true  # パッケージ別設定可能
+          per_package: true  # Configurable per package
         mock_allowed:
           default: false
           exceptions:
@@ -306,9 +306,9 @@ constitution:
             - external_apis
             - payment_services
 
-# プロジェクト別オーバーライド
+# Per-project override
 project_overrides:
-  # steering/project.yml で上書き可能
+  # Can be overridden in steering/project.yml
   example:
     coverage_threshold: 70
     mock_allowed:
@@ -316,32 +316,32 @@ project_overrides:
       - "@anthropic/sdk"
 ```
 
-### 3.2 パッケージタイプ別カバレッジ基準
+### 3.2 Coverage Criteria by Package Type
 
-| パッケージタイプ | デフォルト基準 | 理由 |
+| Package Type | Default Criteria | Reason |
 |------------------|----------------|------|
-| `library` (core) | 90% | ビジネスロジックの信頼性が最重要 |
-| `cli` | 70% | I/O中心で完全テストが困難 |
-| `application` (web) | 60% | UI部分のテストコストが高い |
-| `infrastructure` | 50% | 外部依存が多い |
-| `extension` | 60% | IDE API依存 |
+| `library` (core) | 90% | Business logic reliability is paramount |
+| `cli` | 70% | I/O-centric, making full testing difficult |
+| `application` (web) | 60% | High cost of testing UI parts |
+| `infrastructure` | 50% | Many external dependencies |
+| `extension` | 60% | Depends on IDE APIs |
 
-**実装タスク**:
+**Implementation tasks**:
 
-| タスク | ファイル | 工数 |
+| Task | File | Effort |
 |--------|----------|------|
-| レベル定義ファイル | `steering/rules/constitution-levels.yml` | 2h |
-| エンフォーサー更新 | `src/validators/constitution-enforcer.js` | 6h |
-| パッケージ別カバレッジ | `src/validators/coverage-validator.js` | 3h |
-| テスト追加 | `tests/constitution-levels.test.js` | 3h |
+| Level definition file | `steering/rules/constitution-levels.yml` | 2h |
+| Update enforcer | `src/validators/constitution-enforcer.js` | 6h |
+| Per-package coverage | `src/validators/coverage-validator.js` | 3h |
+| Add tests | `tests/constitution-levels.test.js` | 3h |
 
 ---
 
-## Phase 4: project.yml の拡張（優先度：中）
+## Phase 4: project.yml Extension (Priority: Medium)
 
-### 4.1 拡張スキーマ
+### 4.1 Extended Schema
 
-**現状**:
+**Current**:
 ```yaml
 name: MUSUBI
 description: Ultimate SDD Tool
@@ -349,28 +349,28 @@ locale: ja
 version: "0.7.0"
 ```
 
-**拡張版**:
+**Extended version**:
 
 ```yaml
 # steering/project.yml
 schema_version: "2.0"
 
-# 基本情報
+# Basic information
 name: MUSUBI
 description: Ultimate SDD Tool with 27 Agents
 locale: ja
 version: "0.7.0"
 
-# リポジトリ情報
+# Repository information
 repository:
   type: monorepo
   manager: pnpm
   url: https://github.com/nahisaho/MUSUBI
 
-# パッケージ構成（packages.ymlへの参照）
+# Package structure (reference to packages.yml)
 packages: ./packages.yml
 
-# リリース設定
+# Release settings
 release:
   registry: npm
   strategy: independent  # or synchronized
@@ -381,7 +381,7 @@ release:
     scheme: semver
     prerelease_tags: [alpha, beta, rc]
 
-# 統合設定
+# Integration settings
 integrations:
   ci:
     provider: github-actions
@@ -398,33 +398,33 @@ integrations:
     generator: typedoc
     output: docs/api
 
-# ワークフロー設定
+# Workflow settings
 workflow:
   default_mode: medium  # small | medium | large
   constitution_level: advisory  # strict | advisory | relaxed
   
-# LLMプロジェクト設定（オプション）
+# LLM project settings (optional)
 llm:
   enabled: false
   config: ./llm-config.yml
 ```
 
-### 4.2 project.yml バリデーター
+### 4.2 project.yml Validator
 
-**実装タスク**:
+**Implementation tasks**:
 
-| タスク | ファイル | 工数 |
+| Task | File | Effort |
 |--------|----------|------|
-| スキーマ定義 | `src/schemas/project-schema.json` | 2h |
-| バリデーター実装 | `src/validators/project-validator.js` | 4h |
-| マイグレーションツール | `bin/musubi-migrate-config.js` | 3h |
-| テスト追加 | `tests/project-config.test.js` | 2h |
+| Schema definition | `src/schemas/project-schema.json` | 2h |
+| Validator implementation | `src/validators/project-validator.js` | 4h |
+| Migration tool | `bin/musubi-migrate-config.js` | 3h |
+| Add tests | `tests/project-config.test.js` | 2h |
 
 ---
 
-## Phase 5: LLMプロジェクト対応（優先度：低）
+## Phase 5: LLM Project Support (Priority: Low)
 
-### 5.1 LLM設定テンプレート
+### 5.1 LLM Configuration Template
 
 ```yaml
 # steering/llm-config.yml
@@ -464,7 +464,7 @@ testing:
   mock_layer:
     enabled: true
     directory: storage/llm-mocks/
-    record_mode: false  # 実際のレスポンスを記録
+    record_mode: false  # Record actual responses
   fixtures:
     directory: tests/fixtures/llm/
     
@@ -480,7 +480,7 @@ benchmarks:
       path: tests/fixtures/benchmark/
 ```
 
-### 5.2 LLMモックレイヤー
+### 5.2 LLM Mock Layer
 
 ```javascript
 // src/testing/llm-mock-layer.js
@@ -503,70 +503,70 @@ class LLMMockLayer {
 
 ---
 
-## 実装ロードマップ
+## Implementation Roadmap
 
 ```mermaid
 gantt
-    title MUSUBI v0.8 改善ロードマップ
+    title MUSUBI v0.8 Improvement Roadmap
     dateFormat  YYYY-MM-DD
     
     section Phase 1
-    ワークフローモード実装    :2025-12-16, 5d
-    新規プロンプト追加        :2025-12-23, 5d
+    Workflow mode implementation    :2025-12-16, 5d
+    Add new prompts                 :2025-12-23, 5d
     
     section Phase 2
-    packages.yml導入          :2025-12-30, 7d
-    依存グラフ生成            :2026-01-06, 3d
+    Introduce packages.yml          :2025-12-30, 7d
+    Dependency graph generation     :2026-01-06, 3d
     
     section Phase 3
-    Constitution段階化        :2026-01-09, 5d
-    パッケージ別カバレッジ    :2026-01-14, 3d
+    Constitution leveling           :2026-01-09, 5d
+    Per-package coverage            :2026-01-14, 3d
     
     section Phase 4
-    project.yml拡張           :2026-01-17, 5d
+    project.yml extension           :2026-01-17, 5d
     
     section Phase 5
-    LLMプロジェクト対応       :2026-01-24, 7d
+    LLM project support             :2026-01-24, 7d
 ```
 
 ---
 
-## 工数サマリー
+## Effort Summary
 
-| Phase | 内容 | 推定工数 | 優先度 |
+| Phase | Content | Estimated Effort | Priority |
 |-------|------|----------|--------|
-| Phase 1 | ワークフロー・プロンプト改善 | 30h | 🔴 高 |
-| Phase 2 | Monorepo対応 | 22h | 🔴 高 |
-| Phase 3 | Constitution段階化 | 14h | 🟡 中 |
-| Phase 4 | project.yml拡張 | 11h | 🟡 中 |
-| Phase 5 | LLMプロジェクト対応 | 20h | 🟢 低 |
-| **合計** | | **97h** | |
+| Phase 1 | Workflow and prompt improvements | 30h | 🔴 High |
+| Phase 2 | Monorepo support | 22h | 🔴 High |
+| Phase 3 | Constitution leveling | 14h | 🟡 Medium |
+| Phase 4 | project.yml extension | 11h | 🟡 Medium |
+| Phase 5 | LLM project support | 20h | 🟢 Low |
+| **Total** | | **97h** | |
 
 ---
 
-## 成功指標
+## Success Metrics
 
-| 指標 | 現状 | 目標 |
+| Metric | Current | Target |
 |------|------|------|
-| 小規模機能の開発時間 | 4h（全ステージ必須） | 1h（ライトモード） |
-| Monorepoセットアップ時間 | 手動設定 | 自動検出・設定 |
-| Constitution違反の誤検出 | 頻繁 | 10%以下 |
-| リリースプロセス時間 | 手動30min | 自動5min |
-| LLMテストカバレッジ | 0%（モック不可） | 70%（モック許容） |
+| Small feature development time | 4h (all stages required) | 1h (lightweight mode) |
+| Monorepo setup time | Manual configuration | Auto-detection and configuration |
+| False positives in Constitution violations | Frequent | 10% or less |
+| Release process time | 30min manual | 5min automated |
+| LLM test coverage | 0% (mocking not allowed) | 70% (mocking allowed) |
 
 ---
 
-## 次のステップ
+## Next Steps
 
-1. **レビュー**: このプランをステークホルダーと確認
-2. **優先度確定**: Phase 1-2を最優先で実装
-3. **実装開始**: `#sdd-requirements musubi-v0.8-phase1` で要件定義開始
+1. **Review**: Review this plan with stakeholders
+2. **Finalize priorities**: Implement Phases 1-2 first
+3. **Start implementation**: Begin requirements definition with `#sdd-requirements musubi-v0.8-phase1`
 
 ---
 
-## 参考資料
+## References
 
-- [COBOL2Java 改善要件](../../References/requirements/requirement-cobol2java-20251212.md)
+- [COBOL2Java Improvement Requirements](../../References/requirements/requirement-cobol2java-20251212.md)
 - [Constitutional Governance](../../steering/rules/constitution.md)
 - [8-Stage SDD Workflow](../../steering/rules/workflow.md)
 - [MUSUBI Documentation](../../README.md)

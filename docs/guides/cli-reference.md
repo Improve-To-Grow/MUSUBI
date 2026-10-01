@@ -1,43 +1,43 @@
-# 📖 MUSUBI CLI コマンドリファレンス
+# 📖 MUSUBI CLI Command Reference
 
-**MUSUBI v3.5.1** | 最終更新: 2025-12-08
+**MUSUBI v3.5.1** | Last updated: 2025-12-08
 
-> 全20個のCLIコマンドの完全リファレンス
-
----
-
-## 📋 目次
-
-1. [基本コマンド](#1-基本コマンド)
-2. [SDDワークフローコマンド](#2-sddワークフローコマンド)
-3. [分析コマンド](#3-分析コマンド)
-4. [メモリ・同期コマンド](#4-メモリ同期コマンド)
-5. [自動化コマンド](#5-自動化コマンド)
-6. [ユーティリティコマンド](#6-ユーティリティコマンド)
+> Complete reference for all 20 CLI commands
 
 ---
 
-## 1. 基本コマンド
+## 📋 Table of Contents
+
+1. [Basic Commands](#1-basic-commands)
+2. [SDD Workflow Commands](#2-sdd-workflow-commands)
+3. [Analysis Commands](#3-analysis-commands)
+4. [Memory and Sync Commands](#4-memory-and-sync-commands)
+5. [Automation Commands](#5-automation-commands)
+6. [Utility Commands](#6-utility-commands)
+
+---
+
+## 1. Basic Commands
 
 ### `musubi` / `musubi-sdd`
 
-メインエントリーポイント。
+Main entry point.
 
 ```bash
-musubi --help           # ヘルプ表示
-musubi --version        # バージョン表示
-musubi <command>        # サブコマンド実行
+musubi --help           # Show help
+musubi --version        # Show version
+musubi <command>        # Run a subcommand
 ```
 
 ### `musubi init`
 
-新規プロジェクトの初期化。
+Initialize a new project.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi init
 
-# プラットフォーム指定
+# Specify platform
 musubi init --copilot      # GitHub Copilot
 musubi init --claude-code  # Claude Code (Skills API)
 musubi init --cursor       # Cursor IDE
@@ -46,57 +46,59 @@ musubi init --codex        # Codex CLI
 musubi init --qwen         # Qwen Code
 musubi init --windsurf     # Windsurf IDE
 
-# オプション
-musubi init --force        # 既存ファイルを上書き
-musubi init --minimal      # 最小構成で初期化
-musubi init --output ./dir # 出力ディレクトリ指定
+# Options
+musubi init --force        # Overwrite existing files
+musubi init --minimal      # Initialize with minimal configuration
+musubi init --output ./dir # Specify output directory
 ```
 
-**生成ファイル:**
+**Generated files:**
 - `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` / `QWEN.md`
-- `steering/` ディレクトリ一式
-- `storage/` ディレクトリ一式
+- Full set of `steering/` directories
+- Full set of `storage/` directories
 
 ### `musubi onboard`
 
-既存プロジェクトの自動解析とsteering docs生成。
+Automatically analyze an existing project and generate steering docs.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi onboard
 
-# オプション
-musubi onboard --analyze-only  # 解析のみ（ファイル生成なし）
-musubi onboard --deep          # 詳細解析モード
-musubi onboard --include-deps  # 依存関係も解析
+# Options
+musubi onboard --analyze-only  # Analyze only (no file generation)
+musubi onboard --deep          # Deep analysis mode
+musubi onboard --include-deps  # Also analyze dependencies
 ```
 
-**自動検出:**
-- package.json, requirements.txt, go.mod 等
-- ディレクトリ構造
-- 使用フレームワーク・ライブラリ
+**Auto-detection:**
+- package.json, requirements.txt, go.mod, etc.
+- Directory structure
+- Frameworks and libraries in use
 
 ---
 
-## 2. SDDワークフローコマンド
+## 2. SDD Workflow Commands
 
 ### `musubi requirements`
 
-EARS形式で要件書を生成。
+Generate a requirements document in EARS format.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi requirements --feature login
 
-# オプション
+# Options
 musubi requirements --feature login --output ./specs/
 musubi requirements --feature login --format markdown
-musubi requirements --feature login --lang ja  # 日本語出力
-musubi requirements --interactive              # 対話モード
+musubi requirements --interactive              # Interactive mode
 ```
 
-**EARS 5パターン:**
-| パターン | 構文 |
+> Documents are generated in English. To also produce a translated copy of each document, see
+> [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md).
+
+**5 EARS Patterns:**
+| Pattern | Syntax |
 |---------|------|
 | Ubiquitous | The system shall [action] |
 | Event-Driven | When [trigger], the system shall [action] |
@@ -106,274 +108,274 @@ musubi requirements --interactive              # 対話モード
 
 ### `musubi design`
 
-C4モデルとADR（アーキテクチャ決定記録）を生成。
+Generate C4 models and ADRs (Architecture Decision Records).
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi design --feature login
 
-# オプション
-musubi design --feature login --level container  # C4レベル指定
-musubi design --feature login --include-adr      # ADR含む
+# Options
+musubi design --feature login --level container  # Specify C4 level
+musubi design --feature login --include-adr      # Include ADRs
 musubi design --feature login --output ./design/
 ```
 
-**C4レベル:**
-1. Context - システム全体像
-2. Container - コンテナ図
-3. Component - コンポーネント図
-4. Code - コード図
+**C4 Levels:**
+1. Context - Overall system view
+2. Container - Container diagram
+3. Component - Component diagram
+4. Code - Code diagram
 
 ### `musubi tasks`
 
-設計からタスクを分解。
+Break down the design into tasks.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi tasks --feature login
 
-# オプション
-musubi tasks --feature login --granularity fine  # 細粒度
-musubi tasks --feature login --estimate          # 工数見積もり含む
-musubi tasks --feature login --dependencies      # 依存関係表示
+# Options
+musubi tasks --feature login --granularity fine  # Fine granularity
+musubi tasks --feature login --estimate          # Include effort estimates
+musubi tasks --feature login --dependencies      # Show dependencies
 ```
 
 ### `musubi validate`
 
-実装が要件・設計に準拠しているか検証。
+Verify that the implementation complies with requirements and design.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi validate
 
-# オプション
-musubi validate --feature login      # 特定機能のみ
-musubi validate --constitution       # 憲法準拠チェック
-musubi validate --traceability       # トレーサビリティチェック
-musubi validate score                # スコア算出
-musubi validate --strict             # 厳格モード
+# Options
+musubi validate --feature login      # Specific feature only
+musubi validate --constitution       # Constitution compliance check
+musubi validate --traceability       # Traceability check
+musubi validate score                # Calculate score
+musubi validate --strict             # Strict mode
 ```
 
 ### `musubi workflow`
 
-SDDワークフローの進行管理。
+Manage SDD workflow progress.
 
 ```bash
-# 基本使用法
-musubi workflow status                # 現在のステージ確認
-musubi workflow next                  # 次のステージへ
-musubi workflow prev                  # 前のステージへ
+# Basic usage
+musubi workflow status                # Check current stage
+musubi workflow next                  # Go to the next stage
+musubi workflow prev                  # Go to the previous stage
 
-# ステージ指定
-musubi workflow goto requirements     # 要件ステージへ移動
+# Specify a stage
+musubi workflow goto requirements     # Move to the requirements stage
 musubi workflow goto design
 musubi workflow goto implement
 
-# メトリクス
-musubi workflow metrics               # ワークフローメトリクス表示
-musubi workflow history               # 履歴表示
+# Metrics
+musubi workflow metrics               # Show workflow metrics
+musubi workflow history               # Show history
 ```
 
 ---
 
-## 3. 分析コマンド
+## 3. Analysis Commands
 
 ### `musubi analyze`
 
-コードベースの分析。
+Analyze the codebase.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi analyze
 
-# オプション
-musubi analyze --detect-stuck    # スタック検出
-musubi analyze --changes         # 変更影響分析
-musubi analyze --dependencies    # 依存関係分析
-musubi analyze --complexity      # 複雑度分析
-musubi analyze --security        # セキュリティ分析
+# Options
+musubi analyze --detect-stuck    # Stuck detection
+musubi analyze --changes         # Change impact analysis
+musubi analyze --dependencies    # Dependency analysis
+musubi analyze --complexity      # Complexity analysis
+musubi analyze --security        # Security analysis
 ```
 
 ### `musubi gaps`
 
-要件・設計・実装間のギャップ検出。
+Detect gaps between requirements, design, and implementation.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi gaps
 
-# オプション
-musubi gaps --feature login       # 特定機能のみ
-musubi gaps --detailed            # 詳細レポート
-musubi gaps --output ./reports/   # レポート出力
+# Options
+musubi gaps --feature login       # Specific feature only
+musubi gaps --detailed            # Detailed report
+musubi gaps --output ./reports/   # Report output
 ```
 
 ### `musubi trace`
 
-トレーサビリティマトリクス生成。
+Generate a traceability matrix.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi trace
 
-# オプション
-musubi trace --feature login      # 特定機能のみ
-musubi trace --format matrix      # マトリクス形式
-musubi trace --format graph       # グラフ形式
-musubi trace --output ./trace/    # 出力先指定
+# Options
+musubi trace --feature login      # Specific feature only
+musubi trace --format matrix      # Matrix format
+musubi trace --format graph       # Graph format
+musubi trace --output ./trace/    # Specify output destination
 ```
 
 ---
 
-## 4. メモリ・同期コマンド
+## 4. Memory and Sync Commands
 
 ### `musubi remember`
 
-エージェントメモリの管理。
+Manage agent memory.
 
 ```bash
-# 基本使用法
-musubi remember                    # メモリ表示
-musubi remember --save             # 現在の学習事項を保存
-musubi remember --auto             # 自動更新
+# Basic usage
+musubi remember                    # Show memory
+musubi remember --save             # Save current learnings
+musubi remember --auto             # Auto-update
 
-# オプション
-musubi remember --merge            # メモリマージ
-musubi remember --condense         # メモリ圧縮
-musubi remember --export ./mem/    # エクスポート
+# Options
+musubi remember --merge            # Merge memory
+musubi remember --condense         # Condense memory
+musubi remember --export ./mem/    # Export
 ```
 
 ### `musubi sync`
 
-steering docsとコードベースの同期。
+Synchronize steering docs with the codebase.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi sync
 
-# オプション
-musubi sync --dry-run              # ドライラン（変更なし）
-musubi sync --auto                 # 自動同期
-musubi sync --force                # 強制同期
+# Options
+musubi sync --dry-run              # Dry run (no changes)
+musubi sync --auto                 # Automatic sync
+musubi sync --force                # Forced sync
 ```
 
 ### `musubi change`
 
-変更管理（Delta Specs）。
+Change management (Delta Specs).
 
 ```bash
-# 基本使用法
-musubi change                      # 変更一覧
+# Basic usage
+musubi change                      # List changes
 
-# オプション
-musubi change --create             # 変更リクエスト作成
-musubi change --apply CHG-001      # 変更適用
-musubi change --rollback CHG-001   # ロールバック
-musubi change --history            # 変更履歴
+# Options
+musubi change --create             # Create a change request
+musubi change --apply CHG-001      # Apply a change
+musubi change --rollback CHG-001   # Roll back
+musubi change --history            # Change history
 ```
 
 ---
 
-## 5. 自動化コマンド
+## 5. Automation Commands
 
 ### `musubi orchestrate`
 
-マルチスキルワークフローの実行。
+Run multi-skill workflows.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi orchestrate --workflow sdd-full
 
-# オプション
-musubi orchestrate --pattern sequential  # 順次実行
-musubi orchestrate --pattern parallel    # 並列実行
-musubi orchestrate --pattern swarm       # スウォームパターン
-musubi orchestrate --dry-run             # ドライラン
+# Options
+musubi orchestrate --pattern sequential  # Sequential execution
+musubi orchestrate --pattern parallel    # Parallel execution
+musubi orchestrate --pattern swarm       # Swarm pattern
+musubi orchestrate --dry-run             # Dry run
 ```
 
-**オーケストレーションパターン:**
-| パターン | 説明 |
+**Orchestration Patterns:**
+| Pattern | Description |
 |---------|------|
-| Sequential | 順次実行 |
-| Parallel | 並列実行 |
-| Hierarchical | 階層的実行 |
-| GroupChat | グループチャット |
-| Swarm | スウォームパターン |
-| HumanInLoop | 人間介入あり |
+| Sequential | Sequential execution |
+| Parallel | Parallel execution |
+| Hierarchical | Hierarchical execution |
+| GroupChat | Group chat |
+| Swarm | Swarm pattern |
+| HumanInLoop | With human intervention |
 
 ### `musubi resolve`
 
-GitHub Issue の自動解決。
+Automatically resolve GitHub Issues.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi resolve --issue 123
 
-# オプション
-musubi resolve --issue 123 --auto-pr     # 自動PR作成
-musubi resolve --issue 123 --dry-run     # ドライラン
-musubi resolve --issue 123 --branch fix  # ブランチ名指定
+# Options
+musubi resolve --issue 123 --auto-pr     # Auto-create PR
+musubi resolve --issue 123 --dry-run     # Dry run
+musubi resolve --issue 123 --branch fix  # Specify branch name
 ```
 
 ### `musubi share`
 
-仕様書の共有・エクスポート。
+Share and export specifications.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi share --feature login
 
-# オプション
-musubi share --format markdown           # Markdown出力
-musubi share --format html               # HTML出力
-musubi share --format pdf                # PDF出力
-musubi share --output ./export/          # 出力先指定
+# Options
+musubi share --format markdown           # Markdown output
+musubi share --format html               # HTML output
+musubi share --format pdf                # PDF output
+musubi share --output ./export/          # Specify output destination
 ```
 
 ---
 
-## 6. ユーティリティコマンド
+## 6. Utility Commands
 
 ### `musubi browser`
 
-ブラウザ自動化・E2Eテスト。
+Browser automation and E2E testing.
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi browser test
 
-# オプション
+# Options
 musubi browser test --url http://localhost:3000
-musubi browser test --headless           # ヘッドレスモード
-musubi browser test --screenshot         # スクリーンショット取得
-musubi browser generate                  # テストコード生成
+musubi browser test --headless           # Headless mode
+musubi browser test --screenshot         # Capture screenshots
+musubi browser generate                  # Generate test code
 ```
 
 ### `musubi gui`
 
-Web GUIダッシュボード。
+Web GUI dashboard.
 
 ```bash
-# 基本使用法
-musubi gui start                         # GUIサーバー起動
-musubi gui start --port 8080             # ポート指定
+# Basic usage
+musubi gui start                         # Start the GUI server
+musubi gui start --port 8080             # Specify port
 
-# 機能
-# - プロジェクト概要
-# - ワークフロー可視化
-# - メトリクスダッシュボード
-# - トレーサビリティマトリクス
+# Features
+# - Project overview
+# - Workflow visualization
+# - Metrics dashboard
+# - Traceability matrix
 ```
 
 ### `musubi convert`
 
-フォーマット変換（Spec Kit互換）。
+Format conversion (Spec Kit compatible).
 
 ```bash
-# 基本使用法
+# Basic usage
 musubi convert --input ./specs/
 
-# オプション
+# Options
 musubi convert --from yaml --to markdown
 musubi convert --from markdown --to json
 musubi convert --output ./converted/
@@ -381,45 +383,45 @@ musubi convert --output ./converted/
 
 ---
 
-## 🔧 グローバルオプション
+## 🔧 Global Options
 
-全コマンドで使用可能なオプション：
+Options available for all commands:
 
-| オプション | 説明 |
+| Option | Description |
 |-----------|------|
-| `--help, -h` | ヘルプ表示 |
-| `--version, -v` | バージョン表示 |
-| `--verbose` | 詳細ログ出力 |
-| `--quiet, -q` | 出力抑制 |
-| `--config <path>` | 設定ファイル指定 |
-| `--cwd <path>` | 作業ディレクトリ指定 |
+| `--help, -h` | Show help |
+| `--version, -v` | Show version |
+| `--verbose` | Verbose log output |
+| `--quiet, -q` | Suppress output |
+| `--config <path>` | Specify config file |
+| `--cwd <path>` | Specify working directory |
 
 ---
 
-## 📊 コマンド対応表
+## 📊 Command Reference Table
 
-| コマンド | SDDステージ | 主な用途 |
+| Command | SDD Stage | Main Use |
 |---------|------------|---------|
-| `init` | - | 初期化 |
-| `onboard` | Research | 既存プロジェクト解析 |
-| `requirements` | Requirements | 要件定義 |
-| `design` | Design | 設計 |
-| `tasks` | Tasks | タスク分解 |
-| `validate` | Validate | 検証 |
-| `workflow` | All | ワークフロー管理 |
-| `analyze` | All | 分析 |
-| `gaps` | Validate | ギャップ検出 |
-| `trace` | All | トレーサビリティ |
-| `remember` | All | メモリ管理 |
-| `sync` | All | 同期 |
-| `change` | All | 変更管理 |
-| `orchestrate` | All | オーケストレーション |
-| `resolve` | Implement | Issue解決 |
-| `share` | Deploy | 共有 |
-| `browser` | Test | E2Eテスト |
-| `gui` | All | ダッシュボード |
-| `convert` | All | 変換 |
+| `init` | - | Initialization |
+| `onboard` | Research | Existing project analysis |
+| `requirements` | Requirements | Requirements definition |
+| `design` | Design | Design |
+| `tasks` | Tasks | Task breakdown |
+| `validate` | Validate | Validation |
+| `workflow` | All | Workflow management |
+| `analyze` | All | Analysis |
+| `gaps` | Validate | Gap detection |
+| `trace` | All | Traceability |
+| `remember` | All | Memory management |
+| `sync` | All | Sync |
+| `change` | All | Change management |
+| `orchestrate` | All | Orchestration |
+| `resolve` | Implement | Issue resolution |
+| `share` | Deploy | Sharing |
+| `browser` | Test | E2E testing |
+| `gui` | All | Dashboard |
+| `convert` | All | Conversion |
 
 ---
 
-*ドキュメント生成: MUSUBI v3.5.1*
+*Documentation generated by MUSUBI v3.5.1*

@@ -105,10 +105,10 @@ export class TasksTreeProvider implements vscode.TreeDataProvider<TaskItem> {
       const content = await vscode.workspace.fs.readFile(vscode.Uri.file(filePath));
       const text = Buffer.from(content).toString('utf-8');
       
-      if (text.includes('✅ **完了**') || text.includes('✅ Complete')) {
+      if (text.includes('✅ Complete')) {
         return 'completed';
       }
-      if (text.includes('🔄 進行中') || text.includes('In Progress')) {
+      if (text.includes('In Progress')) {
         return 'in-progress';
       }
     } catch {

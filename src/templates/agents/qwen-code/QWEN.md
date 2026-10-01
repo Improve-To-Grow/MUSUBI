@@ -9,7 +9,6 @@ This project uses **MUSUBI** (Ultimate Specification Driven Development) configu
 - 📋 **Constitutional Governance** - 9 immutable articles + Phase -1 Gates
 - 📝 **EARS Requirements Format** - Unambiguous requirements with complete traceability
 - 🧭 **Auto-Updating Project Memory** - Steering system maintains architecture, tech stack, and product context
-- 🌐 **Bilingual Documentation** - All documents created in both English and Japanese
 
 ## Commands
 
@@ -83,16 +82,12 @@ MUSUBI enforces 9 immutable constitutional articles:
 8. **Anti-Abstraction Gate** - Use framework features directly
 9. **Integration-First Testing** - Real services over mocks
 
-## Bilingual Documentation
+## Documentation Language
 
-**All agent-generated documents are created in both English and Japanese.**
+All agent-generated documents are written in English, and agents communicate with the user in English.
 
-### Language Policy
-
-- **English**: Reference/source documents (`.md`)
-- **Japanese**: Translations (`.ja.md`)
-- **Commands**: Always read English versions for work
-- **Code References**: Requirement IDs, technical terms stay in English
+Bilingual output (an additional translation such as `.ja.md`, and chatting in that language) is optional
+and disabled by default. See `BILINGUAL-IMPLEMENTATION.md` in the MUSUBI repository for how to enable it.
 
 ## OpenHands-Inspired Modules (v3.0.0)
 
@@ -231,4 +226,4 @@ const analysis = await generator.analyze();
 
 ---
 
-**MUSUBI for Qwen Code** - むすび - Bringing specifications, design, and code together.
+**MUSUBI for Qwen Code** - musubi ("connection/binding") - Bringing specifications, design, and code together.

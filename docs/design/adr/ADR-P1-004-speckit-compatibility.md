@@ -10,97 +10,97 @@ Proposed
 
 ## Context
 
-MUSUBI と GitHub Spec Kit は両方とも Specification-Driven Development (SDD) を推進するツールです。多くの開発チームが両方のツールを評価・使用する可能性があるため、相互運用性を提供することで以下のメリットが得られます：
+MUSUBI and GitHub Spec Kit are both tools that promote Specification-Driven Development (SDD). Because many development teams may evaluate and use both tools, providing interoperability offers the following benefits:
 
-1. **移行パス**: Spec Kit から MUSUBI への移行、またはその逆を容易にする
-2. **エコシステム統合**: Spec Kit ユーザーが MUSUBI の機能（憲法ガバナンス、EARS形式）を活用可能
-3. **相互運用性**: プロジェクト間でスペックを共有・交換可能
-4. **ベンダーロックイン回避**: ユーザーが特定ツールに縛られない
+1. **Migration path**: Make it easy to migrate from Spec Kit to MUSUBI, or vice versa
+2. **Ecosystem integration**: Spec Kit users can leverage MUSUBI features (constitutional governance, EARS format)
+3. **Interoperability**: Specs can be shared and exchanged between projects
+4. **Avoid vendor lock-in**: Users are not tied to a specific tool
 
-### Spec Kit の構造
+### Spec Kit Structure
 
-GitHub Spec Kit は以下の構造を使用：
+GitHub Spec Kit uses the following structure:
 
 ```
 .specify/
 ├── memory/
-│   └── constitution.md          # プロジェクト憲法
+│   └── constitution.md          # Project constitution
 ├── templates/
-│   ├── spec-template.md        # スペックテンプレート
-│   ├── plan-template.md        # 計画テンプレート
-│   ├── tasks-template.md       # タスクテンプレート
-│   └── commands/               # スラッシュコマンド定義
+│   ├── spec-template.md        # Spec template
+│   ├── plan-template.md        # Plan template
+│   ├── tasks-template.md       # Task template
+│   └── commands/               # Slash command definitions
 ├── scripts/
-│   ├── bash/                   # Bashスクリプト
-│   └── powershell/             # PowerShellスクリプト
+│   ├── bash/                   # Bash scripts
+│   └── powershell/             # PowerShell scripts
 └── specs/
     └── ###-feature-name/
-        ├── spec.md             # 機能仕様
-        ├── plan.md             # 実装計画
-        ├── tasks.md            # タスクリスト
-        ├── research.md         # リサーチ（オプション）
-        ├── data-model.md       # データモデル（オプション）
-        ├── quickstart.md       # クイックスタート（オプション）
-        └── contracts/          # APIコントラクト
+        ├── spec.md             # Feature specification
+        ├── plan.md             # Implementation plan
+        ├── tasks.md            # Task list
+        ├── research.md         # Research (optional)
+        ├── data-model.md       # Data model (optional)
+        ├── quickstart.md       # Quickstart (optional)
+        └── contracts/          # API contracts
 ```
 
-### MUSUBI の構造
+### MUSUBI Structure
 
-MUSUBI は以下の構造を使用：
+MUSUBI uses the following structure:
 
 ```
 steering/
-├── product.md                  # プロダクトコンテキスト
-├── structure.md                # アーキテクチャパターン
-├── tech.md                     # テクノロジースタック
-├── project.yml                 # プロジェクト設定
+├── product.md                  # Product context
+├── structure.md                # Architecture patterns
+├── tech.md                     # Technology stack
+├── project.yml                 # Project configuration
 ├── rules/
-│   ├── constitution.md         # 9条項憲法
-│   └── workflow.md             # 8ステージワークフロー
-├── memories/                   # 記憶システム
-└── templates/                  # EARS テンプレート
+│   ├── constitution.md         # 9-article constitution
+│   └── workflow.md             # 8-stage workflow
+├── memories/                   # Memory system
+└── templates/                  # EARS templates
 storage/
-└── specs/                      # スペック保存
+└── specs/                      # Spec storage
 ```
 
 ## Decision
 
-**双方向変換システム**を実装し、`musubi-convert` コマンドで MUSUBI ↔ Spec Kit の相互変換を可能にします。
+We implement a **bidirectional conversion system** that enables two-way conversion between MUSUBI and Spec Kit via the `musubi-convert` command.
 
-### 主要アーキテクチャ決定
+### Key Architecture Decisions
 
-#### 1. 変換アーキテクチャ: Intermediate Representation (IR) パターン
+#### 1. Conversion Architecture: Intermediate Representation (IR) Pattern
 
-**選択肢**:
-- A. 直接変換（MUSUBI → Spec Kit, Spec Kit → MUSUBI）
-- B. Intermediate Representation (IR) 経由変換
-- C. プラグインベース変換
+**Options**:
+- A. Direct conversion (MUSUBI → Spec Kit, Spec Kit → MUSUBI)
+- B. Conversion via Intermediate Representation (IR)
+- C. Plugin-based conversion
 
-**決定**: B. Intermediate Representation (IR) 経由変換
+**Decision**: B. Conversion via Intermediate Representation (IR)
 
-**理由**:
-- 将来的に他のフォーマット（Kiro、OpenSpec等）への拡張が容易
-- 変換ロジックの複雑さを O(n) に抑制（直接変換は O(n²)）
-- テスト・デバッグが容易
-- 変換精度の検証が明確
+**Reason**:
+- Easy to extend to other formats (Kiro, OpenSpec, etc.) in the future
+- Keeps conversion logic complexity at O(n) (direct conversion is O(n²))
+- Easy to test and debug
+- Conversion accuracy can be verified clearly
 
-#### 2. マッピング戦略: 構造マッピング + 意味マッピング
+#### 2. Mapping Strategy: Structural Mapping + Semantic Mapping
 
-**選択肢**:
-- A. 構造マッピングのみ（ファイル→ファイル）
-- B. 意味マッピングのみ（内容解析）
-- C. 構造マッピング + 意味マッピング（ハイブリッド）
+**Options**:
+- A. Structural mapping only (file → file)
+- B. Semantic mapping only (content analysis)
+- C. Structural mapping + semantic mapping (hybrid)
 
-**決定**: C. 構造マッピング + 意味マッピング
+**Decision**: C. Structural mapping + semantic mapping
 
-**理由**:
-- ファイル構造は直接マッピング可能
-- 内容（EARS形式 ↔ User Stories）は意味的変換が必要
-- 両方を組み合わせることで高精度な変換を実現
+**Reason**:
+- File structure can be mapped directly
+- Content (EARS format ↔ User Stories) requires semantic conversion
+- Combining both achieves high-accuracy conversion
 
-#### 3. 憲法マッピング: 拡張マッピング
+#### 3. Constitution Mapping: Extended Mapping
 
-**Spec Kit Constitution** → **MUSUBI 9 Articles** マッピング:
+**Spec Kit Constitution** → **MUSUBI 9 Articles** mapping:
 
 | Spec Kit Section | MUSUBI Article |
 |-----------------|----------------|
@@ -114,11 +114,11 @@ storage/
 | (implicit) | Article VIII: Continuous Validation |
 | (implicit) | Article IX: Graceful Degradation |
 
-**決定**: MUSUBI の 9 条項を完全維持し、Spec Kit からの変換時に不足分を補完
+**Decision**: Fully preserve MUSUBI's 9 Articles and fill in missing parts when converting from Spec Kit
 
-#### 4. 要件形式マッピング: EARS ↔ User Stories
+#### 4. Requirements Format Mapping: EARS ↔ User Stories
 
-**Spec Kit User Story 形式**:
+**Spec Kit User Story format**:
 ```markdown
 ### User Story: [Title]
 **Priority**: [P1/P2/P3]
@@ -128,7 +128,7 @@ As a [user type], I want to [action] so that [benefit]
 - [ ] Criterion 2
 ```
 
-**MUSUBI EARS 形式**:
+**MUSUBI EARS format**:
 ```markdown
 ### REQ-XXX: [Title]
 **Pattern**: [Ubiquitous/Event-Driven/State-Driven/Optional/Complex]
@@ -139,9 +139,9 @@ WHEN [trigger], the system SHALL [action]
 - AC2: [criterion]
 ```
 
-**決定**: 双方向変換ルールを定義し、情報損失を最小化
+**Decision**: Define bidirectional conversion rules and minimize information loss
 
-#### 5. CLI インターフェース設計
+#### 5. CLI Interface Design
 
 ```bash
 # Spec Kit → MUSUBI
@@ -150,10 +150,10 @@ musubi-convert --from-speckit [path] [--output dir] [--dry-run] [--verbose]
 # MUSUBI → Spec Kit
 musubi-convert --to-speckit [--output dir] [--dry-run] [--verbose]
 
-# 検証のみ
+# Validation only
 musubi-convert --validate [format] [path]
 
-# ラウンドトリップテスト
+# Round-trip test
 musubi-convert --roundtrip [path]
 ```
 
@@ -161,29 +161,29 @@ musubi-convert --roundtrip [path]
 
 ### Positive
 
-1. **相互運用性向上**: Spec Kit ユーザーが MUSUBI を試用しやすい
-2. **移行パス提供**: プロジェクトの段階的移行が可能
-3. **エコシステム拡大**: 両ツールのコミュニティが相互に利益を得る
-4. **将来拡張性**: IR パターンにより他フォーマット対応が容易
+1. **Improved interoperability**: Spec Kit users can easily try MUSUBI
+2. **Migration path**: Projects can be migrated incrementally
+3. **Ecosystem growth**: Both tools' communities benefit each other
+4. **Future extensibility**: The IR pattern makes supporting other formats easy
 
 ### Negative
 
-1. **開発コスト**: 変換ロジックの実装・テストに時間が必要
-2. **メンテナンス負担**: Spec Kit の仕様変更への追従が必要
-3. **情報損失リスク**: 完全な1:1マッピングは困難
+1. **Development cost**: Implementing and testing conversion logic takes time
+2. **Maintenance burden**: Need to keep up with Spec Kit specification changes
+3. **Information loss risk**: A complete 1:1 mapping is difficult
 
 ### Risks
 
-| リスク | 確率 | 影響 | 対策 |
+| Risk | Probability | Impact | Mitigation |
 |--------|------|------|------|
-| Spec Kit 仕様変更 | 中 | 中 | バージョン固定、抽象化層 |
-| 変換精度の問題 | 低 | 高 | 徹底的なテスト、ラウンドトリップ検証 |
-| パフォーマンス | 低 | 低 | ストリーミング処理、キャッシュ |
+| Spec Kit spec changes | Medium | Medium | Version pinning, abstraction layer |
+| Conversion accuracy issues | Low | High | Thorough testing, round-trip verification |
+| Performance | Low | Low | Streaming processing, caching |
 
 ## Related Decisions
 
-- ADR-P1-003: VS Code Extension（変換機能の UI 統合）
-- REQ-P1-004: Spec Kit Compatibility（要件定義）
+- ADR-P1-003: VS Code Extension (UI integration of conversion features)
+- REQ-P1-004: Spec Kit Compatibility (requirements definition)
 
 ## References
 

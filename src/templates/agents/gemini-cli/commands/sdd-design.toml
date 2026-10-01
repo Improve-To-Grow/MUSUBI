@@ -18,7 +18,7 @@ Create a comprehensive technical design for the given feature based on requireme
 
 # Step 1: Read Project Memory and Requirements
 
-**IMPORTANT: Read these files FIRST (English versions only):**
+**IMPORTANT: Read these files FIRST:**
 
 1. **Steering Context**:
    - `steering/structure.md` - Architecture patterns
@@ -27,8 +27,6 @@ Create a comprehensive technical design for the given feature based on requireme
 
 2. **Requirements**:
    - `storage/specs/{{feature-name}}-requirements.md` - Feature requirements
-
-**Note**: Always read English versions (.md), not Japanese translations (.ja.md)
 
 # Step 2: Design Approach
 
@@ -286,22 +284,9 @@ Verify alignment with Constitutional Articles:
 - ✅ **Article V: Traceability**: Requirements → Design mapping complete
 - ✅ **Article VIII: Anti-Abstraction**: Use Prisma directly, no custom ORM wrapper
 
-# Step 4: Bilingual Output
+# Step 4: Save Design Document
 
-**IMPORTANT**: Create BOTH English and Japanese versions.
-
-**English version (Primary/Reference)**:
 Save to: `storage/design/{{feature-name}}-design.md`
-
-**Japanese version (Translation)**:
-Save to: `storage/design/{{feature-name}}-design.ja.md`
-
-Translation rules:
-- Keep technical terms in English (API, JWT, bcrypt, etc.)
-- Keep code examples unchanged
-- Keep requirement IDs in English (REQ-AUTH-001)
-- Keep ADR numbers in English (ADR-001)
-- Translate explanations and descriptions to Japanese
 
 # Example C4 Diagrams
 
@@ -342,11 +327,6 @@ Before finalizing:
    - Data model complete
    - Security considerations included
    - Performance strategy defined
-
-5. **Bilingual**:
-   - Both English and Japanese versions created
-   - Technical terms consistent
-   - Diagrams identical
 
 # Next Steps
 

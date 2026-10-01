@@ -1,7 +1,7 @@
 /**
  * MUSUBI Critic System
  *
- * SDDステージの品質評価システム
+ * Quality evaluation system for SDD stages
  *
  * @module src/validators/critic-system
  * @see REQ-P0-B005
@@ -12,7 +12,12 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * 評価グレード
+ * Default SRS document evaluated when no content is passed in the context
+ */
+const DEFAULT_SRS_PATH = 'storage/specs/srs/srs-musubi-v3.0.0.md';
+
+/**
+ * Evaluation grades
  */
 const Grade = {
   A: 'A', // 0.8+
@@ -22,7 +27,7 @@ const Grade = {
 };
 
 /**
- * ステージタイプ
+ * Stage types
  */
 const StageType = {
   REQUIREMENTS: 'requirements',
@@ -33,13 +38,13 @@ const StageType = {
 };
 
 /**
- * 評価結果
+ * Evaluation result
  */
 class CriticResult {
   /**
-   * @param {number} score - スコア (0.0 - 1.0)
-   * @param {string} message - 評価メッセージ
-   * @param {Object} details - 詳細情報
+   * @param {number} score - Score (0.0 - 1.0)
+   * @param {string} message - Evaluation message
+   * @param {Object} details - Details
    */
   constructor(score, message, details = {}) {
     this.score = Math.max(0, Math.min(1, score));
@@ -49,7 +54,7 @@ class CriticResult {
   }
 
   /**
-   * 成功判定
+   * Whether the evaluation passed
    * @returns {boolean}
    */
   get success() {
@@ -57,7 +62,7 @@ class CriticResult {
   }
 
   /**
-   * グレードを取得
+   * Get the grade
    * @returns {string}
    */
   get grade() {
@@ -68,7 +73,7 @@ class CriticResult {
   }
 
   /**
-   * パーセンテージを取得
+   * Get the score as a percentage
    * @returns {number}
    */
   get percentage() {
@@ -88,7 +93,7 @@ class CriticResult {
   }
 
   /**
-   * Markdown形式でレポート生成
+   * Generate a report in Markdown format
    * @returns {string}
    */
   toMarkdown() {
@@ -115,7 +120,7 @@ class CriticResult {
 }
 
 /**
- * 基底クリティック
+ * Base critic
  */
 class BaseCritic {
   /**
@@ -127,8 +132,8 @@ class BaseCritic {
   }
 
   /**
-   * 評価を実行
-   * @param {Object} context - 評価コンテキスト
+   * Run the evaluation
+   * @param {Object} context - Evaluation context
    * @returns {CriticResult}
    */
   evaluate(_context = {}) {
@@ -136,8 +141,8 @@ class BaseCritic {
   }
 
   /**
-   * 重み付けスコアを計算
-   * @param {Object} scores - 各項目のスコア
+   * Calculate the weighted score
+   * @param {Object} scores - Score per criterion
    * @returns {number}
    */
   calculateWeightedScore(scores) {
@@ -158,7 +163,7 @@ class BaseCritic {
   }
 
   /**
-   * ファイルが存在するかチェック
+   * Check whether a file exists
    * @param {string} relativePath
    * @returns {boolean}
    */
@@ -167,7 +172,7 @@ class BaseCritic {
   }
 
   /**
-   * ファイル内容を読み込み
+   * Read file contents
    * @param {string} relativePath
    * @returns {string|null}
    */
@@ -179,7 +184,7 @@ class BaseCritic {
 }
 
 /**
- * 要件クリティック
+ * Requirements critic
  */
 class RequirementsCritic extends BaseCritic {
   constructor(options = {}) {
@@ -207,13 +212,12 @@ class RequirementsCritic extends BaseCritic {
   }
 
   /**
-   * EARS形式準拠チェック
+   * Check EARS format compliance
    */
   checkEarsFormat(context) {
-    const content =
-      context.content || this.readFile('storage/specs/srs/srs-musubi-v3.0.0.ja.md') || '';
+    const content = context.content || this.readFile(DEFAULT_SRS_PATH) || '';
 
-    // EARS キーワードパターン
+    // EARS keyword patterns
     const earsPatterns = [
       /\b(When|If|While|Where)\b.*\b(shall|should|must)\b/gi,
       /\bThe system shall\b/gi,
@@ -225,28 +229,27 @@ class RequirementsCritic extends BaseCritic {
 
     if (requirements.length === 0) return 0;
 
-    // EARS パターンの出現をカウント
+    // Count occurrences of EARS patterns
     let earsCount = 0;
     earsPatterns.forEach(pattern => {
       const matches = content.match(pattern) || [];
       earsCount += matches.length;
     });
 
-    // 要件数に対するEARS準拠率
+    // EARS compliance ratio relative to the number of requirements
     return Math.min(1, earsCount / requirements.length);
   }
 
   /**
-   * 完全性チェック
+   * Check completeness
    */
   checkCompleteness(context) {
-    const content =
-      context.content || this.readFile('storage/specs/srs/srs-musubi-v3.0.0.ja.md') || '';
+    const content = context.content || this.readFile(DEFAULT_SRS_PATH) || '';
 
     const requiredSections = [
-      /## 機能要件|## Functional Requirements/i,
-      /## 非機能要件|## Non-Functional Requirements/i,
-      /## 制約|## Constraints/i,
+      /## Functional Requirements/i,
+      /## Non-Functional Requirements/i,
+      /## Constraints/i,
     ];
 
     const presentSections = requiredSections.filter(pattern => pattern.test(content));
@@ -254,18 +257,17 @@ class RequirementsCritic extends BaseCritic {
   }
 
   /**
-   * テスト可能性チェック
+   * Check testability
    */
   checkTestability(context) {
-    const content =
-      context.content || this.readFile('storage/specs/srs/srs-musubi-v3.0.0.ja.md') || '';
+    const content = context.content || this.readFile(DEFAULT_SRS_PATH) || '';
 
-    // 数値目標や測定可能な基準があるかチェック
+    // Check for numeric targets and measurable criteria
     const measurablePatterns = [
-      /\d+%/g, // パーセンテージ
-      /\d+\s*(秒|ms|ミリ秒|seconds?)/gi, // 時間
-      /\d+\s*(回|times?)/gi, // 回数
-      /less than|greater than|at least|最大|最小/gi,
+      /\d+%/g, // Percentages
+      /\d+\s*(ms|seconds?)/gi, // Durations
+      /\d+\s*times?/gi, // Counts
+      /less than|greater than|at least/gi,
     ];
 
     let measurableCount = 0;
@@ -274,44 +276,44 @@ class RequirementsCritic extends BaseCritic {
       measurableCount += matches.length;
     });
 
-    // 測定可能な基準が10個以上あれば満点
+    // Full score with 10 or more measurable criteria
     return Math.min(1, measurableCount / 10);
   }
 
   /**
-   * トレーサビリティチェック
+   * Check traceability
    */
   checkTraceability(context) {
     const content = context.content || '';
 
-    // 要件IDへの参照をチェック
+    // Check references to requirement IDs
     const reqPattern = /REQ-[A-Z0-9]+-\d+/g;
     const requirements = content.match(reqPattern) || [];
 
-    // 重複を除去してユニークな要件数をカウント
+    // Count unique requirements (duplicates removed)
     const uniqueReqs = [...new Set(requirements)];
 
-    // 5つ以上のユニーク要件があれば良好
+    // 5 or more unique requirements is considered good
     return Math.min(1, uniqueReqs.length / 5);
   }
 
   _generateMessage(score, scores) {
     if (score >= 0.8) {
-      return '要件定義は高品質です。EARS形式に準拠し、テスト可能な基準が明確です。';
+      return 'Requirements are high quality: EARS-compliant with clear, testable criteria.';
     } else if (score >= 0.5) {
-      return '要件定義は基本的な品質基準を満たしています。いくつかの改善点があります。';
+      return 'Requirements meet basic quality standards. Some improvements are possible.';
     } else {
       const issues = [];
-      if (scores.earsCompliance < 0.5) issues.push('EARS形式への準拠');
-      if (scores.completeness < 0.5) issues.push('必須セクションの追加');
-      if (scores.testability < 0.5) issues.push('測定可能な基準の追加');
-      return `要件定義には改善が必要です: ${issues.join(', ')}`;
+      if (scores.earsCompliance < 0.5) issues.push('EARS format compliance');
+      if (scores.completeness < 0.5) issues.push('add required sections');
+      if (scores.testability < 0.5) issues.push('add measurable criteria');
+      return `Requirements need improvement: ${issues.join(', ')}`;
     }
   }
 }
 
 /**
- * 設計クリティック
+ * Design critic
  */
 class DesignCritic extends BaseCritic {
   constructor(options = {}) {
@@ -337,13 +339,13 @@ class DesignCritic extends BaseCritic {
   }
 
   /**
-   * C4モデル準拠チェック
+   * Check C4 model compliance
    */
   checkC4Format(_context) {
     const designDir = path.join(this.projectRoot, 'storage/design');
     if (!fs.existsSync(designDir)) return 0;
 
-    // C4レベルのキーワードをチェック
+    // Check for C4 level keywords
     const c4Keywords = ['Context', 'Container', 'Component', 'Code'];
     const files = fs.readdirSync(designDir).filter(f => f.endsWith('.md'));
 
@@ -359,7 +361,7 @@ class DesignCritic extends BaseCritic {
   }
 
   /**
-   * ADR存在チェック
+   * Check that ADRs exist
    */
   checkAdrPresence(_context) {
     const adrDir = path.join(this.projectRoot, 'storage/design/adr');
@@ -367,12 +369,12 @@ class DesignCritic extends BaseCritic {
 
     const adrFiles = fs.readdirSync(adrDir).filter(f => f.startsWith('ADR-') && f.endsWith('.md'));
 
-    // 3つ以上のADRがあれば満点
+    // Full score with 3 or more ADRs
     return Math.min(1, adrFiles.length / 3);
   }
 
   /**
-   * 要件カバレッジチェック
+   * Check requirement coverage
    */
   checkRequirementCoverage(_context) {
     const designDir = path.join(this.projectRoot, 'storage/design');
@@ -387,27 +389,27 @@ class DesignCritic extends BaseCritic {
       matches.forEach(m => reqReferences.add(m));
     }
 
-    // 5つ以上の要件参照があれば満点
+    // Full score with 5 or more requirement references
     return Math.min(1, reqReferences.size / 5);
   }
 
   _generateMessage(score, scores) {
     if (score >= 0.8) {
-      return '設計ドキュメントは高品質です。C4モデルに準拠し、ADRが適切に作成されています。';
+      return 'Design documents are high quality: C4-compliant with appropriate ADRs.';
     } else if (score >= 0.5) {
-      return '設計ドキュメントは基本的な品質を満たしています。';
+      return 'Design documents meet basic quality standards.';
     } else {
       const issues = [];
-      if (scores.c4Compliance < 0.5) issues.push('C4モデルの適用');
-      if (scores.adrPresence < 0.5) issues.push('ADRの作成');
-      if (scores.reqCoverage < 0.5) issues.push('要件へのリンク');
-      return `設計には改善が必要です: ${issues.join(', ')}`;
+      if (scores.c4Compliance < 0.5) issues.push('apply the C4 model');
+      if (scores.adrPresence < 0.5) issues.push('create ADRs');
+      if (scores.reqCoverage < 0.5) issues.push('link to requirements');
+      return `Design needs improvement: ${issues.join(', ')}`;
     }
   }
 }
 
 /**
- * 実装クリティック
+ * Implementation critic
  */
 class ImplementationCritic extends BaseCritic {
   constructor(options = {}) {
@@ -433,10 +435,10 @@ class ImplementationCritic extends BaseCritic {
   }
 
   /**
-   * テストカバレッジチェック
+   * Check test coverage
    */
   checkTestCoverage(_context) {
-    // coverage/lcov-report/index.html があればパース
+    // Parse coverage/coverage-summary.json if it exists
     const coveragePath = path.join(this.projectRoot, 'coverage/coverage-summary.json');
     if (fs.existsSync(coveragePath)) {
       try {
@@ -446,11 +448,11 @@ class ImplementationCritic extends BaseCritic {
           return total.lines.pct / 100;
         }
       } catch (e) {
-        // パース失敗
+        // Parse failed
       }
     }
 
-    // テストファイルの存在をチェック
+    // Check that test files exist
     const testsDir = path.join(this.projectRoot, 'tests');
     if (!fs.existsSync(testsDir)) return 0;
 
@@ -458,27 +460,27 @@ class ImplementationCritic extends BaseCritic {
     const srcDir = path.join(this.projectRoot, 'src');
     const srcFiles = fs.existsSync(srcDir) ? this._countFiles(srcDir, /\.js$/) : 1;
 
-    // テストファイル数とソースファイル数の比率
+    // Ratio of test files to source files
     return Math.min(1, testFiles / Math.max(1, srcFiles * 0.5));
   }
 
   /**
-   * コード品質チェック
+   * Check code quality
    */
   checkCodeQuality(_context) {
     let score = 0;
 
-    // ESLint設定の存在
+    // ESLint configuration present
     if (this.fileExists('.eslintrc.js') || this.fileExists('.eslintrc.json')) {
       score += 0.3;
     }
 
-    // Prettier設定の存在
+    // Prettier configuration present
     if (this.fileExists('.prettierrc') || this.fileExists('.prettierrc.json')) {
       score += 0.2;
     }
 
-    // package.json に lint スクリプトがあるか
+    // package.json has lint/format scripts
     const pkg = this.readFile('package.json');
     if (pkg) {
       try {
@@ -490,7 +492,7 @@ class ImplementationCritic extends BaseCritic {
           score += 0.2;
         }
       } catch (e) {
-        // パース失敗
+        // Parse failed
       }
     }
 
@@ -498,7 +500,7 @@ class ImplementationCritic extends BaseCritic {
   }
 
   /**
-   * ドキュメントチェック
+   * Check documentation
    */
   checkDocumentation(_context) {
     let score = 0;
@@ -509,7 +511,7 @@ class ImplementationCritic extends BaseCritic {
     // CONTRIBUTING.md
     if (this.fileExists('CONTRIBUTING.md')) score += 0.2;
 
-    // steering/ ディレクトリ
+    // steering/ directory
     if (this.fileExists('steering/product.md')) score += 0.2;
     if (this.fileExists('steering/structure.md')) score += 0.2;
 
@@ -531,21 +533,21 @@ class ImplementationCritic extends BaseCritic {
 
   _generateMessage(score, scores) {
     if (score >= 0.8) {
-      return '実装は高品質です。テストカバレッジが高く、コード品質ツールが設定されています。';
+      return 'Implementation is high quality: good test coverage and code quality tools configured.';
     } else if (score >= 0.5) {
-      return '実装は基本的な品質を満たしています。';
+      return 'Implementation meets basic quality standards.';
     } else {
       const issues = [];
-      if (scores.testCoverage < 0.5) issues.push('テストの追加');
-      if (scores.codeQuality < 0.5) issues.push('リンター/フォーマッターの設定');
-      if (scores.documentation < 0.5) issues.push('ドキュメントの充実');
-      return `実装には改善が必要です: ${issues.join(', ')}`;
+      if (scores.testCoverage < 0.5) issues.push('add tests');
+      if (scores.codeQuality < 0.5) issues.push('configure a linter/formatter');
+      if (scores.documentation < 0.5) issues.push('improve documentation');
+      return `Implementation needs improvement: ${issues.join(', ')}`;
     }
   }
 }
 
 /**
- * クリティックシステム
+ * Critic system
  */
 class CriticSystem {
   constructor(options = {}) {
@@ -558,7 +560,7 @@ class CriticSystem {
   }
 
   /**
-   * 特定ステージを評価
+   * Evaluate a specific stage
    * @param {string} stage
    * @param {Object} context
    * @returns {CriticResult}
@@ -572,7 +574,7 @@ class CriticSystem {
   }
 
   /**
-   * 全ステージを評価
+   * Evaluate all stages
    * @param {Object} context
    * @returns {Object}
    */
@@ -598,7 +600,7 @@ class CriticSystem {
   }
 
   /**
-   * レポートを生成
+   * Generate a report
    * @param {Object} results
    * @returns {string}
    */
@@ -626,11 +628,11 @@ class CriticSystem {
     const avgScore =
       Object.values(results).reduce((sum, r) => sum + r.score, 0) / Object.keys(results).length;
     if (avgScore >= 0.8) {
-      return 'プロジェクトは全体的に高品質です。';
+      return 'The project is high quality overall.';
     } else if (avgScore >= 0.5) {
-      return 'プロジェクトは基本的な品質を満たしています。';
+      return 'The project meets basic quality standards.';
     } else {
-      return 'プロジェクトには全体的な改善が必要です。';
+      return 'The project needs improvement overall.';
     }
   }
 }

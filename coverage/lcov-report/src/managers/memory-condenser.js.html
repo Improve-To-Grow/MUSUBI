@@ -934,7 +934,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * MUSUBI Memory Condenser
  *
- * 長いセッション履歴を圧縮してコンテキストウィンドウ内に収める
+ * Compress long session history to fit within the context window
  *
  * @module src/managers/memory-condenser
  * @see REQ-P0-B004
@@ -942,17 +942,17 @@
  */
 &nbsp;
 /**
- * コンデンサータイプ
+ * Condenser types
  */
 const CondenserType = <span class="cstat-no" title="statement not covered" >{</span>
-  LLM: 'llm', // LLMで要約
-  RECENT: 'recent', // 最新N件を保持
-  AMORTIZED: 'amortized', // 分割統治方式
-  NOOP: 'noop', // 圧縮なし
+  LLM: 'llm', // Summarize with an LLM
+  RECENT: 'recent', // Keep the latest N items
+  AMORTIZED: 'amortized', // Divide-and-conquer approach
+  NOOP: 'noop', // No compression
 };
 &nbsp;
 /**
- * イベントタイプ
+ * Event types
  */
 const MemoryEventType = <span class="cstat-no" title="statement not covered" >{</span>
   USER_MESSAGE: 'user_message',
@@ -964,14 +964,14 @@ const MemoryEventType = <span class="cstat-no" title="statement not covered" >{<
 };
 &nbsp;
 /**
- * メモリイベント
+ * Memory event
  */
 class MemoryEvent {
   /**
    * @param {Object} options
-   * @param {string} options.type - イベントタイプ
-   * @param {string} options.content - 内容
-   * @param {Object} options.metadata - メタデータ
+   * @param {string} options.type - Event type
+   * @param {string} options.content - Content
+   * @param {Object} options.metadata - Metadata
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    this.id = options.id || `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;</span>
@@ -983,16 +983,16 @@ class MemoryEvent {
   }
 &nbsp;
   /**
-   * トークン数を推定（簡易版）
+   * Estimate the token count (simple version)
    * @returns {number}
    */
 <span class="fstat-no" title="function not covered" >  _e</span>stimateTokens() {
-    // 簡易推定: 4文字 ≈ 1トークン
+    // Simple estimate: 4 characters ~ 1 token
 <span class="cstat-no" title="statement not covered" >    return Math.ceil(this.content.length / 4);</span>
   }
 &nbsp;
   /**
-   * 要約イベントを作成
+   * Create a summary event
    * @param {string} summary
    * @param {MemoryEvent[]} originalEvents
    * @returns {MemoryEvent}
@@ -1022,12 +1022,12 @@ class MemoryEvent {
 }
 &nbsp;
 /**
- * 圧縮結果
+ * Compression result
  */
 class CondensedView {
   /**
-   * @param {MemoryEvent[]} events - 圧縮後のイベント
-   * @param {Object} stats - 統計情報
+   * @param {MemoryEvent[]} events - Events after compression
+   * @param {Object} stats - Statistics
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(events, stats = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    this.events = events;</span>
@@ -1041,7 +1041,7 @@ class CondensedView {
   }
 &nbsp;
   /**
-   * プロンプト用にフォーマット
+   * Format for prompts
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  to</span>Prompt() {
@@ -1057,7 +1057,7 @@ class CondensedView {
 }
 &nbsp;
 /**
- * 基底コンデンサー
+ * Base condenser
  */
 class BaseCondenser {
   /**
@@ -1074,7 +1074,7 @@ class BaseCondenser {
   }
 &nbsp;
   /**
-   * イベントを圧縮
+   * Compress events
    * @param {MemoryEvent[]} events
    * @returns {Promise&lt;CondensedView&gt;}
    */
@@ -1083,23 +1083,23 @@ class BaseCondenser {
   }
 &nbsp;
   /**
-   * 保持すべきイベントかチェック
+   * Check whether the event should be kept
    * @param {MemoryEvent} event
    * @returns {boolean}
    */
 <span class="fstat-no" title="function not covered" >  sh</span>ouldPreserve(event) {
-    // 要約イベントは常に保持
+    // Always keep summary events
 <span class="cstat-no" title="statement not covered" >    if (event.type === MemoryEventType.SUMMARY) {</span>
 <span class="cstat-no" title="statement not covered" >      return true;</span>
     }
 &nbsp;
-    // パターンマッチング
+    // Pattern matching
 <span class="cstat-no" title="statement not covered" >    return this.preservePatterns.some(<span class="fstat-no" title="function not covered" >pa</span>ttern =&gt; <span class="cstat-no" title="statement not covered" >event.content.includes(pattern))</span>;</span>
   }
 }
 &nbsp;
 /**
- * Noopコンデンサー（圧縮なし）
+ * Noop condenser (no compression)
  */
 class NoopCondenser extends BaseCondenser {
 <span class="fstat-no" title="function not covered" >  as</span>ync condense(events) {
@@ -1110,13 +1110,13 @@ class NoopCondenser extends BaseCondenser {
 }
 &nbsp;
 /**
- * 最新N件コンデンサー
+ * Recent-N condenser
  */
 class RecentEventsCondenser extends BaseCondenser {
   /**
    * @param {Object} options
-   * @param {number} options.keepFirst - 最初のN件を保持
-   * @param {number} options.keepRecent - 最新のN件を保持
+   * @param {number} options.keepFirst - Keep the first N items
+   * @param {number} options.keepRecent - Keep the latest N items
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    super(options);</span>
@@ -1134,11 +1134,11 @@ class RecentEventsCondenser extends BaseCondenser {
     const firstEvents = <span class="cstat-no" title="statement not covered" >events.slice(0, this.keepFirst);</span>
     const recentEvents = <span class="cstat-no" title="statement not covered" >events.slice(-this.keepRecent);</span>
 &nbsp;
-    // 中間イベントから保持すべきものを抽出
+    // Extract the events to keep from the middle events
     const middleEvents = <span class="cstat-no" title="statement not covered" >events.slice(this.keepFirst, -this.keepRecent);</span>
     const preservedMiddle = <span class="cstat-no" title="statement not covered" >middleEvents.filter(<span class="fstat-no" title="function not covered" >e </span>=&gt; <span class="cstat-no" title="statement not covered" >this.shouldPreserve(e))</span>;</span>
 &nbsp;
-    // 省略された数を示すサマリー
+    // Summary indicating the number omitted
     const omittedCount = <span class="cstat-no" title="statement not covered" >middleEvents.length - preservedMiddle.length;</span>
     const summaryEvent = <span class="cstat-no" title="statement not covered" >MemoryEvent.createSummary(</span>
       `[${omittedCount} messages omitted for brevity]`,
@@ -1154,14 +1154,14 @@ class RecentEventsCondenser extends BaseCondenser {
 }
 &nbsp;
 /**
- * LLMコンデンサー
+ * LLM condenser
  */
 class LLMCondenser extends BaseCondenser {
   /**
    * @param {Object} options
-   * @param {number} options.maxTokens - 最大トークン数
-   * @param {number} options.keepFirst - 最初のN件を保持
-   * @param {Function} options.summarizer - 要約関数 (events) =&gt; Promise&lt;string&gt;
+   * @param {number} options.maxTokens - Maximum number of tokens
+   * @param {number} options.keepFirst - Keep the first N items
+   * @param {Function} options.summarizer - Summarizer function (events) =&gt; Promise&lt;string&gt;
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    super(options);</span>
@@ -1180,15 +1180,15 @@ class LLMCondenser extends BaseCondenser {
       });
     }
 &nbsp;
-    // 最初のイベントは保持
+    // Keep the first event
     const preserved = <span class="cstat-no" title="statement not covered" >events.slice(0, this.keepFirst);</span>
     let remaining = <span class="cstat-no" title="statement not covered" >events.slice(this.keepFirst);</span>
 &nbsp;
-    // 重要なイベントを抽出
+    // Extract important events
     const importantEvents = <span class="cstat-no" title="statement not covered" >remaining.filter(<span class="fstat-no" title="function not covered" >e </span>=&gt; <span class="cstat-no" title="statement not covered" >this.shouldPreserve(e))</span>;</span>
     const regularEvents = <span class="cstat-no" title="statement not covered" >remaining.filter(<span class="fstat-no" title="function not covered" >e </span>=&gt; <span class="cstat-no" title="statement not covered" >!this.shouldPreserve(e))</span>;</span>
 &nbsp;
-    // 通常イベントをチャンク化して要約
+    // Chunk normal events and summarize them
     const chunks = <span class="cstat-no" title="statement not covered" >this._chunkEvents(regularEvents);</span>
     const summaries = <span class="cstat-no" title="statement not covered" >[];</span>
 &nbsp;
@@ -1207,7 +1207,7 @@ class LLMCondenser extends BaseCondenser {
   }
 &nbsp;
   /**
-   * イベントをチャンク化
+   * Split events into chunks
    * @param {MemoryEvent[]} events
    * @returns {MemoryEvent[][]}
    */
@@ -1220,7 +1220,7 @@ class LLMCondenser extends BaseCondenser {
   }
 &nbsp;
   /**
-   * デフォルト要約関数（LLM未使用、簡易版）
+   * Default summarizer function (no LLM, simple version)
    * @param {MemoryEvent[]} events
    * @returns {Promise&lt;string&gt;}
    */
@@ -1239,14 +1239,14 @@ class LLMCondenser extends BaseCondenser {
 }
 &nbsp;
 /**
- * 分割統治コンデンサー（Amortized）
+ * Divide-and-conquer condenser (Amortized)
  */
 class AmortizedCondenser extends BaseCondenser {
   /**
    * @param {Object} options
-   * @param {number} options.maxSize - 最大イベント数
-   * @param {number} options.targetSize - 目標イベント数
-   * @param {Function} options.summarizer - 要約関数
+   * @param {number} options.maxSize - Maximum number of events
+   * @param {number} options.targetSize - Target number of events
+   * @param {Function} options.summarizer - Summarizer function
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    super(options);</span>
@@ -1262,19 +1262,19 @@ class AmortizedCondenser extends BaseCondenser {
       });
     }
 &nbsp;
-    // ユーザーメッセージの位置を特定（境界として使用）
+    // Identify user message positions (used as boundaries)
     const userMessageIndices = <span class="cstat-no" title="statement not covered" >events</span>
       .map(<span class="fstat-no" title="function not covered" >(e</span>, i) =&gt; (<span class="cstat-no" title="statement not covered" >e.type === MemoryEventType.USER_MESSAGE ? i : -1)</span>)
       .filter(<span class="fstat-no" title="function not covered" >i </span>=&gt; <span class="cstat-no" title="statement not covered" >i !== -1)</span>;
 &nbsp;
-    // 最初と最新のユーザーメッセージ周辺は保持
+    // Keep events around the first and latest user messages
     const preserveStart = <span class="cstat-no" title="statement not covered" >userMessageIndices[0] !== undefined ? userMessageIndices[0] : 0;</span>
     const preserveEnd =
 <span class="cstat-no" title="statement not covered" >      userMessageIndices.length &gt; 1</span>
         ? userMessageIndices[userMessageIndices.length - 1]
         : events.length;
 &nbsp;
-    // 圧縮対象を特定
+    // Identify the events to compress
     const toCondense = <span class="cstat-no" title="statement not covered" >events.slice(preserveStart + 1, preserveEnd);</span>
     const condensedCount = <span class="cstat-no" title="statement not covered" >events.length - this.targetSize;</span>
 &nbsp;
@@ -1284,7 +1284,7 @@ class AmortizedCondenser extends BaseCondenser {
       });
     }
 &nbsp;
-    // 要約を作成
+    // Create the summary
     const summaryText = <span class="cstat-no" title="statement not covered" >await this.summarizer(toCondense.slice(0, condensedCount));</span>
     const summaryEvent = <span class="cstat-no" title="statement not covered" >MemoryEvent.createSummary(</span>
       summaryText,
@@ -1309,13 +1309,13 @@ class AmortizedCondenser extends BaseCondenser {
 }
 &nbsp;
 /**
- * メモリコンデンサーファクトリー
+ * Memory condenser factory
  */
 class MemoryCondenser {
   /**
-   * コンデンサーを作成
+   * Create a condenser
    * @param {Object} options
-   * @param {string} options.type - コンデンサータイプ
+   * @param {string} options.type - Condenser type
    * @returns {BaseCondenser}
    */
 <span class="fstat-no" title="function not covered" >  st</span>atic create(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -1336,8 +1336,8 @@ class MemoryCondenser {
   }
 &nbsp;
   /**
-   * 設定ファイルからコンデンサーを作成
-   * @param {Object} config - project.yml の condenser セクション
+   * Create a condenser from a configuration file
+   * @param {Object} config - condenser section of project.yml
    * @returns {BaseCondenser}
    */
 <span class="fstat-no" title="function not covered" >  st</span>atic fromConfig(config = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {

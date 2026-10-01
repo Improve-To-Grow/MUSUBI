@@ -9,7 +9,7 @@
   <!-- Main circle -->
   <circle cx="50" cy="50" r="45" fill="url(#grad1)" />
   
-  <!-- 結 (musubi) character stylized -->
+  <!-- Stylized musubi (knot) character -->
   <g fill="white" transform="translate(20, 25) scale(0.6)">
     <!-- Stylized knot/binding symbol -->
     <path d="M50 10 

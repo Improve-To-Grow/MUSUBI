@@ -38,46 +38,46 @@ graph LR
 
 ## Stage 0: Spike / PoC (Optional)
 
-**When to use**: 技術的な不確実性が高い場合、新技術の評価が必要な場合
+**When to use**: When technical uncertainty is high or a new technology needs to be evaluated
 
 **Agent**: `@software-developer`, `@system-architect`
 
 **Output**: 
-- `spike-{topic}.md` - 調査結果と結論
-- PoC コード（使い捨て可）
+- `spike-{topic}.md` - Research findings and conclusions
+- PoC code (disposable)
 
 **Purpose**:
-- 技術的実現可能性の検証
-- パフォーマンス特性の確認
-- ライブラリ/フレームワークの評価
-- リスクの早期発見
+- Validation of technical feasibility
+- Confirmation of performance characteristics
+- Evaluation of libraries/frameworks
+- Early risk discovery
 
-**Timeboxing**: 最大 1-2 日（超える場合は分割）
+**Timeboxing**: Maximum 1-2 days (split if it exceeds this)
 
 **Completion Criteria**:
-- [ ] 技術的な質問に回答できた
-- [ ] Go/No-Go の判断ができた
-- [ ] リスクと制約が明確になった
-- [ ] 次のステップが決まった
+- [ ] Technical questions answered
+- [ ] Go/No-Go decision made
+- [ ] Risks and constraints clarified
+- [ ] Next steps decided
 
 **Output Format**:
 ```markdown
 # Spike: [Topic]
 
 ## Question
-何を検証するのか？
+What is being validated?
 
 ## Approach
-どのように検証したか？
+How was it validated?
 
 ## Findings
-何がわかったか？
+What was learned?
 
 ## Recommendation
-推奨事項と次のステップ
+Recommendations and next steps
 
 ## Time Spent
-実際にかかった時間
+Actual time spent
 ```
 
 **Next Stage**: Requirements Definition
@@ -270,37 +270,37 @@ graph LR
 - Requirements document
 
 **Output**:
-- レビューコメント
-- 承認/修正要求
-- セキュリティ指摘事項
+- Review comments
+- Approval / change requests
+- Security findings
 
 **Purpose**:
-- コード品質の確保
-- 設計との整合性確認
-- セキュリティ脆弱性の検出
-- 知識共有とメンタリング
+- Ensuring code quality
+- Verifying consistency with the design
+- Detecting security vulnerabilities
+- Knowledge sharing and mentoring
 
 **Review Checklist**:
-- [ ] コードが設計に準拠している
-- [ ] SOLID 原則に従っている
-- [ ] エラーハンドリングが適切
-- [ ] セキュリティ考慮事項が実装されている
-- [ ] テストが十分
-- [ ] ドキュメントが更新されている
-- [ ] パフォーマンス問題がない
+- [ ] Code complies with the design
+- [ ] Follows SOLID principles
+- [ ] Error handling is appropriate
+- [ ] Security considerations are implemented
+- [ ] Tests are sufficient
+- [ ] Documentation is updated
+- [ ] No performance issues
 
-**MCP Tools** (CodeGraph 利用時):
-- `find_callers` - 変更の影響範囲確認
-- `find_dependencies` - 依存関係の確認
-- `query_codebase` - 類似コードの検索
+**MCP Tools** (when using CodeGraph):
+- `find_callers` - Check the impact scope of a change
+- `find_dependencies` - Check dependencies
+- `query_codebase` - Search for similar code
 
 **Review Types**:
 
-| タイプ | 目的 | 時間目安 |
+| Type | Purpose | Estimated Time |
 |--------|------|---------|
-| **Quick Review** | 小さな変更、バグ修正 | 15-30分 |
-| **Standard Review** | 機能追加 | 1-2時間 |
-| **Deep Review** | アーキテクチャ変更、セキュリティ | 半日 |
+| **Quick Review** | Small changes, bug fixes | 15-30 min |
+| **Standard Review** | Feature additions | 1-2 hours |
+| **Deep Review** | Architecture changes, security | Half a day |
 
 **Next Stage**: Testing
 
@@ -410,59 +410,59 @@ graph LR
 **Agent**: `@project-manager`, `@orchestrator`
 
 **When to run**: 
-- 各スプリント/イテレーション終了時
-- 機能リリース後
-- 重大インシデント後
+- At the end of each sprint/iteration
+- After a feature release
+- After a major incident
 
 **Input**:
-- 完了した要件/タスク
-- インシデントレポート
-- チームフィードバック
-- メトリクス
+- Completed requirements/tasks
+- Incident reports
+- Team feedback
+- Metrics
 
 **Output**:
-- `steering/memories/lessons_learned.md` への追記
-- 改善アクションアイテム
-- ワークフロー改善提案
+- Append to `steering/memories/lessons_learned.md`
+- Improvement action items
+- Workflow improvement proposals
 
 **Purpose**:
-- プロセスの継続的改善
-- 知識の蓄積と共有
-- チームの成長
+- Continuous process improvement
+- Accumulation and sharing of knowledge
+- Team growth
 
 **Retrospective Format**:
 
 ```markdown
-## [YYYY-MM-DD] Sprint/Release X.X 振り返り
+## [YYYY-MM-DD] Sprint/Release X.X Retrospective
 
 ### 📊 Metrics
-- 要件数: X
-- タスク完了率: X%
-- バグ発見（テスト時/本番）: X/X
-- 手戻り回数: X
-- リードタイム: X 日
+- Number of requirements: X
+- Task completion rate: X%
+- Bugs found (testing/production): X/X
+- Rework count: X
+- Lead time: X days
 
 ### 👍 What Went Well
-- [良かった点]
+- [What went well]
 
 ### 🔧 What Could Be Improved
-- [改善点]
+- [What to improve]
 
 ### 💡 Insights
-- [気づき、学び]
+- [Insights and learnings]
 
 ### 📋 Action Items
-- [ ] [具体的な改善アクション]
-- [ ] [担当者: XXX、期限: YYYY-MM-DD]
+- [ ] [Specific improvement action]
+- [ ] [Owner: XXX, Due: YYYY-MM-DD]
 ```
 
 **Discussion Questions**:
-1. ワークフローのどこがボトルネックだったか？
-2. どのステージで手戻りが発生したか？
-3. 事前に防げた問題はあったか？
-4. 次回改善できることは何か？
+1. Where were the workflow bottlenecks?
+2. At which stage did rework occur?
+3. Were there problems that could have been prevented in advance?
+4. What can be improved next time?
 
-**Next Stage**: 次のイテレーションの Requirements へ
+**Next Stage**: To Requirements of the next iteration
 
 ---
 

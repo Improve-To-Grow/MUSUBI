@@ -46,7 +46,7 @@ class TechArticleGenerator {
     this.config = {
       outputDir: config.outputDir || 'docs/articles',
       defaultPlatform: config.defaultPlatform || PLATFORM.GENERIC,
-      defaultLanguage: config.defaultLanguage || 'ja',
+      defaultLanguage: config.defaultLanguage || 'en',
       includeTableOfContents: config.includeTableOfContents !== false,
       includeFrontMatter: config.includeFrontMatter !== false,
       ...config,
@@ -162,7 +162,7 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
 
     // Table of Contents
     if (this.config.includeTableOfContents && content.sections) {
-      sections.push('## 目次');
+      sections.push('## Table of Contents');
       sections.push('');
       content.sections.forEach((section, idx) => {
         sections.push(`${idx + 1}. [${section.title}](#${this.slugify(section.title)})`);
@@ -219,9 +219,9 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
 
     // Benchmarks
     if (content.benchmarks) {
-      sections.push('## ベンチマーク結果');
+      sections.push('## Benchmark Results');
       sections.push('');
-      sections.push('| 項目 | 値 |');
+      sections.push('| Item | Value |');
       sections.push('|------|-----|');
       for (const [key, value] of Object.entries(content.benchmarks)) {
         sections.push(`| ${key} | ${value} |`);
@@ -231,7 +231,7 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
 
     // Conclusion
     if (content.conclusion) {
-      sections.push('## まとめ');
+      sections.push('## Conclusion');
       sections.push('');
       sections.push(content.conclusion);
       sections.push('');
@@ -239,7 +239,7 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
 
     // References
     if (content.references && content.references.length > 0) {
-      sections.push('## 参考文献');
+      sections.push('## References');
       sections.push('');
       for (const ref of content.references) {
         sections.push(`- ${template.link(ref.title, ref.url)}`);
@@ -275,8 +275,8 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
    */
   async generateFromExperiment(experimentReport, options = {}) {
     const content = {
-      title: options.title || `実験レポート: ${experimentReport.metadata?.title || 'Unknown'}`,
-      description: options.description || '実験結果と観察のレポート',
+      title: options.title || `Experiment Report: ${experimentReport.metadata?.title || 'Unknown'}`,
+      description: options.description || 'A report of experiment results and observations',
       tags: options.tags || ['experiment', 'test', 'report'],
       introduction: options.introduction || this.generateExperimentIntroduction(experimentReport),
       sections: this.generateExperimentSections(experimentReport),
@@ -296,9 +296,9 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
   generateExperimentIntroduction(report) {
     const summary = report.summary || {};
     return (
-      `本記事では、${report.metadata?.title || 'テスト'}の実験結果を報告します。` +
-      `合計${summary.total || 0}件のテストを実行し、` +
-      `${summary.passRate || '0%'}のパス率を達成しました。`
+      `This article reports the experiment results for ${report.metadata?.title || 'the test suite'}. ` +
+      `A total of ${summary.total || 0} tests were run, ` +
+      `achieving a pass rate of ${summary.passRate || '0%'}.`
     );
   }
 
@@ -312,22 +312,22 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
 
     // Summary section
     sections.push({
-      title: '実験サマリー',
+      title: 'Experiment Summary',
       content: `
-| 指標 | 値 |
-|------|-----|
-| 総テスト数 | ${report.summary?.total || 0} |
-| 成功 | ${report.summary?.passed || 0} |
-| 失敗 | ${report.summary?.failed || 0} |
-| スキップ | ${report.summary?.skipped || 0} |
-| パス率 | ${report.summary?.passRate || '0%'} |
+| Metric | Value |
+|--------|-------|
+| Total Tests | ${report.summary?.total || 0} |
+| Passed | ${report.summary?.passed || 0} |
+| Failed | ${report.summary?.failed || 0} |
+| Skipped | ${report.summary?.skipped || 0} |
+| Pass Rate | ${report.summary?.passRate || '0%'} |
       `.trim(),
     });
 
     // Metrics section (if available)
     if (report.metrics && Object.keys(report.metrics).length > 0) {
       sections.push({
-        title: 'メトリクス',
+        title: 'Metrics',
         content: this.formatMetricsSection(report.metrics),
       });
     }
@@ -335,7 +335,7 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
     // Observations section
     if (report.observations && report.observations.length > 0) {
       sections.push({
-        title: '観察結果',
+        title: 'Observations',
         content: report.observations.map(o => `- ${o}`).join('\n'),
       });
     }
@@ -352,10 +352,10 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
     const lines = [];
 
     if (metrics.performance) {
-      lines.push('### パフォーマンス');
+      lines.push('### Performance');
       lines.push('');
-      lines.push('| 指標 | 値 |');
-      lines.push('|------|-----|');
+      lines.push('| Metric | Value |');
+      lines.push('|--------|-------|');
       for (const [key, value] of Object.entries(metrics.performance)) {
         lines.push(`| ${key} | ${value} |`);
       }
@@ -363,10 +363,10 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
     }
 
     if (metrics.coverage) {
-      lines.push('### カバレッジ');
+      lines.push('### Coverage');
       lines.push('');
-      lines.push('| 種別 | 値 |');
-      lines.push('|------|-----|');
+      lines.push('| Type | Value |');
+      lines.push('|------|-------|');
       for (const [key, value] of Object.entries(metrics.coverage)) {
         lines.push(`| ${key} | ${value} |`);
       }
@@ -404,13 +404,13 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
     const passRate = parseFloat(summary.passRate) || 0;
 
     if (passRate >= 95) {
-      return '実験は非常に成功裏に完了しました。すべての品質基準を満たしています。';
+      return 'The experiment completed very successfully. All quality criteria were met.';
     } else if (passRate >= 80) {
-      return '実験は概ね成功しましたが、いくつかの改善点が見つかりました。';
+      return 'The experiment was largely successful, but some areas for improvement were found.';
     } else if (passRate >= 50) {
-      return '実験結果は混合的でした。重大な問題がいくつか検出されました。';
+      return 'The experiment results were mixed. Several significant issues were detected.';
     } else {
-      return '実験では多くの問題が検出されました。根本的な見直しが必要です。';
+      return 'The experiment detected many issues. A fundamental review is required.';
     }
   }
 
@@ -461,10 +461,10 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
    * @returns {number} Word count
    */
   countWords(text) {
-    // Count Japanese characters + English words
-    const japanese = (text.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/g) || []).length;
-    const english = (text.match(/\b\w+\b/g) || []).length;
-    return japanese + english;
+    // Count CJK characters individually (no word separators) plus Latin words
+    const cjk = (text.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/g) || []).length;
+    const words = (text.match(/\b\w+\b/g) || []).length;
+    return cjk + words;
   }
 
   /**
@@ -474,9 +474,9 @@ tags: [${meta.tags.map(t => `"${t}"`).join(', ')}]
    */
   estimateReadingTime(text) {
     const words = this.countWords(text);
-    // Average reading speed: 400 characters/words per minute for Japanese
-    const minutes = Math.ceil(words / 400);
-    return `約${minutes}分`;
+    // Average reading speed: about 200 words per minute
+    const minutes = Math.ceil(words / 200);
+    return `${minutes} min read`;
   }
 
   /**

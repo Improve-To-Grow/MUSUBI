@@ -163,20 +163,20 @@ coverage_design = (requirements_with_design / requirements_total) * 100
 coverage_test = (requirements_with_tests / requirements_total) * 100
 ```
 
-### Phase 5: 段階的レポート生成
+### Phase 5: Incremental Report Generation
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: Prevent context length overflow**
 
-**出力方式の原則:**
+**Output Principles:**
 
-- ✅ 1セクションずつ順番に生成・保存
-- ✅ 各セクション生成後に進捗を報告
-- ✅ エラー発生時も部分的なレポートが残る
+- ✅ Generate and save one section at a time, in order
+- ✅ Report progress after generating each section
+- ✅ Partial reports are preserved even if an error occurs
 
 ```
-🤖 確認ありがとうございます。トレーサビリティ監査レポートを順番に生成します。
+🤖 Thank you for confirming. I will generate the traceability audit report in order.
 
-【生成予定のセクション】
+[Sections to be generated]
 1. Executive Summary
 2. Traceability Matrix
 3. Coverage Analysis
@@ -184,69 +184,69 @@ coverage_test = (requirements_with_tests / requirements_total) * 100
 5. Recommendations
 6. Constitutional Compliance
 
-合計: 6セクション
+Total: 6 sections
 
-**重要: 段階的生成方式**
-各セクションを1つずつ生成・保存し、進捗を報告します。
-これにより、途中経過が見え、エラーが発生しても部分的なレポートが残ります。
+**Important: Incremental generation method**
+I will generate and save each section one at a time and report progress.
+This makes intermediate progress visible, and a partial report is preserved even if an error occurs.
 
-生成を開始してよろしいですか?
-👤 ユーザー: [回答待ち]
+Shall I start generating?
+👤 User: [Awaiting response]
 ```
 
-ユーザーが承認後、**各セクションを順番に生成**:
+After the user approves, **generate each section in order**:
 
 **Step 1: Executive Summary**
 
 ```
-🤖 [1/6] Executive Summaryを生成しています...
+🤖 [1/6] Generating Executive Summary...
 
 📝 traceability/audit-report.md (Section 1)
-✅ 保存が完了しました
+✅ Save complete
 
-[1/6] 完了。次のセクションに進みます。
+[1/6] Complete. Proceeding to the next section.
 ```
 
 **Step 2: Traceability Matrix**
 
 ```
-🤖 [2/6] Traceability Matrixを生成しています...
+🤖 [2/6] Generating the Traceability Matrix...
 
 📝 traceability/audit-report.md (Section 2)
-✅ 保存が完了しました
+✅ Save complete
 
-[2/6] 完了。次のセクションに進みます。
+[2/6] Complete. Proceeding to the next section.
 ```
 
-**大きなトレーサビリティレポート(>300行)の場合:**
+**For large traceability reports (>300 lines):**
 
 ```
-🤖 トレーサビリティマトリクスが大規模なため、2パートに分割します。
-⚠️ 要件数が多いため、分割して詳細な追跡情報を生成します。
+🤖 The traceability matrix is large, so I will split it into 2 parts.
+⚠️ Because there are many requirements, I will split the output to generate detailed tracking information.
 
-📝 Part 1/2: traceability/audit-report.md (要件1-50の追跡情報)
-✅ 保存が完了しました (280行)
+📝 Part 1/2: traceability/audit-report.md (tracking information for requirements 1-50)
+✅ Save complete (280 lines)
 
-📝 Part 2/2: traceability/audit-report.md (要件51-100の追跡情報)
-✅ 保存が完了しました (250行)
+📝 Part 2/2: traceability/audit-report.md (tracking information for requirements 51-100)
+✅ Save complete (250 lines)
 
-✅ レポート生成完了: traceability/audit-report.md (530行)
+✅ Report generation complete: traceability/audit-report.md (530 lines)
 
-全要件の追跡が完了しました。
+Tracking of all requirements is complete.
 ```
 
-**Final: レポート生成完了サマリー**
+**Final: Report Generation Completion Summary**
 
 ```
-🤖 ✨ トレーサビリティ監査レポートの生成が完了しました！
+🤖 ✨ Traceability audit report generation is complete!
 
-## 📊 監査サマリー
-- **全体トレーサビリティ**: 66.7%
-- **実装済み要件**: 2/3
-- **孤立アイテム**: 2件
+## 📊 Audit Summary
+- **Overall traceability**: 66.7%
+- **Implemented requirements**: 2/3
+- **Orphaned items**: 2
 
-## 📂 生成されたレポート
-✅ traceability/audit-report.md (6セクション)
+## 📂 Generated Reports
+✅ traceability/audit-report.md (6 sections)
 
 ```
 

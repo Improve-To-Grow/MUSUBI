@@ -1,97 +1,97 @@
-# MUSUBI SDD クイックスタートガイド
+# MUSUBI SDD Quickstart Guide
 
-## 🚀 5分で始める MUSUBI SDD
+## 🚀 Get Started with MUSUBI SDD in 5 Minutes
 
-このガイドでは、MUSUBI SDD を使って最初の仕様駆動開発ワークフローを実行する方法を説明します。
+This guide explains how to run your first specification-driven development workflow with MUSUBI SDD.
 
-## 前提条件
+## Prerequisites
 
 - Node.js 18+
-- npm または yarn
-- OpenAI API キー（または他のLLMプロバイダー）
+- npm or yarn
+- OpenAI API key (or another LLM provider)
 
-## ステップ 1: インストール
+## Step 1: Installation
 
 ```bash
-# グローバルインストール（CLI用）
+# Global installation (for the CLI)
 npm install -g musubi-sdd
 
-# または、プロジェクトローカルにインストール
+# Or install locally in your project
 npm install musubi-sdd
 ```
 
-## ステップ 2: プロジェクト初期化
+## Step 2: Initialize the Project
 
 ```bash
-# 新規プロジェクトで初期化
+# Initialize in a new project
 musubi init
 
-# または既存プロジェクトに追加
+# Or add to an existing project
 musubi init --existing
 ```
 
-これにより以下のファイルが作成されます：
-- `steering/` - プロジェクトメモリ
-- `steering/rules/constitution.md` - 9条憲法
-- `steering/project.yml` - 設定ファイル
+This creates the following files:
+- `steering/` - Project memory
+- `steering/rules/constitution.md` - 9-Article Constitution
+- `steering/project.yml` - Configuration file
 
-## ステップ 3: 環境変数の設定
+## Step 3: Set Environment Variables
 
 ```bash
-# .envファイルを作成
+# Create a .env file
 echo "OPENAI_API_KEY=your-api-key-here" > .env
 
-# または環境変数として設定
+# Or set as environment variables
 export OPENAI_API_KEY=your-api-key-here
 ```
 
-## ステップ 4: 最初の機能を開発
+## Step 4: Develop Your First Feature
 
-### 4.1 要件生成
+### 4.1 Generate Requirements
 
 ```bash
-musubi requirements "ユーザー認証機能"
+musubi requirements "User authentication feature"
 ```
 
-生成される内容（EARS形式）：
+Generated content (EARS format):
 ```
 REQ-001: When a user provides valid credentials, the system shall authenticate the user within 2 seconds.
 REQ-002: If authentication fails 3 times, the system shall lock the account for 15 minutes.
 ```
 
-### 4.2 設計生成
+### 4.2 Generate Design
 
 ```bash
-musubi design "ユーザー認証機能"
+musubi design "User authentication feature"
 ```
 
-生成される内容：
-- C4コンテキスト図
-- コンテナ図
-- コンポーネント図
-- ADR（アーキテクチャ決定記録）
+Generated content:
+- C4 context diagram
+- Container diagram
+- Component diagram
+- ADR (Architecture Decision Record)
 
-### 4.3 タスク分解
+### 4.3 Task Breakdown
 
 ```bash
-musubi tasks "ユーザー認証機能"
+musubi tasks "User authentication feature"
 ```
 
-生成される内容：
+Generated content:
 ```
-TASK-001: AuthController の作成 [2h]
-TASK-002: AuthService の実装 [4h]
-TASK-003: JWT トークン生成 [2h]
-TASK-004: ユニットテスト作成 [3h]
+TASK-001: Create AuthController [2h]
+TASK-002: Implement AuthService [4h]
+TASK-003: Generate JWT tokens [2h]
+TASK-004: Write unit tests [3h]
 ```
 
-### 4.4 憲法検証
+### 4.4 Constitutional Validation
 
 ```bash
-musubi validate "ユーザー認証機能"
+musubi validate "User authentication feature"
 ```
 
-出力例：
+Example output:
 ```
 ✅ Article 1: Traceability - PASSED
 ✅ Article 2: EARS Requirements - PASSED
@@ -99,56 +99,56 @@ musubi validate "ユーザー認証機能"
 ⚠️ Article 7: Test Coverage - WARNING (75% < 80%)
 ```
 
-### 4.5 レビューゲート（v6.2.0 新機能）
+### 4.5 Review Gates (New in v6.2.0)
 
-各ステージでの品質レビュー：
-
-```bash
-# 要件レビュー
-musubi review requirements "ユーザー認証機能"
-
-# 設計レビュー
-musubi review design "ユーザー認証機能"
-
-# 実装レビュー
-musubi review implementation "ユーザー認証機能"
-
-# 全ゲートレビュー
-musubi review all "ユーザー認証機能"
-```
-
-### 4.6 ワークフローダッシュボード（v6.2.0 新機能）
-
-進捗状況の可視化：
+Quality review at each stage:
 
 ```bash
-# ダッシュボード表示
-musubi dashboard show "ユーザー認証機能"
+# Requirements review
+musubi review requirements "User authentication feature"
 
-# 新規ワークフロー開始
-musubi dashboard start "ユーザー認証機能"
+# Design review
+musubi review design "User authentication feature"
 
-# ブロッカー追加
-musubi dashboard blocker "ユーザー認証機能" --add "API設計のレビュー待ち"
+# Implementation review
+musubi review implementation "User authentication feature"
+
+# Review all gates
+musubi review all "User authentication feature"
 ```
 
-## ステップ 5: フルオーケストレーション
+### 4.6 Workflow Dashboard (New in v6.2.0)
 
-すべてのステップを一度に実行：
+Visualize progress:
 
 ```bash
-musubi orchestrate "ユーザー認証機能"
+# Show the dashboard
+musubi dashboard show "User authentication feature"
+
+# Start a new workflow
+musubi dashboard start "User authentication feature"
+
+# Add a blocker
+musubi dashboard blocker "User authentication feature" --add "Waiting for API design review"
 ```
 
-## 📊 コスト追跡
+## Step 5: Full Orchestration
 
-トークン使用量とコストを確認：
+Run all steps at once:
+
+```bash
+musubi orchestrate "User authentication feature"
+```
+
+## 📊 Cost Tracking
+
+Check token usage and cost:
 
 ```bash
 musubi costs --report
 ```
 
-出力例：
+Example output:
 ```
 📊 Cost Report
 ─────────────────────────────
@@ -162,9 +162,9 @@ By Operation:
   Validation:     $0.0434
 ```
 
-## 🔧 プログラマティック利用
+## 🔧 Programmatic Usage
 
-### Node.js から使用
+### Use from Node.js
 
 ```javascript
 const { OrchestrationEngine } = require('musubi-sdd');
@@ -176,118 +176,118 @@ const engine = new OrchestrationEngine({
 
 const result = await engine.execute({
   workflow: 'full-sdd',
-  feature: 'ユーザー認証'
+  feature: 'User Authentication'
 });
 
 console.log(result.summary);
 ```
 
-### VSCode 拡張機能
+### VSCode Extension
 
-1. VSCode Marketplace で「MUSUBI SDD」を検索
-2. インストール
-3. コマンドパレット（Ctrl+Shift+P）から `MUSUBI: Orchestrate` を実行
+1. Search for "MUSUBI SDD" in the VSCode Marketplace
+2. Install
+3. Run `MUSUBI: Orchestrate` from the Command Palette (Ctrl+Shift+P)
 
-## 📁 プロジェクト構造
+## 📁 Project Structure
 
-初期化後の構造：
+Structure after initialization:
 
 ```
 your-project/
 ├── steering/
-│   ├── product.md          # 製品コンテキスト
-│   ├── structure.md        # アーキテクチャパターン
-│   ├── tech.md             # 技術スタック
-│   ├── project.yml         # MUSUBI設定
+│   ├── product.md          # Product context
+│   ├── structure.md        # Architecture patterns
+│   ├── tech.md             # Technology stack
+│   ├── project.yml         # MUSUBI configuration
 │   ├── rules/
-│   │   ├── constitution.md # 9条憲法
-│   │   └── workflow.md     # ワークフロー定義
-│   ├── memories/           # 機能別メモリ
-│   └── templates/          # カスタムテンプレート
+│   │   ├── constitution.md # 9-Article Constitution
+│   │   └── workflow.md     # Workflow definition
+│   ├── memories/           # Per-feature memory
+│   └── templates/          # Custom templates
 ├── storage/
-│   ├── specs/              # 要件定義書（v6.3.0）
-│   ├── design/             # 設計書（v6.3.0）
-│   ├── tasks/              # タスク（v6.3.0）
-│   ├── validation/         # 検証レポート
-│   └── changes/            # 変更仕様
-└── src/                    # ソースコード
+│   ├── specs/              # Requirements specifications (v6.3.0)
+│   ├── design/             # Design documents (v6.3.0)
+│   ├── tasks/              # Tasks (v6.3.0)
+│   ├── validation/         # Validation reports
+│   └── changes/            # Change specifications
+└── src/                    # Source code
 ```
 
-## 🎯 ベストプラクティス
+## 🎯 Best Practices
 
-### 1. 機能を小さく保つ
+### 1. Keep Features Small
 
-❌ `musubi orchestrate "ECサイト全体"`
+❌ `musubi orchestrate "Entire e-commerce site"`
 
-✅ `musubi orchestrate "商品検索機能"`
+✅ `musubi orchestrate "Product search feature"`
 
-### 2. 既存コードを活用
+### 2. Leverage Existing Code
 
 ```bash
-# 既存コードを分析してから要件生成
+# Analyze existing code before generating requirements
 musubi analyze ./src
-musubi requirements "新機能" --context-from-analysis
+musubi requirements "New feature" --context-from-analysis
 ```
 
-### 3. 反復的に改善
+### 3. Improve Iteratively
 
 ```bash
-# 初回
-musubi requirements "機能X"
+# First pass
+musubi requirements "Feature X"
 
-# フィードバック後に改善
-musubi requirements "機能X" --refine
+# Refine after feedback
+musubi requirements "Feature X" --refine
 ```
 
-### 4. コストを意識
+### 4. Be Cost-Conscious
 
 ```bash
-# 見積もりのみ（実行しない）
-musubi orchestrate "機能X" --dry-run --estimate-cost
+# Estimate only (do not execute)
+musubi orchestrate "Feature X" --dry-run --estimate-cost
 ```
 
-## 🔗 次のステップ
+## 🔗 Next Steps
 
-- [API リファレンス](./API-REFERENCE.md)
-- [ユーザーガイド](./USER-GUIDE.md)
-- [設定オプション](./guides/configuration.md)
-- [VSCode 拡張機能ガイド](./guides/vscode-extension.md)
-- [企業向け機能](./guides/enterprise.md)
+- [API Reference](./API-REFERENCE.md)
+- [User Guide](./USER-GUIDE.md)
+- [Configuration Options](./guides/configuration.md)
+- [VSCode Extension Guide](./guides/vscode-extension.md)
+- [Enterprise Features](./guides/enterprise.md)
 
-## 🆘 トラブルシューティング
+## 🆘 Troubleshooting
 
-### エラー: API キーが無効
+### Error: Invalid API Key
 
 ```bash
-# API キーを確認
+# Check the API key
 echo $OPENAI_API_KEY
 
-# 設定をリセット
+# Reset the configuration
 musubi init --reset-config
 ```
 
-### エラー: 憲法検証に失敗
+### Error: Constitutional Validation Failed
 
 ```bash
-# 詳細なレポートを確認
-musubi validate "機能X" --verbose
+# View the detailed report
+musubi validate "Feature X" --verbose
 
-# 特定の条項のみ検証
-musubi validate "機能X" --articles 1,2,3
+# Validate specific articles only
+musubi validate "Feature X" --articles 1,2,3
 ```
 
-### コストが高すぎる
+### Cost Is Too High
 
 ```bash
-# 小さいモデルを使用
-musubi orchestrate "機能X" --model gpt-4o-mini
+# Use a smaller model
+musubi orchestrate "Feature X" --model gpt-4o-mini
 
-# チャンク処理を有効化
-musubi orchestrate "機能X" --chunk-size 4000
+# Enable chunked processing
+musubi orchestrate "Feature X" --chunk-size 4000
 ```
 
-## 📞 サポート
+## 📞 Support
 
 - GitHub Issues: https://github.com/nahisaho/MUSUBI/issues
-- ドキュメント: https://musubi.dev/docs
+- Documentation: https://musubi.dev/docs
 - Discord: https://discord.gg/musubi

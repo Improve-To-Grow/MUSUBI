@@ -167,7 +167,7 @@ Each includes:
 - SDD workflow
 - EARS format examples
 - Constitutional governance
-- Bilingual documentation policy
+- Documentation language policy
 - Quick start guide
 
 ### 6. ✅ README Updates
@@ -191,7 +191,7 @@ All agents share:
 - `templates/` directory (document templates)
 - Constitutional governance (9 articles)
 - EARS requirements format
-- Bilingual documentation (English + Japanese)
+- English documentation, with optional bilingual output ([BILINGUAL-IMPLEMENTATION.md](BILINGUAL-IMPLEMENTATION.md))
 - 8-stage SDD workflow
 
 ## Agent-Specific Features
@@ -369,7 +369,7 @@ npx musubi-sdd init --windsurf
 3. **Vendor Independence** - Not locked to Claude Code
 4. **Consistent Workflow** - Same SDD process across all agents
 5. **Shared Governance** - Constitutional compliance across platforms
-6. **Bilingual Support** - All agents support English + Japanese documentation
+6. **Optional Bilingual Support** - All agents can add a translated copy of each document when enabled ([BILINGUAL-IMPLEMENTATION.md](BILINGUAL-IMPLEMENTATION.md))
 
 ## Known Limitations
 
@@ -399,7 +399,7 @@ npx musubi-sdd init --windsurf
 ### MUSUBI-Specific Additions
 - **25 Claude Code Skills** (vs cc-sdd's simpler setup)
 - **Constitutional Governance** (9 articles)
-- **Bilingual Documentation** (English + Japanese)
+- **Optional Bilingual Documentation** ([BILINGUAL-IMPLEMENTATION.md](BILINGUAL-IMPLEMENTATION.md))
 - **Library-First Pattern** (Article I enforcement)
 - **EARS Format** (requirements syntax)
 - **Shared Templates** (steering, constitution, documents)

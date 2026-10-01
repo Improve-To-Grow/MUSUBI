@@ -22,10 +22,7 @@ You are executing the `/sdd-requirements [feature-name]` command to create a req
 
 ### Output Directory
 
-**Requirements documents are saved to**: `storage/specs/`
-
-- English: `storage/specs/{{feature-name}}-requirements.md`
-- Japanese: `storage/specs/{{feature-name}}-requirements.ja.md`
+**Requirements documents are saved to**: `storage/specs/{{feature-name}}-requirements.md`
 
 ---
 
@@ -69,7 +66,7 @@ steering/tech.md         # Technology stack
 **Turn 1**: Start with the WHY question
 
 ```
-この機能で解決したい『本当の課題』は何ですか？
+What is the "real problem" this feature should solve?
 ```
 
 → STOP HERE. Wait for user response.
@@ -77,7 +74,7 @@ steering/tech.md         # Technology stack
 **Turn 2**: Based on answer, ask WHO question
 
 ```
-この機能を最も必要としているのは誰ですか？
+Who needs this feature the most?
 ```
 
 → STOP HERE. Wait for user response.
@@ -85,7 +82,7 @@ steering/tech.md         # Technology stack
 **Turn 3**: Ask WHAT-IF question
 
 ```
-もしこの機能が完璧に動作したら、何が変わりますか？
+If this feature worked perfectly, what would change?
 ```
 
 → STOP HERE. Wait for user response.
@@ -93,7 +90,7 @@ steering/tech.md         # Technology stack
 **Turn 4**: Ask CONSTRAINT question
 
 ```
-この機能で『絶対にやってはいけないこと』はありますか？
+Is there anything this feature must "absolutely never do"?
 ```
 
 → STOP HERE. Wait for user response.
@@ -101,7 +98,7 @@ steering/tech.md         # Technology stack
 **Turn 5**: Ask SUCCESS CRITERIA question
 
 ```
-この機能が『成功した』と言えるのはどんな状態ですか？
+What state would let you say this feature has "succeeded"?
 ```
 
 → STOP HERE. Wait for user response.
@@ -109,34 +106,34 @@ steering/tech.md         # Technology stack
 **After 5+ turns**: Summarize and confirm
 
 ```
-ここまでの理解を確認させてください：
+Let me confirm my understanding so far:
 [Summary]
-この理解で正しいですか？
+Is this understanding correct?
 ```
 
 #### Example Dialogue Flow
 
 **AI Turn 1**:
 
-> まず、この機能について教えてください。
+> First, tell me about this feature.
 >
-> **この機能で解決したい『本当の課題』は何ですか？**
+> **What is the "real problem" this feature should solve?**
 
-**User**: "CSVから社員データをインポートしたい"
+**User**: "I want to import employee data from CSV"
 
 **AI Turn 2**:
 
-> なるほど、社員データのCSVインポートですね。
+> I see, a CSV import for employee data.
 >
-> **このインポート機能を最も必要としているのは誰ですか？**（人事部？IT管理者？）
+> **Who needs this import feature the most?** (HR? IT administrators?)
 
-**User**: "人事部です"
+**User**: "HR"
 
 **AI Turn 3**:
 
-> 人事部の方が使うのですね。
+> So HR will be using it.
 >
-> **もしこの機能が完璧に動作したら、人事部の業務はどう変わりますか？**
+> **If this feature worked perfectly, how would HR's work change?**
 
 ...(continues one question at a time)
 
@@ -466,38 +463,22 @@ Run validation:
 
 ---
 
-### 12. Save Document (Bilingual)
-
-**IMPORTANT**: Create BOTH English and Japanese versions.
+### 12. Save Document
 
 **Output Directory**: `storage/specs/`
 
-**English version (Primary/Reference)**:
 Save to: `storage/specs/{{feature-name}}-requirements.md`
-
-**Japanese version (Translation)**:
-Save to: `storage/specs/{{feature-name}}-requirements.ja.md`
 
 **File Naming**:
 
 - Use kebab-case
 - Include feature name
 - Add `-requirements` suffix
-- Add `.ja` before `.md` for Japanese version
 
 **Examples**:
 
-- `storage/specs/authentication-requirements.md` (English)
-- `storage/specs/authentication-requirements.ja.md` (Japanese)
-- `storage/specs/payment-processing-requirements.md` (English)
-- `storage/specs/payment-processing-requirements.ja.md` (Japanese)
-
-**Generation Order**:
-
-1. Generate English version FIRST
-2. Then generate Japanese translation
-3. Ensure requirement IDs are identical in both versions
-4. Keep technical terms (REQ-XXX-NNN, EARS keywords) in English in Japanese version
+- `storage/specs/authentication-requirements.md`
+- `storage/specs/payment-processing-requirements.md`
 
 ---
 
@@ -510,10 +491,7 @@ Present summary to user:
 
 **Feature**: {{FEATURE_NAME}}
 **Output Directory**: `storage/specs/`
-**Files**:
-
-- English: storage/specs/{{feature-name}}-requirements.md
-- Japanese: storage/specs/{{feature-name}}-requirements.ja.md
+**File**: storage/specs/{{feature-name}}-requirements.md
 
 ### True Purpose Discovery:
 
@@ -585,27 +563,27 @@ Present summary to user:
 
 2. **Interactive Dialogue (1-on-1)**:
 
-   **AI**: 「認証機能について、この機能で解決したい『本当の課題』は何ですか？」
+   **AI**: "Regarding the authentication feature, what is the 'real problem' this feature should solve?"
 
-   **User**: 「ユーザーがログインできるようにしたい」
+   **User**: "I want users to be able to log in"
 
-   **AI**: 「なるほど。では、この機能がないと、誰がどのように困りますか？」
+   **AI**: "I see. Then, without this feature, who would be affected and how?"
 
-   **User**: 「顧客がサービスを使えない。また、管理者が顧客データを保護できない」
+   **User**: "Customers can't use the service. Also, administrators can't protect customer data"
 
-   **AI**: 「顧客データの保護が重要なのですね。この機能で『絶対にやってはいけないこと』はありますか？」
+   **AI**: "Protecting customer data is important. Is there anything this feature must 'absolutely never do'?"
 
-   **User**: 「データ漏洩。SOC2準拠が必要」
+   **User**: "Data leaks. SOC2 compliance is required"
 
-   **AI**: 「SOC2準拠が必要とのこと。この機能が『成功した』と言えるのはどんな状態ですか？」
+   **AI**: "SOC2 compliance is required. What state would let you say this feature has 'succeeded'?"
 
-   **User**: 「ログイン成功率99%以上、不正アクセスゼロ」
+   **User**: "Login success rate of 99% or higher, zero unauthorized access"
 
-   **AI**: 「理解しました。確認させてください：
-   - **表面的要求**: ユーザーがログインできること
-   - **真の目的**: SOC2準拠でセキュアな顧客データ保護
-   - **成功基準**: ログイン成功率99%以上、不正アクセスゼロ
-     この理解で正しいですか？」
+   **AI**: "Understood. Let me confirm:
+   - **Surface request**: Users can log in
+   - **True purpose**: Secure customer data protection through SOC2 compliance
+   - **Success criteria**: Login success rate of 99% or higher, zero unauthorized access
+     Is this understanding correct?"
 
 3. **MECE Analysis**:
    - User Journey: Login → Session → Logout → Error handling
@@ -617,9 +595,9 @@ Present summary to user:
    ```markdown
    ## True Purpose Statement
 
-   - Surface Request: ユーザーログイン機能
-   - True Purpose: SOC2準拠のセキュアな顧客データ保護基盤
-   - Key Insight: 単なるログインではなく、コンプライアンス要件が重要
+   - Surface Request: User login feature
+   - True Purpose: Secure customer data protection foundation compliant with SOC2
+   - Key Insight: Not just login; compliance requirements are what matter
 
    ### REQ-AUTH-001: User Login
 
@@ -710,7 +688,6 @@ If `storage/specs/{{feature-name}}-requirements.md` exists:
 **Output Directory Summary**:
 
 - Requirements documents: `storage/specs/{{feature-name}}-requirements.md`
-- Japanese version: `storage/specs/{{feature-name}}-requirements.ja.md`
 
 ---
 

@@ -1,56 +1,56 @@
-# 🔧 プラットフォーム別セットアップガイド
+# 🔧 Platform-Specific Setup Guide
 
-**MUSUBI v3.5.1** | 最終更新: 2025-12-08
+**MUSUBI v3.5.1** | Last updated: 2025-12-08
 
-> 7つのAIコーディングエージェントごとの詳細セットアップ手順
+> Detailed setup instructions for each of the 7 AI coding agents
 
 ---
 
-## 📋 目次
+## 📋 Table of Contents
 
-1. [Claude Code（Skills API）](#1-claude-codeskills-api)
+1. [Claude Code (Skills API)](#1-claude-code-skills-api)
 2. [GitHub Copilot](#2-github-copilot)
 3. [Cursor](#3-cursor)
 4. [Gemini CLI](#4-gemini-cli)
 5. [Codex CLI](#5-codex-cli)
 6. [Qwen Code](#6-qwen-code)
 7. [Windsurf](#7-windsurf)
-8. [プラットフォーム比較](#8-プラットフォーム比較)
+8. [Platform Comparison](#8-platform-comparison)
 
 ---
 
-## 1. Claude Code（Skills API）
+## 1. Claude Code (Skills API)
 
-### 概要
+### Overview
 
-| 項目 | 内容 |
+| Item | Content |
 |------|------|
-| **形式** | Skills API（.mdc ファイル） |
-| **コマンド形式** | `/command` |
-| **Skills数** | 25 スキル + 11 コマンド |
-| **推奨度** | ⭐⭐⭐⭐⭐ 最高 |
+| **Format** | Skills API (.mdc files) |
+| **Command Format** | `/command` |
+| **Skills** | 25 skills + 11 commands |
+| **Recommendation** | ⭐⭐⭐⭐⭐ Best |
 
-### セットアップ
+### Setup
 
 ```bash
-# 初期化
+# Initialize
 npx musubi-sdd init --claude-code
 ```
 
-### 生成されるファイル構成
+### Generated File Structure
 
 ```
 project/
-├── CLAUDE.md                    # メインエントリーポイント
+├── CLAUDE.md                    # Main entry point
 ├── .claude/
-│   ├── commands/                # 11 SDDコマンド
+│   ├── commands/                # 11 SDD commands
 │   │   ├── sdd-requirements.md
 │   │   ├── sdd-design.md
 │   │   ├── sdd-tasks.md
 │   │   ├── sdd-implement.md
 │   │   ├── sdd-validate.md
 │   │   └── ...
-│   └── skills/                  # 25 専門スキル
+│   └── skills/                  # 25 specialized skills
 │       ├── orchestrator/
 │       ├── requirements-analyst/
 │       ├── system-architect/
@@ -60,22 +60,22 @@ project/
     └── ...
 ```
 
-### 使用方法
+### Usage
 
 ```
-# コマンド実行
-/sdd-requirements ログイン機能
+# Run a command
+/sdd-requirements login feature
 
-# スキル指定
-@requirements-analyst この機能の要件を分析して
+# Specify a skill
+@requirements-analyst Analyze the requirements for this feature
 
-# オーケストレーター経由
-@orchestrator 新機能を設計から実装まで担当して
+# Via the orchestrator
+@orchestrator Take charge of the new feature from design through implementation
 ```
 
-### 25 スキル一覧
+### List of 25 Skills
 
-| カテゴリ | スキル |
+| Category | Skills |
 |---------|--------|
 | **Core** | orchestrator, steering, constitution-enforcer |
 | **Requirements** | requirements-analyst, change-impact-analyzer |
@@ -92,45 +92,45 @@ project/
 
 ## 2. GitHub Copilot
 
-### 概要
+### Overview
 
-| 項目 | 内容 |
+| Item | Content |
 |------|------|
-| **形式** | AGENTS.md（公式サポート） |
-| **コマンド形式** | `#command` |
-| **推奨度** | ⭐⭐⭐⭐⭐ 最高 |
+| **Format** | AGENTS.md (officially supported) |
+| **Command Format** | `#command` |
+| **Recommendation** | ⭐⭐⭐⭐⭐ Best |
 
-### セットアップ
+### Setup
 
 ```bash
-# 初期化
+# Initialize
 npx musubi-sdd init --copilot
 ```
 
-### 生成されるファイル構成
+### Generated File Structure
 
 ```
 project/
-├── AGENTS.md                    # メインエントリーポイント
+├── AGENTS.md                    # Main entry point
 ├── .github/
-│   └── copilot-instructions.md  # Copilot設定
+│   └── copilot-instructions.md  # Copilot settings
 └── steering/
     └── ...
 ```
 
-### 使用方法
+### Usage
 
 ```
-# コマンド実行
-#sdd-requirements ログイン機能
-#sdd-design ログイン機能
+# Run a command
+#sdd-requirements login feature
+#sdd-design login feature
 #sdd-implement REQ-LOGIN-001
 
-# ワークフロー
-#sdd-steering 現在のプロジェクト状況を確認
+# Workflow
+#sdd-steering Check the current project status
 ```
 
-### VS Code設定（推奨）
+### VS Code Settings (Recommended)
 
 `.vscode/settings.json`:
 
@@ -154,32 +154,32 @@ project/
 
 ## 3. Cursor
 
-### 概要
+### Overview
 
-| 項目 | 内容 |
+| Item | Content |
 |------|------|
-| **形式** | AGENTS.md + .cursorrules |
-| **コマンド形式** | `@command` |
-| **推奨度** | ⭐⭐⭐⭐ 高 |
+| **Format** | AGENTS.md + .cursorrules |
+| **Command Format** | `@command` |
+| **Recommendation** | ⭐⭐⭐⭐ High |
 
-### セットアップ
+### Setup
 
 ```bash
-# 初期化
+# Initialize
 npx musubi-sdd init --cursor
 ```
 
-### 生成されるファイル構成
+### Generated File Structure
 
 ```
 project/
-├── AGENTS.md                    # メインエントリーポイント
-├── .cursorrules                 # Cursorルール設定
+├── AGENTS.md                    # Main entry point
+├── .cursorrules                 # Cursor rule settings
 └── steering/
     └── ...
 ```
 
-### .cursorrules 設定
+### .cursorrules Settings
 
 ```yaml
 # .cursorrules
@@ -191,60 +191,60 @@ rules:
   - Maintain traceability matrix
 ```
 
-### 使用方法
+### Usage
 
 ```
-# Cursorチャットで
-@sdd-requirements ログイン機能を定義して
-@sdd-design C4モデルで設計して
-@sdd-implement この要件を実装して
+# In Cursor chat
+@sdd-requirements Define the login feature
+@sdd-design Design it using the C4 model
+@sdd-implement Implement this requirement
 ```
 
 ---
 
 ## 4. Gemini CLI
 
-### 概要
+### Overview
 
-| 項目 | 内容 |
+| Item | Content |
 |------|------|
-| **形式** | GEMINI.md |
-| **コマンド形式** | テキストプロンプト |
-| **推奨度** | ⭐⭐⭐⭐ 高 |
+| **Format** | GEMINI.md |
+| **Command Format** | Text prompt |
+| **Recommendation** | ⭐⭐⭐⭐ High |
 
-### セットアップ
+### Setup
 
 ```bash
-# Gemini CLI インストール（まだの場合）
+# Install Gemini CLI (if not yet installed)
 npm install -g @anthropic-ai/gemini-cli
 
-# MUSUBI初期化
+# Initialize MUSUBI
 npx musubi-sdd init --gemini
 ```
 
-### 生成されるファイル構成
+### Generated File Structure
 
 ```
 project/
-├── GEMINI.md                    # メインエントリーポイント
+├── GEMINI.md                    # Main entry point
 └── steering/
     └── ...
 ```
 
-### 使用方法
+### Usage
 
 ```bash
-# Gemini CLIで実行
-gemini "GEMINI.mdを参照して、ログイン機能の要件を定義して"
+# Run with Gemini CLI
+gemini "Refer to GEMINI.md and define the requirements for the login feature"
 
-# ファイル参照付き
-gemini -f GEMINI.md -f steering/tech.md "新機能を設計して"
+# With file references
+gemini -f GEMINI.md -f steering/tech.md "Design the new feature"
 ```
 
-### コンテキスト設定
+### Context Settings
 
 ```bash
-# 環境変数でコンテキスト設定
+# Set context via environment variables
 export GEMINI_CONTEXT="$(cat GEMINI.md steering/product.md)"
 ```
 
@@ -252,70 +252,70 @@ export GEMINI_CONTEXT="$(cat GEMINI.md steering/product.md)"
 
 ## 5. Codex CLI
 
-### 概要
+### Overview
 
-| 項目 | 内容 |
+| Item | Content |
 |------|------|
-| **形式** | AGENTS.md |
-| **コマンド形式** | テキストプロンプト |
-| **推奨度** | ⭐⭐⭐ 中 |
+| **Format** | AGENTS.md |
+| **Command Format** | Text prompt |
+| **Recommendation** | ⭐⭐⭐ Medium |
 
-### セットアップ
+### Setup
 
 ```bash
-# Codex CLI インストール（まだの場合）
+# Install Codex CLI (if not yet installed)
 npm install -g @openai/codex-cli
 
-# MUSUBI初期化
+# Initialize MUSUBI
 npx musubi-sdd init --codex
 ```
 
-### 生成されるファイル構成
+### Generated File Structure
 
 ```
 project/
-├── AGENTS.md                    # メインエントリーポイント
+├── AGENTS.md                    # Main entry point
 └── steering/
     └── ...
 ```
 
-### 使用方法
+### Usage
 
 ```bash
-# Codex CLIで実行
-codex "AGENTS.mdのSDD手法に従って、ログイン機能を実装して"
+# Run with Codex CLI
+codex "Following the SDD methodology in AGENTS.md, implement the login feature"
 
-# インタラクティブモード
+# Interactive mode
 codex -i
-> sdd-requirements ログイン機能
+> sdd-requirements login feature
 ```
 
 ---
 
 ## 6. Qwen Code
 
-### 概要
+### Overview
 
-| 項目 | 内容 |
+| Item | Content |
 |------|------|
-| **形式** | QWEN.md + commands/ |
-| **コマンド形式** | テキストプロンプト |
-| **推奨度** | ⭐⭐⭐ 中 |
+| **Format** | QWEN.md + commands/ |
+| **Command Format** | Text prompt |
+| **Recommendation** | ⭐⭐⭐ Medium |
 
-### セットアップ
+### Setup
 
 ```bash
-# MUSUBI初期化
+# Initialize MUSUBI
 npx musubi-sdd init --qwen
 ```
 
-### 生成されるファイル構成
+### Generated File Structure
 
 ```
 project/
-├── QWEN.md                      # メインエントリーポイント
+├── QWEN.md                      # Main entry point
 ├── .qwen/
-│   └── commands/                # SDDコマンド
+│   └── commands/                # SDD commands
 │       ├── sdd-requirements.md
 │       ├── sdd-design.md
 │       └── ...
@@ -323,50 +323,50 @@ project/
     └── ...
 ```
 
-### 使用方法
+### Usage
 
 ```
-# Qwen Codeで実行
-QWEN.mdを参照して、sdd-requirementsでログイン機能を定義
+# Run with Qwen Code
+Refer to QWEN.md and define the login feature using sdd-requirements
 
-# コマンドファイル参照
-.qwen/commands/sdd-requirements.mdに従って要件を書いて
+# Reference the command file
+Write the requirements following .qwen/commands/sdd-requirements.md
 ```
 
 ---
 
 ## 7. Windsurf
 
-### 概要
+### Overview
 
-| 項目 | 内容 |
+| Item | Content |
 |------|------|
-| **形式** | AGENTS.md |
-| **コマンド形式** | チャット形式 |
-| **推奨度** | ⭐⭐⭐ 中 |
+| **Format** | AGENTS.md |
+| **Command Format** | Chat format |
+| **Recommendation** | ⭐⭐⭐ Medium |
 
-### セットアップ
+### Setup
 
 ```bash
-# MUSUBI初期化
+# Initialize MUSUBI
 npx musubi-sdd init --windsurf
 ```
 
-### 生成されるファイル構成
+### Generated File Structure
 
 ```
 project/
-├── AGENTS.md                    # メインエントリーポイント
+├── AGENTS.md                    # Main entry point
 └── steering/
     └── ...
 ```
 
-### Windsurf設定
+### Windsurf Settings
 
-Windsurfの設定パネルで:
+In the Windsurf settings panel:
 
-1. **Project Context** → `AGENTS.md` を追加
-2. **Custom Instructions** → 以下を設定:
+1. **Project Context** → add `AGENTS.md`
+2. **Custom Instructions** → set the following:
 
 ```
 Follow the SDD methodology defined in AGENTS.md.
@@ -375,71 +375,71 @@ Generate EARS-format requirements.
 Maintain full traceability.
 ```
 
-### 使用方法
+### Usage
 
 ```
-# Windsurfチャットで
-AGENTS.mdに従って、sdd-requirementsでログイン機能を定義して
+# In Windsurf chat
+Following AGENTS.md, define the login feature using sdd-requirements
 
-# ステアリング参照
-steering/tech.mdの技術スタックに基づいて設計して
+# Steering reference
+Design based on the tech stack in steering/tech.md
 ```
 
 ---
 
-## 8. プラットフォーム比較
+## 8. Platform Comparison
 
-### 機能比較表
+### Feature Comparison Table
 
-| 機能 | Claude Code | GitHub Copilot | Cursor | Gemini CLI | Codex CLI | Qwen Code | Windsurf |
+| Feature | Claude Code | GitHub Copilot | Cursor | Gemini CLI | Codex CLI | Qwen Code | Windsurf |
 |------|:-----------:|:--------------:|:------:|:----------:|:---------:|:---------:|:--------:|
 | **Skills API** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **AGENTS.md** | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| **コマンド形式** | `/cmd` | `#cmd` | `@cmd` | Text | Text | Text | Text |
-| **25スキル** | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ |
-| **IDE統合** | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
-| **CLI利用** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Command Format** | `/cmd` | `#cmd` | `@cmd` | Text | Text | Text | Text |
+| **25 Skills** | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ |
+| **IDE Integration** | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
+| **CLI Usage** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-⚠️ = AGENTS.md経由で限定的にサポート
+⚠️ = Limited support via AGENTS.md
 
-### 推奨プラットフォーム
+### Recommended Platforms
 
-| ユースケース | 推奨 |
+| Use Case | Recommendation |
 |-------------|------|
-| **フル機能SDD** | Claude Code |
-| **日常的な開発** | GitHub Copilot, Cursor |
-| **CLIベース開発** | Gemini CLI, Codex CLI |
-| **中国語環境** | Qwen Code |
-| **Cascadeワークフロー** | Windsurf |
+| **Full-featured SDD** | Claude Code |
+| **Everyday development** | GitHub Copilot, Cursor |
+| **CLI-based development** | Gemini CLI, Codex CLI |
+| **Chinese-language environment** | Qwen Code |
+| **Cascade workflow** | Windsurf |
 
-### CLI コマンド（全プラットフォーム共通）
+### CLI Commands (Common to All Platforms)
 
-すべてのプラットフォームで以下のCLIコマンドが使用可能:
+The following CLI commands are available on all platforms:
 
 ```bash
-# 初期化
+# Initialize
 npx musubi-sdd init
 
-# SDDワークフロー
+# SDD workflow
 npx musubi-sdd requirements --feature <name>
 npx musubi-sdd design --feature <name>
 npx musubi-sdd tasks --feature <name>
 npx musubi-sdd validate
 
-# 分析
+# Analysis
 npx musubi-sdd analyze
 npx musubi-sdd gaps
 npx musubi-sdd trace
 
-# メモリ管理
+# Memory management
 npx musubi-sdd remember
 npx musubi-sdd sync
 
-# 自動化
+# Automation
 npx musubi-sdd orchestrate
 npx musubi-sdd resolve --issue <number>
 
-# ユーティリティ
+# Utilities
 npx musubi-sdd browser
 npx musubi-sdd gui start
 npx musubi-sdd convert
@@ -447,13 +447,13 @@ npx musubi-sdd convert
 
 ---
 
-## 🔗 関連ドキュメント
+## 🔗 Related Documents
 
-- [5分間クイックスタート](./quick-start-5min.md)
-- [CLI完全リファレンス](./cli-reference.md)
-- [実践チュートリアル](./tutorial-todo-app.md)
-- [トラブルシューティング](./troubleshooting.md)
+- [5-Minute Quick Start](./quick-start-5min.md)
+- [Complete CLI Reference](./cli-reference.md)
+- [Hands-On Tutorial](./tutorial-todo-app.md)
+- [Troubleshooting](./troubleshooting.md)
 
 ---
 
-*ドキュメント生成: MUSUBI v3.5.1*
+*Documentation generated by MUSUBI v3.5.1*

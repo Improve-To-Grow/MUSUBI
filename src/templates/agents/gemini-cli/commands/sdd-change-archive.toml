@@ -91,7 +91,7 @@ Update steering files with final state:
 - Update feature list
 - Add adoption metrics
 
-# Step 8: Create Archive Report (Bilingual)
+# Step 8: Create Archive Report
 
 Generate comprehensive archive report with:
 
@@ -123,9 +123,7 @@ Generate comprehensive archive report with:
 - Product lead approval
 - QA lead approval
 
-Save to:
-1. English: `storage/changes/<change-name>-archive.md`
-2. Japanese: `storage/changes/<change-name>-archive.ja.md`
+Save to: `storage/changes/<change-name>-archive.md`
 
 # Step 9: Move Files to Archive Directory
 
@@ -138,11 +136,6 @@ mkdir -p storage/archive/<YEAR>/<change-name>/
 mv storage/changes/<change-name>-proposal.md storage/archive/<YEAR>/<change-name>/
 mv storage/changes/<change-name>-implementation.md storage/archive/<YEAR>/<change-name>/
 mv storage/changes/<change-name>-archive.md storage/archive/<YEAR>/<change-name>/
-
-# Move Japanese versions
-mv storage/changes/<change-name>-proposal.ja.md storage/archive/<YEAR>/<change-name>/
-mv storage/changes/<change-name>-implementation.ja.md storage/archive/<YEAR>/<change-name>/
-mv storage/changes/<change-name>-archive.ja.md storage/archive/<YEAR>/<change-name>/
 
 # Create index README
 ```
@@ -170,7 +163,7 @@ Before completing:
 - Deprecated code removed (if applicable)
 - Documentation updated
 - Steering files updated
-- Archive report created (bilingual)
+- Archive report created
 - Files moved to archive directory
 - Lessons learned documented
 - Summary presented

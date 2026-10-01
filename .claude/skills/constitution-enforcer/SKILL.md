@@ -376,89 +376,89 @@ Run all Phase -1 Gates:
 8. CLI Interface Gate
 9. Test-First Gate
 
-### Phase 4: 段階的レポート生成
+### Phase 4: Step-by-Step Report Generation
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: Prevent context length overflow**
 
-**出力方式の原則:**
+**Output Principles:**
 
-- ✅ 1セクションずつ順番に生成・保存
-- ✅ 各セクション生成後に進捗を報告
-- ✅ エラー発生時も部分的なレポートが残る
+- ✅ Generate and save one section at a time, in order
+- ✅ Report progress after generating each section
+- ✅ Partial reports are preserved even if an error occurs
 
 ```
-🤖 確認ありがとうございます。憲法違反レポートを順番に生成します。
+🤖 Thank you for confirming. I will generate the Constitution violation report in order.
 
-【生成予定のセクション】
+[Sections to be generated]
 1. Executive Summary
 2. Failed Gates
 3. Passed Gates
 4. Recommendations
 5. Approval Status
 
-合計: 5セクション
+Total: 5 sections
 
-**重要: 段階的生成方式**
-各セクションを1つずつ生成・保存し、進捗を報告します。
-これにより、途中経過が見え、エラーが発生しても部分的なレポートが残ります。
+**Important: Incremental generation method**
+I will generate and save each section one at a time and report progress.
+This makes intermediate progress visible, and a partial report is preserved even if an error occurs.
 
-生成を開始してよろしいですか?
-👤 ユーザー: [回答待ち]
+Shall I start generating?
+👤 User: [Awaiting response]
 ```
 
-ユーザーが承認後、**各セクションを順番に生成**:
+After the user approves, **generate each section in order**:
 
 **Step 1: Executive Summary**
 
 ```
-🤖 [1/5] Executive Summaryを生成しています...
+🤖 [1/5] Generating Executive Summary...
 
 📝 compliance/constitutional-compliance-report.md (Section 1)
-✅ 保存が完了しました
+✅ Save complete
 
-[1/5] 完了。次のセクションに進みます。
+[1/5] Complete. Proceeding to the next section.
 ```
 
 **Step 2: Failed Gates**
 
 ```
-🤖 [2/5] Failed Gatesを生成しています...
+🤖 [2/5] Generating Failed Gates...
 
 📝 compliance/constitutional-compliance-report.md (Section 2)
-✅ 保存が完了しました
+✅ Save complete
 
-[2/5] 完了。次のセクションに進みます。
+[2/5] Complete. Proceeding to the next section.
 ```
 
-**大きなコンプライアンスレポート(>300行)の場合:**
+**For large compliance reports (>300 lines):**
 
 ```
-🤖 コンプライアンスレポート全体が400行超えるため、セクションごとに保存します。
-⚠️ 詳細な検証結果を2パートに分割して生成します。
+🤖 The entire compliance report exceeds 400 lines, so I will save it section by section.
+⚠️ Generating the detailed validation results in 2 parts.
 
-📝 Part 1/2: compliance/constitutional-compliance-report.md (Summary & Failed Gates詳細)
-✅ 保存が完了しました (250行)
+📝 Part 1/2: compliance/constitutional-compliance-report.md (Summary & Failed Gates details)
+✅ Save complete (250 lines)
 
 📝 Part 2/2: compliance/constitutional-compliance-report.md (Passed Gates & Recommendations)
-✅ 保存が完了しました (180行)
+✅ Save complete (180 lines)
 
-✅ レポート生成完了: compliance/constitutional-compliance-report.md (430行)
+✅ Report generation complete: compliance/constitutional-compliance-report.md (430 lines)
 
-全セクション完了。
+All sections complete.
 ```
 
-**Final: レポート生成完了サマリー**
+**Final: Report Generation Completion Summary**
 
 ```
-🤖 ✨ 憲法違反レポートの生成が完了しました！
+🤖 ✨ Constitution violation report generation is complete!
 
-## 📊 コンプライアンスサマリー
-- **合格ゲート**: 7/9 (77.8%)
-- **不合格ゲート**: 2/9 (22.2%)
-- **ステータス**: ❌ BLOCKED
+## 📊 Compliance Summary
+- **Passed gates**: 7/9 (77.8%)
+- **Failed gates**: 2/9 (22.2%)
+- **Status**: ❌ BLOCKED
 
-## 📂 生成されたレポート
-✅ compliance/constitutional-compliance-report.md (5セクション)
+## 📂 Generated Reports
+✅ compliance/constitutional-compliance-report.md (5 sections)
 
 ```
 
@@ -575,20 +575,22 @@ Once all gates pass:
 
 Use these commands to enforce constitutional compliance programmatically:
 
-| Command | Purpose | Example |
-|---------|---------|--------|
-| `musubi-validate guardrails --type safety` | Validate content against safety rules | `npx musubi-validate guardrails "content" --type safety` |
-| `musubi-validate guardrails --type safety --constitutional` | Full constitutional validation | `npx musubi-validate guardrails "code" --type safety --constitutional` |
-| `musubi-validate guardrails --type input` | Validate input against injection attacks | `npx musubi-validate guardrails "input" --type input` |
-| `musubi-validate guardrails-chain` | Run full guardrail chain | `npx musubi-validate guardrails-chain "content" --parallel` |
+| Command                                                     | Purpose                                  | Example                                                                |
+| ----------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------- |
+| `musubi-validate guardrails --type safety`                  | Validate content against safety rules    | `npx musubi-validate guardrails "content" --type safety`               |
+| `musubi-validate guardrails --type safety --constitutional` | Full constitutional validation           | `npx musubi-validate guardrails "code" --type safety --constitutional` |
+| `musubi-validate guardrails --type input`                   | Validate input against injection attacks | `npx musubi-validate guardrails "input" --type input`                  |
+| `musubi-validate guardrails-chain`                          | Run full guardrail chain                 | `npx musubi-validate guardrails-chain "content" --parallel`            |
 
 **Constitutional Safety Levels**:
+
 - `--level low` - Permissive (development)
 - `--level medium` - Balanced (default)
 - `--level high` - Strict (production)
 - `--level critical` - Maximum (security-critical)
 
 **Use with Constitution Validation**:
+
 ```bash
 # Validate code against constitutional articles
 npx musubi-validate guardrails "$(cat src/feature.js)" --type safety --constitutional --level high
@@ -614,4 +616,4 @@ Before finishing:
 - [ ] Failures documented with severity
 - [ ] Remediation plan provided
 - [ ] Overall status determined (APPROVED/BLOCKED)
-- [ ] Report saved to `storage/specs/[feature]-constitutional-compliance.md`
+- [ ] Report saved to `storage/specs/[feature]/constitutional-compliance.md`

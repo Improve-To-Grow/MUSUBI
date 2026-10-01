@@ -290,36 +290,20 @@ Run validation:
 
 ---
 
-### 9. Save Document (Bilingual)
+### 9. Save Document
 
-**IMPORTANT**: Create BOTH English and Japanese versions.
-
-**English version (Primary/Reference)**:
 Save to: `storage/specs/{{feature-name}}-requirements.md`
-
-**Japanese version (Translation)**:
-Save to: `storage/specs/{{feature-name}}-requirements.ja.md`
 
 **File Naming**:
 
 - Use kebab-case
 - Include feature name
 - Add `-requirements` suffix
-- Add `.ja` before `.md` for Japanese version
 
 **Examples**:
 
-- `storage/specs/authentication-requirements.md` (English)
-- `storage/specs/authentication-requirements.ja.md` (Japanese)
-- `storage/specs/payment-processing-requirements.md` (English)
-- `storage/specs/payment-processing-requirements.ja.md` (Japanese)
-
-**Generation Order**:
-
-1. Generate English version FIRST
-2. Then generate Japanese translation
-3. Ensure requirement IDs are identical in both versions
-4. Keep technical terms (REQ-XXX-NNN, EARS keywords) in English in Japanese version
+- `storage/specs/authentication-requirements.md`
+- `storage/specs/payment-processing-requirements.md`
 
 ---
 
@@ -331,10 +315,7 @@ Present summary to user:
 ## ✅ Requirements Specification Complete
 
 **Feature**: {{FEATURE_NAME}}
-**Files**:
-
-- English: storage/specs/{{feature-name}}-requirements.md
-- Japanese: storage/specs/{{feature-name}}-requirements.ja.md
+**File**: storage/specs/{{feature-name}}-requirements.md
 
 ### Summary:
 

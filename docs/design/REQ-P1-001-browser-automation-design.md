@@ -1,17 +1,17 @@
-# REQ-P1-001: Browser Automation Agent 設計書
+# REQ-P1-001: Browser Automation Agent Design Document
 
-## 概要
+## Overview
 
-ブラウザ自動化エージェントは、自然言語コマンドによるブラウザ操作、スクリーンショット取得・比較、E2E テストコード生成を提供する MUSUBI スキルです。
+The browser automation agent is a MUSUBI skill that provides browser operation via natural language commands, screenshot capture and comparison, and E2E test code generation.
 
-### 目的
+### Purpose
 
-1. **自然言語でのブラウザ操作**: 「ログインページに移動して、メールを入力」のような指示を実行
-2. **スクリーンショット検証**: 期待される画面と実際の画面を AI で比較
-3. **テストコード生成**: 操作履歴から Playwright テストコードを自動生成
-4. **仕様とのトレーサビリティ**: MUSUBI 仕様からブラウザテストを生成
+1. **Browser operation in natural language**: Execute instructions such as "Go to the login page and enter the email"
+2. **Screenshot verification**: Compare the expected screen with the actual screen using AI
+3. **Test code generation**: Automatically generate Playwright test code from the action history
+4. **Traceability with specifications**: Generate browser tests from MUSUBI specifications
 
-## アーキテクチャ
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -44,17 +44,17 @@
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## コンポーネント詳細
+## Component Details
 
 ### 1. NL Command Parser (`src/agents/browser/nl-parser.js`)
 
-自然言語コマンドを構造化されたアクションに変換します。
+Converts natural language commands into structured actions.
 
 ```javascript
-// 入力例
-"ログインページ https://example.com/login に移動して、メールフィールドに test@example.com を入力"
+// Input example
+"Go to the login page https://example.com/login and enter test@example.com in the email field"
 
-// 出力例
+// Output example
 {
   actions: [
     { type: 'navigate', url: 'https://example.com/login' },
@@ -63,21 +63,21 @@
 }
 ```
 
-#### サポートするアクション
+#### Supported Actions
 
-| アクション | 構文パターン | 例 |
+| Action | Syntax Pattern | Example |
 |-----------|-------------|-----|
-| navigate | "〜に移動", "〜を開く" | "https://example.com を開く" |
-| click | "〜をクリック", "〜を押す" | "ログインボタンをクリック" |
-| fill | "〜に入力", "〜と入力" | "メール欄に test@example.com と入力" |
-| select | "〜を選択" | "国のドロップダウンから Japan を選択" |
-| wait | "〜秒待つ", "〜を待つ" | "3秒待つ", "ローディングが消えるまで待つ" |
-| screenshot | "スクリーンショット", "画面を保存" | "現在の画面をスクリーンショット" |
-| assert | "〜が表示される", "〜があること" | "「ログイン成功」が表示されること" |
+| navigate | "go to ...", "open ..." | "Open https://example.com" |
+| click | "click ...", "press ..." | "Click the login button" |
+| fill | "enter ... in ...", "type ..." | "Enter test@example.com in the email field" |
+| select | "select ..." | "Select Japan from the country dropdown" |
+| wait | "wait ... seconds", "wait for ..." | "Wait 3 seconds", "Wait until the loading indicator disappears" |
+| screenshot | "screenshot", "save the screen" | "Take a screenshot of the current screen" |
+| assert | "... is displayed", "there is ..." | "\"Login successful\" is displayed" |
 
 ### 2. Action Executor (`src/agents/browser/action-executor.js`)
 
-パースされたアクションを Playwright API 呼び出しに変換して実行します。
+Converts parsed actions into Playwright API calls and executes them.
 
 ```javascript
 class ActionExecutor {
@@ -100,30 +100,30 @@ class ActionExecutor {
 
 ### 3. Context Manager (`src/agents/browser/context-manager.js`)
 
-ブラウザセッション、ページ、状態を管理します。
+Manages browser sessions, pages, and state.
 
 ```javascript
 class ContextManager {
   constructor() {
     this.browser = null;
-    this.contexts = new Map(); // 名前付きコンテキスト
-    this.pages = new Map();    // アクティブページ
-    this.history = [];         // アクション履歴
+    this.contexts = new Map(); // named contexts
+    this.pages = new Map();    // active pages
+    this.history = [];         // action history
   }
   
   async createContext(name, options = {}) {
-    // 新しいブラウザコンテキストを作成
+    // Create a new browser context
   }
   
   async getOrCreatePage(contextName = 'default') {
-    // ページを取得または作成
+    // Get or create a page
   }
 }
 ```
 
 ### 4. Screenshot Capture (`src/agents/browser/screenshot.js`)
 
-スクリーンショットの取得と管理を行います。
+Handles screenshot capture and management.
 
 ```javascript
 class ScreenshotCapture {
@@ -144,7 +144,7 @@ class ScreenshotCapture {
 
 ### 5. AI Comparator (`src/agents/browser/ai-comparator.js`)
 
-スクリーンショットを AI（GPT-4V または Claude Vision）で比較します。
+Compares screenshots using AI (GPT-4V or Claude Vision).
 
 ```javascript
 class AIComparator {
@@ -155,23 +155,23 @@ class AIComparator {
   
   async compare(expected, actual, description) {
     const prompt = `
-      これは2つのウェブページのスクリーンショットです。
+      These are screenshots of two web pages.
       
-      期待される画面: [image1]
-      実際の画面: [image2]
+      Expected screen: [image1]
+      Actual screen: [image2]
       
-      検証内容: ${description}
+      Verification: ${description}
       
-      以下を評価してください:
-      1. 視覚的な類似度（0-100%）
-      2. レイアウトの差異
-      3. コンテンツの差異
-      4. 致命的な差異があるか
+      Please evaluate the following:
+      1. Visual similarity (0-100%)
+      2. Layout differences
+      3. Content differences
+      4. Whether there are critical differences
       
-      JSON形式で回答してください。
+      Respond in JSON format.
     `;
     
-    // Vision API 呼び出し
+    // Vision API call
     const result = await this.callVisionAPI(prompt, expected, actual);
     return {
       similarity: result.similarity,
@@ -185,7 +185,7 @@ class AIComparator {
 
 ### 6. Test Code Generator (`src/agents/browser/test-generator.js`)
 
-アクション履歴から Playwright テストコードを生成します。
+Generates Playwright test code from the action history.
 
 ```javascript
 class TestCodeGenerator {
@@ -223,103 +223,103 @@ class TestCodeGenerator {
 }
 ```
 
-## Claude Code スキル定義
+## Claude Code Skill Definition
 
-### browser-agent スキル
+### browser-agent Skill
 
 ```markdown
 ---
 name: browser-agent
-description: ブラウザ自動化エージェント - 自然言語でブラウザを操作し、スクリーンショットを取得・比較、E2Eテストを生成
+description: Browser automation agent - operate the browser in natural language, capture and compare screenshots, and generate E2E tests
 version: 1.0.0
 ---
 
-## 機能
+## Features
 
-1. **ブラウザ操作**: 自然言語でブラウザを操作
-2. **スクリーンショット**: 画面を自動キャプチャ
-3. **AI比較**: 期待画面と実際の画面を比較
-4. **テスト生成**: 操作履歴からPlaywrightテストを生成
+1. **Browser operation**: Operate the browser in natural language
+2. **Screenshots**: Automatically capture the screen
+3. **AI comparison**: Compare the expected screen with the actual screen
+4. **Test generation**: Generate Playwright tests from the action history
 
-## 使用方法
+## Usage
 
-### 基本操作
-
-```
-browser-agent: https://example.com を開いて、ログインボタンをクリック
-```
-
-### スクリーンショット取得
+### Basic Operations
 
 ```
-browser-agent: 現在の画面をスクリーンショットして "login-page" として保存
+browser-agent: Open https://example.com and click the login button
 ```
 
-### 画面比較
+### Capturing Screenshots
 
 ```
-browser-agent: 現在の画面を expected/login.png と比較して、95%以上の類似度か検証
+browser-agent: Take a screenshot of the current screen and save it as "login-page"
 ```
 
-### テスト生成
+### Screen Comparison
 
 ```
-browser-agent: これまでの操作履歴からPlaywrightテストコードを生成
+browser-agent: Compare the current screen with expected/login.png and verify the similarity is 95% or higher
 ```
 
-## 実行
+### Test Generation
+
+```
+browser-agent: Generate Playwright test code from the action history so far
+```
+
+## Execution
 
 ```bash
-npx musubi browser-agent "https://example.com を開いて、ログインをテスト"
+npx musubi browser-agent "Open https://example.com and test the login"
 ```
 ```
 
-## CLI インターフェース
+## CLI Interface
 
-### `musubi-browser` コマンド
+### `musubi-browser` Command
 
 ```bash
-# インタラクティブモード
+# Interactive mode
 npx musubi browser
 
-# 単一コマンド実行
-npx musubi browser --command "https://example.com を開く"
+# Run a single command
+npx musubi browser --command "Open https://example.com"
 
-# スクリプト実行
+# Run a script
 npx musubi browser --script ./browser-script.txt
 
-# スクリーンショット比較
+# Screenshot comparison
 npx musubi browser --compare expected.png actual.png --threshold 0.95
 
-# テスト生成
+# Test generation
 npx musubi browser --generate-test --output tests/e2e/login.spec.ts
 ```
 
-### オプション
+### Options
 
-| オプション | 説明 | デフォルト |
+| Option | Description | Default |
 |-----------|------|-----------|
-| `--headless` | ヘッドレスモードで実行 | `true` |
-| `--browser` | ブラウザ種類 (chromium/firefox/webkit) | `chromium` |
-| `--timeout` | タイムアウト（ミリ秒） | `30000` |
-| `--output-dir` | スクリーンショット保存先 | `./screenshots` |
-| `--vision-model` | Vision AI モデル | `gpt-4-vision-preview` |
-| `--threshold` | 類似度閾値 | `0.95` |
+| `--headless` | Run in headless mode | `true` |
+| `--browser` | Browser type (chromium/firefox/webkit) | `chromium` |
+| `--timeout` | Timeout (milliseconds) | `30000` |
+| `--output-dir` | Screenshot output directory | `./screenshots` |
+| `--vision-model` | Vision AI model | `gpt-4-vision-preview` |
+| `--threshold` | Similarity threshold | `0.95` |
 
-## ファイル構成
+## File Structure
 
 ```
 src/
 ├── agents/
 │   └── browser/
-│       ├── index.js              # エントリポイント
-│       ├── nl-parser.js          # 自然言語パーサー
-│       ├── action-executor.js    # アクション実行
-│       ├── context-manager.js    # コンテキスト管理
-│       ├── screenshot.js         # スクリーンショット
-│       ├── ai-comparator.js      # AI比較
-│       ├── test-generator.js     # テスト生成
-│       └── actions/              # アクション定義
+│       ├── index.js              # entry point
+│       ├── nl-parser.js          # natural language parser
+│       ├── action-executor.js    # action execution
+│       ├── context-manager.js    # context management
+│       ├── screenshot.js         # screenshots
+│       ├── ai-comparator.js      # AI comparison
+│       ├── test-generator.js     # test generation
+│       └── actions/              # action definitions
 │           ├── navigate.js
 │           ├── click.js
 │           ├── fill.js
@@ -329,12 +329,12 @@ src/
 ├── bin/
 │   └── musubi-browser.js         # CLI
 └── skills/
-    └── browser-agent.md          # Claude Code スキル
+    └── browser-agent.md          # Claude Code skill
 ```
 
 ## API
 
-### BrowserAgent クラス
+### BrowserAgent Class
 
 ```javascript
 import { BrowserAgent } from 'musubi/agents/browser';
@@ -346,36 +346,36 @@ const agent = new BrowserAgent({
   visionModel: 'gpt-4-vision-preview',
 });
 
-// ブラウザ起動
+// Launch the browser
 await agent.launch();
 
-// 自然言語コマンド実行
-await agent.execute('https://example.com を開く');
-await agent.execute('ログインボタンをクリック');
-await agent.execute('スクリーンショットを取得');
+// Execute natural language commands
+await agent.execute('Open https://example.com');
+await agent.execute('Click the login button');
+await agent.execute('Take a screenshot');
 
-// スクリーンショット比較
+// Screenshot comparison
 const result = await agent.compare('expected.png', 'actual.png', {
   threshold: 0.95,
-  description: 'ログインページが正しく表示されること',
+  description: 'The login page is displayed correctly',
 });
 
-// テストコード生成
+// Test code generation
 const testCode = await agent.generateTest({
   name: 'Login Flow Test',
   output: 'tests/e2e/login.spec.ts',
 });
 
-// 終了
+// Shutdown
 await agent.close();
 ```
 
-## 仕様連携
+## Specification Integration
 
-### MUSUBI 仕様からテスト生成
+### Generating Tests from MUSUBI Specifications
 
 ```javascript
-// spec.md の要件からブラウザテストを生成
+// Generate browser tests from the requirements in spec.md
 const spec = await parseSpecification('storage/specs/auth/spec.md');
 
 for (const req of spec.requirements) {
@@ -387,18 +387,18 @@ for (const req of spec.requirements) {
 }
 ```
 
-### 例: REQ-001 からのテスト生成
+### Example: Test Generation from REQ-001
 
 ```markdown
-## 要件
+## Requirements
 WHEN the user clicks the login button with valid credentials,
 the system SHALL display the dashboard page.
 ```
 
-↓ 生成されるテスト
+↓ Generated test
 
 ```javascript
-test('REQ-001: ログイン成功でダッシュボード表示', async ({ page }) => {
+test('REQ-001: Dashboard is displayed on successful login', async ({ page }) => {
   await page.goto('https://example.com/login');
   await page.fill('[data-testid="email"]', 'test@example.com');
   await page.fill('[data-testid="password"]', 'password123');
@@ -409,47 +409,47 @@ test('REQ-001: ログイン成功でダッシュボード表示', async ({ page 
 });
 ```
 
-## セキュリティ考慮事項
+## Security Considerations
 
-1. **認証情報**: 環境変数から取得、ログに出力しない
-2. **URL 制限**: 許可リストによるアクセス制御
-3. **ファイルアクセス**: サンドボックス内のみ
-4. **Vision API**: 機密情報のマスク処理
+1. **Credentials**: Retrieved from environment variables, never logged
+2. **URL restrictions**: Access control via an allowlist
+3. **File access**: Sandbox only
+4. **Vision API**: Mask sensitive information
 
-## 実装フェーズ
+## Implementation Phases
 
-### Phase 1: 基盤（Week 1）
-- [ ] Playwright 統合基盤
-- [ ] 基本アクション (navigate, click, fill)
-- [ ] コンテキストマネージャー
+### Phase 1: Foundation (Week 1)
+- [ ] Playwright integration foundation
+- [ ] Basic actions (navigate, click, fill)
+- [ ] Context manager
 
-### Phase 2: 高度な機能（Week 2）
-- [ ] 完全な NL パーサー
-- [ ] 全アクションタイプ実装
-- [ ] セッション管理
+### Phase 2: Advanced Features (Week 2)
+- [ ] Complete NL parser
+- [ ] Implement all action types
+- [ ] Session management
 
-### Phase 3: AI 連携（Week 3）
-- [ ] スクリーンショット取得
-- [ ] AI 比較エンジン
-- [ ] 比較レポート生成
+### Phase 3: AI Integration (Week 3)
+- [ ] Screenshot capture
+- [ ] AI comparison engine
+- [ ] Comparison report generation
 
-### Phase 4: 統合（Week 4）
-- [ ] テストコード生成
-- [ ] Claude Code スキル登録
-- [ ] MUSUBI 仕様連携
-- [ ] ドキュメント整備
+### Phase 4: Integration (Week 4)
+- [ ] Test code generation
+- [ ] Claude Code skill registration
+- [ ] MUSUBI specification integration
+- [ ] Documentation
 
-## 成功基準
+## Success Criteria
 
-| 基準 | 目標 |
+| Criterion | Target |
 |------|------|
-| 基本操作成功率 | 99%+ |
-| NL パース精度 | 95%+ |
-| スクリーンショット比較精度 | 95%+ |
-| テスト生成成功率 | 90%+ |
-| E2E テストカバレッジ | 80%+ |
+| Basic operation success rate | 99%+ |
+| NL parsing accuracy | 95%+ |
+| Screenshot comparison accuracy | 95%+ |
+| Test generation success rate | 90%+ |
+| E2E test coverage | 80%+ |
 
-## 依存関係
+## Dependencies
 
 ```json
 {
@@ -462,7 +462,7 @@ test('REQ-001: ログイン成功でダッシュボード表示', async ({ page 
 }
 ```
 
-## 参考
+## References
 
 - [Playwright Documentation](https://playwright.dev/docs/intro)
 - [GPT-4V Documentation](https://platform.openai.com/docs/guides/vision)

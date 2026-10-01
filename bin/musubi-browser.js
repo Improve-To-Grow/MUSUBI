@@ -389,19 +389,17 @@ async function generateTest(options) {
 function showHelp() {
   console.log(chalk.cyan('\nAvailable Commands:'));
   console.log(chalk.gray('  Navigation:'));
-  console.log('    "https://example.com を開く" or "go to https://example.com"');
+  console.log('    "go to https://example.com"');
   console.log(chalk.gray('  Click:'));
-  console.log('    "ログインボタンをクリック" or "click login button"');
+  console.log('    "click login button"');
   console.log(chalk.gray('  Fill:'));
-  console.log(
-    '    "メール欄に「test@example.com」と入力" or "type test@example.com in email field"'
-  );
+  console.log('    "type test@example.com in email field"');
   console.log(chalk.gray('  Wait:'));
-  console.log('    "3秒待つ" or "wait 3 seconds"');
+  console.log('    "wait 3 seconds"');
   console.log(chalk.gray('  Screenshot:'));
-  console.log('    "スクリーンショット" or "take screenshot"');
+  console.log('    "take screenshot"');
   console.log(chalk.gray('  Assert:'));
-  console.log('    "「ログイン成功」が表示される" or "verify Login Success is visible"');
+  console.log('    "verify Login Success is visible"');
   console.log(chalk.gray('\nSession Commands:'));
   console.log('    history      - Show action history');
   console.log('    clear        - Clear action history');

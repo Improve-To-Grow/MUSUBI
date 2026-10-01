@@ -1,5 +1,9 @@
 # Implementation Guide: Gradual Output Pattern for All Agents
 
+> Bilingual output (an additional translated copy of each deliverable) is optional. For the
+> template that adds translation steps, see
+> [BILINGUAL-IMPLEMENTATION.md](../BILINGUAL-IMPLEMENTATION.md) (Step 4.3).
+
 ## Status
 
 **Date**: 2025-11-22  
@@ -12,21 +16,21 @@
 
 Agents with **full gradual output implementation**:
 
-1. ✅ **system-architect** - Phase 4 "段階的成果物生成"
-2. ✅ **cloud-architect** - Phase 4 "段階的成果物生成"
-3. ✅ **technical-writer** - Phase 3 "段階的成果物生成"
-4. ✅ **api-designer** - Phase 4 "段階的成果物生成"
-5. ✅ **requirements-analyst** - Phase 6 "段階的成果物生成"
-6. ✅ **project-manager** - Phase 6 "段階的成果物生成"
-7. ✅ **database-schema-designer** - Phase 5 "段階的成果物生成"
-8. ✅ **ui-ux-designer** - Phase 5 "段階的成果物生成と開発引き継ぎ"
-9. ✅ **test-engineer** - Phase 4 "段階的テスト実装" (2025-11-22 updated)
+1. ✅ **system-architect** - Phase 4 "Incremental Deliverable Generation"
+2. ✅ **cloud-architect** - Phase 4 "Incremental Deliverable Generation"
+3. ✅ **technical-writer** - Phase 3 "Incremental Deliverable Generation"
+4. ✅ **api-designer** - Phase 4 "Incremental Deliverable Generation"
+5. ✅ **requirements-analyst** - Phase 6 "Incremental Deliverable Generation"
+6. ✅ **project-manager** - Phase 6 "Incremental Deliverable Generation"
+7. ✅ **database-schema-designer** - Phase 5 "Incremental Deliverable Generation"
+8. ✅ **ui-ux-designer** - Phase 5 "Incremental Deliverable Generation and Development Handoff"
+9. ✅ **test-engineer** - Phase 4 "Incremental Test Implementation" (2025-11-22 updated)
 
 ### 🔧 Needs Enhancement (11/25 agents)
 
 Agents with partial implementation (needs strengthening):
 
-10. 🔧 **software-developer** - Has "1ファイルずつ" but missing progress counter
+10. 🔧 **software-developer** - Has "one file at a time" but missing progress counter
 11. 🔧 **bug-hunter** - Has Phase 4 but no step-by-step reporting
 12. 🔧 **performance-optimizer** - Has Phase 4 but no file-by-file saves
 13. 🔧 **security-auditor** - Has Phase 4 but no gradual output
@@ -55,81 +59,79 @@ Agents without Phase 4 or gradual output:
 ### Standard Template Structure
 
 ```markdown
-### Phase 4: 段階的成果物生成
+### Phase 4: Incremental Deliverable Generation
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: Prevent context length overflow**
 
-**出力方式の原則:**
-- ✅ 1ファイルずつ順番に生成・保存
-- ✅ 各ファイル生成後に進捗を報告
-- ✅ 大きなファイル(>300行)は複数に分割
-- ✅ エラー発生時も部分的な成果物が残る
-- ✅ ユーザーに進捗が見える形で実行
+**Output Principles:**
+- ✅ Generate and save one file at a time, in order
+- ✅ Report progress after each file is generated
+- ✅ Split large files (>300 lines) into multiple files
+- ✅ Partial deliverables remain even if an error occurs
+- ✅ Execute in a way that makes progress visible to the user
 
 ```
-🤖 確認ありがとうございます。以下の成果物を順番に生成します。
+🤖 Thank you for confirming. I will generate the following deliverables in order.
 
-【生成予定の成果物】（英語版と日本語版の両方）
-1. [成果物1]
-2. [成果物2]
-3. [成果物3]
+[Deliverables to generate]
+1. [Deliverable 1]
+2. [Deliverable 2]
+3. [Deliverable 3]
 ...
 
-合計: N個のファイル
+Total: N files
 
-**重要: 段階的生成方式**
-各ドキュメント/コードファイルを1つずつ生成・保存し、進捗を報告します。
-これにより、途中経過が見え、エラーが発生しても部分的な成果物が残ります。
+**Important: Incremental generation method**
+I will generate and save each document/code file one at a time and report progress.
+This lets you see intermediate progress, and partial deliverables remain even if an error occurs.
 
-生成を開始してよろしいですか?
-👤 ユーザー: [回答待ち]
+Shall I start generating?
+👤 User: [Awaiting response]
 ```
 
-**Step 1: [成果物1] - 英語版**
+**Step 1: [Deliverable 1]**
 
 ```
-🤖 [1/N] [成果物1]英語版を生成しています...
+🤖 [1/N] Generating [Deliverable 1]...
 
 📝 ./[path]/[filename]-[date].md
-✅ 保存が完了しました
+✅ Save complete
 
-[1/N] 完了。次のファイルに進みます。
+[1/N] Complete. Proceeding to the next file.
 ```
 
-**Step 2: [成果物2] - 英語版**
+**Step 2: [Deliverable 2]**
 
 ```
-🤖 [2/N] [成果物2]英語版を生成しています...
+🤖 [2/N] Generating [Deliverable 2]...
 
 📝 ./[path]/[filename]-[date].md
-✅ 保存が完了しました
+✅ Save complete
 
-[2/N] 完了。次のファイルに進みます。
+[2/N] Complete. Proceeding to the next file.
 ```
 
 ... (continue for all files)
 
-**Final Step: すべての成果物の生成完了**
+**Final Step: All Deliverables Generated**
 
 ```
-🤖 ✨ すべての成果物の生成が完了しました！
+🤖 ✨ All deliverables have been generated!
 
-## 📊 生成サマリー
-- **作成ファイル数**: N個
-- **英語版**: X個
-- **日本語版**: Y個
+## 📊 Generation Summary
+- **Files created**: N
 
-## 📂 生成されたファイル
+## 📂 Generated Files
 1. ✅ ./[path]/[file1].md
 2. ✅ ./[path]/[file2].md
 ...
 
-## 🔍 次のステップ
-1. 成果物を確認して、フィードバックをお願いします
-2. 不足や修正が必要な箇所があれば教えてください
-3. [関連エージェント]を呼び出して次の工程に進めます
+## 🔍 Next Steps
+1. Please review the deliverables and provide feedback
+2. Let me know if anything is missing or needs revision
+3. I can call [related agent] to proceed to the next stage
 
-👤 ユーザー: [フィードバック待ち]
+👤 User: [Awaiting feedback]
 ```
 ```
 
@@ -149,12 +151,12 @@ Agents without Phase 4 or gradual output:
 
 **Progress message template**:
 ```
-🤖 [1/N] [Component/Module name]を生成しています...
+🤖 [1/N] Generating [Component/Module name]...
 
 📝 src/[path]/[filename].ts
-✅ 保存が完了しました (150行)
+✅ Save complete (150 lines)
 
-[1/N] 完了。次のファイルに進みます。
+[1/N] Complete. Proceeding to the next file.
 ```
 
 ### Document Generators Group
@@ -169,12 +171,12 @@ Agents without Phase 4 or gradual output:
 
 **Progress message template**:
 ```
-🤖 [1/N] [Document title]英語版を生成しています...
+🤖 [1/N] Generating [Document title]...
 
 📝 docs/[path]/[filename]-[date].md
-✅ 保存が完了しました
+✅ Save complete
 
-[1/N] 完了。次のドキュメントに進みます。
+[1/N] Complete. Proceeding to the next document.
 ```
 
 ### Design/Architecture Generators Group
@@ -189,12 +191,12 @@ Agents without Phase 4 or gradual output:
 
 **Progress message template**:
 ```
-🤖 [1/N] [Design artifact]英語版を生成しています...
+🤖 [1/N] Generating [Design artifact]...
 
 📝 design/[category]/[filename]-[project]-[date].md
-✅ 保存が完了しました
+✅ Save complete
 
-[1/N] 完了。次の成果物に進みます。
+[1/N] Complete. Proceeding to the next deliverable.
 ```
 
 ### Infrastructure/DevOps Generators Group
@@ -210,12 +212,12 @@ Agents without Phase 4 or gradual output:
 
 **Progress message template**:
 ```
-🤖 [1/N] [Config/Script name]を生成しています...
+🤖 [1/N] Generating [Config/Script name]...
 
 📝 [path]/[filename]
-✅ 保存が完了しました (200行)
+✅ Save complete (200 lines)
 
-[1/N] 完了。次の設定ファイルに進みます。
+[1/N] Complete. Moving on to the next configuration file.
 ```
 
 ### Review/Audit Generators Group
@@ -231,12 +233,12 @@ Agents without Phase 4 or gradual output:
 
 **Progress message template**:
 ```
-🤖 [1/N] [Report type]を生成しています...
+🤖 [1/N] Generating [Report type]...
 
 📝 reports/[category]/[filename]-[date].md
-✅ 保存が完了しました
+✅ Save complete
 
-[1/N] 完了。次のレポートに進みます。
+[1/N] Complete. Moving on to the next report.
 ```
 
 ---
@@ -256,14 +258,14 @@ Find the section:
 Add at the beginning of Phase 4:
 
 ```markdown
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: Prevent context length overflow**
 
-**出力方式の原則:**
-- ✅ 1ファイルずつ順番に生成・保存
-- ✅ 各ファイル生成後に進捗を報告
-- ✅ 大きなファイル(>300行)は複数に分割
-- ✅ エラー発生時も部分的な成果物が残る
-- ✅ ユーザーに進捗が見える形で実行
+**Output Principles:**
+- ✅ Generate and save one file at a time, in order
+- ✅ Report progress after each file is generated
+- ✅ Split large files (>300 lines) into multiple files
+- ✅ Partial deliverables remain even if an error occurs
+- ✅ Execute in a way that makes progress visible to the user
 ```
 
 ### Step 3: Add File List and Confirmation
@@ -272,22 +274,22 @@ Before generation starts:
 
 ```markdown
 ```
-🤖 確認ありがとうございます。以下の成果物を順番に生成します。
+🤖 Thank you for confirming. I will generate the following deliverables in order.
 
-【生成予定の成果物】
-1. [具体的なファイル名1]
-2. [具体的なファイル名2]
-3. [具体的なファイル名3]
+[Deliverables to Generate]
+1. [Specific file name 1]
+2. [Specific file name 2]
+3. [Specific file name 3]
 ...
 
-合計: N個のファイル
+Total: N files
 
-**重要: 段階的生成方式**
-各ファイルを1つずつ生成・保存し、進捗を報告します。
-これにより、途中経過が見え、エラーが発生しても部分的な成果物が残ります。
+**Important: Incremental generation method**
+I will generate and save each file one at a time and report progress.
+This lets you see intermediate progress, and partial deliverables remain even if an error occurs.
 
-生成を開始してよろしいですか?
-👤 ユーザー: [回答待ち]
+Shall I start generating?
+👤 User: [Awaiting response]
 ```
 ```
 
@@ -299,12 +301,12 @@ For each file:
 **Step 1: [File/Component Name]**
 
 ```
-🤖 [1/N] [具体的な内容]を生成しています...
+🤖 [1/N] Generating [specific content]...
 
-📝 [具体的なファイルパス]
-✅ 保存が完了しました (行数)
+📝 [Specific file path]
+✅ Save complete (line count)
 
-[1/N] 完了。次のファイルに進みます。
+[1/N] Complete. Proceeding to the next file.
 ```
 ```
 
@@ -314,23 +316,23 @@ After all files generated:
 
 ```markdown
 ```
-🤖 ✨ すべての成果物の生成が完了しました！
+🤖 ✨ All deliverables have been generated!
 
-## 📊 生成サマリー
-- **作成ファイル数**: N個
-- **[カテゴリ別の内訳]**
+## 📊 Generation Summary
+- **Files created**: N
+- **[Breakdown by category]**
 
-## 📂 生成されたファイル
-1. ✅ [ファイルパス1]
-2. ✅ [ファイルパス2]
+## 📂 Generated Files
+1. ✅ [File path 1]
+2. ✅ [File path 2]
 ...
 
-## 🔍 次のステップ
-1. 成果物を確認して、フィードバックをお願いします
-2. 不足や修正が必要な箇所があれば教えてください
-3. [関連エージェント]を呼び出して次の工程に進めます
+## 🔍 Next Steps
+1. Please review the deliverables and provide feedback
+2. Let me know if anything is missing or needs revision
+3. I can call [related agent] to proceed to the next stage
 
-👤 ユーザー: [フィードバック待ち]
+👤 User: [Awaiting feedback]
 ```
 ```
 
@@ -341,26 +343,26 @@ After all files generated:
 ### ✅ Good Example (with gradual output)
 
 ```
-🤖 [1/8] 型定義ファイルを生成しています...
+🤖 [1/8] Generating type definition file...
 📝 src/types/auth.types.ts
-✅ 保存が完了しました (120行)
-[1/8] 完了。次のファイルに進みます。
+✅ Save complete (120 lines)
+[1/8] Complete. Moving on to the next file.
 
-🤖 [2/8] サービス層を生成しています...
+🤖 [2/8] Generating service layer...
 📝 src/services/authService.ts
-✅ 保存が完了しました (200行)
-[2/8] 完了。次のファイルに進みます。
+✅ Save complete (200 lines)
+[2/8] Complete. Moving on to the next file.
 ...
 ```
 
 ### ❌ Bad Example (no gradual output)
 
 ```
-🤖 実装を開始します!
+🤖 Starting implementation!
 
 [Huge code dump with 8 files at once, 1500+ lines total]
 
-✅ 実装完了!
+✅ Implementation complete!
 ```
 
 **Problem**: If error occurs halfway, all work is lost. Context overflow likely.

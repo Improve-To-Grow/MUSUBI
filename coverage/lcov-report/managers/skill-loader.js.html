@@ -916,7 +916,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * MUSUBI Skill Loader
  * 
- * キーワードトリガー型スキルのロードと活性化
+ * Load and activate keyword-triggered skills
  * 
  * @module src/managers/skill-loader
  * @see REQ-P0-B002
@@ -928,7 +928,7 @@ const path = <span class="cstat-no" title="statement not covered" >require('path
 const os = <span class="cstat-no" title="statement not covered" >require('os');</span>
 &nbsp;
 /**
- * スキルタイプ
+ * Skill types
  */
 const SkillType = <span class="cstat-no" title="statement not covered" >{</span>
   GLOBAL: 'global',
@@ -938,7 +938,7 @@ const SkillType = <span class="cstat-no" title="statement not covered" >{</span>
 };
 &nbsp;
 /**
- * エージェントタイプ
+ * Agent types
  */
 const AgentType = <span class="cstat-no" title="statement not covered" >{</span>
   ALL: 'all',
@@ -948,18 +948,18 @@ const AgentType = <span class="cstat-no" title="statement not covered" >{</span>
 };
 &nbsp;
 /**
- * スキル定義
+ * Skill definition
  */
 class Skill {
   /**
    * @param {Object} options
-   * @param {string} options.name - スキル名
-   * @param {string} options.type - スキルタイプ
-   * @param {string[]} options.triggers - トリガーキーワード
-   * @param {string} options.agent - 対象エージェント
-   * @param {number} options.priority - 優先度
-   * @param {string} options.content - スキル内容（Markdown）
-   * @param {string} options.source - ソースファイルパス
+   * @param {string} options.name - Skill name
+   * @param {string} options.type - Skill type
+   * @param {string[]} options.triggers - Trigger keywords
+   * @param {string} options.agent - Target agent
+   * @param {number} options.priority - Priority
+   * @param {string} options.content - Skill content (Markdown)
+   * @param {string} options.source - Source file path
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    this.name = options.name || 'unnamed';</span>
@@ -973,7 +973,7 @@ class Skill {
   }
 &nbsp;
   /**
-   * メッセージがこのスキルをトリガーするか判定
+   * Determine whether a message triggers this skill
    * @param {string} message 
    * @returns {boolean}
    */
@@ -981,7 +981,7 @@ class Skill {
     const normalizedMessage = <span class="cstat-no" title="statement not covered" >message.toLowerCase();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return this.triggers.some(<span class="fstat-no" title="function not covered" >tr</span>igger =&gt; {</span>
-      // 正規表現パターン: /pattern/flags
+      // Regex pattern: /pattern/flags
 <span class="cstat-no" title="statement not covered" >      if (trigger.startsWith('/') &amp;&amp; trigger.includes('/', 1)) {</span>
         const lastSlash = <span class="cstat-no" title="statement not covered" >trigger.lastIndexOf('/');</span>
         const pattern = <span class="cstat-no" title="statement not covered" >trigger.slice(1, lastSlash);</span>
@@ -990,18 +990,18 @@ class Skill {
           const regex = <span class="cstat-no" title="statement not covered" >new RegExp(pattern, flags);</span>
 <span class="cstat-no" title="statement not covered" >          return regex.test(message);</span>
         } catch (e) {
-          // 無効な正規表現は無視
+          // Ignore invalid regular expressions
 <span class="cstat-no" title="statement not covered" >          return false;</span>
         }
       }
 &nbsp;
-      // 通常のキーワードマッチ
+      // Normal keyword matching
 <span class="cstat-no" title="statement not covered" >      return normalizedMessage.includes(trigger.toLowerCase());</span>
     });
   }
 &nbsp;
   /**
-   * エージェントがこのスキルを使用可能か判定
+   * Determine whether an agent can use this skill
    * @param {string} agentType 
    * @returns {boolean}
    */
@@ -1026,15 +1026,15 @@ class Skill {
 }
 &nbsp;
 /**
- * スキルローダー
+ * Skill loader
  */
 class SkillLoader {
   /**
    * @param {Object} options
-   * @param {string} options.globalDir - グローバルスキルディレクトリ
-   * @param {string} options.userDir - ユーザースキルディレクトリ
-   * @param {string} options.repoDir - リポジトリスキルディレクトリ
-   * @param {string} options.projectRoot - プロジェクトルート
+   * @param {string} options.globalDir - Global skill directory
+   * @param {string} options.userDir - User skill directory
+   * @param {string} options.repoDir - Repository skill directory
+   * @param {string} options.projectRoot - Project root
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    this.projectRoot = options.projectRoot || process.cwd();</span>
@@ -1047,19 +1047,19 @@ class SkillLoader {
   }
 &nbsp;
   /**
-   * 全スキルをロード
-   * 優先順位: リポジトリ &gt; ユーザー &gt; グローバル
+   * Load all skills
+   * Priority: repository &gt; user &gt; global
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync loadAll() {
 <span class="cstat-no" title="statement not covered" >    this.loadedSkills.clear();</span>
 &nbsp;
-    // グローバルスキルをロード（最低優先度）
+    // Load global skills (lowest priority)
 <span class="cstat-no" title="statement not covered" >    await this._loadFromDirectory(this.globalDir, SkillType.GLOBAL, 0);</span>
 &nbsp;
-    // ユーザースキルをロード
+    // Load user skills
 <span class="cstat-no" title="statement not covered" >    await this._loadFromDirectory(this.userDir, SkillType.USER, 100);</span>
 &nbsp;
-    // リポジトリスキルをロード（最高優先度）
+    // Load repository skills (highest priority)
 <span class="cstat-no" title="statement not covered" >    await this._loadFromDirectory(this.repoDir, SkillType.REPO, 200);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    this.initialized = true;</span>
@@ -1067,7 +1067,7 @@ class SkillLoader {
   }
 &nbsp;
   /**
-   * ディレクトリからスキルをロード
+   * Load skills from a directory
    * @param {string} dir 
    * @param {string} defaultType 
    * @param {number} basePriority 
@@ -1084,7 +1084,7 @@ class SkillLoader {
 <span class="cstat-no" title="statement not covered" >      try {</span>
         const skill = <span class="cstat-no" title="statement not covered" >await this.parseSkill(filePath, defaultType, basePriority);</span>
 <span class="cstat-no" title="statement not covered" >        if (skill) {</span>
-          // 同名スキルは高優先度で上書き
+          // Skills with the same name are overridden by the higher priority one
           const existing = <span class="cstat-no" title="statement not covered" >this.loadedSkills.get(skill.name);</span>
 <span class="cstat-no" title="statement not covered" >          if (!existing || skill.priority &gt; existing.priority) {</span>
 <span class="cstat-no" title="statement not covered" >            this.loadedSkills.set(skill.name, skill);</span>
@@ -1097,7 +1097,7 @@ class SkillLoader {
   }
 &nbsp;
   /**
-   * スキルファイルをパース
+   * Parse a skill file
    * @param {string} filePath 
    * @param {string} defaultType 
    * @param {number} basePriority 
@@ -1111,7 +1111,7 @@ class SkillLoader {
 <span class="cstat-no" title="statement not covered" >      frontmatter.name = path.basename(filePath, '.md');</span>
     }
 &nbsp;
-    // トリガーの正規化
+    // Normalize triggers
     let triggers = <span class="cstat-no" title="statement not covered" >frontmatter.triggers || [];</span>
 <span class="cstat-no" title="statement not covered" >    if (typeof triggers === 'string') {</span>
 <span class="cstat-no" title="statement not covered" >      triggers = triggers.split(',').map(<span class="fstat-no" title="function not covered" >t </span>=&gt; <span class="cstat-no" title="statement not covered" >t.trim())</span>;</span>
@@ -1129,7 +1129,7 @@ class SkillLoader {
   }
 &nbsp;
   /**
-   * Frontmatterをパース
+   * Parse frontmatter
    * @param {string} content 
    * @returns {{ frontmatter: Object, body: string }}
    */
@@ -1144,7 +1144,7 @@ class SkillLoader {
     const frontmatterText = <span class="cstat-no" title="statement not covered" >match[1];</span>
     const body = <span class="cstat-no" title="statement not covered" >match[2];</span>
 &nbsp;
-    // 簡易YAMLパーサー
+    // Simple YAML parser
     const frontmatter = <span class="cstat-no" title="statement not covered" >{};</span>
     const lines = <span class="cstat-no" title="statement not covered" >frontmatterText.split('\n');</span>
     let currentKey = <span class="cstat-no" title="statement not covered" >null;</span>
@@ -1152,7 +1152,7 @@ class SkillLoader {
     let arrayValue = <span class="cstat-no" title="statement not covered" >[];</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (const line of lines) {</span>
-      // 配列項目
+      // Array item
 <span class="cstat-no" title="statement not covered" >      if (line.match(/^\s*-\s+(.+)$/)) {</span>
 <span class="cstat-no" title="statement not covered" >        if (currentKey &amp;&amp; inArray) {</span>
 <span class="cstat-no" title="statement not covered" >          arrayValue.push(line.match(/^\s*-\s+(.+)$/)[1].trim());</span>
@@ -1160,7 +1160,7 @@ class SkillLoader {
 <span class="cstat-no" title="statement not covered" >        continue;</span>
       }
 &nbsp;
-      // 配列終了判定
+      // Detect end of array
 <span class="cstat-no" title="statement not covered" >      if (inArray &amp;&amp; currentKey &amp;&amp; !line.match(/^\s*-/)) {</span>
 <span class="cstat-no" title="statement not covered" >        frontmatter[currentKey] = arrayValue;</span>
 <span class="cstat-no" title="statement not covered" >        arrayValue = [];</span>
@@ -1168,14 +1168,14 @@ class SkillLoader {
 <span class="cstat-no" title="statement not covered" >        currentKey = null;</span>
       }
 &nbsp;
-      // キーバリューペア
+      // Key-value pair
       const kvMatch = <span class="cstat-no" title="statement not covered" >line.match(/^(\w+):\s*(.*)$/);</span>
 <span class="cstat-no" title="statement not covered" >      if (kvMatch) {</span>
         const key = <span class="cstat-no" title="statement not covered" >kvMatch[1];</span>
         const value = <span class="cstat-no" title="statement not covered" >kvMatch[2].trim();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        if (value === '' || value === '|') {</span>
-          // 配列または複数行の開始
+          // Start of an array or multiple lines
 <span class="cstat-no" title="statement not covered" >          currentKey = key;</span>
 <span class="cstat-no" title="statement not covered" >          inArray = true;</span>
 <span class="cstat-no" title="statement not covered" >          arrayValue = [];</span>
@@ -1185,7 +1185,7 @@ class SkillLoader {
       }
     }
 &nbsp;
-    // 最後の配列を処理
+    // Process the last array
 <span class="cstat-no" title="statement not covered" >    if (inArray &amp;&amp; currentKey &amp;&amp; arrayValue.length &gt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >      frontmatter[currentKey] = arrayValue;</span>
     }
@@ -1194,34 +1194,34 @@ class SkillLoader {
   }
 &nbsp;
   /**
-   * 値をパース
+   * Parse a value
    * @param {string} value 
    * @returns {any}
    */
 <span class="fstat-no" title="function not covered" >  _p</span>arseValue(value) {
-    // 数値
+    // Number
 <span class="cstat-no" title="statement not covered" >    if (/^-?\d+$/.test(value)) {</span>
 <span class="cstat-no" title="statement not covered" >      return parseInt(value, 10);</span>
     }
 <span class="cstat-no" title="statement not covered" >    if (/^-?\d+\.\d+$/.test(value)) {</span>
 <span class="cstat-no" title="statement not covered" >      return parseFloat(value);</span>
     }
-    // ブール値
+    // Boolean
 <span class="cstat-no" title="statement not covered" >    if (value.toLowerCase() === 'true') <span class="cstat-no" title="statement not covered" >return true;</span></span>
 <span class="cstat-no" title="statement not covered" >    if (value.toLowerCase() === 'false') <span class="cstat-no" title="statement not covered" >return false;</span></span>
-    // 配列（インライン）
+    // Array (inline)
 <span class="cstat-no" title="statement not covered" >    if (value.startsWith('[') &amp;&amp; value.endsWith(']')) {</span>
 <span class="cstat-no" title="statement not covered" >      return value.slice(1, -1).split(',').map(<span class="fstat-no" title="function not covered" >v </span>=&gt; <span class="cstat-no" title="statement not covered" >v.trim().replace(/^["']|["']$/g, ''))</span>;</span>
     }
-    // 文字列
+    // String
 <span class="cstat-no" title="statement not covered" >    return value.replace(/^["']|["']$/g, '');</span>
   }
 &nbsp;
   /**
-   * キーワードに基づいてスキルを活性化
-   * @param {string} message ユーザーメッセージ
-   * @param {string} agentType エージェントタイプ
-   * @returns {Skill[]} 活性化されたスキル（優先度順）
+   * Activate skills based on keywords
+   * @param {string} message User message
+   * @param {string} agentType Agent type
+   * @returns {Skill[]} Activated skills (in priority order)
    */
 <span class="fstat-no" title="function not covered" >  ac</span>tivateByKeywords(message, agentType = <span class="branch-0 cbranch-no" title="branch not covered" >AgentType.ALL)</span> {
 <span class="cstat-no" title="statement not covered" >    if (!this.initialized) {</span>
@@ -1232,25 +1232,25 @@ class SkillLoader {
     const matchedSkills = <span class="cstat-no" title="statement not covered" >[];</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (const skill of this.loadedSkills.values()) {</span>
-      // エージェント互換性チェック
+      // Agent compatibility check
 <span class="cstat-no" title="statement not covered" >      if (!skill.isAvailableFor(agentType)) {</span>
 <span class="cstat-no" title="statement not covered" >        continue;</span>
       }
 &nbsp;
-      // トリガーマッチング
+      // Trigger matching
 <span class="cstat-no" title="statement not covered" >      if (skill.matchesTrigger(message)) {</span>
 <span class="cstat-no" title="statement not covered" >        matchedSkills.push(skill);</span>
       }
     }
 &nbsp;
-    // 優先度でソート（降順）
+    // Sort by priority (descending)
 <span class="cstat-no" title="statement not covered" >    matchedSkills.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >b.priority - a.priority)</span>;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return matchedSkills;</span>
   }
 &nbsp;
   /**
-   * 名前でスキルを取得
+   * Get a skill by name
    * @param {string} name 
    * @returns {Skill|undefined}
    */
@@ -1259,7 +1259,7 @@ class SkillLoader {
   }
 &nbsp;
   /**
-   * 全スキルを取得
+   * Get all skills
    * @returns {Skill[]}
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tSkills() {
@@ -1267,7 +1267,7 @@ class SkillLoader {
   }
 &nbsp;
   /**
-   * スキルタイプでフィルタリング
+   * Filter by skill type
    * @param {string} type 
    * @returns {Skill[]}
    */
@@ -1276,7 +1276,7 @@ class SkillLoader {
   }
 &nbsp;
   /**
-   * リポジトリスキルが存在するか確認
+   * Check whether repository skills exist
    * @returns {boolean}
    */
 <span class="fstat-no" title="function not covered" >  ha</span>sRepoSkills() {
@@ -1285,7 +1285,7 @@ class SkillLoader {
   }
 &nbsp;
   /**
-   * ロードされたスキルのサマリーをMarkdownで出力
+   * Output a summary of loaded skills in Markdown
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tSummary() {
@@ -1310,7 +1310,7 @@ class SkillLoader {
   }
 &nbsp;
   /**
-   * 活性化されたスキルをプロンプトに変換
+   * Convert activated skills into a prompt
    * @param {Skill[]} skills 
    * @returns {string}
    */

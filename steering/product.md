@@ -6,16 +6,16 @@ Ultimate Specification Driven Development Tool with 31 Agents for 7 AI Coding Pl
 
 ## Purpose
 
-MUSUBI は、仕様駆動開発 (SDD) を通じて AI コーディングエージェントの品質と一貫性を向上させるツールです。
+MUSUBI is a tool that improves the quality and consistency of AI coding agents through Specification Driven Development (SDD).
 
 ### Core Value Proposition
 
-- **Constitutional Governance**: 9つの憲法条項による一貫した開発ガイダンス
-- **Review Gate Engine**: Requirements, Design, Implementation の各ゲートでの品質検証
-- **Multi-Agent Orchestration**: Swarm, Triage, Handoff パターンによる複数エージェント協調
+- **Constitutional Governance**: Consistent development guidance through 9 Constitutional Articles
+- **Review Gate Engine**: Quality validation at the Requirements, Design, and Implementation gates
+- **Multi-Agent Orchestration**: Multi-agent coordination through Swarm, Triage, and Handoff patterns
 - **7 Platform Support**: Claude Code, GitHub Copilot, Cursor, Gemini CLI, Windsurf, Codex, Qwen Code
-- **MCP Integration**: CodeGraph MCP による高度なコード分析
-- **Traceability**: 要件からテストまでの完全な追跡可能性
+- **MCP Integration**: Advanced code analysis through CodeGraph MCP
+- **Traceability**: Complete traceability from requirements to tests
 
 ## v6.3.0 Features (New)
 
@@ -32,66 +32,66 @@ MUSUBI は、仕様駆動開発 (SDD) を通じて AI コーディングエー�
 
 | Feature | Description |
 |---------|-------------|
-| **Requirements Gate** | EARS形式、優先度、受入基準の検証 |
-| **Design Gate** | C4モデル、ADR、コンポーネント設計の検証 |
-| **Implementation Gate** | コード品質、テストカバレッジ、命名規則の検証 |
+| **Requirements Gate** | Validates EARS format, priority, and acceptance criteria |
+| **Design Gate** | Validates C4 model, ADRs, and component design |
+| **Implementation Gate** | Validates code quality, test coverage, and naming conventions |
 | **Review Prompts** | `#sdd-review-requirements`, `#sdd-review-design`, etc. |
 
 ### Workflow Dashboard
 
 | Feature | Description |
 |---------|-------------|
-| **Progress Visualization** | 5ステージの進捗状況をリアルタイム表示 |
-| **Blocker Management** | ブロッカーの追加・解決・追跡 |
-| **Transition Recording** | ステージ間遷移の記録と分析 |
-| **Sprint Planning** | タスク優先度とベロシティ管理 |
+| **Progress Visualization** | Real-time display of progress across the 5 stages |
+| **Blocker Management** | Add, resolve, and track blockers |
+| **Transition Recording** | Recording and analysis of stage transitions |
+| **Sprint Planning** | Task priority and velocity management |
 
 ### Traceability System
 
 | Feature | Description |
 |---------|-------------|
-| **Auto-Extraction** | コード・テスト・コミットからID自動抽出 |
-| **Gap Detection** | 設計・実装・テストの欠落を検出 |
-| **Matrix Storage** | YAMLベースのトレーサビリティマトリックス |
+| **Auto-Extraction** | Automatic ID extraction from code, tests, and commits |
+| **Gap Detection** | Detects missing design, implementation, and tests |
+| **Matrix Storage** | YAML-based traceability matrix |
 
 ### Enterprise Features
 
 | Feature | Description |
 |---------|-------------|
-| **Error Recovery** | エラー分析と修復手順の自動生成 |
-| **Rollback Manager** | ファイル/コミット/ステージ/スプリント単位のロールバック |
-| **CI Reporter** | GitHub Actions への結果レポート |
-| **Tech Article Generator** | Qiita, Zenn, Medium, Dev.to 向け記事生成 |
+| **Error Recovery** | Error analysis and automatic generation of recovery steps |
+| **Rollback Manager** | Rollback at the file, commit, stage, or sprint level |
+| **CI Reporter** | Result reporting to GitHub Actions |
+| **Tech Article Generator** | Article generation for Qiita, Zenn, Medium, and Dev.to |
 
 ### CLI Commands (24+)
 
-- `musubi init` - プロジェクト初期化
-- `musubi requirements` - 要件生成
-- `musubi design` - 設計文書生成
-- `musubi tasks` - タスク分解
-- `musubi validate` - 憲法準拠検証
-- `musubi orchestrate` - マルチエージェント実行
-- `musubi release` - リリース管理
-- `musubi config` - 設定管理
-- `musubi dashboard` - ワークフローダッシュボード (v6.2.0 新規)
+- `musubi init` - Initialize a project
+- `musubi requirements` - Generate requirements
+- `musubi design` - Generate design documents
+- `musubi tasks` - Task breakdown
+- `musubi validate` - Validate Constitution compliance
+- `musubi orchestrate` - Run multi-agent execution
+- `musubi release` - Release management
+- `musubi config` - Configuration management
+- `musubi dashboard` - Workflow dashboard (new in v6.2.0)
 
 ## Target Users
 
 ### Primary Users
 
-- **開発チーム**: AI コーディングエージェントを活用する開発チーム
-- **アーキテクト**: 一貫した開発プラクティスを確立したいアーキテクト
-- **エンタープライズ**: 大規模プロジェクトでの品質管理が必要な組織
-- **QA チーム**: トレーサビリティと品質ゲートを活用する品質保証チーム
+- **Development teams**: Development teams that use AI coding agents
+- **Architects**: Architects who want to establish consistent development practices
+- **Enterprises**: Organizations that need quality control on large-scale projects
+- **QA teams**: Quality assurance teams that use traceability and quality gates
 
 ### Use Cases
 
-1. **新規プロジェクト**: SDD ワークフローでプロジェクトを開始
-2. **既存プロジェクト**: 段階的に SDD プラクティスを導入
-3. **モノレポ**: 複数パッケージの統合管理
-4. **エンタープライズ**: カスタマイズ可能な Constitution レベル
-5. **品質ゲート**: Review Gate Engine による段階的品質検証
-6. **トレーサビリティ**: 要件からテストまでの完全な追跡
+1. **New projects**: Start a project with the SDD workflow
+2. **Existing projects**: Introduce SDD practices incrementally
+3. **Monorepos**: Integrated management of multiple packages
+4. **Enterprise**: Customizable Constitution levels
+5. **Quality gates**: Step-by-step quality validation with the Review Gate Engine
+6. **Traceability**: Complete tracking from requirements to tests
 
 ---
 

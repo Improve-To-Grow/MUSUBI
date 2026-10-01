@@ -33,6 +33,7 @@ describe('TechArticleGenerator', () => {
     it('should create generator with default config', () => {
       const g = new TechArticleGenerator();
       expect(g.config.defaultPlatform).toBe(PLATFORM.GENERIC);
+      expect(g.config.defaultLanguage).toBe('en');
       expect(g.config.includeTableOfContents).toBe(true);
     });
 
@@ -122,7 +123,7 @@ describe('TechArticleGenerator', () => {
 
       const result = await generator.generate(content);
 
-      expect(result.article).toContain('## 目次');
+      expect(result.article).toContain('## Table of Contents');
       expect(result.article).toContain('First Section');
     });
 
@@ -137,7 +138,7 @@ describe('TechArticleGenerator', () => {
 
       const result = await generator.generate(content);
 
-      expect(result.article).toContain('ベンチマーク結果');
+      expect(result.article).toContain('## Benchmark Results');
       expect(result.article).toContain('100ms');
     });
   });
@@ -153,7 +154,9 @@ describe('TechArticleGenerator', () => {
 
       const result = await generator.generateFromExperiment(experimentReport);
 
-      expect(result.article).toContain('実験レポート');
+      expect(result.article).toContain('Experiment Report: Test Experiment');
+      expect(result.article).toContain('## Experiment Summary');
+      expect(result.article).toContain('## Conclusion');
       expect(result.article).toContain('90%');
     });
   });
@@ -214,13 +217,8 @@ describe('TechArticleGenerator', () => {
       expect(generator.countWords('Hello world test')).toBe(3);
     });
 
-    it('should count Japanese characters', () => {
-      expect(generator.countWords('テスト記事')).toBe(5);
-    });
-
-    it('should count mixed content', () => {
-      const mixed = 'Hello テスト world';
-      expect(generator.countWords(mixed)).toBeGreaterThan(4);
+    it('should count CJK characters individually', () => {
+      expect(generator.countWords('\u30c6\u30b9\u30c8')).toBe(3);
     });
   });
 
@@ -229,8 +227,8 @@ describe('TechArticleGenerator', () => {
       const shortText = 'Hello world';
       const longText = 'word '.repeat(1000);
 
-      expect(generator.estimateReadingTime(shortText)).toContain('約');
-      expect(generator.estimateReadingTime(longText)).toContain('分');
+      expect(generator.estimateReadingTime(shortText)).toBe('1 min read');
+      expect(generator.estimateReadingTime(longText)).toBe('5 min read');
     });
   });
 

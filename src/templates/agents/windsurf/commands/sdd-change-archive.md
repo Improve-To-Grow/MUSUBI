@@ -523,9 +523,7 @@ git checkout archive/{{deprecated-feature}} -- lib/{{deprecated-feature}}/
 
 ````
 
-**Save To**:
-- English: `storage/changes/{{change-name}}-archive.md`
-- Japanese: `storage/changes/{{change-name}}-archive.ja.md`
+**Save To**: `storage/changes/{{change-name}}-archive.md`
 
 ---
 
@@ -541,11 +539,6 @@ mkdir -p storage/archive/{{YEAR}}/{{change-name}}/
 mv storage/changes/{{change-name}}-proposal.md storage/archive/{{YEAR}}/{{change-name}}/
 mv storage/changes/{{change-name}}-implementation.md storage/archive/{{YEAR}}/{{change-name}}/
 mv storage/changes/{{change-name}}-archive.md storage/archive/{{YEAR}}/{{change-name}}/
-
-# Move Japanese versions
-mv storage/changes/{{change-name}}-proposal.ja.md storage/archive/{{YEAR}}/{{change-name}}/
-mv storage/changes/{{change-name}}-implementation.ja.md storage/archive/{{YEAR}}/{{change-name}}/
-mv storage/changes/{{change-name}}-archive.ja.md storage/archive/{{YEAR}}/{{change-name}}/
 
 # Create index
 cat > storage/archive/{{YEAR}}/{{change-name}}/README.md <<EOF
@@ -632,7 +625,7 @@ Before completing, verify:
 - [ ] Deprecated code removed (if applicable)
 - [ ] Documentation updated
 - [ ] Steering files updated
-- [ ] Archive report created (bilingual)
+- [ ] Archive report created
 - [ ] Files moved to archive directory
 - [ ] Lessons learned documented
 - [ ] Summary presented to user

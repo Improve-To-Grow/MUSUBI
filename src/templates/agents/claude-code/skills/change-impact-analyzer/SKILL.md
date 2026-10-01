@@ -310,21 +310,21 @@ find api/ -name "*.yaml" -o -name "*.json"
 3. Identify indirect (cascading) dependencies
 4. Identify integration points
 
-### Phase 4: 段階的影響分析レポート生成
+### Phase 4: Incremental Impact Analysis Report Generation
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: Prevent context length overflow**
 
-**出力方式の原則:**
+**Output Principles:**
 
-- ✅ 1セクションずつ順番に生成・保存
-- ✅ 各セクション生成後に進捗を報告
-- ✅ 大きなレポートをセクションごとに分割
-- ✅ エラー発生時も部分的なレポートが残る
+- ✅ Generate and save one section at a time, in order
+- ✅ Report progress after generating each section
+- ✅ Split large reports into sections
+- ✅ Partial reports are preserved even if an error occurs
 
 ```
-🤖 確認ありがとうございます。影響分析レポートを順番に生成します。
+🤖 Thank you for confirming. I will generate the impact analysis report in order.
 
-【生成予定のセクション】
+[Sections to be generated]
 1. Executive Summary
 2. Affected Components
 3. Breaking Changes
@@ -332,71 +332,71 @@ find api/ -name "*.yaml" -o -name "*.json"
 5. Recommendations
 6. Approval Checklist
 
-合計: 6セクション
+Total: 6 sections
 
-**重要: 段階的生成方式**
-各セクションを1つずつ生成・保存し、進捗を報告します。
-これにより、途中経過が見え、エラーが発生しても部分的なレポートが残ります。
+**Important: Incremental generation method**
+I will generate and save each section one at a time and report progress.
+This makes intermediate progress visible, and a partial report is preserved even if an error occurs.
 
-生成を開始してよろしいですか?
-👤 ユーザー: [回答待ち]
+Shall I start generating?
+👤 User: [Awaiting response]
 ```
 
-ユーザーが承認後、**各セクションを順番に生成**:
+After the user approves, **generate each section in order**:
 
 **Step 1: Executive Summary**
 
 ```
-🤖 [1/6] Executive Summaryを生成しています...
+🤖 [1/6] Generating Executive Summary...
 
 📝 impact-analysis/add-two-factor-auth-report.md (Section 1)
-✅ 保存が完了しました
+✅ Save complete
 
-[1/6] 完了。次のセクションに進みます。
+[1/6] Complete. Proceeding to the next section.
 ```
 
 **Step 2: Affected Components**
 
 ```
-🤖 [2/6] Affected Componentsを生成しています...
+🤖 [2/6] Generating Affected Components...
 
 📝 impact-analysis/add-two-factor-auth-report.md (Section 2)
-✅ 保存が完了しました
+✅ Save complete
 
-[2/6] 完了。次のセクションに進みます。
+[2/6] Complete. Proceeding to the next section.
 ```
 
-**大きな影響分析レポート(>300行)の場合:**
+**For large impact analysis reports (>300 lines):**
 
 ```
-🤖 影響分析レポート全体が500行超えるため、セクションごとに保存します。
-⚠️ 各セクションを個別ファイルとして生成し、最後に統合します。
+🤖 The entire impact analysis report exceeds 500 lines, so it will be saved section by section.
+⚠️ Each section is generated as a separate file and merged at the end.
 
 📝 Part 1/3: impact-analysis/add-two-factor-auth-report-part1.md (Executive Summary & Affected Components)
-✅ 保存が完了しました (200行)
+✅ Save complete (200 lines)
 
 📝 Part 2/3: impact-analysis/add-two-factor-auth-report-part2.md (Risk Assessment & Dependencies)
-✅ 保存が完了しました (180行)
+✅ Save complete (180 lines)
 
 📝 Part 3/3: impact-analysis/add-two-factor-auth-report-part3.md (Recommendations & Approval)
-✅ 保存が完了しました (150行)
+✅ Save complete (150 lines)
 
-✅ レポート生成完了: 3ファイル (合計530行)
-💡 必要に応じて統合版も生成できます
+✅ Report generation complete: 3 files (530 lines total)
+💡 A merged version can also be generated if needed
 ```
 
-**Final: レポート生成完了サマリー**
+**Final: Report Generation Completion Summary**
 
 ```
-🤖 ✨ 影響分析レポートの生成が完了しました！
+🤖 ✨ Impact analysis report generation is complete!
 
-## 📊 分析サマリー
-- **影響を受けるコンポーネント**: 12ファイル
-- **破壊的変更**: 1件
-- **リスクレベル**: HIGH
+## 📊 Analysis Summary
+- **Affected components**: 12 files
+- **Breaking changes**: 1
+- **Risk level**: HIGH
 
-## 📂 生成されたレポート
-✅ impact-analysis/add-two-factor-auth-report.md (6セクション)
+## 📂 Generated Reports
+✅ impact-analysis/add-two-factor-auth-report.md (6 sections)
 
 ```
 

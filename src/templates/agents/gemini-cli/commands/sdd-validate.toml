@@ -18,7 +18,7 @@ Validate that the implementation follows all Constitutional Articles and meets r
 
 # Step 1: Read All Context
 
-**IMPORTANT: Read these files FIRST (English versions only):**
+**IMPORTANT: Read these files FIRST:**
 
 1. **Constitutional Governance**:
    - `steering/rules/constitution.md` - 9 Constitutional Articles
@@ -36,8 +36,6 @@ Validate that the implementation follows all Constitutional Articles and meets r
    - Read lib/{{feature-name}}/ directory
    - Read app/api/{{feature-name}}/ directory (if applicable)
    - Read test files
-
-**Note**: Always read English versions (.md), not Japanese translations (.ja.md)
 
 # Step 2: Validation Checklist
 

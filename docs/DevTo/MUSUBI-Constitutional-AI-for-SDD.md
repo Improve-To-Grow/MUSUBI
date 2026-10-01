@@ -38,7 +38,7 @@ The result? Software that actually works.
 
 ## Introducing MUSUBI
 
-**MUSUBI** (むすび - "connection" in Japanese) is an open-source SDD framework that works with **7 major AI coding platforms**:
+**MUSUBI** (musubi - "connection" in Japanese) is an open-source SDD framework that works with **7 major AI coding platforms**:
 
 - ✅ Claude Code (Skills API)
 - ✅ GitHub Copilot (AGENTS.md)
@@ -151,16 +151,16 @@ You: @change-impact-analyzer I want to modify calculatePrice().
 
 Running find_callers("calculatePrice")...
 
-【Direct Callers】(5 locations)
+[Direct Callers] (5 locations)
 - OrderService.createOrder() - line 45
 - CartController.updateCart() - line 78
 - InvoiceGenerator.generate() - line 112
 
-【Indirect Callers】(3 locations) ← Previously missed!
+[Indirect Callers] (3 locations) ← Previously missed!
 - APIController.handleRequest() → OrderService → calculatePrice
 - ScheduledTask.dailyReport() → BatchProcessor → calculatePrice
 
-【Affected Tests】
+[Affected Tests]
 - tests/unit/price.test.ts (direct)
 - tests/integration/order.test.ts (indirect)
 ```
@@ -281,7 +281,7 @@ npx musubi-sdd init --copilot
 
 ---
 
-**MUSUBI** - むすび - Connecting specifications, design, and code.
+**MUSUBI** - musubi - Connecting specifications, design, and code.
 
 ⭐ Star us on [GitHub](https://github.com/nahisaho/MUSUBI) if this helps!
 

@@ -11,7 +11,7 @@
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-[English](README.md) | [日本語](README.ja.md) | [Documentation](docs/) | [npm](https://www.npmjs.com/package/musubi-sdd)
+[Documentation](docs/) | [npm](https://www.npmjs.com/package/musubi-sdd)
 
 </div>
 
@@ -19,7 +19,7 @@
 
 > 🤖 **7 AI Coding Agents** × 📋 **31 Specialized Skills** × ⚖️ **Constitutional Governance**
 
-MUSUBI (結び - "connection/binding") is a comprehensive **Specification Driven Development (SDD)** framework that synthesizes the best features from 6 leading frameworks into a production-ready tool for multiple AI coding agents.
+MUSUBI (musubi - "connection/binding") is a comprehensive **Specification Driven Development (SDD)** framework that synthesizes the best features from 6 leading frameworks into a production-ready tool for multiple AI coding agents.
 
 <div align="center">
 
@@ -457,7 +457,7 @@ const result = await validator.validateAll(projectPath);
 - 🤝 **Team Collaboration** - `musubi-share` enables memory sharing, import/export, and multi-platform sync (v0.6.0)
 - ✅ **Constitutional Validation** - `musubi-validate` enforces 9 immutable governance articles with Phase -1 Gates (v0.7.0)
 - ✅ **Complete Traceability** - Requirements → Design → Code → Tests mapping
-- 🌐 **Bilingual Documentation** - All agent-generated documents created in both English and Japanese
+- 🌐 **Optional Bilingual Output** - English by default; agents can add a translated copy of every document and chat in a second language ([how to enable](BILINGUAL-IMPLEMENTATION.md))
 
 ## Supported AI Coding Agents
 
@@ -880,7 +880,7 @@ Analyzing your project...
 
 - Automatic codebase analysis (package.json, directory structure)
 - Technology stack detection (languages, frameworks)
-- Bilingual steering docs generation (English + Japanese)
+- Steering docs generation (structure, tech, product)
 - Memory system initialization (6 memory files)
 - Project configuration (project.yml)
 - 96% time reduction (2-4 hours → 2-5 minutes)
@@ -900,8 +900,8 @@ Detected changes:
 ? Apply these changes? (Y/n) Y
 
 ✅ Updated steering/project.yml
-✅ Updated steering/tech.md (en + ja)
-✅ Updated steering/structure.md (en + ja)
+✅ Updated steering/tech.md
+✅ Updated steering/structure.md
 ✅ Recorded change in memories/architecture_decisions.md
 
 🎉 Steering synchronized successfully!
@@ -913,7 +913,6 @@ Detected changes:
 - Interactive mode (default): Show changes, ask confirmation
 - Auto-approve mode (--auto-approve): CI/CD integration
 - Dry-run mode (--dry-run): Preview only
-- Bilingual updates (English + Japanese together)
 - Memory recording (audit trail)
 
 **Usage**:
@@ -1204,37 +1203,14 @@ AND the system SHALL create a session.
 - AND system SHALL redirect to dashboard
 ```
 
-## Bilingual Documentation
+## Documentation Language
 
-**All agent-generated documents are created in both English and Japanese.**
+All agent-generated documents are written in English, and agents communicate with users in English.
 
-### Language Policy
-
-- **English**: Reference/source documents (`.md`)
-- **Japanese**: Translations (`.ja.md`)
-- **Skills**: Always read English versions for work
-- **Code References**: Requirement IDs, technical terms stay in English
-
-### Files Generated Bilingually
-
-**Steering Context**:
-
-- `steering/structure.md` + `steering/structure.ja.md`
-- `steering/tech.md` + `steering/tech.ja.md`
-- `steering/product.md` + `steering/product.ja.md`
-
-**Specifications**:
-
-- `storage/specs/auth-requirements.md` + `storage/specs/auth-requirements.ja.md`
-- `storage/design/auth-design.md` + `storage/design/auth-design.ja.md`
-- `storage/tasks/auth-tasks.md` + `storage/tasks/auth-tasks.ja.md`
-
-### Generation Order
-
-1. **English version generated FIRST** (reference/source)
-2. **Japanese version generated SECOND** (translation)
-3. Technical terms (REQ-XXX-NNN, EARS keywords, API endpoints) remain in English
-4. Both versions maintained in sync
+Bilingual output is optional: when enabled, every document also gets a translated copy
+(e.g. `requirements.ja.md` next to `requirements.md`, with English as the reference), and agents can
+chat with users in the second language. See [BILINGUAL-IMPLEMENTATION.md](BILINGUAL-IMPLEMENTATION.md)
+for which files to edit to enable it.
 
 ## Delta Specifications (Brownfield)
 
@@ -1513,7 +1489,7 @@ MUSUBI synthesizes features from:
 
 <div align="center">
 
-**🎋 MUSUBI** - むすび - Bringing specifications, design, and code together.
+**🎋 MUSUBI** - musubi - Bringing specifications, design, and code together.
 
 [![GitHub stars](https://img.shields.io/github/stars/nahisaho/musubi?style=social)](https://github.com/nahisaho/MUSUBI)
 

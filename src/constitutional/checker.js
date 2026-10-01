@@ -162,9 +162,9 @@ class ConstitutionalChecker {
         article: 'I',
         articleName: ARTICLES.I.name,
         severity: SEVERITY.MEDIUM,
-        message: 'ファイルに要件参照（REQ-XXX、IMP-XXX等）がありません',
+        message: 'File has no requirement references (REQ-XXX, IMP-XXX, etc.)',
         filePath,
-        suggestion: 'コードコメントまたはJSDocに関連する要件IDを追加してください',
+        suggestion: 'Add the related requirement IDs to code comments or JSDoc',
       };
     }
 
@@ -202,9 +202,9 @@ class ConstitutionalChecker {
       article: 'III',
       articleName: ARTICLES.III.name,
       severity: SEVERITY.HIGH,
-      message: '対応するテストファイルがありません',
+      message: 'No corresponding test file found',
       filePath,
-      suggestion: `テストファイル（例: ${base}.test${ext}）を作成してください`,
+      suggestion: `Create a test file (e.g. ${base}.test${ext})`,
     };
   }
 
@@ -225,9 +225,9 @@ class ConstitutionalChecker {
         article: 'VII',
         articleName: ARTICLES.VII.name,
         severity: SEVERITY.HIGH,
-        message: `ファイルが長すぎます（${lines.length}行 > ${thresholds.maxFileLines}行）`,
+        message: `File is too long (${lines.length} lines > ${thresholds.maxFileLines} lines)`,
         filePath,
-        suggestion: 'ファイルを複数のモジュールに分割してください',
+        suggestion: 'Split the file into multiple modules',
       });
     }
 
@@ -243,10 +243,10 @@ class ConstitutionalChecker {
           article: 'VII',
           articleName: ARTICLES.VII.name,
           severity: SEVERITY.MEDIUM,
-          message: `関数 "${fn.name}" が長すぎます（約${fn.lines}行 > ${thresholds.maxFunctionLines}行）`,
+          message: `Function "${fn.name}" is too long (~${fn.lines} lines > ${thresholds.maxFunctionLines} lines)`,
           filePath,
           line: fn.startLine,
-          suggestion: '関数をより小さな関数に分割してください',
+          suggestion: 'Split the function into smaller functions',
         });
       }
     }
@@ -258,9 +258,9 @@ class ConstitutionalChecker {
         article: 'VII',
         articleName: ARTICLES.VII.name,
         severity: SEVERITY.MEDIUM,
-        message: `依存関係が多すぎます（${imports.length}個 > ${thresholds.maxDependencies}個）`,
+        message: `Too many dependencies (${imports.length} > ${thresholds.maxDependencies})`,
         filePath,
-        suggestion: '依存関係を見直し、必要に応じてモジュールを再構成してください',
+        suggestion: 'Review the dependencies and restructure the module if needed',
       });
     }
 
@@ -337,9 +337,9 @@ class ConstitutionalChecker {
           article: 'VIII',
           articleName: ARTICLES.VIII.name,
           severity: SEVERITY.HIGH,
-          message: `早すぎる抽象化の可能性: "${match[0]}"`,
+          message: `Possible premature abstraction: "${match[0]}"`,
           filePath,
-          suggestion: '具体的な実装から始め、必要に応じて後から抽象化してください',
+          suggestion: 'Start with a concrete implementation and abstract later only when needed',
         });
       }
     }
@@ -368,9 +368,9 @@ class ConstitutionalChecker {
         article: 'IX',
         articleName: ARTICLES.IX.name,
         severity: SEVERITY.LOW,
-        message: 'ドキュメンテーションが不足しています',
+        message: 'Insufficient documentation',
         filePath,
-        suggestion: 'JSDocコメントを追加してください',
+        suggestion: 'Add JSDoc comments',
       };
     }
 
@@ -497,9 +497,9 @@ class ConstitutionalChecker {
       shouldBlock: criticalViolations.length > 0 || phaseMinusOneViolations.length > 0,
       reason:
         criticalViolations.length > 0
-          ? 'クリティカルな違反があります'
+          ? 'Critical violations found'
           : phaseMinusOneViolations.length > 0
-            ? 'Article VII/VIII違反によりPhase -1 Gateレビューが必要です'
+            ? 'Phase -1 Gate review required due to Article VII/VIII violations'
             : null,
       criticalCount: criticalViolations.length,
       highCount: highViolations.length,
@@ -539,7 +539,7 @@ class ConstitutionalChecker {
       lines.push(`**Reason:** ${blockDecision.reason}`);
       if (blockDecision.requiresPhaseMinusOne) {
         lines.push('');
-        lines.push('> Phase -1 Gate レビューが必要です。System Architectの承認を得てください。');
+        lines.push('> Phase -1 Gate review required. Obtain approval from the System Architect.');
       }
       lines.push('');
     } else {

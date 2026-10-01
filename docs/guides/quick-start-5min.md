@@ -1,31 +1,31 @@
-# 🚀 MUSUBI 5分間クイックスタート
+# 🚀 MUSUBI 5-Minute Quick Start
 
-**MUSUBI v3.5.1** | 最終更新: 2025-12-08
+**MUSUBI v3.5.1** | Last updated: 2025-12-08
 
-> 5分でMUSUBIを始めて、最初のSDD仕様書を作成しましょう！
-
----
-
-## 📋 目次
-
-1. [前提条件](#1-前提条件)
-2. [インストール](#2-インストール)
-3. [プロジェクト初期化](#3-プロジェクト初期化)
-4. [最初の要件定義](#4-最初の要件定義)
-5. [次のステップ](#5-次のステップ)
+> Get started with MUSUBI in 5 minutes and create your first SDD specification!
 
 ---
 
-## 1. 前提条件
+## 📋 Table of Contents
 
-| 項目 | 要件 |
+1. [Prerequisites](#1-prerequisites)
+2. [Installation](#2-installation)
+3. [Project Initialization](#3-project-initialization)
+4. [First Requirements Definition](#4-first-requirements-definition)
+5. [Next Steps](#5-next-steps)
+
+---
+
+## 1. Prerequisites
+
+| Item | Requirement |
 |------|------|
-| **Node.js** | v18.0.0 以上 |
-| **AIコーディングエージェント** | 以下のいずれか |
+| **Node.js** | v18.0.0 or later |
+| **AI Coding Agent** | Any of the following |
 
-### 対応AIエージェント
+### Supported AI Agents
 
-| エージェント | 対応 | 初期化コマンド |
+| Agent | Supported | Initialization Command |
 |-------------|------|----------------|
 | Claude Code | ✅ Skills API | `musubi init --claude-code` |
 | GitHub Copilot | ✅ AGENTS.md | `musubi init --copilot` |
@@ -37,22 +37,22 @@
 
 ---
 
-## 2. インストール
+## 2. Installation
 
-### 方法A: npx（推奨・インストール不要）
+### Option A: npx (Recommended, No Installation Required)
 
 ```bash
 npx musubi-sdd init
 ```
 
-### 方法B: グローバルインストール
+### Option B: Global Installation
 
 ```bash
 npm install -g musubi-sdd
 musubi init
 ```
 
-### 方法C: プロジェクトローカル
+### Option C: Project-Local
 
 ```bash
 npm install --save-dev musubi-sdd
@@ -61,70 +61,70 @@ npx musubi init
 
 ---
 
-## 3. プロジェクト初期化
+## 3. Project Initialization
 
-### 3.1 新規プロジェクト（Greenfield）
+### 3.1 New Project (Greenfield)
 
 ```bash
-# 新しいプロジェクトディレクトリを作成
+# Create a new project directory
 mkdir my-project && cd my-project
 
-# MUSUBI初期化（GitHub Copilotの場合）
+# Initialize MUSUBI (for GitHub Copilot)
 npx musubi-sdd init --copilot
 ```
 
-**生成されるファイル構成:**
+**Generated file structure:**
 
 ```
 my-project/
-├── AGENTS.md              # AIエージェント設定
+├── AGENTS.md              # AI agent settings
 ├── steering/
-│   ├── structure.md       # アーキテクチャパターン
-│   ├── tech.md            # 技術スタック
-│   ├── product.md         # プロダクトコンテキスト
-│   ├── project.yml        # プロジェクト設定
+│   ├── structure.md       # Architecture patterns
+│   ├── tech.md            # Technology stack
+│   ├── product.md         # Product context
+│   ├── project.yml        # Project settings
 │   └── rules/
-│       ├── constitution.md # 9条の憲法
-│       └── workflow.md     # SDDワークフロー
+│       ├── constitution.md # The 9-Article Constitution
+│       └── workflow.md     # SDD workflow
 └── storage/
-    ├── features/          # 機能仕様書
-    ├── specs/             # 詳細仕様
-    └── changes/           # 変更履歴
+    ├── features/          # Feature specifications
+    ├── specs/             # Detailed specifications
+    └── changes/           # Change history
 ```
 
-### 3.2 既存プロジェクト（Brownfield）
+### 3.2 Existing Project (Brownfield)
 
 ```bash
 cd existing-project
 
-# 自動解析してsteering docs生成
+# Automatically analyze and generate steering docs
 npx musubi-sdd onboard
 ```
 
-**自動検出される項目:**
-- 📦 使用技術（package.json, requirements.txt等）
-- 📁 ディレクトリ構造
-- 🔧 ビルドツール・フレームワーク
+**Automatically detected items:**
+- 📦 Technologies used (package.json, requirements.txt, etc.)
+- 📁 Directory structure
+- 🔧 Build tools and frameworks
 
 ---
 
-## 4. 最初の要件定義
+## 4. First Requirements Definition
 
-### 4.1 AIエージェントでコマンド実行
+### 4.1 Run a Command in an AI Agent
 
-| プラットフォーム | コマンド形式 |
+| Platform | Command Format |
 |-----------------|-------------|
-| Claude Code | `/sdd-requirements ログイン機能` |
-| GitHub Copilot | `#sdd-requirements ログイン機能` |
-| Cursor | `@sdd-requirements ログイン機能` |
+| Claude Code | `/sdd-requirements login feature` |
+| GitHub Copilot | `#sdd-requirements login feature` |
+| Cursor | `@sdd-requirements login feature` |
 
-### 4.2 CLIで要件生成
+### 4.2 Generate Requirements with the CLI
 
 ```bash
 npx musubi-sdd requirements --feature login --output storage/specs/
 ```
 
-### 4.3 生成される要件書（EARS形式）
+### 4.3 Generated Requirements Document (EARS Format)
 
 ```markdown
 # Feature: Login Function
@@ -148,9 +148,9 @@ npx musubi-sdd requirements --feature login --output storage/specs/
 
 ---
 
-## 5. 次のステップ
+## 5. Next Steps
 
-### 📚 SDDワークフロー8ステージ
+### 📚 The 8 Stages of the SDD Workflow
 
 ```mermaid
 graph LR
@@ -163,47 +163,47 @@ graph LR
     DEP --> M[📊 Monitor]
 ```
 
-### 🎯 よく使うコマンド
+### 🎯 Frequently Used Commands
 
-| ステージ | CLI | AIコマンド |
+| Stage | CLI | AI Command |
 |---------|-----|-----------|
-| 要件定義 | `musubi requirements` | `/sdd-requirements` |
-| 設計 | `musubi design` | `/sdd-design` |
-| タスク分解 | `musubi tasks` | `/sdd-tasks` |
-| 実装 | `musubi workflow` | `/sdd-implement` |
-| 検証 | `musubi validate` | `/sdd-validate` |
+| Requirements | `musubi requirements` | `/sdd-requirements` |
+| Design | `musubi design` | `/sdd-design` |
+| Task Breakdown | `musubi tasks` | `/sdd-tasks` |
+| Implementation | `musubi workflow` | `/sdd-implement` |
+| Validation | `musubi validate` | `/sdd-validate` |
 
-### 📖 追加リソース
+### 📖 Additional Resources
 
-- [CLI完全リファレンス](./cli-reference.md)
-- [実践チュートリアル: ToDoアプリ開発](./tutorial-todo-app.md)
-- [プラットフォーム別セットアップ](./platform-setup.md)
-- [トラブルシューティング](./troubleshooting.md)
-- [EARS要件フォーマット詳細](./ears-format.md)
+- [Complete CLI Reference](./cli-reference.md)
+- [Hands-On Tutorial: Building a ToDo App](./tutorial-todo-app.md)
+- [Platform-Specific Setup](./platform-setup.md)
+- [Troubleshooting](./troubleshooting.md)
+- [EARS Requirements Format Details](./ears-format.md)
 
 ---
 
 ## 💡 Tips
 
-### Tip 1: プロジェクトメモリの更新
+### Tip 1: Update Project Memory
 
-コードベースが変更されたら、steering docsを更新：
+When the codebase changes, update the steering docs:
 
 ```bash
 npx musubi-sdd remember --auto
 ```
 
-### Tip 2: ギャップ分析
+### Tip 2: Gap Analysis
 
-要件と実装の差異を確認：
+Check the differences between requirements and implementation:
 
 ```bash
 npx musubi-sdd gaps
 ```
 
-### Tip 3: 変更影響分析
+### Tip 3: Change Impact Analysis
 
-変更の影響範囲を可視化：
+Visualize the scope of a change's impact:
 
 ```bash
 npx musubi-sdd analyze --changes
@@ -211,8 +211,8 @@ npx musubi-sdd analyze --changes
 
 ---
 
-**🎉 おめでとうございます！MUSUBIでのSDD開発を始める準備ができました！**
+**🎉 Congratulations! You are ready to start SDD development with MUSUBI!**
 
 ---
 
-*ドキュメント生成: MUSUBI v3.5.1*
+*Documentation generated by MUSUBI v3.5.1*

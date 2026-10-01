@@ -1078,7 +1078,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * MUSUBI Repository Skill Manager
  *
- * リポジトリ固有スキル（.musubi/skills/）の管理と自動生成
+ * Manage and auto-generate repository-specific skills (.musubi/skills/)
  *
  * @module src/managers/repo-skill-manager
  * @see REQ-P0-B003
@@ -1089,13 +1089,13 @@ const fs = <span class="cstat-no" title="statement not covered" >require('fs');<
 const path = <span class="cstat-no" title="statement not covered" >require('path');</span>
 &nbsp;
 /**
- * リポジトリスキルマネージャー
+ * Repository skill manager
  */
 class RepoSkillManager {
   /**
    * @param {Object} options
-   * @param {string} options.projectRoot - プロジェクトルート
-   * @param {boolean} options.autoGenerate - 存在しない場合に自動生成
+   * @param {string} options.projectRoot - Project root
+   * @param {boolean} options.autoGenerate - Auto-generate if missing
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    this.projectRoot = options.projectRoot || process.cwd();</span>
@@ -1104,8 +1104,8 @@ class RepoSkillManager {
   }
 &nbsp;
   /**
-   * .musubi/skills/ ディレクトリを初期化
-   * @returns {Object} 初期化結果
+   * Initialize the .musubi/skills/ directory
+   * @returns {Object} Initialization result
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync initialize() {
     const results = <span class="cstat-no" title="statement not covered" >{</span>
@@ -1114,13 +1114,13 @@ class RepoSkillManager {
       errors: [],
     };
 &nbsp;
-    // ディレクトリ作成
+    // Create directory
 <span class="cstat-no" title="statement not covered" >    if (!fs.existsSync(this.skillsDir)) {</span>
 <span class="cstat-no" title="statement not covered" >      fs.mkdirSync(this.skillsDir, { recursive: true });</span>
 <span class="cstat-no" title="statement not covered" >      results.created.push('.musubi/skills/');</span>
     }
 &nbsp;
-    // repo.md 生成
+    // Generate repo.md
     const repoMdPath = <span class="cstat-no" title="statement not covered" >path.join(this.skillsDir, 'repo.md');</span>
 <span class="cstat-no" title="statement not covered" >    if (!fs.existsSync(repoMdPath)) {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
@@ -1138,7 +1138,7 @@ class RepoSkillManager {
   }
 &nbsp;
   /**
-   * repo.md を自動生成
+   * Auto-generate repo.md
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync generateRepoMd() {
@@ -1213,7 +1213,7 @@ ${analysis.conventions.map(<span class="fstat-no" title="function not covered" >
   }
 &nbsp;
   /**
-   * プロジェクトを分析
+   * Analyze the project
    * @returns {Object}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync analyzeProject() {
@@ -1229,7 +1229,7 @@ ${analysis.conventions.map(<span class="fstat-no" title="function not covered" >
       conventions: [],
     };
 &nbsp;
-    // package.json の分析
+    // Analyze package.json
     const packageJsonPath = <span class="cstat-no" title="statement not covered" >path.join(this.projectRoot, 'package.json');</span>
 <span class="cstat-no" title="statement not covered" >    if (fs.existsSync(packageJsonPath)) {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
@@ -1237,10 +1237,10 @@ ${analysis.conventions.map(<span class="fstat-no" title="function not covered" >
 <span class="cstat-no" title="statement not covered" >        analysis.name = pkg.name || analysis.name;</span>
 <span class="cstat-no" title="statement not covered" >        analysis.description = pkg.description || '';</span>
 &nbsp;
-        // セットアップコマンド
+        // Setup commands
 <span class="cstat-no" title="statement not covered" >        analysis.setupCommands.push('npm install');</span>
 &nbsp;
-        // スクリプト
+        // Scripts
 <span class="cstat-no" title="statement not covered" >        if (pkg.scripts) {</span>
           const scriptMapping = <span class="cstat-no" title="statement not covered" >{</span>
             start: 'Start the application',
@@ -1261,7 +1261,7 @@ ${analysis.conventions.map(<span class="fstat-no" title="function not covered" >
           }
         }
 &nbsp;
-        // 依存関係からパターンを検出
+        // Detect patterns from dependencies
         const deps = <span class="cstat-no" title="statement not covered" >{ ...pkg.dependencies, ...pkg.devDependencies };</span>
 <span class="cstat-no" title="statement not covered" >        if (deps['jest'] || deps['vitest']) {</span>
 <span class="cstat-no" title="statement not covered" >          analysis.patterns.push({</span>
@@ -1297,11 +1297,11 @@ ${analysis.conventions.map(<span class="fstat-no" title="function not covered" >
           });
         }
       } catch (error) {
-        // 無視
+        // Ignore
       }
     }
 &nbsp;
-    // Python プロジェクトの分析
+    // Analyze Python project
     const requirementsPath = <span class="cstat-no" title="statement not covered" >path.join(this.projectRoot, 'requirements.txt');</span>
     const pyprojectPath = <span class="cstat-no" title="statement not covered" >path.join(this.projectRoot, 'pyproject.toml');</span>
 <span class="cstat-no" title="statement not covered" >    if (fs.existsSync(requirementsPath)) {</span>
@@ -1316,7 +1316,7 @@ ${analysis.conventions.map(<span class="fstat-no" title="function not covered" >
 <span class="cstat-no" title="statement not covered" >      analysis.patterns.push({ name: 'Packaging', description: 'pyproject.toml' });</span>
     }
 &nbsp;
-    // CI/CD の検出
+    // Detect CI/CD
     const cicdPaths = <span class="cstat-no" title="statement not covered" >[</span>
       { path: '.github/workflows', desc: 'GitHub Actions workflows' },
       { path: '.gitlab-ci.yml', desc: 'GitLab CI configuration' },
@@ -1332,10 +1332,10 @@ ${analysis.conventions.map(<span class="fstat-no" title="function not covered" >
       }
     }
 &nbsp;
-    // ディレクトリ構造
+    // Directory structure
 <span class="cstat-no" title="statement not covered" >    analysis.structureTree = this._generateTreeStructure();</span>
 &nbsp;
-    // 規約の検出
+    // Detect conventions
 <span class="cstat-no" title="statement not covered" >    if (fs.existsSync(path.join(this.projectRoot, '.editorconfig'))) {</span>
 <span class="cstat-no" title="statement not covered" >      analysis.conventions.push('Follow .editorconfig settings');</span>
     }
@@ -1353,7 +1353,7 @@ ${analysis.conventions.map(<span class="fstat-no" title="function not covered" >
   }
 &nbsp;
   /**
-   * ディレクトリツリー構造を生成
+   * Generate the directory tree structure
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  _g</span>enerateTreeStructure() {
@@ -1384,12 +1384,12 @@ ${analysis.conventions.map(<span class="fstat-no" title="function not covered" >
 <span class="cstat-no" title="statement not covered" >        return;</span>
       }
 &nbsp;
-      // フィルタリングとソート
+      // Filtering and sorting
 <span class="cstat-no" title="statement not covered" >      entries = entries</span>
         .filter(<span class="fstat-no" title="function not covered" >e </span>=&gt; <span class="cstat-no" title="statement not covered" >!e.name.startsWith('.') || e.name === '.musubi')</span>
         .filter(<span class="fstat-no" title="function not covered" >e </span>=&gt; <span class="cstat-no" title="statement not covered" >!ignoreDirs.includes(e.name))</span>
         .sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; {
-          // ディレクトリ優先
+          // Directories first
 <span class="cstat-no" title="statement not covered" >          if (a.isDirectory() !== b.isDirectory()) {</span>
 <span class="cstat-no" title="statement not covered" >            return a.isDirectory() ? -1 : 1;</span>
           }
@@ -1423,10 +1423,10 @@ ${analysis.conventions.map(<span class="fstat-no" title="function not covered" >
   }
 &nbsp;
   /**
-   * カスタムスキルを追加
-   * @param {string} name スキル名
-   * @param {Object} options スキルオプション
-   * @returns {string} 作成されたファイルパス
+   * Add a custom skill
+   * @param {string} name Skill name
+   * @param {Object} options Skill options
+   * @returns {string} Created file path
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync addSkill(name, options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
     const filename = <span class="cstat-no" title="statement not covered" >`${name.toLowerCase().replace(/\s+/g, '-')}.md`;</span>
@@ -1450,7 +1450,7 @@ priority: ${options.priority || 50}
 ${options.content || '&lt;!-- Add skill content here --&gt;'}
 `;
 &nbsp;
-    // ディレクトリ作成
+    // Create directory
 <span class="cstat-no" title="statement not covered" >    if (!fs.existsSync(this.skillsDir)) {</span>
 <span class="cstat-no" title="statement not covered" >      fs.mkdirSync(this.skillsDir, { recursive: true });</span>
     }
@@ -1460,7 +1460,7 @@ ${options.content || '&lt;!-- Add skill content here --&gt;'}
   }
 &nbsp;
   /**
-   * スキル一覧を取得
+   * Get the skill list
    * @returns {Object[]}
    */
 <span class="fstat-no" title="function not covered" >  li</span>stSkills() {
@@ -1477,7 +1477,7 @@ ${options.content || '&lt;!-- Add skill content here --&gt;'}
   }
 &nbsp;
   /**
-   * repo.md を更新
+   * Update repo.md
    * @returns {boolean}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync updateRepoMd() {
@@ -1488,7 +1488,7 @@ ${options.content || '&lt;!-- Add skill content here --&gt;'}
   }
 &nbsp;
   /**
-   * スキルを削除
+   * Delete a skill
    * @param {string} name
    * @returns {boolean}
    */
@@ -1502,8 +1502,8 @@ ${options.content || '&lt;!-- Add skill content here --&gt;'}
   }
 &nbsp;
   /**
-   * サンプルスキルを生成
-   * @returns {Object} 作成結果
+   * Generate sample skills
+   * @returns {Object} Creation result
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync generateSampleSkills() {
     const results = <span class="cstat-no" title="statement not covered" >{ created: [], skipped: [] };</span>
@@ -1511,7 +1511,7 @@ ${options.content || '&lt;!-- Add skill content here --&gt;'}
     const sampleSkills = <span class="cstat-no" title="statement not covered" >[</span>
       {
         name: 'testing',
-        triggers: ['test', 'テスト', '/\\bspec\\b/i'],
+        triggers: ['test', '/\\bspec\\b/i'],
         content: `## Testing Guidelines
 &nbsp;
 When writing tests for this project:
@@ -1540,7 +1540,7 @@ describe('FeatureName', () =&gt; {
       },
       {
         name: 'debugging',
-        triggers: ['debug', 'デバッグ', 'error', 'bug', 'issue'],
+        triggers: ['debug', 'error', 'bug', 'issue'],
         content: `## Debugging Guidelines
 &nbsp;
 When debugging issues in this project:
@@ -1570,7 +1570,7 @@ When debugging issues in this project:
         });
 <span class="cstat-no" title="statement not covered" >        results.created.push(skill.name);</span>
       } catch (error) {
-        // スキップ
+        // Skip
       }
     }
 &nbsp;

@@ -688,10 +688,7 @@ ls -la lib/{{feature}}/*.integration.test.ts  # Must exist
 7. Archive change: `#sdd-change-archive {{change-name}}`
 ```
 
-**Save To**:
-
-- English: `storage/changes/{{change-name}}-implementation.md`
-- Japanese: `storage/changes/{{change-name}}-implementation.ja.md`
+**Save To**: `storage/changes/{{change-name}}-implementation.md`
 
 ---
 

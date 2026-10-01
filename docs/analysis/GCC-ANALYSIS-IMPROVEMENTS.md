@@ -1,45 +1,45 @@
-# MUSUBI改善提案: GCCプロジェクト分析からの学び
+# MUSUBI Improvement Proposals: Lessons from the GCC Project Analysis
 
-**作成日**: 2025-12-10
-**最終更新**: 2025-12-10 (v5.6.0 実装完了)
-**分析対象**: GCC (580,595エンティティ、109,073ファイル、1,436,920リレーション)
+**Created**: 2025-12-10
+**Last updated**: 2025-12-10 (v5.6.0 implementation complete)
+**Analysis target**: GCC (580,595 entities, 109,073 files, 1,436,920 relations)
 
 ## Executive Summary
 
-GCC（約1,000万行、301,193関数）という超大規模プロジェクトの分析を通じて、
-MUSUBIフレームワークに以下の改善点が明らかになりました。
+Through analyzing GCC, an ultra-large project (about 10 million lines, 301,193 functions),
+the following improvements for the MUSUBI framework became clear.
 
-**✅ v5.5.0/v5.6.0で全ての主要改善を実装完了しました。**
+**✅ All major improvements were implemented in v5.5.0/v5.6.0.**
 
 ---
 
-## 実装ステータス
+## Implementation Status
 
-| 項目                   | 優先度 | ステータス | 実装バージョン |
+| Item                   | Priority | Status | Implemented In |
 | ---------------------- | ------ | ---------- | -------------- |
-| 大規模プロジェクト対応 | P0     | ✅ 完了    | v5.5.0         |
-| CodeGraph MCP統合      | P1     | ✅ 完了    | v5.5.0         |
-| 複雑度検出強化         | P1     | ✅ 完了    | v5.5.0         |
-| Rustリライト支援       | P2     | ✅ 完了    | v5.5.0         |
-| 階層的分析レポート     | P2     | ✅ 完了    | v5.5.0         |
-| マルチ言語サポート     | P3     | ✅ 完了    | v5.5.0         |
+| Large project support | P0     | ✅ Complete    | v5.5.0         |
+| CodeGraph MCP integration      | P1     | ✅ Complete    | v5.5.0         |
+| Enhanced complexity detection         | P1     | ✅ Complete    | v5.5.0         |
+| Rust rewrite support       | P2     | ✅ Complete    | v5.5.0         |
+| Hierarchical analysis reports     | P2     | ✅ Complete    | v5.5.0         |
+| Multi-language support     | P3     | ✅ Complete    | v5.5.0         |
 
 ---
 
-## 1. ✅ Critical: 大規模プロジェクト対応 (実装完了)
+## 1. ✅ Critical: Large Project Support (Implemented)
 
-### 問題
+### Problem
 
-現在のMUSUBIは中小規模プロジェクト（〜10万行）を想定した設計。
-GCCのような1,000万行規模のプロジェクトでは以下の問題が発生：
+The current MUSUBI is designed for small to medium projects (up to 100,000 lines).
+For projects on the scale of GCC (10 million lines), the following problems occur:
 
-- `musubi-analyze` がメモリ不足でクラッシュする可能性
-- 全ファイルスキャンによるタイムアウト
-- 複雑度計算の精度低下
+- `musubi-analyze` may crash due to running out of memory
+- Timeouts caused by scanning all files
+- Reduced accuracy of complexity calculation
 
-### 実装済み: LargeProjectAnalyzer
+### Implemented: LargeProjectAnalyzer
 
-**ファイル**: `src/analyzers/large-project-analyzer.js`
+**File**: `src/analyzers/large-project-analyzer.js`
 
 ```javascript
 const { LargeProjectAnalyzer } = require('musubi-sdd');
@@ -51,31 +51,31 @@ console.log(result.stats);
 // { totalFiles: 109073, totalLines: 10000000, ... }
 ```
 
-**機能**:
+**Features**:
 
-- スケール認識分析（Small/Medium/Large/Massive自動判定）
-- チャンクベース処理（1000ファイル単位）
-- ストリーミング分析モード
-- メモリ監視とGC呼び出し
-- 進捗コールバック
+- Scale-aware analysis (automatic Small/Medium/Large/Massive classification)
+- Chunk-based processing (1000 files per chunk)
+- Streaming analysis mode
+- Memory monitoring and GC invocation
+- Progress callbacks
 
 ---
 
-## 2. ✅ High: CodeGraph MCP統合 (実装完了)
+## 2. ✅ High: CodeGraph MCP Integration (Implemented)
 
-### 問題
+### Problem
 
-MUSUBIはファイルベースの静的分析のみ。GCCで見たように：
+MUSUBI only does file-based static analysis. As seen in GCC:
 
-- 関数間の呼び出し関係（1,436,920リレーション）
-- 影響範囲の特定
-- リファクタリング影響分析
+- Call relationships between functions (1,436,920 relations)
+- Identification of impact scope
+- Refactoring impact analysis
 
-これらがCodeGraph MCPを使えば可能になる。
+These become possible with CodeGraph MCP.
 
-### 実装済み: CodeGraphMCP
+### Implemented: CodeGraphMCP
 
-**ファイル**: `src/integrations/code-graph-mcp.js`
+**File**: `src/integrations/code-graph-mcp.js`
 
 ```javascript
 const { CodeGraphMCP } = require('musubi-sdd');
@@ -83,80 +83,80 @@ const { CodeGraphMCP } = require('musubi-sdd');
 const mcp = new CodeGraphMCP('/path/to/project');
 await mcp.indexRepository();
 
-// コールグラフ取得
+// Get call graph
 const callGraph = await mcp.getCallGraph('main', { depth: 3 });
 
-// 影響分析
+// Impact analysis
 const affected = await mcp.getImpactAnalysis(['src/parser.c', 'src/lexer.c']);
 
-// 循環依存検出
+// Circular dependency detection
 const cycles = await mcp.detectCircularDependencies();
 
-// ホットスポット特定
+// Hotspot identification
 const hotspots = await mcp.identifyHotspots({ minConnections: 10 });
 ```
 
-**機能**:
+**Features**:
 
-- SQLiteベースのコードグラフ格納
-- コールグラフ生成（深度設定可能）
-- 影響分析（変更ファイル→影響ファイル）
-- 循環依存検出
-- コミュニティ検出（Louvain法）
-- ホットスポット特定
+- SQLite-based code graph storage
+- Call graph generation (configurable depth)
+- Impact analysis (changed files → affected files)
+- Circular dependency detection
+- Community detection (Louvain method)
+- Hotspot identification
 
 ---
 
-## 3. ✅ High: 複雑度検出の強化 (実装完了)
+## 3. ✅ High: Enhanced Complexity Detection (Implemented)
 
-### 問題
+### Problem
 
-GCCには1,000行以上の関数が95個存在（`find_comparison_args`: 4,884行など）。
-現在のMUSUBIでは：
+GCC has 95 functions with more than 1,000 lines (e.g. `find_comparison_args`: 4,884 lines).
+Currently MUSUBI:
 
-- 循環的複雑度のみ計測
-- 巨大関数の検出・分割提案がない
+- Only measures cyclomatic complexity
+- Has no detection of huge functions or splitting suggestions
 
-### 実装済み: ComplexityAnalyzer
+### Implemented: ComplexityAnalyzer
 
-**ファイル**: `src/analyzers/complexity-analyzer.js`
+**File**: `src/analyzers/complexity-analyzer.js`
 
 ```javascript
 const { ComplexityAnalyzer } = require('musubi-sdd');
 
 const analyzer = new ComplexityAnalyzer();
 
-// 循環的複雑度
+// Cyclomatic complexity
 const cyclomatic = analyzer.calculateCyclomaticComplexity(code, 'javascript');
 
-// 認知的複雑度
+// Cognitive complexity
 const cognitive = analyzer.calculateCognitiveComplexity(code, 'javascript');
 
-// 総合分析
+// Overall analysis
 const analysis = analyzer.analyzeCode(code, 'javascript');
 // { cyclomatic, cognitive, halstead, maintainability, recommendations }
 ```
 
-**機能**:
+**Features**:
 
-- 循環的複雑度計算
-- 認知的複雑度計算（SonarSource方式）
-- 重大度レベル（Ideal/Warning/Critical/Extreme）
-- 自動リファクタリング提案
-- 多言語パターン対応（JS、TS、C、C++、Python、Rust、Go、Java）
+- Cyclomatic complexity calculation
+- Cognitive complexity calculation (SonarSource method)
+- Severity levels (Ideal/Warning/Critical/Extreme)
+- Automatic refactoring suggestions
+- Multi-language pattern support (JS, TS, C, C++, Python, Rust, Go, Java)
 
 ---
 
-## 4. ✅ Medium: Rustリライト支援 (実装完了)
+## 4. ✅ Medium: Rust Rewrite Support (Implemented)
 
-### 問題
+### Problem
 
-GCCのRust置き換え分析で、MUSUBIにはC/C++→Rust変換支援がない。
-セキュリティ強化のためのRust化は今後増える傾向。
+In the GCC Rust-replacement analysis, MUSUBI had no support for C/C++ → Rust conversion.
+Rewriting in Rust for stronger security is a growing trend.
 
-### 実装済み: RustMigrationGenerator
+### Implemented: RustMigrationGenerator
 
-**ファイル**: `src/generators/rust-migration-generator.js`
+**File**: `src/generators/rust-migration-generator.js`
 
 ```javascript
 const { RustMigrationGenerator } = require('musubi-sdd');
@@ -172,34 +172,34 @@ console.log(analysis.summary);
 //   migrationPriorities: [...]
 // }
 
-// 個別ファイル分析
+// Individual file analysis
 const fileAnalysis = await generator.analyzeFile('/path/to/buffer.c');
 // { unsafePatterns: [...], riskLevel: 'high', ... }
 ```
 
-**機能**:
+**Features**:
 
-- メモリ安全性パターン検出（malloc、free、strcpy等）
-- バッファオーバーフローリスク検出
-- ポインタ操作リスク検出
-- セキュリティコンポーネント特定
-- マイグレーション優先度スコアリング
-- 自動Rustコードスケルトン生成
+- Memory safety pattern detection (malloc, free, strcpy, etc.)
+- Buffer overflow risk detection
+- Pointer operation risk detection
+- Security component identification
+- Migration priority scoring
+- Automatic Rust code skeleton generation
 
 ---
 
-## 5. ✅ Medium: 階層的分析レポート (実装完了)
+## 5. ✅ Medium: Hierarchical Analysis Reports (Implemented)
 
-### 問題
+### Problem
 
-GCCのような大規模プロジェクトでは、フラットなレポートは読みづらい。
+For large projects like GCC, flat reports are hard to read.
 
-- 580,595エンティティを1つのレポートにすると巨大
-- 階層的なドリルダウンが必要
+- Putting 580,595 entities into one report would be huge
+- Hierarchical drill-down is needed
 
-### 実装済み: HierarchicalReporter
+### Implemented: HierarchicalReporter
 
-**ファイル**: `src/reporters/hierarchical-reporter.js`
+**File**: `src/reporters/hierarchical-reporter.js`
 
 ```javascript
 const { HierarchicalReporter } = require('musubi-sdd');
@@ -222,26 +222,26 @@ console.log(report.hotspots);
 // [{ file: 'gcc/fold-const.cc', complexity: 500, issues: 25 }, ...]
 ```
 
-**機能**:
+**Features**:
 
-- ディレクトリ階層グルーピング
-- ホットスポット特定
-- トレンド分析
-- 自動レコメンデーション生成
-- 複数出力形式（Markdown、JSON）
+- Directory hierarchy grouping
+- Hotspot identification
+- Trend analysis
+- Automatic recommendation generation
+- Multiple output formats (Markdown, JSON)
 
 ---
 
-## 6. ✅ Low: マルチ言語サポート強化 (実装完了)
+## 6. ✅ Low: Enhanced Multi-Language Support (Implemented)
 
-### 問題
+### Problem
 
-GCCは複数言語を含む（C, C++, Ada, Fortran, Go, Rust, COBOL）。
-MUSUBIは主にJavaScript/TypeScript中心。
+GCC contains multiple languages (C, C++, Ada, Fortran, Go, Rust, COBOL).
+MUSUBI is mainly centered on JavaScript/TypeScript.
 
-### 実装済み
+### Implemented
 
-**LargeProjectAnalyzer**と**ComplexityAnalyzer**が8言語をサポート：
+**LargeProjectAnalyzer** and **ComplexityAnalyzer** support 8 languages:
 
 - JavaScript / TypeScript
 - C / C++
@@ -250,7 +250,7 @@ MUSUBIは主にJavaScript/TypeScript中心。
 - Go
 - Java
 
-**言語検出パターン**:
+**Language detection patterns**:
 
 ```javascript
 const LANGUAGE_PATTERNS = {
@@ -267,76 +267,76 @@ const LANGUAGE_PATTERNS = {
 
 ---
 
-## 実装ロードマップ (完了)
+## Implementation Roadmap (Complete)
 
-| Phase | 項目                   | 優先度 | ステータス | 実装日     |
+| Phase | Item                   | Priority | Status | Implemented On     |
 | ----- | ---------------------- | ------ | ---------- | ---------- |
-| 1     | 大規模プロジェクト対応 | P0     | ✅ 完了    | 2025-12-10 |
-| 2     | CodeGraph MCP統合      | P1     | ✅ 完了    | 2025-12-10 |
-| 2     | 複雑度検出強化         | P1     | ✅ 完了    | 2025-12-10 |
-| 3     | Rustリライト支援       | P2     | ✅ 完了    | 2025-12-10 |
-| 3     | 階層的分析レポート     | P2     | ✅ 完了    | 2025-12-10 |
-| 4     | マルチ言語サポート     | P3     | ✅ 完了    | 2025-12-10 |
+| 1     | Large project support | P0     | ✅ Complete    | 2025-12-10 |
+| 2     | CodeGraph MCP integration      | P1     | ✅ Complete    | 2025-12-10 |
+| 2     | Enhanced complexity detection         | P1     | ✅ Complete    | 2025-12-10 |
+| 3     | Rust rewrite support       | P2     | ✅ Complete    | 2025-12-10 |
+| 3     | Hierarchical analysis reports     | P2     | ✅ Complete    | 2025-12-10 |
+| 4     | Multi-language support     | P3     | ✅ Complete    | 2025-12-10 |
 
-**全機能がv5.5.0/v5.6.0で実装完了**
+**All features were implemented in v5.5.0/v5.6.0**
 
 ---
 
-## テスト済み
+## Tested
 
-### E2Eテスト
+### E2E Tests
 
 ```bash
 npm test -- --testPathPattern="enterprise-scale-e2e"
 # ✅ 5 passed
 ```
 
-### 大規模プロジェクトテスト
+### Large Project Tests
 
 ```javascript
 const { LargeProjectAnalyzer } = require('musubi-sdd');
 const analyzer = new LargeProjectAnalyzer('/path/to/project');
 const result = await analyzer.analyze();
-// ✅ result.stats.totalFiles取得成功
+// ✅ result.stats.totalFiles retrieved successfully
 ```
 
-### 複雑度分析テスト
+### Complexity Analysis Tests
 
 ```javascript
 const { ComplexityAnalyzer } = require('musubi-sdd');
 const analyzer = new ComplexityAnalyzer();
 const score = analyzer.calculateCyclomaticComplexity(code, 'javascript');
-// ✅ 正確な複雑度スコア
+// ✅ Accurate complexity scores
 ```
 
-### Rustマイグレーションテスト
+### Rust Migration Tests
 
 ```javascript
 const { RustMigrationGenerator } = require('musubi-sdd');
 const generator = new RustMigrationGenerator('/path/to/c-project');
 const analysis = await generator.analyzeFile('/path/to/buffer.c');
-// ✅ unsafePatternsを正しく検出
+// ✅ unsafePatterns detected correctly
 ```
 
 ---
 
-## まとめ
+## Summary
 
-GCCプロジェクトの分析を通じて特定された改善点は、
-**v5.5.0/v5.6.0で全て実装完了**しました：
+All improvements identified through the GCC project analysis
+were **fully implemented in v5.5.0/v5.6.0**:
 
-| 改善点           | 実装ファイル                                 |
+| Improvement           | Implementation File                                 |
 | ---------------- | -------------------------------------------- |
-| スケーラビリティ | `src/analyzers/large-project-analyzer.js`    |
-| 深い分析         | `src/integrations/code-graph-mcp.js`         |
-| 検出精度         | `src/analyzers/complexity-analyzer.js`       |
-| Rust対応         | `src/generators/rust-migration-generator.js` |
-| レポート         | `src/reporters/hierarchical-reporter.js`     |
+| Scalability | `src/analyzers/large-project-analyzer.js`    |
+| Deep analysis         | `src/integrations/code-graph-mcp.js`         |
+| Detection accuracy         | `src/analyzers/complexity-analyzer.js`       |
+| Rust support         | `src/generators/rust-migration-generator.js` |
+| Reporting         | `src/reporters/hierarchical-reporter.js`     |
 
-これらの実装により、MUSUBIは10万行〜1,000万行規模の
-**エンタープライズプロジェクトにも完全対応**しています。
+With these implementations, MUSUBI now
+**fully supports enterprise projects** ranging from 100,000 to 10 million lines.
 
-### 使用方法
+### Usage
 
 ```bash
 npm install musubi-sdd@latest

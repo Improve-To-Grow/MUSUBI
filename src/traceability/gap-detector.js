@@ -32,12 +32,13 @@ const SEVERITY_ORDER = {
  */
 const SUGGESTIONS = {
   'no-test':
-    'この要件に対するテストを作成してください。Article III (Test-First) に従い、実装前にテストを書くことを推奨します。',
-  'no-code': '要件の実装が必要です。設計ドキュメントを参照して実装を開始してください。',
+    'Create tests for this requirement. Per Article III (Test-First), write tests before implementing.',
+  'no-code':
+    'This requirement needs an implementation. Start implementing it based on the design document.',
   'no-design':
-    '設計ドキュメントを作成してください。C4モデルに従い、コンポーネント図とADRを追加することを推奨します。',
+    'Create a design document. Following the C4 model, adding a component diagram and ADRs is recommended.',
   'no-commit':
-    'この要件に関連するコミットがありません。コミットメッセージに要件IDを含めてください。',
+    'No commits are linked to this requirement. Include the requirement ID in commit messages.',
 };
 
 /**

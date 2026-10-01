@@ -237,7 +237,6 @@ const correctionResult = await requirementsReviewerSkill.execute({
     { defectId: 'DEF-003', action: 'reject', reason: 'Intentional' },
   ],
   createBackup: true,
-  updateJapanese: true,
   outputFormat: 'markdown',
 });
 
@@ -347,7 +346,6 @@ const correctionResult = await designReviewerSkill.execute({
     { issueId: 'DES-003', action: 'reject-with-adr', reason: 'Performance tradeoff' },
   ],
   createBackup: true,
-  updateJapanese: true,
   generateADRs: true,
   outputFormat: 'markdown',
 });

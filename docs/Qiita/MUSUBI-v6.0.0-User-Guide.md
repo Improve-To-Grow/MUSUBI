@@ -1,87 +1,87 @@
-# 【MUSUBI v6.1.0】完全ユーザーガイド - 7つのAIプラットフォームで仕様駆動開発を始めよう
+# [MUSUBI v6.1.0] Complete User Guide - Get Started with Specification-Driven Development on 7 AI Platforms
 
-# はじめに
+# Introduction
 
-**MUSUBI SDD v6.1.0** がリリースされました！このバージョンでは、ディレクトリ構造の統一と要件定義ワークフローが強化されました。
+**MUSUBI SDD v6.1.0** has been released! This version unifies the directory structure and strengthens the requirements definition workflow.
 
-本記事は MUSUBI を初めて使う方から、既存ユーザーまで、v6.1.0 の全機能を網羅したユーザーガイドです。
+This article is a user guide covering all features of v6.1.0, for both first-time MUSUBI users and existing users.
 
-# 🆕 v6.1.0 の変更点
+# 🆕 Changes in v6.1.0
 
-## ディレクトリ構造の統一
+## Unified Directory Structure
 
-| 項目 | v6.0.0 | v6.1.0 |
+| Item | v6.0.0 | v6.1.0 |
 |------|--------|--------|
-| 仕様書格納先 | `storage/features/{feature}/` | `storage/specs/` |
-| ファイル命名 | `requirements.md` | `{feature}-requirements.md` |
+| Specification location | `storage/features/{feature}/` | `storage/specs/` |
+| File naming | `requirements.md` | `{feature}-requirements.md` |
 
-**Article VIII 準拠**: 不要なディレクトリ階層を削減し、フラットな命名規則を採用。
+**Article VIII compliance**: Reduced unnecessary directory hierarchy and adopted a flat naming convention.
 
-## 要件定義ワークフローの強化
+## Strengthened Requirements Definition Workflow
 
-- **対話型ダイアログ**: 1問1答形式で「真の目的」を探り出す
-- **MECE分析**: 4つの観点で網羅的に要件をカバー
+- **Interactive dialogue**: Probe for the "true purpose" one question at a time
+- **MECE analysis**: Cover requirements comprehensively from 4 perspectives
 
-# 🆕 v6.0.0 の変更点（前バージョン）
+# 🆕 Changes in v6.0.0 (Previous Version)
 
-## Breaking Change: GitHub Copilot プロンプトファイル拡張子
+## Breaking Change: GitHub Copilot Prompt File Extension
 
-| 項目 | v5.x | v6.0.0 |
+| Item | v5.x | v6.0.0 |
 |------|------|--------|
-| ファイル拡張子 | `.md` | `.prompt.md` |
-| 配置場所 | `.github/prompts/` | `.github/prompts/` |
-| コマンド形式 | `/sdd-*` | `/sdd-*`（変更なし） |
+| File extension | `.md` | `.prompt.md` |
+| Location | `.github/prompts/` | `.github/prompts/` |
+| Command format | `/sdd-*` | `/sdd-*` (unchanged) |
 
-**VS Code 公式ドキュメント準拠**: GitHub Copilot のプロンプトファイルは `.prompt.md` 拡張子を使用することが推奨されています。
+**Compliant with the official VS Code documentation**: Using the `.prompt.md` extension is recommended for GitHub Copilot prompt files.
 
-# マイグレーションガイド
+# Migration Guide
 
-既存プロジェクトをアップグレードする場合：
+When upgrading an existing project:
 
 ```bash
-# .github/prompts/ 内のファイルをリネーム（AGENTS.mdは除く）
+# Rename the files in .github/prompts/ (except AGENTS.md)
 cd .github/prompts/
 for f in *.md; do [ "$f" != "AGENTS.md" ] && mv "$f" "${f%.md}.prompt.md"; done
 ```
 
 ---
 
-# 📦 インストール
+# 📦 Installation
 
-# 新規インストール
+# New installation
 
 ```bash
-# npm でグローバルインストール（Linux/Macはsudo必要）
+# Global install via npm (sudo required on Linux/Mac)
 sudo npm install -g musubi-sdd
 
-# または npx で直接実行（インストール不要・推奨）
+# Or run directly with npx (no install needed, recommended)
 npx musubi-sdd@latest --version
-# 出力: 6.1.0
+# Output: 6.1.0
 ```
 
-# アップグレード
+# Upgrade
 
 ```bash
-# グローバルインストール済みの場合（Linux/Macはsudo必要）
+# If installed globally (sudo required on Linux/Mac)
 sudo npm install -g musubi-sdd@latest
 
-# npx なら常に最新版を使用（推奨）
+# npx always uses the latest version (recommended)
 npx musubi-sdd@latest --version
 ```
 
 ---
 
-# 🚀 クイックスタート（5分で始める）
+# 🚀 Quick Start (Get Going in 5 Minutes)
 
-# Step 1: プロジェクト初期化
+# Step 1: Initialize the Project
 
-お使いの AI コーディングプラットフォームに合わせて初期化：
+Initialize to match your AI coding platform:
 
 ```bash
-# Claude Code（推奨）
+# Claude Code (recommended)
 npx musubi-sdd init --claude
 
-# GitHub Copilot（VS Code）
+# GitHub Copilot (VS Code)
 npx musubi-sdd init --copilot
 
 # Cursor IDE
@@ -90,83 +90,83 @@ npx musubi-sdd init --cursor
 # Gemini CLI
 npx musubi-sdd init --gemini
 
-# 複数プラットフォーム同時
+# Multiple platforms at once
 npx musubi-sdd init --claude --copilot
 ```
 
-# Step 2: 要件定義
+# Step 2: Define Requirements
 
 ```bash
-# EARS形式で要件を生成（対話型）
-npx musubi-requirements "ユーザー認証機能"
+# Generate requirements in EARS format (interactive)
+npx musubi-requirements "User authentication feature"
 ```
 
-**注意**: 要件定義は対話型で進みます。AIが1問1答形式で「真の目的」を探り出した後、MECEを使用して網羅的に要件を定義します。
+**Note**: Requirements definition proceeds interactively. After the AI probes for the "true purpose" one question at a time, it defines the requirements comprehensively using MECE.
 
-生成されるファイル: `storage/specs/user-auth-requirements.md`
+Generated file: `storage/specs/user-auth-requirements.md`
 
-# Step 3: 設計
+# Step 3: Design
 
 ```bash
-# C4モデルで設計を生成
+# Generate the design with the C4 model
 npx musubi-design user-auth
 ```
 
-生成されるファイル: `storage/design/user-auth-design.md`
+Generated file: `storage/design/user-auth-design.md`
 
-# Step 4: タスク分解
+# Step 4: Task Breakdown
 
 ```bash
-# 実装タスクを生成
+# Generate implementation tasks
 npx musubi-tasks user-auth
 ```
 
-生成されるファイル: `storage/tasks/user-auth-tasks.md`
+Generated file: `storage/tasks/user-auth-tasks.md`
 
-# Step 5: 検証
+# Step 5: Validation
 
 ```bash
-# 全体を検証
+# Validate everything
 npx musubi-validate all
 ```
 
 ---
 
-# 🤖 対応AIプラットフォーム（7種類）
+# 🤖 Supported AI Platforms (7 Types)
 
-MUSUBI v6.1.0 は以下の7つのAIコーディングプラットフォームに対応しています：
+MUSUBI v6.1.0 supports the following 7 AI coding platforms:
 
-| プラットフォーム | Skills API | コマンド形式 | ファイル形式 | インストール先 |
+| Platform | Skills API | Command format | File format | Install location |
 |-----------------|-----------|-------------|-------------|---------------|
 | **Claude Code** | ✅ 27 Skills | `/sdd-*` | Markdown (.md) | `.claude/commands/`, `.claude/skills/` |
 | **GitHub Copilot** | ❌ | `/sdd-*` | Prompt (.prompt.md) | `.github/prompts/`, `AGENTS.md` |
-| **Cursor IDE** | ❌ | 自然言語 | Markdown (.md) | `.cursor/rules/` |
+| **Cursor IDE** | ❌ | Natural language | Markdown (.md) | `.cursor/rules/` |
 | **Gemini CLI** | ❌ | `/sdd-*` | TOML (.toml) | `.gemini/settings/` |
 | **Codex CLI** | ❌ | `/sdd-*` | Markdown (.md) | `CODEX.md` |
 | **Qwen Code** | ❌ | `/sdd-*` | Markdown (.md) | `QWEN.md` |
-| **Windsurf** | ❌ | 自然言語 | Markdown (.md) | `.windsurf/rules/` |
+| **Windsurf** | ❌ | Natural language | Markdown (.md) | `.windsurf/rules/` |
 
-# プラットフォーム別の特徴
+# Platform-Specific Characteristics
 
-# Claude Code（最も機能が充実）
-- 27個の専門スキル（Skills API）
-- 9つのオーケストレーションパターン
-- MCP（Model Context Protocol）統合
+# Claude Code (Most Full-Featured)
+- 27 specialized skills (Skills API)
+- 9 orchestration patterns
+- MCP (Model Context Protocol) integration
 
 ```bash
 npx musubi-sdd init --claude
 ```
 
-# GitHub Copilot（v6.0.0で改善）
-- `.prompt.md` 拡張子（VS Code公式準拠）
-- AGENTS.md による 27 エージェント定義
-- VS Code 完全統合
+# GitHub Copilot (Improved in v6.0.0)
+- `.prompt.md` extension (compliant with official VS Code)
+- 27 agent definitions via AGENTS.md
+- Full VS Code integration
 
 ```bash
 npx musubi-sdd init --copilot
 ```
 
-生成されるファイル構造：
+Generated file structure:
 ```
 .github/
 ├── prompts/
@@ -180,307 +180,307 @@ npx musubi-sdd init --copilot
 │   ├── sdd-change-apply.prompt.md
 │   └── sdd-change-archive.prompt.md
 └── AGENTS.md
-AGENTS.md                      # ルートにも配置
+AGENTS.md                      # Also placed at the root
 ```
 
 ---
 
-# 📋 27エージェント（スキル）一覧
+# 📋 List of 27 Agents (Skills)
 
-MUSUBI は27個の専門AIエージェントを提供します：
+MUSUBI provides 27 specialized AI agents:
 
-> **Note**: コマンド形式はプラットフォームにより異なります。
+> **Note**: The command format varies by platform.
 > - Claude Code: `/sdd-*`
 > - GitHub Copilot: `/sdd-*`
-> - Cursor/Windsurf: 自然言語でコマンド名を伝える
+> - Cursor/Windsurf: Tell it the command name in natural language
 
-# コアワークフロー（9個）
-| エージェント | 役割 | コマンド（Claude Code） |
+# Core Workflow (9)
+| Agent | Role | Command (Claude Code) |
 |-------------|------|---------|
-| Steering | プロジェクトメモリ管理 | `/sdd-steering` |
-| Requirements Analyst | EARS形式要件定義 | `/sdd-requirements` |
-| System Architect | C4モデル設計 | `/sdd-design` |
-| Project Manager | タスク分解 | `/sdd-tasks` |
-| Software Developer | 実装 | `/sdd-implement` |
-| Traceability Auditor | トレーサビリティ検証 | `/sdd-validate` |
-| Change Impact Analyzer | 変更影響分析 | `/sdd-change-init` |
-| Delta Spec Manager | 差分仕様適用 | `/sdd-change-apply` |
-| Archive Manager | 変更アーカイブ | `/sdd-change-archive` |
+| Steering | Project memory management | `/sdd-steering` |
+| Requirements Analyst | EARS-format requirements definition | `/sdd-requirements` |
+| System Architect | C4 model design | `/sdd-design` |
+| Project Manager | Task breakdown | `/sdd-tasks` |
+| Software Developer | Implementation | `/sdd-implement` |
+| Traceability Auditor | Traceability validation | `/sdd-validate` |
+| Change Impact Analyzer | Change impact analysis | `/sdd-change-init` |
+| Delta Spec Manager | Delta spec application | `/sdd-change-apply` |
+| Archive Manager | Change archiving | `/sdd-change-archive` |
 
-# 品質保証（6個）
-| エージェント | 役割 |
+# Quality Assurance (6)
+| Agent | Role |
 |-------------|------|
-| Test Engineer | テスト設計・実装 |
-| Code Reviewer | コードレビュー |
-| Security Auditor | セキュリティ監査 |
-| Performance Optimizer | パフォーマンス最適化 |
-| Quality Assurance | 品質管理 |
-| Constitution Enforcer | ガバナンス検証 |
+| Test Engineer | Test design and implementation |
+| Code Reviewer | Code review |
+| Security Auditor | Security auditing |
+| Performance Optimizer | Performance optimization |
+| Quality Assurance | Quality management |
+| Constitution Enforcer | Governance validation |
 
-# 専門領域（12個）
-| エージェント | 役割 |
+# Specialized Areas (12)
+| Agent | Role |
 |-------------|------|
-| API Designer | API設計 |
-| Database Schema Designer | DB設計 |
-| Database Administrator | DB運用 |
-| UI/UX Designer | UI/UX設計 |
-| DevOps Engineer | CI/CD構築 |
-| Cloud Architect | クラウド設計 |
-| AI/ML Engineer | AI/ML実装 |
-| Technical Writer | ドキュメント作成 |
-| Release Coordinator | リリース管理 |
-| SRE | 信頼性エンジニアリング |
-| Bug Hunter | バグ調査 |
-| Issue Resolver | 課題解決 |
+| API Designer | API design |
+| Database Schema Designer | DB design |
+| Database Administrator | DB operations |
+| UI/UX Designer | UI/UX design |
+| DevOps Engineer | CI/CD setup |
+| Cloud Architect | Cloud design |
+| AI/ML Engineer | AI/ML implementation |
+| Technical Writer | Documentation |
+| Release Coordinator | Release management |
+| SRE | Reliability engineering |
+| Bug Hunter | Bug investigation |
+| Issue Resolver | Issue resolution |
 
 ---
 
-# 🏛️ 9つの憲法条項（Constitutional Articles）
+# 🏛️ The 9 Constitutional Articles
 
-MUSUBI は「憲法」によるガバナンスで品質を保証します：
+MUSUBI ensures quality through governance by the "Constitution":
 
-| 条項 | 原則 | 内容 |
+| Article | Principle | Content |
 |------|------|------|
-| Article I | Library-First | 機能はまずライブラリとして実装 |
-| Article II | CLI Interface | 全機能にCLIインターフェース必須 |
-| Article III | Test-First | テストを実装前に書く（Red-Green-Blue） |
-| Article IV | EARS Format | 要件はEARS形式で記述 |
-| Article V | Traceability | 要件↔設計↔コード↔テストの追跡性 |
-| Article VI | Project Memory | Steeringファイルの参照必須 |
-| Article VII | Simplicity Gate | プロジェクト数は最大3つまで |
-| Article VIII | Anti-Abstraction | 不要な抽象化層を作らない |
-| Article IX | Integration-First | 統合テストで実サービスを使用 |
+| Article I | Library-First | Implement features as libraries first |
+| Article II | CLI Interface | A CLI interface is required for every feature |
+| Article III | Test-First | Write tests before implementation (Red-Green-Blue) |
+| Article IV | EARS Format | Write requirements in EARS format |
+| Article V | Traceability | Traceability of requirements <-> design <-> code <-> tests |
+| Article VI | Project Memory | Referencing Steering files is required |
+| Article VII | Simplicity Gate | Maximum of 3 projects |
+| Article VIII | Anti-Abstraction | Do not create unnecessary abstraction layers |
+| Article IX | Integration-First | Use real services in integration tests |
 
 ---
 
-# 📁 プロジェクト構造
+# 📁 Project Structure
 
-MUSUBI で初期化されたプロジェクトの標準構造：
+Standard structure of a project initialized with MUSUBI:
 
 ```
 your-project/
-├── AGENTS.md                    # AIエージェント定義
+├── AGENTS.md                    # AI agent definitions
 ├── steering/
-│   ├── structure.md             # アーキテクチャパターン
-│   ├── tech.md                  # 技術スタック
-│   ├── product.md               # プロダクトコンテキスト
+│   ├── structure.md             # Architecture patterns
+│   ├── tech.md                  # Technology stack
+│   ├── product.md               # Product context
 │   └── rules/
-│       ├── constitution.md      # 9つの憲法条項
-│       ├── workflow.md          # ワークフローガイド
-│       └── ears-format.md       # EARS形式ガイド
+│       ├── constitution.md      # The 9 Constitutional Articles
+│       ├── workflow.md          # Workflow guide
+│       └── ears-format.md       # EARS format guide
 ├── storage/
-│   ├── specs/                   # 仕様書
-│   │   ├── *-requirements.md    # 要件定義
-│   │   ├── *-design.md          # 設計書
-│   │   └── *-tasks.md           # タスク分解
-│   ├── changes/                 # 変更管理
-│   └── archive/                 # アーカイブ
-└── .github/prompts/             # GitHub Copilot用（v6.0.0）
+│   ├── specs/                   # Specifications
+│   │   ├── *-requirements.md    # Requirements definition
+│   │   ├── *-design.md          # Design document
+│   │   └── *-tasks.md           # Task breakdown
+│   ├── changes/                 # Change management
+│   └── archive/                 # Archive
+└── .github/prompts/             # For GitHub Copilot (v6.0.0)
     ├── sdd-steering.prompt.md
     ├── sdd-requirements.prompt.md
-    └── ... (他の.prompt.mdファイル)
+    └── ... (other .prompt.md files)
 ```
 
 ---
 
-# 🔧 CLIコマンドリファレンス
+# 🔧 CLI Command Reference
 
-# 基本コマンド
+# Basic Commands
 
 ```bash
-# ヘルプ表示
+# Show help
 npx musubi-sdd --help
 
-# バージョン確認
+# Check version
 npx musubi-sdd --version
 
-# 初期化
+# Initialize
 npx musubi-sdd init [--claude|--copilot|--cursor|--gemini]
 ```
 
-# 仕様駆動開発コマンド
+# Specification-Driven Development Commands
 
 ```bash
-# 要件定義
-npx musubi-requirements "<機能説明>"
+# Requirements definition
+npx musubi-requirements "<feature description>"
 
-# 設計
+# Design
 npx musubi-design <feature-name>
 
-# タスク分解
+# Task breakdown
 npx musubi-tasks <feature-name>
 
-# 検証
+# Validation
 npx musubi-validate [all|requirements|design|traceability]
 
-# トレーサビリティ
+# Traceability
 npx musubi-trace <feature-name>
 
-# ギャップ分析
+# Gap analysis
 npx musubi-gaps <feature-name>
 ```
 
-# 変更管理コマンド
+# Change Management Commands
 
 ```bash
-# 変更提案作成
+# Create a change proposal
 npx musubi-change init <change-name>
 
-# 変更適用
+# Apply changes
 npx musubi-change apply <change-name>
 
-# 変更アーカイブ
+# Archive changes
 npx musubi-change archive <change-name>
 ```
 
-# 高度なコマンド
+# Advanced Commands
 
 ```bash
-# オーケストレーション
+# Orchestration
 npx musubi-orchestrate <pattern> <feature-name>
 
-# コスト追跡
+# Cost tracking
 npx musubi-costs
 
-# リリース
+# Release
 npx musubi-release [--dry-run]
 
-# 解析
+# Analysis
 npx musubi-analyze <path>
 
-# 同期
+# Sync
 npx musubi-sync
 ```
 
 ---
 
-# 🌐 多言語対応（8言語）
+# 🌐 Multilingual Support (8 Languages)
 
-MUSUBI は8言語でテンプレートを生成できます：
+MUSUBI can generate templates in 8 languages:
 
-| 言語 | コード | 例 |
+| Language | Code | Example |
 |------|--------|-----|
 | English | `en` | `--locale en` |
-| 日本語 | `ja` | `--locale ja` |
-| 中文 | `zh` | `--locale zh` |
-| 한국어 | `ko` | `--locale ko` |
+| Japanese | `ja` | `--locale ja` |
+| Chinese | `zh` | `--locale zh` |
+| Korean | `ko` | `--locale ko` |
 | Deutsch | `de` | `--locale de` |
 | Français | `fr` | `--locale fr` |
 | Español | `es` | `--locale es` |
 | Bahasa Indonesia | `id` | `--locale id` |
 
 ```bash
-# 日本語テンプレートで初期化
+# Initialize with Japanese templates
 npx musubi-sdd init --claude --locale ja
 ```
 
 ---
 
-# 🔄 オーケストレーションパターン（9種類）
+# 🔄 Orchestration Patterns (9 Types)
 
-複数エージェントを連携させるパターン：
+Patterns for coordinating multiple agents:
 
-| パターン | 用途 | コマンド |
+| Pattern | Use | Command |
 |----------|------|---------|
-| Sequential | 順次実行 | `npx musubi-orchestrate sequential` |
-| Triage | タスク振り分け | `npx musubi-orchestrate triage` |
-| Handoff | エージェント間引継ぎ | `npx musubi-orchestrate handoff` |
-| Swarm | 協調処理 | `npx musubi-orchestrate swarm` |
-| Group Chat | 議論型 | `npx musubi-orchestrate group-chat` |
-| Nested | 階層型 | `npx musubi-orchestrate nested` |
-| Human-in-Loop | 人間承認 | `npx musubi-orchestrate human-in-loop` |
-| Auto | 自動選択 | `npx musubi-orchestrate auto` |
-| Parallel | 並列実行 | `npx musubi-orchestrate parallel` |
+| Sequential | Sequential execution | `npx musubi-orchestrate sequential` |
+| Triage | Task routing | `npx musubi-orchestrate triage` |
+| Handoff | Handoff between agents | `npx musubi-orchestrate handoff` |
+| Swarm | Cooperative processing | `npx musubi-orchestrate swarm` |
+| Group Chat | Discussion-style | `npx musubi-orchestrate group-chat` |
+| Nested | Hierarchical | `npx musubi-orchestrate nested` |
+| Human-in-Loop | Human approval | `npx musubi-orchestrate human-in-loop` |
+| Auto | Automatic selection | `npx musubi-orchestrate auto` |
+| Parallel | Parallel execution | `npx musubi-orchestrate parallel` |
 
 ---
 
-# 🏢 エンタープライズ機能
+# 🏢 Enterprise Features
 
-# ワークフローモード（3種類）
+# Workflow Modes (3 Types)
 
-| モード | プロジェクト規模 | ステージ数 |
+| Mode | Project size | Number of stages |
 |--------|----------------|-----------|
-| `small` | 小規模 | 3ステージ |
-| `medium` | 中規模 | 5ステージ |
-| `large` | 大規模 | 8ステージ |
+| `small` | Small | 3 stages |
+| `medium` | Medium | 5 stages |
+| `large` | Large | 8 stages |
 
 ```bash
-# 大規模プロジェクトモードで初期化
+# Initialize in large-project mode
 npx musubi-sdd init --mode large
 ```
 
-# モノレポサポート
+# Monorepo Support
 
 ```javascript
 const { PackageManager } = require('musubi-sdd');
 const pm = new PackageManager('/path/to/monorepo');
 
-// 依存関係グラフを生成
+// Generate the dependency graph
 const graph = pm.generateDependencyGraph('mermaid');
 ```
 
-# 憲法レベル管理
+# Constitution Level Management
 
-| レベル | 違反時の動作 |
+| Level | Behavior on violation |
 |--------|------------|
-| `critical` | ブロック（必須修正） |
-| `advisory` | 警告（推奨修正） |
-| `flexible` | 情報（任意） |
+| `critical` | Block (mandatory fix) |
+| `advisory` | Warning (recommended fix) |
+| `flexible` | Info (optional) |
 
 ---
 
-# 🛠️ トラブルシューティング
+# 🛠️ Troubleshooting
 
-# よくある問題
+# Common Issues
 
-# Q: `npx musubi-sdd` が見つからない
+# Q: `npx musubi-sdd` is not found
 
 ```bash
-# キャッシュクリア
+# Clear the cache
 npx clear-npx-cache
 
-# 再実行
+# Re-run
 npx musubi-sdd@latest --version
 ```
 
-# Q: GitHub Copilot で `.prompt.md` が認識されない
+# Q: GitHub Copilot does not recognize `.prompt.md`
 
-1. VS Code を最新版にアップデート
-2. GitHub Copilot 拡張機能を最新版に
-3. ファイル拡張子が正しく `.prompt.md` であることを確認
+1. Update VS Code to the latest version
+2. Update the GitHub Copilot extension to the latest version
+3. Confirm the file extension is correctly `.prompt.md`
 
-# Q: 既存プロジェクトをアップグレードしたい
+# Q: I want to upgrade an existing project
 
 ```bash
-# v6.0.0 用にファイルをマイグレーション
+# Migrate files for v6.0.0
 cd .github/prompts/
 for f in *.md; do [ "$f" != "AGENTS.md" ] && mv "$f" "${f%.md}.prompt.md"; done
 ```
 
 ---
 
-# 📚 関連リソース
+# 📚 Related Resources
 
-- **GitHub リポジトリ**: [nahisaho/musubi](https://github.com/nahisaho/MUSUBI)
-- **npm パッケージ**: [musubi-sdd](https://www.npmjs.com/package/musubi-sdd)
-- **VS Code Copilot ドキュメント**: [Reusable prompt files](https://code.visualstudio.com/docs/copilot/copilot-customization#_reusable-prompt-files)
-
----
-
-# まとめ
-
-MUSUBI v6.1.0 では以下が改善されました：
-
-1. ✅ **ディレクトリ構造の統一**: `storage/specs/` にフラット化
-2. ✅ **対話型要件定義**: 1問1答 + MECE分析
-3. ✅ **GitHub Copilot 公式準拠**: `.prompt.md` 拡張子（v6.0.0）
-4. ✅ **7プラットフォーム対応**: Claude Code, GitHub Copilot, Cursor, Gemini CLI, Codex CLI, Qwen Code, Windsurf
-5. ✅ **27エージェント**: 専門AIによる開発支援
-6. ✅ **9つの憲法条項**: 品質ガバナンス
-7. ✅ **8言語対応**: グローバルチーム向け
-
-仕様駆動開発で、より品質の高いソフトウェアを構築しましょう！
+- **GitHub repository**: [nahisaho/musubi](https://github.com/nahisaho/MUSUBI)
+- **npm package**: [musubi-sdd](https://www.npmjs.com/package/musubi-sdd)
+- **VS Code Copilot documentation**: [Reusable prompt files](https://code.visualstudio.com/docs/copilot/copilot-customization#_reusable-prompt-files)
 
 ---
 
-**Tags**: `MUSUBI` `SDD` `仕様駆動開発` `AIコーディング` `GitHubCopilot` `ClaudeCode` `ソフトウェア開発` `開発ツール`
+# Summary
+
+MUSUBI v6.1.0 improves the following:
+
+1. ✅ **Unified directory structure**: Flattened to `storage/specs/`
+2. ✅ **Interactive requirements definition**: One question at a time + MECE analysis
+3. ✅ **Official GitHub Copilot compliance**: `.prompt.md` extension (v6.0.0)
+4. ✅ **7-platform support**: Claude Code, GitHub Copilot, Cursor, Gemini CLI, Codex CLI, Qwen Code, Windsurf
+5. ✅ **27 agents**: Development support from specialized AI
+6. ✅ **9 Constitutional Articles**: Quality governance
+7. ✅ **8-language support**: For global teams
+
+Build higher-quality software with specification-driven development!
+
+---
+
+**Tags**: `MUSUBI` `SDD` `SpecDrivenDevelopment` `AICoding` `GitHubCopilot` `ClaudeCode` `SoftwareDevelopment` `DevTools`

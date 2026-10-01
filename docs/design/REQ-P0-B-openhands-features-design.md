@@ -1,40 +1,40 @@
-# REQ-P0-B: OpenHands由来機能 - 統合設計ドキュメント
+# REQ-P0-B: OpenHands-Derived Features - Integrated Design Document
 
-| 項目 | 内容 |
+| Item | Content |
 |------|------|
-| **文書ID** | DESIGN-P0-B-001 |
-| **バージョン** | 1.0 |
-| **作成日** | 2025-12-07 |
-| **関連ADR** | ADR-P0-B001 〜 ADR-P0-B008 |
-| **対象バージョン** | MUSUBI v2.2.0 |
-| **出典** | OpenHands (https://github.com/OpenHands/OpenHands) |
+| **Document ID** | DESIGN-P0-B-001 |
+| **Version** | 1.0 |
+| **Created** | 2025-12-07 |
+| **Related ADRs** | ADR-P0-B001 ~ ADR-P0-B008 |
+| **Target Version** | MUSUBI v2.2.0 |
+| **Source** | OpenHands (https://github.com/OpenHands/OpenHands) |
 
 ---
 
-## 1. 概要
+## 1. Overview
 
-### 1.1 目的
+### 1.1 Purpose
 
-本ドキュメントは、OpenHandsから導入する8つのコア機能の技術設計を定義します。これらの機能はMUSUBIのエージェント品質とユーザー体験を大幅に向上させます。
+This document defines the technical design of the eight core features adopted from OpenHands. These features significantly improve MUSUBI's agent quality and user experience.
 
-### 1.2 対象要件
+### 1.2 Target Requirements
 
-| 要件ID | 機能名 | 優先度 |
+| Requirement ID | Feature Name | Priority |
 |--------|--------|--------|
-| REQ-P0-B001 | スタック検出システム | 最高 |
-| REQ-P0-B002 | キーワードトリガー型スキル | 最高 |
-| REQ-P0-B003 | リポジトリ固有スキル | 最高 |
-| REQ-P0-B004 | メモリコンデンサー | 高 |
-| REQ-P0-B005 | クリティック（評価）システム | 高 |
-| REQ-P0-B006 | GitHub Issue自動解決 | 中 |
-| REQ-P0-B007 | セキュリティリスクアナライザー | 中 |
-| REQ-P0-B008 | エージェントメモリ | 中 |
+| REQ-P0-B001 | Stuck Detection System | Highest |
+| REQ-P0-B002 | Keyword-Triggered Skills | Highest |
+| REQ-P0-B003 | Repository-Specific Skills | Highest |
+| REQ-P0-B004 | Memory Condenser | High |
+| REQ-P0-B005 | Critic (Evaluation) System | High |
+| REQ-P0-B006 | Automatic GitHub Issue Resolution | Medium |
+| REQ-P0-B007 | Security Risk Analyzer | Medium |
+| REQ-P0-B008 | Agent Memory | Medium |
 
 ---
 
-## 2. システムアーキテクチャ
+## 2. System Architecture
 
-### 2.1 C4 Context図
+### 2.1 C4 Context Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -42,7 +42,7 @@
 │                                                                      │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │
 │  │   User      │  │  AI Agent   │  │   GitHub    │  │  LLM API    │ │
-│  │ (Developer) │  │(Claude etc.)│  │    API      │  │ (OpenAI等)  │ │
+│  │ (Developer) │  │(Claude etc.)│  │    API      │  │(OpenAI etc.)│ │
 │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘ │
 │         │                │                │                │        │
 │         ▼                ▼                ▼                ▼        │
@@ -66,47 +66,47 @@
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 ディレクトリ構造
+### 2.2 Directory Structure
 
 ```
 musubi/
 ├── src/
 │   ├── agents/
-│   │   └── registry.js           # 既存
+│   │   └── registry.js           # existing
 │   ├── analyzers/
 │   │   ├── stuck-detector.js     # NEW: REQ-P0-B001
 │   │   └── security-analyzer.js  # NEW: REQ-P0-B007
 │   ├── generators/
-│   │   └── ... (既存)
+│   │   └── ... (existing)
 │   ├── managers/
 │   │   ├── skills-loader.js      # NEW: REQ-P0-B002, REQ-P0-B003
 │   │   ├── memory-condenser.js   # NEW: REQ-P0-B004
 │   │   └── agent-memory.js       # NEW: REQ-P0-B008
 │   ├── validators/
 │   │   ├── critic-system.js      # NEW: REQ-P0-B005
-│   │   └── ... (既存)
+│   │   └── ... (existing)
 │   └── resolvers/
 │       └── issue-resolver.js     # NEW: REQ-P0-B006
 ├── steering/
 │   └── memories/
-│       ├── quality_report.md     # Critic出力
-│       ├── session_learnings.md  # AgentMemory出力
-│       └── stuck_history.md      # StuckDetector履歴
+│       ├── quality_report.md     # Critic output
+│       ├── session_learnings.md  # AgentMemory output
+│       └── stuck_history.md      # StuckDetector history
 └── .musubi/
-    └── skills/                   # リポジトリ固有スキル
+    └── skills/                   # Repository-specific skills
         └── repo.md
 ```
 
 ---
 
-## 3. REQ-P0-B001: スタック検出システム
+## 3. REQ-P0-B001: Stuck Detection System
 
-### 3.1 クラス設計
+### 3.1 Class Design
 
 ```javascript
 /**
- * スタック検出システム
- * OpenHands: openhands/controller/stuck.py から着想
+ * Stuck detection system
+ * OpenHands: inspired by openhands/controller/stuck.py
  */
 class StuckDetector {
   constructor(options = {}) {
@@ -117,36 +117,36 @@ class StuckDetector {
   }
 
   /**
-   * イベントを履歴に追加
+   * Add events to history
    * @param {StuckEvent} event 
    */
   addEvent(event) {}
 
   /**
-   * スタック状態を検出
+   * Detect stuck state
    * @returns {StuckAnalysis|null}
    */
   detect() {}
 
   /**
-   * 代替アプローチを提案
+   * Suggest alternative approaches
    * @returns {string[]}
    */
   suggestAlternatives() {}
 }
 ```
 
-### 3.2 検出シナリオ
+### 3.2 Detection Scenarios
 
-| シナリオ | 検出条件 | 介入アクション |
+| Scenario | Detection Condition | Intervention Action |
 |----------|----------|---------------|
-| 同一アクション繰り返し | 4回連続で同じアクション+結果 | 警告 + 代替提案 |
-| エラーループ | 3回連続で同じエラー | 強制中断 + 原因分析 |
-| モノローグ | 10ステップ以上の出力なし思考 | 進捗確認プロンプト |
-| コンテキスト超過 | トークン制限エラー3回 | メモリ圧縮トリガー |
-| ステージ往復 | 同一ステージ間を3回往復 | ステージ固定提案 |
+| Repeated identical action | Same action + result 4 times in a row | Warning + alternative suggestion |
+| Error loop | Same error 3 times in a row | Forced abort + root cause analysis |
+| Monologue | 10+ steps of thinking with no output | Progress check prompt |
+| Context overflow | Token limit error 3 times | Memory compression trigger |
+| Stage ping-pong | Moving back and forth between the same stages 3 times | Stage pinning suggestion |
 
-### 3.3 データモデル
+### 3.3 Data Model
 
 ```typescript
 interface StuckEvent {
@@ -155,7 +155,7 @@ interface StuckEvent {
   type: 'action' | 'observation' | 'error';
   stage: 'requirements' | 'design' | 'implement' | 'test';
   content: string;
-  hash: string;  // 内容のハッシュ（比較用）
+  hash: string;  // content hash (for comparison)
 }
 
 interface StuckAnalysis {
@@ -167,27 +167,27 @@ interface StuckAnalysis {
 }
 ```
 
-### 3.4 CLI統合
+### 3.4 CLI Integration
 
 ```bash
-# ワークフロー実行時に自動検出
+# Automatically detected during workflow execution
 musubi-workflow --detect-stuck
 
-# スタック履歴の確認
+# Check stuck history
 musubi-workflow --stuck-history
 
-# スタック時の自動介入設定
+# Configure automatic intervention when stuck
 musubi-workflow --stuck-action=warn|pause|abort
 ```
 
 ---
 
-## 4. REQ-P0-B002: キーワードトリガー型スキル
+## 4. REQ-P0-B002: Keyword-Triggered Skills
 
-### 4.1 スキル定義形式
+### 4.1 Skill Definition Format
 
 ```yaml
-# steering/skills/testing.md のfrontmatter
+# Frontmatter of steering/skills/testing.md
 ---
 name: testing-skill
 type: knowledge
@@ -195,27 +195,27 @@ version: 1.0.0
 triggers:
   - test
   - unit test
-  - テスト
-  - 単体テスト
-  - /\btest(ing)?\b/i   # 正規表現サポート
+  - test
+  - unit test
+  - /\btest(ing)?\b/i   # regex support
 agent: all
-priority: 10  # 高い値が優先
+priority: 10  # higher value takes precedence
 ---
 
-# スキル内容（Markdown）
-## テスト作成ガイドライン
+# Skill content (Markdown)
+## Test Writing Guidelines
 
-- Jest/Vitestを使用
-- カバレッジ80%以上を目標
+- Use Jest/Vitest
+- Target 80%+ coverage
 - ...
 ```
 
-### 4.2 スキルローダー設計
+### 4.2 Skill Loader Design
 
 ```javascript
 /**
- * スキルローダー
- * OpenHands: openhands/microagent/microagent.py から着想
+ * Skill loader
+ * OpenHands: inspired by openhands/microagent/microagent.py
  */
 class SkillsLoader {
   constructor(options = {}) {
@@ -226,20 +226,20 @@ class SkillsLoader {
   }
 
   /**
-   * 全スキルをロード
-   * 優先順位: リポジトリ > ユーザー > グローバル
+   * Load all skills
+   * Priority: repository > user > global
    */
   async loadAll() {}
 
   /**
-   * キーワードに基づいてスキルを活性化
-   * @param {string} message ユーザーメッセージ
-   * @returns {Skill[]} 活性化されたスキル
+   * Activate skills based on keywords
+   * @param {string} message User message
+   * @returns {Skill[]} Activated skills
    */
   activateByKeywords(message) {}
 
   /**
-   * スキルをパース
+   * Parse skill
    * @param {string} filePath 
    * @returns {Skill}
    */
@@ -247,20 +247,20 @@ class SkillsLoader {
 }
 ```
 
-### 4.3 トリガーマッチングアルゴリズム
+### 4.3 Trigger Matching Algorithm
 
 ```javascript
 function matchTriggers(message, triggers) {
   const normalizedMessage = message.toLowerCase();
   
   return triggers.filter(trigger => {
-    // 正規表現の場合
+    // For regex
     if (trigger.startsWith('/') && trigger.endsWith('/')) {
       const regex = new RegExp(trigger.slice(1, -1), 'i');
       return regex.test(message);
     }
     
-    // 通常のキーワード
+    // For plain keywords
     return normalizedMessage.includes(trigger.toLowerCase());
   });
 }
@@ -268,28 +268,28 @@ function matchTriggers(message, triggers) {
 
 ---
 
-## 5. REQ-P0-B003: リポジトリ固有スキル
+## 5. REQ-P0-B003: Repository-Specific Skills
 
-### 5.1 ディレクトリ構造
+### 5.1 Directory Structure
 
 ```
 project-root/
 ├── .musubi/
-│   ├── config.yml              # MUSUBI設定
+│   ├── config.yml              # MUSUBI configuration
 │   └── skills/
-│       ├── repo.md             # リポジトリ概要（必須、自動生成）
-│       ├── testing.md          # テスト規約
-│       ├── deployment.md       # デプロイ手順
-│       └── coding-style.md     # コーディング規約
+│       ├── repo.md             # Repository overview (required, auto-generated)
+│       ├── testing.md          # Testing conventions
+│       ├── deployment.md       # Deployment procedures
+│       └── coding-style.md     # Coding conventions
 └── steering/
     └── ...
 ```
 
-### 5.2 repo.md 自動生成
+### 5.2 repo.md Auto-Generation
 
 ```javascript
 /**
- * リポジトリ情報からrepo.mdを自動生成
+ * Auto-generate repo.md from repository information
  */
 async function generateRepoMd(projectRoot) {
   const analysis = await analyzeProject(projectRoot);
@@ -329,13 +329,13 @@ ${analysis.cicdInfo}
 }
 ```
 
-### 5.3 musubi-onboard との統合
+### 5.3 Integration with musubi-onboard
 
 ```bash
-# onboard実行時に.musubi/skills/repo.md を自動生成
+# Auto-generate .musubi/skills/repo.md when onboard runs
 musubi-onboard
 
-# 出力:
+# Output:
 # ✓ Analyzed project structure
 # ✓ Detected: Node.js + TypeScript + Jest
 # ✓ Created .musubi/skills/repo.md
@@ -344,14 +344,14 @@ musubi-onboard
 
 ---
 
-## 6. REQ-P0-B004: メモリコンデンサー
+## 6. REQ-P0-B004: Memory Condenser
 
-### 6.1 コンデンサー戦略
+### 6.1 Condenser Strategy
 
 ```javascript
 /**
- * メモリコンデンサー
- * OpenHands: openhands/memory/condenser/condenser.py から着想
+ * Memory condenser
+ * OpenHands: inspired by openhands/memory/condenser/condenser.py
  */
 class MemoryCondenser {
   constructor(options = {}) {
@@ -362,14 +362,14 @@ class MemoryCondenser {
   }
 
   /**
-   * イベント履歴を圧縮
+   * Compress event history
    * @param {Event[]} events 
    * @returns {CondensedView}
    */
   async condense(events) {}
 
   /**
-   * LLMを使用して要約を生成
+   * Generate summaries using an LLM
    * @param {Event[]} chunk 
    * @returns {string}
    */
@@ -377,25 +377,25 @@ class MemoryCondenser {
 }
 ```
 
-### 6.2 圧縮アルゴリズム
+### 6.2 Compression Algorithm
 
 ```
-1. 最初のN個のイベントは常に保持 (keepFirst)
-2. 残りのイベントをユーザーメッセージ間でチャンク化
-3. 古いチャンクから順にLLMで要約
-4. 要約をSummaryEventとして履歴に挿入
-5. maxSize以下になるまで繰り返し
+1. Always keep the first N events (keepFirst)
+2. Chunk the remaining events between user messages
+3. Summarize with the LLM, starting from the oldest chunks
+4. Insert the summary into the history as a SummaryEvent
+5. Repeat until the size is at or below maxSize
 ```
 
-### 6.3 設定 (project.yml)
+### 6.3 Configuration (project.yml)
 
 ```yaml
 condenser:
   type: llm              # llm | recent | noop
-  max_size: 100          # 最大イベント数
-  keep_first: 2          # 常に保持する最初のイベント数
-  summary_model: gpt-4o-mini  # 要約用LLM
-  preserve_patterns:     # 常に保持するパターン
+  max_size: 100          # maximum number of events
+  keep_first: 2          # number of initial events always kept
+  summary_model: gpt-4o-mini  # LLM for summarization
+  preserve_patterns:     # patterns always preserved
     - "DECISION:"
     - "ARCHITECTURE:"
     - "REQ-"
@@ -403,20 +403,20 @@ condenser:
 
 ---
 
-## 7. REQ-P0-B005: クリティック（評価）システム
+## 7. REQ-P0-B005: Critic (Evaluation) System
 
-### 7.1 クリティック基底クラス
+### 7.1 Critic Base Class
 
 ```javascript
 /**
- * 評価システム基底クラス
- * OpenHands: openhands/critic/base.py から着想
+ * Evaluation system base class
+ * OpenHands: inspired by openhands/critic/base.py
  */
 class BaseCritic {
   /**
-   * イベントリストを評価
+   * Evaluate the event list
    * @param {Event[]} events 
-   * @param {Object} context 追加コンテキスト
+   * @param {Object} context Additional context
    * @returns {CriticResult}
    */
   evaluate(events, context = {}) {
@@ -445,10 +445,10 @@ class CriticResult {
 }
 ```
 
-### 7.2 ステージ別クリティック
+### 7.2 Stage-Specific Critics
 
 ```javascript
-// 要件クリティック
+// Requirements critic
 class RequirementsCritic extends BaseCritic {
   evaluate(events, context) {
     const score = this.calculateScore({
@@ -461,7 +461,7 @@ class RequirementsCritic extends BaseCritic {
   }
 }
 
-// 設計クリティック
+// Design critic
 class DesignCritic extends BaseCritic {
   evaluate(events, context) {
     const score = this.calculateScore({
@@ -473,7 +473,7 @@ class DesignCritic extends BaseCritic {
   }
 }
 
-// 実装クリティック
+// Implementation critic
 class ImplementationCritic extends BaseCritic {
   evaluate(events, context) {
     const score = this.calculateScore({
@@ -486,10 +486,10 @@ class ImplementationCritic extends BaseCritic {
 }
 ```
 
-### 7.3 CLI統合
+### 7.3 CLI Integration
 
 ```bash
-# ステージ完了時に自動評価
+# Automatic evaluation on stage completion
 musubi-workflow --stage requirements
 # Output: ✓ Requirements Stage Complete
 #         Score: 0.85 (Grade: A)
@@ -497,23 +497,23 @@ musubi-workflow --stage requirements
 #         - Completeness: 80%
 #         - Testability: 80%
 
-# 手動評価
+# Manual evaluation
 musubi-validate score --stage design
 
-# プロジェクト全体スコア
+# Overall project score
 musubi-validate score --all
 ```
 
 ---
 
-## 8. REQ-P0-B006: GitHub Issue自動解決
+## 8. REQ-P0-B006: Automatic GitHub Issue Resolution
 
-### 8.1 リゾルバー設計
+### 8.1 Resolver Design
 
 ```javascript
 /**
- * Issue自動解決システム
- * OpenHands: openhands/resolver/ から着想
+ * Automatic issue resolution system
+ * OpenHands: inspired by openhands/resolver/
  */
 class IssueResolver {
   constructor(options = {}) {
@@ -523,33 +523,33 @@ class IssueResolver {
   }
 
   /**
-   * Issueを解決
+   * Resolve the issue
    * @param {string} issueUrl 
    * @returns {ResolverResult}
    */
   async resolve(issueUrl) {
-    // 1. Issue分析
+    // 1. Issue analysis
     const issue = await this.fetchIssue(issueUrl);
     
-    // 2. 要件抽出
+    // 2. Requirements extraction
     const requirements = await this.extractRequirements(issue);
     
-    // 3. 影響範囲分析
+    // 3. Impact analysis
     const impactAnalysis = await this.analyzeImpact(requirements);
     
-    // 4. 実装生成
+    // 4. Implementation generation
     const implementation = await this.generateImplementation(requirements, impactAnalysis);
     
-    // 5. テスト追加
+    // 5. Add tests
     const tests = await this.generateTests(implementation);
     
-    // 6. PR作成
+    // 6. Create PR
     return await this.createPullRequest(issue, implementation, tests);
   }
 }
 ```
 
-### 8.2 GitHub Actionsワークフロー
+### 8.2 GitHub Actions Workflow
 
 ```yaml
 # .github/workflows/musubi-resolver.yml
@@ -600,26 +600,26 @@ jobs:
 ### 8.3 CLI
 
 ```bash
-# Issueから解決
+# Resolve from an issue
 musubi-resolve --issue 123
 musubi-resolve --issue https://github.com/owner/repo/issues/123
 
-# オプション
-musubi-resolve --issue 123 --dry-run        # PRを作成せずにプレビュー
-musubi-resolve --issue 123 --branch fix/123 # ブランチ名を指定
-musubi-resolve --issue 123 --no-draft       # Draftでない通常のPR
+# Options
+musubi-resolve --issue 123 --dry-run        # Preview without creating a PR
+musubi-resolve --issue 123 --branch fix/123 # Specify the branch name
+musubi-resolve --issue 123 --no-draft       # Regular PR, not a draft
 ```
 
 ---
 
-## 9. REQ-P0-B007: セキュリティリスクアナライザー
+## 9. REQ-P0-B007: Security Risk Analyzer
 
-### 9.1 アナライザー設計
+### 9.1 Analyzer Design
 
 ```javascript
 /**
- * セキュリティリスクアナライザー
- * OpenHands: openhands/security/ から着想
+ * Security risk analyzer
+ * OpenHands: inspired by openhands/security/
  */
 class SecurityAnalyzer {
   constructor(options = {}) {
@@ -628,14 +628,14 @@ class SecurityAnalyzer {
   }
 
   /**
-   * アクションのリスクを評価
+   * Evaluate the risk of actions
    * @param {Action} action 
    * @returns {SecurityRisk}
    */
   analyzeRisk(action) {
     const risks = [];
     
-    // パターンマッチング
+    // Pattern matching
     risks.push(...this.checkSecretPatterns(action));
     risks.push(...this.checkDangerousCommands(action));
     risks.push(...this.checkVulnerabilityPatterns(action));
@@ -645,7 +645,7 @@ class SecurityAnalyzer {
 }
 ```
 
-### 9.2 検出パターン
+### 9.2 Detection Patterns
 
 ```javascript
 const SECURITY_PATTERNS = {
@@ -675,16 +675,16 @@ const SECURITY_PATTERNS = {
 };
 ```
 
-### 9.3 リスクレベルと対応
+### 9.3 Risk Levels and Responses
 
-| レベル | 条件 | アクション |
+| Level | Condition | Action |
 |--------|------|-----------|
-| LOW | 軽微なスタイル問題 | ログ記録のみ |
-| MEDIUM | 潜在的リスク | 警告表示 + 続行 |
-| HIGH | 重大なセキュリティリスク | 確認必須 |
-| CRITICAL | 即座に危険 | 自動ブロック |
+| LOW | Minor style issues | Log only |
+| MEDIUM | Potential risk | Show warning + continue |
+| HIGH | Serious security risk | Confirmation required |
+| CRITICAL | Immediately dangerous | Automatic block |
 
-### 9.4 設定 (project.yml)
+### 9.4 Configuration (project.yml)
 
 ```yaml
 security:
@@ -702,14 +702,14 @@ security:
 
 ---
 
-## 10. REQ-P0-B008: エージェントメモリ
+## 10. REQ-P0-B008: Agent Memory
 
-### 10.1 メモリマネージャー設計
+### 10.1 Memory Manager Design
 
 ```javascript
 /**
- * エージェントメモリ管理
- * OpenHands: skills/agent_memory.md から着想
+ * Agent memory management
+ * OpenHands: inspired by skills/agent_memory.md
  */
 class AgentMemoryManager {
   constructor(options = {}) {
@@ -718,7 +718,7 @@ class AgentMemoryManager {
   }
 
   /**
-   * セッションから学習事項を抽出
+   * Extract learnings from the session
    * @param {Event[]} sessionEvents 
    * @returns {LearningItem[]}
    */
@@ -732,20 +732,20 @@ class AgentMemoryManager {
   }
 
   /**
-   * 学習事項を保存
+   * Save learnings
    * @param {LearningItem[]} items 
-   * @param {boolean} confirmed ユーザー確認済みか
+   * @param {boolean} confirmed Whether the user has confirmed
    */
   async saveLearnings(items, confirmed = false) {
     if (!confirmed && !this.autoSave) {
       return { status: 'pending', items };
     }
     
-    // 既存メモリとマージ
+    // Merge with existing memory
     const existing = await this.loadMemories();
     const merged = this.mergeMemories(existing, items);
     
-    // ファイルに保存
+    // Save to file
     await this.writeMemories(merged);
     
     return { status: 'saved', items: merged };
@@ -753,7 +753,7 @@ class AgentMemoryManager {
 }
 ```
 
-### 10.2 学習項目カテゴリ
+### 10.2 Learning Item Categories
 
 ```typescript
 interface LearningItem {
@@ -762,17 +762,17 @@ interface LearningItem {
   title: string;
   content: string;
   confidence: number;  // 0.0 - 1.0
-  source: string;      // どのイベントから抽出されたか
+  source: string;      // which event it was extracted from
   timestamp: Date;
 }
 
-// 例
+// Example
 const learningItems = [
   {
     id: 'learn-001',
     category: 'commands',
-    title: 'テスト実行コマンド',
-    content: '`npm run test:unit` でユニットテストを実行',
+    title: 'Test execution command',
+    content: 'Run unit tests with `npm run test:unit`',
     confidence: 0.95,
     source: 'session-2025-12-07-001',
     timestamp: new Date(),
@@ -780,8 +780,8 @@ const learningItems = [
   {
     id: 'learn-002',
     category: 'practices',
-    title: 'コミットメッセージ規約',
-    content: 'Conventional Commits形式を使用: feat:, fix:, docs: など',
+    title: 'Commit message convention',
+    content: 'Use Conventional Commits format: feat:, fix:, docs:, etc.',
     confidence: 0.85,
     source: 'session-2025-12-07-001',
     timestamp: new Date(),
@@ -789,56 +789,56 @@ const learningItems = [
 ];
 ```
 
-### 10.3 コマンド統合
+### 10.3 Command Integration
 
 ```bash
-# セッションから学習事項を抽出・確認
+# Extract and confirm learnings from the session
 # Claude Code: /sdd-remember
 # GitHub Copilot: #sdd-remember
 
 # CLI
-musubi-remember              # 対話的に学習事項を確認・保存
-musubi-remember --auto       # 自動保存モード
-musubi-remember --list       # 保存済み学習事項を表示
-musubi-remember --export     # JSON形式でエクスポート
+musubi-remember              # Interactively review and save learnings
+musubi-remember --auto       # Automatic save mode
+musubi-remember --list       # Show saved learnings
+musubi-remember --export     # Export in JSON format
 ```
 
 ---
 
-## 11. 実装計画
+## 11. Implementation Plan
 
-### 11.1 フェーズ1（Week 1-2）
+### 11.1 Phase 1 (Week 1-2)
 
-| タスク | ファイル | 担当 |
+| Task | File | Owner |
 |--------|----------|------|
-| スタック検出システム | `src/analyzers/stuck-detector.js` | - |
-| キーワードトリガー | `src/managers/skills-loader.js` | - |
-| リポジトリスキル | `src/managers/skills-loader.js` | - |
+| Stuck detection system | `src/analyzers/stuck-detector.js` | - |
+| Keyword triggers | `src/managers/skills-loader.js` | - |
+| Repository skills | `src/managers/skills-loader.js` | - |
 
-### 11.2 フェーズ2（Week 3-4）
+### 11.2 Phase 2 (Week 3-4)
 
-| タスク | ファイル | 担当 |
+| Task | File | Owner |
 |--------|----------|------|
-| メモリコンデンサー | `src/managers/memory-condenser.js` | - |
-| クリティックシステム | `src/validators/critic-system.js` | - |
-| エージェントメモリ | `src/managers/agent-memory.js` | - |
+| Memory condenser | `src/managers/memory-condenser.js` | - |
+| Critic system | `src/validators/critic-system.js` | - |
+| Agent memory | `src/managers/agent-memory.js` | - |
 
-### 11.3 フェーズ3（Week 5-6）
+### 11.3 Phase 3 (Week 5-6)
 
-| タスク | ファイル | 担当 |
+| Task | File | Owner |
 |--------|----------|------|
-| Issue自動解決 | `src/resolvers/issue-resolver.js` | - |
-| セキュリティアナライザー | `src/analyzers/security-analyzer.js` | - |
-| GitHub Actionsワークフロー | `.github/workflows/musubi-resolver.yml` | - |
-| テスト・ドキュメント | `tests/`, `docs/` | - |
+| Automatic issue resolution | `src/resolvers/issue-resolver.js` | - |
+| Security analyzer | `src/analyzers/security-analyzer.js` | - |
+| GitHub Actions workflow | `.github/workflows/musubi-resolver.yml` | - |
+| Tests and documentation | `tests/`, `docs/` | - |
 
 ---
 
-## 12. テスト計画
+## 12. Test Plan
 
-### 12.1 単体テスト
+### 12.1 Unit Tests
 
-| 対象 | テストファイル | カバレッジ目標 |
+| Target | Test File | Coverage Target |
 |------|---------------|---------------|
 | StuckDetector | `tests/analyzers/stuck-detector.test.js` | 90% |
 | SkillsLoader | `tests/managers/skills-loader.test.js` | 85% |
@@ -848,39 +848,39 @@ musubi-remember --export     # JSON形式でエクスポート
 | IssueResolver | `tests/resolvers/issue-resolver.test.js` | 80% |
 | AgentMemory | `tests/managers/agent-memory.test.js` | 85% |
 
-### 12.2 統合テスト
+### 12.2 Integration Tests
 
 ```bash
-# 全OpenHands機能の統合テスト
+# Integration tests for all OpenHands features
 npm run test:integration:openhands
 
-# E2Eテスト（実際のプロジェクトで検証）
+# E2E tests (verified on a real project)
 npm run test:e2e:openhands
 ```
 
 ---
 
-## 13. トレーサビリティ
+## 13. Traceability
 
-| 要件ID | 設計セクション | 実装ファイル | テストID |
+| Requirement ID | Design Section | Implementation File | Test ID |
 |--------|---------------|-------------|----------|
-| REQ-P0-B001 | 3. スタック検出 | `stuck-detector.js` | TST-P0-B001 |
-| REQ-P0-B002 | 4. キーワードトリガー | `skills-loader.js` | TST-P0-B002 |
-| REQ-P0-B003 | 5. リポジトリスキル | `skills-loader.js` | TST-P0-B003 |
-| REQ-P0-B004 | 6. メモリコンデンサー | `memory-condenser.js` | TST-P0-B004 |
-| REQ-P0-B005 | 7. クリティック | `critic-system.js` | TST-P0-B005 |
-| REQ-P0-B006 | 8. Issue解決 | `issue-resolver.js` | TST-P0-B006 |
-| REQ-P0-B007 | 9. セキュリティ | `security-analyzer.js` | TST-P0-B007 |
-| REQ-P0-B008 | 10. エージェントメモリ | `agent-memory.js` | TST-P0-B008 |
+| REQ-P0-B001 | 3. Stuck Detection | `stuck-detector.js` | TST-P0-B001 |
+| REQ-P0-B002 | 4. Keyword Triggers | `skills-loader.js` | TST-P0-B002 |
+| REQ-P0-B003 | 5. Repository Skills | `skills-loader.js` | TST-P0-B003 |
+| REQ-P0-B004 | 6. Memory Condenser | `memory-condenser.js` | TST-P0-B004 |
+| REQ-P0-B005 | 7. Critic | `critic-system.js` | TST-P0-B005 |
+| REQ-P0-B006 | 8. Issue Resolution | `issue-resolver.js` | TST-P0-B006 |
+| REQ-P0-B007 | 9. Security | `security-analyzer.js` | TST-P0-B007 |
+| REQ-P0-B008 | 10. Agent Memory | `agent-memory.js` | TST-P0-B008 |
 
 ---
 
-## 14. 文書履歴
+## 14. Document History
 
-| バージョン | 日付 | 作成者 | 変更内容 |
+| Version | Date | Author | Changes |
 |-----------|------|--------|----------|
-| 1.0 | 2025-12-07 | MUSUBIチーム | 初版作成 |
+| 1.0 | 2025-12-07 | MUSUBI Team | Initial version |
 
 ---
 
-*― 文書終了 ―*
+*- End of Document -*

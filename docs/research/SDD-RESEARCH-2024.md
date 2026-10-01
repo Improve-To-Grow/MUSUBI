@@ -1,171 +1,171 @@
-# Specification Driven Development (SDD) 調査レポート
+# Specification Driven Development (SDD) Research Report
 
-**調査日:** 2024年12月9日  
-**調査目的:** SDDに関連する最新の記事や実践を調査し、ベストプラクティス、ツール比較、重要な機能・概念をまとめる
+**Research date:** December 9, 2024  
+**Research purpose:** Survey recent articles and practices related to SDD, and summarize best practices, tool comparisons, and key features/concepts
 
 ---
 
-## 1. SDDの最新ベストプラクティス
+## 1. Latest SDD Best Practices
 
-### 1.1 コンテキスト・ファースト設計
+### 1.1 Context-First Design
 
-現代のSDDでは、AIコーディングエージェントに対して**明確なコンテキスト**を提供することが最も重要視されています。
+In modern SDD, providing **clear context** to AI coding agents is considered the most important factor.
 
-| プラクティス | 説明 |
+| Practice | Description |
 |------------|------|
-| **プロジェクトルール定義** | `.cursorrules`、`CLAUDE.md`、`steering/`のようなファイルでプロジェクト固有のルールを定義 |
-| **コーディング規約の明文化** | スタイルガイド、命名規則、アーキテクチャパターンを文書化 |
-| **依存関係の明示** | 使用ライブラリ、フレームワーク、バージョンを明確に指定 |
-| **ディレクトリ構造の説明** | プロジェクト構造と各ディレクトリの役割を明確に |
+| **Define project rules** | Define project-specific rules in files such as `.cursorrules`, `CLAUDE.md`, and `steering/` |
+| **Document coding conventions** | Document style guides, naming conventions, and architecture patterns |
+| **Make dependencies explicit** | Clearly specify the libraries, frameworks, and versions used |
+| **Explain directory structure** | Clearly describe the project structure and the role of each directory |
 
-### 1.2 段階的な仕様記述
+### 1.2 Incremental Specification Writing
 
 ```
-高レベル仕様 → 詳細仕様 → 実装指示 → 検証基準
+High-level specification → Detailed specification → Implementation instructions → Validation criteria
 ```
 
-1. **ビジョン/目標**: 何を達成したいか
-2. **機能要件**: 必要な機能のリスト
-3. **技術仕様**: 具体的な実装方法
-4. **受け入れ基準**: 完了条件とテスト
+1. **Vision/Goals**: What you want to achieve
+2. **Functional requirements**: List of required features
+3. **Technical specification**: Concrete implementation approach
+4. **Acceptance criteria**: Completion conditions and tests
 
-### 1.3 反復的な改善サイクル
+### 1.3 Iterative Improvement Cycle
 
-- **仕様作成 → コード生成 → レビュー → 仕様更新**のサイクル
-- AIの出力を検証し、仕様を継続的に改善
-- 学習したパターンを`memories/`や`rules/`に蓄積
+- A cycle of **Write spec → Generate code → Review → Update spec**
+- Validate AI output and continuously improve the specification
+- Accumulate learned patterns in `memories/` and `rules/`
 
 ---
 
-## 2. SDDツール・フレームワーク比較
+## 2. SDD Tool and Framework Comparison
 
-### 2.1 主要ツール概要
+### 2.1 Overview of Major Tools
 
-| ツール | カテゴリ | 特徴 | Star数 |
+| Tool | Category | Features | Stars |
 |--------|----------|------|--------|
-| **Cursor** | AI IDE | Rules for AI、コードベース理解、Agent機能 | N/A |
-| **Claude Code** | ターミナルエージェント | MCP対応、Unix哲学、ファイル直接編集 | N/A |
-| **Windsurf (Codeium)** | AI IDE | Cascade、フロー状態維持、深いコンテキスト認識 | N/A |
-| **GPT Engineer** | コード生成プラットフォーム | 自然言語→コード、Lovable.devへ発展 | 55.1k |
-| **Aider** | ターミナルペアプログラミング | Git統合、コーディング規約対応、マルチLLM | 大人気 |
-| **Codegen** | コードエージェントOS | PR自動生成、チケット連携、MCP対応 | N/A |
-| **Bolt.new** | Web Builder | チャットベース開発、デプロイ統合 | N/A |
+| **Cursor** | AI IDE | Rules for AI, codebase understanding, Agent feature | N/A |
+| **Claude Code** | Terminal agent | MCP support, Unix philosophy, direct file editing | N/A |
+| **Windsurf (Codeium)** | AI IDE | Cascade, flow state maintenance, deep context awareness | N/A |
+| **GPT Engineer** | Code generation platform | Natural language to code, evolved into Lovable.dev | 55.1k |
+| **Aider** | Terminal pair programming | Git integration, coding convention support, multi-LLM | Very popular |
+| **Codegen** | Code agent OS | Automatic PR generation, ticket integration, MCP support | N/A |
+| **Bolt.new** | Web Builder | Chat-based development, deployment integration | N/A |
 
-### 2.2 詳細比較
+### 2.2 Detailed Comparison
 
 #### Cursor
 
-**主な機能:**
-- `.cursorrules` ファイルによるAI挙動カスタマイズ
-- コードベース埋め込みモデル（全体理解）
-- Agentモード（自律的なコーディング）
-- ルールとメモリ機能
-- MCP（Model Context Protocol）サポート
+**Key features:**
+- Customize AI behavior via `.cursorrules` files
+- Codebase embedding model (whole-codebase understanding)
+- Agent mode (autonomous coding)
+- Rules and memory features
+- MCP (Model Context Protocol) support
 
-**強み:**
-- VS Code互換
-- 直感的なUI
-- コミュニティルール（awesome-cursorrules: 36k stars）
+**Strengths:**
+- VS Code compatible
+- Intuitive UI
+- Community rules (awesome-cursorrules: 36k stars)
 
 #### Claude Code
 
-**主な機能:**
-- ターミナルネイティブ
-- 直接ファイル編集・コマンド実行
-- MCP連携（Google Drive、Jira、Slack等）
-- スクリプタブル（パイプライン対応）
-- エンタープライズ対応
+**Key features:**
+- Terminal-native
+- Direct file editing and command execution
+- MCP integration (Google Drive, Jira, Slack, etc.)
+- Scriptable (pipeline support)
+- Enterprise ready
 
-**強み:**
-- Unix哲学に忠実
-- 既存ワークフローへの統合が容易
-- CI/CD連携
+**Strengths:**
+- Faithful to the Unix philosophy
+- Easy to integrate into existing workflows
+- CI/CD integration
 
 #### Windsurf (Cascade)
 
-**主な機能:**
-- Cascade: 深いコードベース理解
-- フロー状態維持設計
-- Supercomplete（次のアクション予測）
-- Tab to Jump（カーソル位置予測）
-- MCP対応
+**Key features:**
+- Cascade: deep codebase understanding
+- Flow state maintenance design
+- Supercomplete (next action prediction)
+- Tab to Jump (cursor position prediction)
+- MCP support
 
-**強み:**
-- 94%のコードがAI生成
-- Fortune 500企業の59%が使用
-- Linter自動修正
+**Strengths:**
+- 94% of code is AI-generated
+- Used by 59% of Fortune 500 companies
+- Automatic linter fixes
 
 #### Aider
 
-**主な機能:**
-- Git統合（自動コミット）
-- マルチLLMサポート
-- `.aider.conf.yml` による設定
-- `/architect` コマンド
-- コーディング規約指定
+**Key features:**
+- Git integration (automatic commits)
+- Multi-LLM support
+- Configuration via `.aider.conf.yml`
+- `/architect` command
+- Coding convention specification
 
-**強み:**
-- オープンソース
-- 柔軟なモデル選択
-- 詳細なドキュメント
+**Strengths:**
+- Open source
+- Flexible model selection
+- Detailed documentation
 
 #### GPT Engineer → Lovable.dev
 
-**主な機能:**
-- 自然言語でのソフトウェア仕様記述
-- `prompt` ファイルによる指示
-- `preprompts` によるAIアイデンティティ設定
-- ビジョン対応（画像入力）
-- ベンチマーク機能
+**Key features:**
+- Describe software specifications in natural language
+- Instructions via `prompt` file
+- AI identity configuration via `preprompts`
+- Vision support (image input)
+- Benchmark feature
 
-**発展:**
-- Lovable.dev: チャットでアプリ構築
-- Bolt.new: StackBlitz提供のWebビルダー
+**Evolution:**
+- Lovable.dev: Build apps via chat
+- Bolt.new: Web builder provided by StackBlitz
 
 ---
 
-## 3. SDDで重要視されている機能・概念
+## 3. Features and Concepts Valued in SDD
 
-### 3.1 コンテキスト管理
+### 3.1 Context Management
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                   Context Hierarchy                      │
 ├─────────────────────────────────────────────────────────┤
-│  Global Rules     │ 組織全体のコーディング規約           │
-│  Project Rules    │ プロジェクト固有の設定               │
-│  File Rules       │ ファイルタイプ別の指示               │
-│  Task Context     │ 現在のタスクに関する情報             │
-│  Conversation     │ 対話履歴                             │
+│  Global Rules     │ Organization-wide coding conventions │
+│  Project Rules    │ Project-specific settings            │
+│  File Rules       │ Instructions by file type            │
+│  Task Context     │ Information about the current task   │
+│  Conversation     │ Dialogue history                     │
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 3.2 主要概念リスト
+### 3.2 List of Key Concepts
 
-| 概念 | 説明 | 実装例 |
+| Concept | Description | Implementation Example |
 |------|------|--------|
-| **Rules/Specifications** | AIの振る舞いを定義する設定 | `.cursorrules`, `CLAUDE.md`, `steering/` |
-| **Memory** | 学習した情報の永続化 | `memories/`, プロジェクトナレッジ |
-| **Context Window** | 利用可能なコンテキストサイズ | モデル依存（128K-200K tokens） |
-| **Repository Map** | コードベースの構造マップ | Aider repomap |
-| **Codebase Embedding** | コードのベクトル表現 | Cursor、Windsurf |
-| **Agent Mode** | 自律的なタスク実行 | Cursor Agent、Claude Code |
-| **MCP (Model Context Protocol)** | 外部ツール連携プロトコル | 全主要ツールが対応 |
-| **Pre-prompts** | AIのアイデンティティ設定 | GPT Engineer |
-| **Checkpoints** | 作業状態の保存・復元 | musubi checkpoint |
+| **Rules/Specifications** | Settings that define AI behavior | `.cursorrules`, `CLAUDE.md`, `steering/` |
+| **Memory** | Persistence of learned information | `memories/`, project knowledge |
+| **Context Window** | Available context size | Model-dependent (128K-200K tokens) |
+| **Repository Map** | Structural map of the codebase | Aider repomap |
+| **Codebase Embedding** | Vector representation of code | Cursor, Windsurf |
+| **Agent Mode** | Autonomous task execution | Cursor Agent, Claude Code |
+| **MCP (Model Context Protocol)** | Protocol for external tool integration | Supported by all major tools |
+| **Pre-prompts** | AI identity configuration | GPT Engineer |
+| **Checkpoints** | Saving and restoring working state | musubi checkpoint |
 
-### 3.3 品質保証機能
+### 3.3 Quality Assurance Features
 
-- **Linter統合**: エラー自動検出・修正
-- **テスト生成**: 仕様からのテスト自動生成
-- **コードレビュー**: AIによるレビュー（Bugbot等）
-- **リファクタリング**: 自動リファクタリング提案
+- **Linter integration**: Automatic error detection and fixing
+- **Test generation**: Automatic test generation from specifications
+- **Code review**: AI-based review (Bugbot, etc.)
+- **Refactoring**: Automatic refactoring suggestions
 
 ---
 
-## 4. AIコーディングエージェントとの統合パターン
+## 4. Integration Patterns with AI Coding Agents
 
-### 4.1 統合アーキテクチャ
+### 4.1 Integration Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -202,36 +202,36 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 4.2 統合パターン一覧
+### 4.2 List of Integration Patterns
 
-#### パターン1: IDE統合
+#### Pattern 1: IDE Integration
 ```
 Developer ←→ AI IDE (Cursor/Windsurf) ←→ LLM
                     ↓
               Codebase Context
 ```
-- **ユースケース**: 日常的なコーディング
-- **例**: Cursor, Windsurf, GitHub Copilot
+- **Use case**: Everyday coding
+- **Examples**: Cursor, Windsurf, GitHub Copilot
 
-#### パターン2: ターミナル統合
+#### Pattern 2: Terminal Integration
 ```
 Developer ←→ Terminal Agent (Claude Code/Aider) ←→ LLM
                     ↓
               Git Repository
 ```
-- **ユースケース**: コマンドライン好み、スクリプト連携
-- **例**: Claude Code, Aider
+- **Use case**: Command-line preference, script integration
+- **Examples**: Claude Code, Aider
 
-#### パターン3: チケット/PR統合
+#### Pattern 3: Ticket/PR Integration
 ```
 Issue Tracker ←→ Code Agent (Codegen) ←→ LLM
                     ↓
               Pull Request
 ```
-- **ユースケース**: 自動化されたタスク処理
-- **例**: Codegen, Sweep
+- **Use case**: Automated task processing
+- **Examples**: Codegen, Sweep
 
-#### パターン4: MCP統合
+#### Pattern 4: MCP Integration
 ```
                  ┌─── Figma
 Developer ←→ MCP Server ←→ LLM
@@ -239,134 +239,134 @@ Developer ←→ MCP Server ←→ LLM
                  ├─── Jira
                  └─── Custom Tools
 ```
-- **ユースケース**: 複数ツール連携
-- **例**: 全主要プラットフォームがMCP対応
+- **Use case**: Multi-tool integration
+- **Examples**: All major platforms support MCP
 
-### 4.3 musubi-sddとの統合
+### 4.3 Integration with musubi-sdd
 
-musubiプロジェクトは以下のSDD機能を実装:
+The musubi project implements the following SDD features:
 
-| 機能 | 対応コマンド | 説明 |
+| Feature | Corresponding Command | Description |
 |------|-------------|------|
-| 仕様管理 | `musubi-requirements` | 要件定義の管理 |
-| 設計管理 | `musubi-design` | 設計ドキュメント生成 |
-| コード解析 | `musubi-analyze` | コードベース分析 |
-| ギャップ分析 | `musubi-gaps` | 仕様と実装の差分検出 |
-| 変更追跡 | `musubi-change` | 変更履歴の管理 |
-| チェックポイント | `musubi-checkpoint` | 状態の保存・復元 |
-| メモリ | `musubi-remember` | 学習情報の永続化 |
-| ステアリング | `steering/` | AI挙動の制御 |
+| Specification management | `musubi-requirements` | Requirements definition management |
+| Design management | `musubi-design` | Design document generation |
+| Code analysis | `musubi-analyze` | Codebase analysis |
+| Gap analysis | `musubi-gaps` | Detect differences between specification and implementation |
+| Change tracking | `musubi-change` | Change history management |
+| Checkpoints | `musubi-checkpoint` | Save and restore state |
+| Memory | `musubi-remember` | Persist learned information |
+| Steering | `steering/` | Control of AI behavior |
 
 ---
 
-## 5. 現在のトレンドと新しいアプローチ
+## 5. Current Trends and New Approaches
 
-### 5.1 2024-2025年のトレンド
+### 5.1 Trends for 2024-2025
 
-1. **Agentic Coding（自律型コーディング）**
-   - 単純な補完から自律的なタスク実行へ
-   - 計画→実行→検証のループ
+1. **Agentic Coding (autonomous coding)**
+   - From simple completion to autonomous task execution
+   - Plan -> execute -> verify loop
 
-2. **MCP（Model Context Protocol）の普及**
-   - Anthropic主導の標準化
-   - 外部ツール連携の統一インターフェース
+2. **Spread of MCP (Model Context Protocol)**
+   - Standardization led by Anthropic
+   - Unified interface for external tool integration
 
-3. **コンテキストウィンドウの拡大**
+3. **Expansion of context windows**
    - 128K → 200K tokens
-   - より多くのコードベースを一度に理解
+   - Understand more of the codebase at once
 
-4. **マルチモーダル対応**
-   - 画像（UI設計）からのコード生成
-   - 音声入力対応
+4. **Multimodal support**
+   - Code generation from images (UI designs)
+   - Voice input support
 
-5. **エンタープライズ対応**
-   - SOC 2コンプライアンス
-   - オンプレミスデプロイ
-   - SSO統合
+5. **Enterprise readiness**
+   - SOC 2 compliance
+   - On-premises deployment
+   - SSO integration
 
-### 5.2 新しいアプローチ
+### 5.2 New Approaches
 
-#### フロー状態維持設計（Windsurf）
+#### Flow State Maintenance Design (Windsurf)
 ```
-開発者の思考フロー
+Developer's thought flow
     ↓
-AI が先回りして予測
+AI anticipates and predicts ahead
     ↓
-シームレスな補完・提案
+Seamless completions and suggestions
     ↓
-中断なく開発継続
-```
-
-#### 仕様駆動型ワークフロー（musubi SDD）
-```
-ステアリングファイル
-    ↓
-自動仕様生成
-    ↓
-ギャップ分析
-    ↓
-コード生成
-    ↓
-検証・フィードバック
+Development continues without interruption
 ```
 
-#### チームナレッジ統合
-- プロジェクト固有の知識を蓄積
-- チーム間での知識共有
-- コードレビューからの学習
+#### Specification-Driven Workflow (musubi SDD)
+```
+Steering files
+    ↓
+Automatic specification generation
+    ↓
+Gap analysis
+    ↓
+Code generation
+    ↓
+Validation and feedback
+```
+
+#### Team Knowledge Integration
+- Accumulate project-specific knowledge
+- Knowledge sharing across teams
+- Learning from code reviews
 
 ---
 
-## 6. 推奨事項（musubiプロジェクトへの提案）
+## 6. Recommendations (Proposals for the musubi Project)
 
-### 6.1 短期的改善
+### 6.1 Short-Term Improvements
 
-1. **MCPサポートの強化**
-   - 主要ツール（Figma, Jira, Slack）との連携
-   - カスタムMCPサーバーのテンプレート提供
+1. **Strengthen MCP support**
+   - Integration with major tools (Figma, Jira, Slack)
+   - Provide templates for custom MCP servers
 
-2. **ルール形式の標準化**
-   - `.cursorrules` との互換性
-   - `CLAUDE.md` 形式のサポート
+2. **Standardize rule formats**
+   - Compatibility with `.cursorrules`
+   - Support for the `CLAUDE.md` format
 
-3. **コンテキスト管理の改善**
-   - より効率的なコードベースインデックス
-   - 選択的なコンテキスト提供
+3. **Improve context management**
+   - More efficient codebase indexing
+   - Selective context provision
 
-### 6.2 中長期的な方向性
+### 6.2 Medium- to Long-Term Direction
 
-1. **Agentic機能の強化**
-   - 計画→実行→検証の自動化
-   - マルチエージェント協調
+1. **Strengthen Agentic features**
+   - Automate plan -> execute -> verify
+   - Multi-agent collaboration
 
-2. **学習機能の拡張**
-   - プロジェクトからの自動学習
-   - ベストプラクティスの蓄積
+2. **Expand learning features**
+   - Automatic learning from projects
+   - Accumulation of best practices
 
-3. **エンタープライズ機能**
-   - チーム間でのルール共有
-   - 監査ログ
-   - コンプライアンス対応
+3. **Enterprise features**
+   - Rule sharing across teams
+   - Audit logs
+   - Compliance support
 
 ---
 
-## 7. 参考リソース
+## 7. Reference Resources
 
-### 公式ドキュメント
+### Official Documentation
 - [Claude Code Docs](https://code.claude.com/docs/en/overview)
 - [Cursor Features](https://cursor.com/features)
 - [Aider Documentation](https://aider.chat/docs/)
 - [Windsurf](https://windsurf.com/)
 
-### コミュニティリソース
+### Community Resources
 - [awesome-cursorrules](https://github.com/PatrickJS/awesome-cursorrules) - 36k stars
 - [GPT Engineer](https://github.com/AntonOsika/gpt-engineer) - 55.1k stars
 
-### 記事・ブログ
+### Articles and Blogs
 - [Claude's Character - Anthropic Research](https://www.anthropic.com/research/claude-character)
 - [Lovable.dev Blog](https://lovable.dev/blog)
 - [Codegen Blog](https://codegen.com/blog)
 
 ---
 
-*このレポートは2024年12月時点の情報に基づいています。AI開発ツールの分野は急速に進化しているため、最新情報は各公式サイトを参照してください。*
+*This report is based on information as of December 2024. The AI development tools field is evolving rapidly, so please refer to each official site for the latest information.*

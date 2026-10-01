@@ -1,74 +1,74 @@
 # GitHub Actions CI/CD Design Document
 
-## メタデータ
-- **ドキュメント種別**: 設計書 (SDD Stage 3)
-- **作成日**: 2025-11-17
-- **プロジェクト**: MUSUBI v0.1.4
-- **関連要件**: [github-actions-requirements.md](./github-actions-requirements.md)
+## Metadata
+- **Document type**: Design document (SDD Stage 3)
+- **Created**: 2025-11-17
+- **Project**: MUSUBI v0.1.4
+- **Related requirements**: [github-actions-requirements.md](./github-actions-requirements.md)
 - **Constitutional Compliance**: Article III (Design-First), Article V (Traceability)
 
 ---
 
 ## 1. Architecture Decision Record (ADR)
 
-### ADR-001: GitHub Actions を CI/CD プラットフォームとして採用
+### ADR-001: Adopt GitHub Actions as the CI/CD Platform
 
 **Status**: Accepted  
 **Date**: 2025-11-17  
 **Context**:  
-MUSUBI は現在、手動でのテスト実行、npm 公開、バージョン管理を行っている。これは人的エラーのリスクが高く、品質保証の一貫性が保てない。
+MUSUBI currently runs tests, publishes to npm, and manages versions manually. This carries a high risk of human error and cannot keep quality assurance consistent.
 
 **Decision**:  
-GitHub Actions を CI/CD プラットフォームとして採用し、以下を自動化する:
-- PR 時の自動テスト・Lint・ビルド検証
-- main ブランチへのプッシュ時の完全テスト実行
-- バージョンタグ作成時の npm 自動公開
-- Dependabot による依存関係の自動更新
+Adopt GitHub Actions as the CI/CD platform and automate the following:
+- Automatic testing, linting, and build validation on PRs
+- Full test execution on pushes to the main branch
+- Automatic npm publishing when a version tag is created
+- Automatic dependency updates via Dependabot
 
 **Consequences**:
-- ✅ 一貫した品質チェック
-- ✅ 人的エラーの削減
-- ✅ リリースプロセスの高速化
-- ✅ GitHub ネイティブ統合(PR status checks, branch protection)
-- ⚠️ GitHub Actions の利用制限(パブリックリポジトリは無料)
-- ⚠️ YAML ベースの設定管理が必要
+- ✅ Consistent quality checks
+- ✅ Fewer human errors
+- ✅ Faster release process
+- ✅ Native GitHub integration (PR status checks, branch protection)
+- ⚠️ GitHub Actions usage limits (free for public repositories)
+- ⚠️ YAML-based configuration management is required
 
 ---
 
-### ADR-002: CI と Release を別ワークフローに分離
+### ADR-002: Separate CI and Release into Different Workflows
 
 **Status**: Accepted  
 **Date**: 2025-11-17  
 **Context**:  
-CI(継続的インテグレーション)と Release(リリース自動化)は異なるトリガーと目的を持つ。
+CI (continuous integration) and Release (release automation) have different triggers and purposes.
 
 **Decision**:  
-以下の2つのワークフローに分離:
-1. **ci.yml**: PR・push トリガー、品質チェック
-2. **release.yml**: バージョンタグトリガー、npm 公開
+Separate them into the following two workflows:
+1. **ci.yml**: PR/push triggers, quality checks
+2. **release.yml**: Version tag trigger, npm publishing
 
 **Rationale**:
-- 関心の分離 (Separation of Concerns)
-- 再利用可能性の向上
-- トラブルシューティングの容易化
-- 異なるパーミッション設定の適用
+- Separation of Concerns
+- Improved reusability
+- Easier troubleshooting
+- Different permission settings can be applied
 
 **Consequences**:
-- ✅ 明確な責任分離
-- ✅ 個別のメンテナンス性向上
-- ⚠️ ワークフロー数の増加
+- ✅ Clear separation of responsibilities
+- ✅ Better individual maintainability
+- ⚠️ More workflows
 
 ---
 
-### ADR-003: Matrix Strategy でマルチプラットフォームテストを実施
+### ADR-003: Run Multi-Platform Tests with a Matrix Strategy
 
 **Status**: Accepted  
 **Date**: 2025-11-17  
 **Context**:  
-MUSUBI は7つのプラットフォーム(Claude Code, GitHub Copilot, Cursor, Gemini CLI, Windsurf, Codex, Qwen Code)をサポートしており、各プラットフォームでの初期化が正しく動作することを保証する必要がある。
+MUSUBI supports 7 platforms (Claude Code, GitHub Copilot, Cursor, Gemini CLI, Windsurf, Codex, Qwen Code), and we must ensure that initialization works correctly on each platform.
 
 **Decision**:  
-GitHub Actions の matrix strategy を使用して、全7プラットフォームの初期化テストを並列実行する。
+Use the GitHub Actions matrix strategy to run initialization tests for all 7 platforms in parallel.
 
 ```yaml
 strategy:
@@ -77,22 +77,22 @@ strategy:
 ```
 
 **Consequences**:
-- ✅ 全プラットフォームの網羅的検証
-- ✅ 並列実行による高速化
-- ✅ プラットフォーム固有の問題の早期発見
-- ⚠️ ワークフロー実行時間の増加(並列化で緩和)
+- ✅ Comprehensive validation of all platforms
+- ✅ Faster through parallel execution
+- ✅ Early detection of platform-specific issues
+- ⚠️ Longer workflow execution time (mitigated by parallelization)
 
 ---
 
-### ADR-004: Caching Strategy で CI 実行時間を短縮
+### ADR-004: Reduce CI Execution Time with a Caching Strategy
 
 **Status**: Accepted  
 **Date**: 2025-11-17  
 **Context**:  
-`npm install` は毎回実行すると時間がかかる。REQ-GHA-010 では 80% のキャッシュヒット率を目標としている。
+Running `npm install` every time is slow. REQ-GHA-010 targets an 80% cache hit rate.
 
 **Decision**:  
-`actions/setup-node@v4` の組み込みキャッシュ機能を使用する:
+Use the built-in caching of `actions/setup-node@v4`:
 
 ```yaml
 - uses: actions/setup-node@v4
@@ -102,26 +102,26 @@ strategy:
 ```
 
 **Rationale**:
-- package-lock.json のハッシュ値をキーとした自動キャッシュ
-- GitHub Actions の標準機能で追加設定不要
-- クロスジョブでのキャッシュ共有
+- Automatic caching keyed on the hash of package-lock.json
+- Standard GitHub Actions feature, no extra configuration needed
+- Cache sharing across jobs
 
 **Consequences**:
-- ✅ CI 実行時間の大幅短縮(目標: < 5分)
-- ✅ GitHub Actions の無料枠の節約
-- ✅ 開発体験の向上
+- ✅ Significantly shorter CI execution time (target: < 5 min)
+- ✅ Saves the GitHub Actions free tier
+- ✅ Better developer experience
 
 ---
 
-### ADR-005: Branch Protection Rules で品質ゲートを強制
+### ADR-005: Enforce Quality Gates with Branch Protection Rules
 
 **Status**: Accepted  
 **Date**: 2025-11-17  
 **Context**:  
-main ブランチへの直接プッシュは品質リスクが高い。CI チェックの通過を必須とする必要がある。
+Direct pushes to the main branch carry a high quality risk. Passing CI checks must be required.
 
 **Decision**:  
-GitHub Settings で以下の Branch Protection Rules を設定:
+Configure the following Branch Protection Rules in GitHub Settings:
 - Require status checks to pass before merging
 - Required status checks: `lint`, `test`, `build`, `audit`
 - Require branches to be up to date before merging
@@ -129,10 +129,10 @@ GitHub Settings で以下の Branch Protection Rules を設定:
 - Do not allow bypassing the above settings
 
 **Consequences**:
-- ✅ main ブランチの品質保証
-- ✅ コードレビューの強制
-- ✅ CI チェック通過の必須化
-- ⚠️ 緊急修正時のワークフローが複雑化(hotfix ブランチで対応)
+- ✅ Quality assurance for the main branch
+- ✅ Enforced code review
+- ✅ Mandatory passing of CI checks
+- ⚠️ Emergency fix workflow becomes more complex (handled with hotfix branches)
 
 ---
 
@@ -140,11 +140,11 @@ GitHub Settings で以下の Branch Protection Rules を設定:
 
 ### 2.1 CI Workflow (ci.yml)
 
-**トリガー**:
-- `pull_request`: 任意のブランチへの PR
-- `push`: main ブランチへのプッシュ
+**Triggers**:
+- `pull_request`: PRs to any branch
+- `push`: Pushes to the main branch
 
-**ジョブ構成**:
+**Job structure**:
 
 ```yaml
 name: CI
@@ -243,18 +243,18 @@ jobs:
         run: npm test -- tests/init-platforms.test.js -t "${{ matrix.platform }}"
 ```
 
-**パフォーマンス目標**:
-- Total execution time: < 5 分
-- 並列実行: lint, test, build, audit, platform-tests(7 variants)
+**Performance targets**:
+- Total execution time: < 5 min
+- Parallel execution: lint, test, build, audit, platform-tests (7 variants)
 
 ---
 
 ### 2.2 Release Workflow (release.yml)
 
-**トリガー**:
-- `push`: tags matching `v*.*.*` (例: v0.1.5, v1.0.0)
+**Triggers**:
+- `push`: tags matching `v*.*.*` (e.g., v0.1.5, v1.0.0)
 
-**ジョブ構成**:
+**Job structure**:
 
 ```yaml
 name: Release
@@ -342,15 +342,15 @@ jobs:
           prerelease: false
 ```
 
-**パフォーマンス目標**:
-- Total execution time: < 3 分
-- npm publish 成功率: > 99.9%
+**Performance targets**:
+- Total execution time: < 3 min
+- npm publish success rate: > 99.9%
 
 ---
 
 ### 2.3 Dependabot Configuration
 
-**ファイル**: `.github/dependabot.yml`
+**File**: `.github/dependabot.yml`
 
 ```yaml
 version: 2
@@ -384,33 +384,33 @@ updates:
 
 ### 3.1 Secrets Management
 
-**必要な Secrets**:
+**Required Secrets**:
 
-| Secret 名 | 用途 | スコープ | 設定場所 |
+| Secret Name | Purpose | Scope | Where to Configure |
 |-----------|------|---------|---------|
-| `NPM_TOKEN` | npm publish 認証 | Automation token | GitHub Repository Secrets |
-| `GITHUB_TOKEN` | GitHub API アクセス | 自動生成 | GitHub Actions 標準 |
+| `NPM_TOKEN` | npm publish authentication | Automation token | GitHub Repository Secrets |
+| `GITHUB_TOKEN` | GitHub API access | Auto-generated | GitHub Actions standard |
 
-**設定手順**:
-1. npm にログイン → Account Settings → Access Tokens
-2. "Generate New Token" → Automation token 選択
+**Setup steps**:
+1. Log in to npm → Account Settings → Access Tokens
+2. "Generate New Token" → Select Automation token
 3. GitHub → Settings → Secrets and variables → Actions
-4. "New repository secret" → `NPM_TOKEN` を追加
+4. "New repository secret" → Add `NPM_TOKEN`
 
 ### 3.2 Permission Model
 
 **CI Workflow**:
 ```yaml
 permissions:
-  contents: read        # コード読み取り
-  pull-requests: write  # PR コメント投稿(カバレッジレポート)
+  contents: read        # Read code
+  pull-requests: write  # Post PR comments (coverage report)
 ```
 
 **Release Workflow**:
 ```yaml
 permissions:
-  contents: write    # GitHub Release 作成
-  id-token: write    # npm provenance 署名
+  contents: write    # Create GitHub Release
+  id-token: write    # npm provenance signing
 ```
 
 ---
@@ -419,7 +419,7 @@ permissions:
 
 ### 4.1 Platform Initialization Tests
 
-**新規テストファイル**: `tests/init-platforms.test.js`
+**New test file**: `tests/init-platforms.test.js`
 
 ```javascript
 const fs = require('fs-extra');
@@ -474,10 +474,10 @@ describe('Platform Initialization Tests', () => {
 });
 ```
 
-**テスト戦略**:
-- Matrix strategy で7プラットフォーム並列実行
-- 各プラットフォームで必須ファイルの生成を検証
-- Skills API (Claude Code 専用)の条件付き検証
+**Test strategy**:
+- Run 7 platforms in parallel with a matrix strategy
+- Verify generation of required files on each platform
+- Conditional validation of Skills API (Claude Code only)
 
 ---
 
@@ -485,11 +485,11 @@ describe('Platform Initialization Tests', () => {
 
 **GitHub Settings → Branches → Branch protection rules**
 
-**ルール名**: `main`
+**Rule name**: `main`
 
-**設定項目**:
+**Settings**:
 - ✅ Require a pull request before merging
-  - ✅ Require approvals: 0 (small team, 1人開発)
+  - ✅ Require approvals: 0 (small team, solo development)
   - ✅ Dismiss stale pull request approvals when new commits are pushed
 - ✅ Require status checks to pass before merging
   - ✅ Require branches to be up to date before merging
@@ -515,79 +515,79 @@ describe('Platform Initialization Tests', () => {
 
 ### 6.1 Workflow Metrics
 
-**監視項目**:
-- CI 実行時間(目標: < 5分)
-- Release 実行時間(目標: < 3分)
-- キャッシュヒット率(目標: > 80%)
-- テスト成功率(目標: 100%)
-- npm publish 成功率(目標: > 99.9%)
+**Monitoring items**:
+- CI execution time (target: < 5 min)
+- Release execution time (target: < 3 min)
+- Cache hit rate (target: > 80%)
+- Test success rate (target: 100%)
+- npm publish success rate (target: > 99.9%)
 
-**監視方法**:
-- GitHub Actions の "Insights" タブ
-- Workflow run history の定期レビュー
+**Monitoring methods**:
+- The "Insights" tab in GitHub Actions
+- Periodic review of workflow run history
 
 ### 6.2 Notification Strategy
 
-**成功時**:
-- GitHub Status Check の緑チェック
-- PR への自動コメント(カバレッジレポート)
+**On success**:
+- Green check in GitHub Status Check
+- Automatic comment on the PR (coverage report)
 
-**失敗時**:
-- GitHub Status Check の赤 X
-- PR への自動コメント(エラー詳細)
-- Email 通知(GitHub Settings で設定)
+**On failure**:
+- Red X in GitHub Status Check
+- Automatic comment on the PR (error details)
+- Email notification (configured in GitHub Settings)
 
 ---
 
 ## 7. Rollout Plan
 
 ### Phase 1: CI Workflow (Week 1)
-1. `ci.yml` 作成・コミット
-2. テスト PR での動作検証
-3. Branch Protection Rules 設定
-4. チーム通知・ドキュメント更新
+1. Create and commit `ci.yml`
+2. Validate behavior with a test PR
+3. Configure Branch Protection Rules
+4. Notify the team and update documentation
 
 ### Phase 2: Platform Tests (Week 1)
-1. `tests/init-platforms.test.js` 実装
-2. Local での動作確認
-3. CI Workflow に統合
-4. 全7プラットフォームの検証
+1. Implement `tests/init-platforms.test.js`
+2. Verify behavior locally
+3. Integrate into the CI Workflow
+4. Validate all 7 platforms
 
 ### Phase 3: Release Workflow (Week 2)
-1. `release.yml` 作成・コミット
-2. テストタグでの動作検証(例: v0.1.5-test)
-3. npm token の設定
-4. 本番リリース(v0.1.5)
+1. Create and commit `release.yml`
+2. Validate behavior with a test tag (e.g., v0.1.5-test)
+3. Configure the npm token
+4. Production release (v0.1.5)
 
 ### Phase 4: Dependabot (Week 2)
-1. `.github/dependabot.yml` 作成・コミット
-2. 初回依存関係更新 PR の確認
-3. マージプロセスの確立
+1. Create and commit `.github/dependabot.yml`
+2. Review the first dependency update PR
+3. Establish the merge process
 
 ---
 
 ## 8. Risk Management
 
-### Risk 1: CI Failure による開発ブロック
+### Risk 1: Development Blocked by CI Failure
 
 **Mitigation**:
-- `fail-fast: false` を使用して全テストを実行
-- 明確なエラーメッセージとログ出力
-- Local での事前テスト推奨
+- Use `fail-fast: false` to run all tests
+- Clear error messages and log output
+- Recommend pre-testing locally
 
 ### Risk 2: npm Publish Failure
 
 **Mitigation**:
-- Pre-release verification ジョブで事前検証
-- npm token の有効期限管理
-- 手動 rollback 手順のドキュメント化
+- Pre-validate with the Pre-release verification job
+- Manage npm token expiration
+- Document the manual rollback procedure
 
-### Risk 3: GitHub Actions 利用制限
+### Risk 3: GitHub Actions Usage Limits
 
 **Mitigation**:
-- キャッシュ戦略で実行時間短縮
-- 不要なワークフローの削減
-- Public repository の無料枠活用
+- Shorten execution time with the caching strategy
+- Remove unnecessary workflows
+- Use the free tier for public repositories
 
 ---
 
@@ -595,8 +595,8 @@ describe('Platform Initialization Tests', () => {
 
 | Design Decision | Related Requirements | Implementation |
 |-----------------|---------------------|----------------|
-| ADR-001: GitHub Actions 採用 | REQ-GHA-001, REQ-GHA-002, REQ-GHA-003 | ci.yml, release.yml |
-| ADR-002: ワークフロー分離 | REQ-GHA-001, REQ-GHA-003 | ci.yml, release.yml |
+| ADR-001: Adopt GitHub Actions | REQ-GHA-001, REQ-GHA-002, REQ-GHA-003 | ci.yml, release.yml |
+| ADR-002: Separate workflows | REQ-GHA-001, REQ-GHA-003 | ci.yml, release.yml |
 | ADR-003: Matrix Strategy | REQ-GHA-006 | ci.yml (platform-tests job) |
 | ADR-004: Caching | REQ-GHA-010 | actions/setup-node@v4 with cache |
 | ADR-005: Branch Protection | REQ-GHA-007 | GitHub Settings |
@@ -610,14 +610,14 @@ describe('Platform Initialization Tests', () => {
 
 ## 10. Next Steps
 
-1. ✅ 設計書レビュー・承認
-2. ⏳ タスク分解(実装優先順位の決定)
-3. ⏳ CI Workflow 実装
-4. ⏳ Platform Tests 実装
-5. ⏳ Release Workflow 実装
-6. ⏳ Branch Protection 設定
-7. ⏳ Dependabot 有効化
-8. ⏳ ドキュメント更新(README.md, CONTRIBUTING.md)
+1. ✅ Design document reviewed and approved
+2. ⏳ Task breakdown (decide implementation priorities)
+3. ⏳ Implement CI Workflow
+4. ⏳ Implement Platform Tests
+5. ⏳ Implement Release Workflow
+6. ⏳ Configure Branch Protection
+7. ⏳ Enable Dependabot
+8. ⏳ Update documentation (README.md, CONTRIBUTING.md)
 
 ---
 

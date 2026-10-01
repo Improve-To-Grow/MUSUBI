@@ -1,6 +1,6 @@
 /**
  * Advanced Validation Engine
- * クロスアーティファクト一貫性検証と仕様ギャップ検出
+ * Cross-artifact consistency validation and specification gap detection
  *
  * @module validators/advanced-validation
  */

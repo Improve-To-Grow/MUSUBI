@@ -31,13 +31,13 @@ const TEMPLATE_CATEGORIES = {
  */
 const LOCALE_NAMES = {
   en: 'English',
-  ja: '日本語',
-  zh: '中文',
-  ko: '한국어',
-  id: 'Bahasa Indonesia',
-  es: 'Español',
-  de: 'Deutsch',
-  fr: 'Français',
+  ja: 'Japanese',
+  zh: 'Chinese',
+  ko: 'Korean',
+  id: 'Indonesian',
+  es: 'Spanish',
+  de: 'German',
+  fr: 'French',
 };
 
 /**
@@ -263,7 +263,7 @@ class LocaleManager {
     const structurePath = path.join(this.projectPath, 'steering', 'structure.md');
     if (await fs.pathExists(structurePath)) {
       const content = await fs.readFile(structurePath, 'utf-8');
-      // Check for Japanese characters
+      // Check for Japanese characters (hiragana, katakana, CJK ideographs)
       if (/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/.test(content)) {
         return 'ja';
       }

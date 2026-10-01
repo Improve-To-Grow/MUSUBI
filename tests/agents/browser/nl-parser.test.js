@@ -13,8 +13,8 @@ describe('NLParser', () => {
   });
 
   describe('parse', () => {
-    test('should parse navigate command (Japanese)', () => {
-      const result = parser.parse('https://example.com を開く');
+    test('should parse navigate command with "open"', () => {
+      const result = parser.parse('open https://example.com');
 
       expect(result.success).toBe(true);
       expect(result.actions).toHaveLength(1);
@@ -22,7 +22,7 @@ describe('NLParser', () => {
       expect(result.actions[0].url).toBe('https://example.com');
     });
 
-    test('should parse navigate command (English)', () => {
+    test('should parse navigate command', () => {
       const result = parser.parse('go to https://example.com');
 
       expect(result.success).toBe(true);
@@ -31,8 +31,8 @@ describe('NLParser', () => {
       expect(result.actions[0].url).toBe('https://example.com');
     });
 
-    test('should parse click command (Japanese)', () => {
-      const result = parser.parse('ログインボタンをクリック');
+    test('should resolve known element in click command', () => {
+      const result = parser.parse('click the login button');
 
       expect(result.success).toBe(true);
       expect(result.actions).toHaveLength(1);
@@ -40,7 +40,7 @@ describe('NLParser', () => {
       expect(result.actions[0].selector).toContain('login');
     });
 
-    test('should parse click command (English)', () => {
+    test('should parse click command', () => {
       const result = parser.parse('click login button');
 
       expect(result.success).toBe(true);
@@ -48,16 +48,17 @@ describe('NLParser', () => {
       expect(result.actions[0].type).toBe('click');
     });
 
-    test('should parse fill command (Japanese)', () => {
-      const result = parser.parse('メール欄に「test@example.com」と入力');
+    test('should parse fill command with known element', () => {
+      const result = parser.parse('enter "test@example.com" in the email field');
 
       expect(result.success).toBe(true);
       expect(result.actions).toHaveLength(1);
       expect(result.actions[0].type).toBe('fill');
+      expect(result.actions[0].selector).toContain('email');
       expect(result.actions[0].value).toBe('test@example.com');
     });
 
-    test('should parse fill command (English)', () => {
+    test('should parse fill command', () => {
       const result = parser.parse('type "hello world" in email field');
 
       expect(result.success).toBe(true);
@@ -66,16 +67,16 @@ describe('NLParser', () => {
       expect(result.actions[0].value).toBe('hello world');
     });
 
-    test('should parse wait command (Japanese)', () => {
-      const result = parser.parse('3秒待つ');
+    test('should parse wait command in milliseconds', () => {
+      const result = parser.parse('wait 500 ms');
 
       expect(result.success).toBe(true);
       expect(result.actions).toHaveLength(1);
       expect(result.actions[0].type).toBe('wait');
-      expect(result.actions[0].delay).toBe(3000);
+      expect(result.actions[0].delay).toBe(500);
     });
 
-    test('should parse wait command (English)', () => {
+    test('should parse wait command in seconds', () => {
       const result = parser.parse('wait 5 seconds');
 
       expect(result.success).toBe(true);
@@ -84,16 +85,16 @@ describe('NLParser', () => {
       expect(result.actions[0].delay).toBe(5000);
     });
 
-    test('should parse screenshot command (Japanese)', () => {
-      const result = parser.parse('スクリーンショットを取る');
+    test('should parse screenshot command', () => {
+      const result = parser.parse('take a screenshot');
 
       expect(result.success).toBe(true);
       expect(result.actions).toHaveLength(1);
       expect(result.actions[0].type).toBe('screenshot');
     });
 
-    test('should parse screenshot with name (Japanese)', () => {
-      const result = parser.parse('画面を「login-page」として保存');
+    test('should parse screenshot with name', () => {
+      const result = parser.parse('save screenshot as login-page');
 
       expect(result.success).toBe(true);
       expect(result.actions).toHaveLength(1);
@@ -101,17 +102,17 @@ describe('NLParser', () => {
       expect(result.actions[0].name).toBe('login-page');
     });
 
-    test('should parse assert command (Japanese)', () => {
-      const result = parser.parse('「ログイン成功」が表示される');
+    test('should parse assert command', () => {
+      const result = parser.parse('verify "Login successful" is visible');
 
       expect(result.success).toBe(true);
       expect(result.actions).toHaveLength(1);
       expect(result.actions[0].type).toBe('assert');
-      expect(result.actions[0].expectedText).toBe('ログイン成功');
+      expect(result.actions[0].expectedText).toBe('Login successful');
     });
 
     test('should parse multiple commands separated by comma', () => {
-      const result = parser.parse('https://example.com を開く、ログインボタンをクリック');
+      const result = parser.parse('open https://example.com, click the login button');
 
       expect(result.success).toBe(true);
       expect(result.actions).toHaveLength(2);
@@ -140,19 +141,19 @@ describe('NLParser', () => {
       expect(result).toBe('hello world');
     });
 
-    test('should normalize Japanese punctuation', () => {
-      const result = parser.normalizeCommand('こんにちは、世界。');
-      expect(result).toBe('こんにちは,世界.');
+    test('should collapse internal whitespace', () => {
+      const result = parser.normalizeCommand('hello    world');
+      expect(result).toBe('hello world');
     });
   });
 
   describe('extractSelector', () => {
-    test('should match known element patterns (Japanese)', () => {
-      const selector = parser.extractSelector('ログインボタン');
+    test('should match known element patterns (button)', () => {
+      const selector = parser.extractSelector('login button');
       expect(selector).toContain('login');
     });
 
-    test('should match known element patterns (English)', () => {
+    test('should match known element patterns (field)', () => {
       const selector = parser.extractSelector('email field');
       expect(selector).toContain('email');
     });

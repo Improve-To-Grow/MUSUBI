@@ -1,10 +1,10 @@
 # Phase 4 & 5 Requirements Document
 
-## メタデータ
-- **ドキュメント種別**: 要件定義書 (SDD Stage 2)
-- **作成日**: 2025-12-10
-- **プロジェクト**: MUSUBI v5.0.0
-- **フォーマット**: EARS (Easy Approach to Requirements Syntax)
+## Metadata
+- **Document type**: Requirements specification (SDD Stage 2)
+- **Created**: 2025-12-10
+- **Project**: MUSUBI v5.0.0
+- **Format**: EARS (Easy Approach to Requirements Syntax)
 - **Constitutional Compliance**: Article II (Requirements), Article V (Traceability)
 
 ---

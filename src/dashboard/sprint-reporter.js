@@ -187,14 +187,14 @@ class SprintReporter {
         type: 'velocity',
         severity: 'high',
         message:
-          'スプリントの実績ベロシティが計画の70%未満でした。次のスプリントでは計画ベロシティを下げることを検討してください。',
+          'Actual sprint velocity was below 70% of the plan. Consider lowering the planned velocity for the next sprint.',
       });
     } else if (metrics.velocityAccuracy > 130) {
       recommendations.push({
         type: 'velocity',
         severity: 'medium',
         message:
-          '計画以上のベロシティを達成しました。次のスプリントでは計画ベロシティを上げることを検討してください。',
+          'Velocity exceeded the plan. Consider raising the planned velocity for the next sprint.',
       });
     }
 
@@ -205,7 +205,7 @@ class SprintReporter {
       recommendations.push({
         type: 'priority',
         severity: 'critical',
-        message: `${incompleteCritical}件のクリティカルタスクが未完了です。次のスプリントで優先的に対応してください。`,
+        message: `${incompleteCritical} critical task(s) incomplete. Prioritize them in the next sprint.`,
       });
     }
 
@@ -215,7 +215,7 @@ class SprintReporter {
         type: 'planning',
         severity: 'high',
         message:
-          'タスク完了率が50%未満です。タスクの見積もりや優先順位付けの改善を検討してください。',
+          'Task completion rate is below 50%. Consider improving task estimation and prioritization.',
       });
     }
 
@@ -224,8 +224,7 @@ class SprintReporter {
       recommendations.push({
         type: 'wip',
         severity: 'medium',
-        message:
-          '進行中のタスクが多すぎます。WIP制限を設けてフォーカスを高めることを検討してください。',
+        message: 'Too many tasks in progress. Consider setting a WIP limit to improve focus.',
       });
     }
 

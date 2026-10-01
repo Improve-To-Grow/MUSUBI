@@ -1472,7 +1472,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * MUSUBI Issue Resolver
  * 
- * GitHub Issue を分析し、自動的に解決策を提案・実装
+ * Analyze GitHub Issues and automatically propose and implement solutions
  * 
  * @module src/resolvers/issue-resolver
  * @see REQ-P0-B006
@@ -1482,7 +1482,7 @@
 const fs = <span class="cstat-no" title="statement not covered" >require('fs');</span>
 const path = <span class="cstat-no" title="statement not covered" >require('path');</span>
 &nbsp;
-// GitHub クライアント（オプショナル依存）
+// GitHub client (optional dependency)
 let GitHubClient;
 <span class="cstat-no" title="statement not covered" >try {</span>
 <span class="cstat-no" title="statement not covered" >  GitHubClient = require('../integrations/github-client').GitHubClient;</span>
@@ -1491,7 +1491,7 @@ let GitHubClient;
 }
 &nbsp;
 /**
- * Issue タイプ
+ * Issue type
  */
 const IssueType = <span class="cstat-no" title="statement not covered" >{</span>
   BUG: 'bug',
@@ -1503,7 +1503,7 @@ const IssueType = <span class="cstat-no" title="statement not covered" >{</span>
 };
 &nbsp;
 /**
- * 解決ステータス
+ * Resolution status
  */
 const ResolverStatus = <span class="cstat-no" title="statement not covered" >{</span>
   PENDING: 'pending',
@@ -1515,7 +1515,7 @@ const ResolverStatus = <span class="cstat-no" title="statement not covered" >{</
 };
 &nbsp;
 /**
- * Issue 情報
+ * Issue information
  */
 class IssueInfo {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -1530,7 +1530,7 @@ class IssueInfo {
   }
 &nbsp;
   /**
-   * Issue タイプを推定
+   * Infer the Issue type
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  ge</span>t type() {
@@ -1554,7 +1554,7 @@ class IssueInfo {
 <span class="cstat-no" title="statement not covered" >      return IssueType.TEST;</span>
     }
 &nbsp;
-    // タイトルと本文からも推定
+    // Also infer from the title and body
     const content = <span class="cstat-no" title="statement not covered" >`${this.title} ${this.body}`.toLowerCase();</span>
 <span class="cstat-no" title="statement not covered" >    if (content.includes('bug') || content.includes('error') || content.includes('fix')) {</span>
 <span class="cstat-no" title="statement not covered" >      return IssueType.BUG;</span>
@@ -1567,7 +1567,7 @@ class IssueInfo {
   }
 &nbsp;
   /**
-   * 全コンテンツを取得
+   * Get all content
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  ge</span>t fullContent() {
@@ -1581,7 +1581,7 @@ class IssueInfo {
 }
 &nbsp;
 /**
- * 解決結果
+ * Resolution result
  */
 class ResolverResult {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -1613,7 +1613,7 @@ class ResolverResult {
   }
 &nbsp;
   /**
-   * Markdown形式でレポート
+   * Report in Markdown format
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  to</span>Markdown() {
@@ -1666,7 +1666,7 @@ class ResolverResult {
 }
 &nbsp;
 /**
- * 影響分析結果
+ * Impact analysis result
  */
 class ImpactAnalysis {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -1689,15 +1689,15 @@ class ImpactAnalysis {
 }
 &nbsp;
 /**
- * Issue リゾルバー
+ * Issue resolver
  */
 class IssueResolver {
   /**
    * @param {Object} options
-   * @param {string} options.projectRoot - プロジェクトルート
-   * @param {string} options.githubToken - GitHub トークン
-   * @param {boolean} options.draftPR - Draft PR を作成するか
-   * @param {boolean} options.dryRun - 実際には変更しない
+   * @param {string} options.projectRoot - Project root
+   * @param {string} options.githubToken - GitHub token
+   * @param {boolean} options.draftPR - Whether to create a Draft PR
+   * @param {boolean} options.dryRun - Do not actually make changes
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    this.projectRoot = options.projectRoot || process.cwd();</span>
@@ -1706,7 +1706,7 @@ class IssueResolver {
 <span class="cstat-no" title="statement not covered" >    this.dryRun = options.dryRun || false;</span>
 <span class="cstat-no" title="statement not covered" >    this.repo = options.repo || this._detectRepo();</span>
     
-    // GitHub クライアント初期化
+    // Initialize the GitHub client
 <span class="cstat-no" title="statement not covered" >    this.github = null;</span>
 <span class="cstat-no" title="statement not covered" >    if (GitHubClient &amp;&amp; this.githubToken &amp;&amp; this.repo) {</span>
 <span class="cstat-no" title="statement not covered" >      this.github = new GitHubClient({</span>
@@ -1718,7 +1718,7 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * リポジトリ情報を検出
+   * Detect repository information
    * @returns {Object|null}
    */
 <span class="fstat-no" title="function not covered" >  _d</span>etectRepo() {
@@ -1732,58 +1732,58 @@ class IssueResolver {
 <span class="cstat-no" title="statement not covered" >        return { owner: match[1], repo: match[2].replace('.git', '') };</span>
       }
     } catch (e) {
-      // 無視
+      // Ignore
     }
 <span class="cstat-no" title="statement not covered" >    return null;</span>
   }
 &nbsp;
   /**
-   * Issue を解決
-   * @param {string|number|IssueInfo} issue - Issue URL、番号、またはIssueInfo
+   * Resolve an Issue
+   * @param {string|number|IssueInfo} issue - Issue URL, number, or IssueInfo
    * @returns {Promise&lt;ResolverResult&gt;}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync resolve(issue) {
     const result = <span class="cstat-no" title="statement not covered" >new ResolverResult({ status: ResolverStatus.ANALYZING });</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    try {</span>
-      // 1. Issue 情報を取得/正規化
+      // 1. Get/normalize Issue information
       const issueInfo = <span class="cstat-no" title="statement not covered" >issue instanceof IssueInfo </span>
         ? issue 
         : await this.fetchIssue(issue);
 <span class="cstat-no" title="statement not covered" >      result.issue = issueInfo;</span>
 &nbsp;
-      // 2. 要件抽出
+      // 2. Extract requirements
 <span class="cstat-no" title="statement not covered" >      result.requirements = this.extractRequirements(issueInfo);</span>
       
-      // 3. 影響範囲分析
+      // 3. Analyze impact scope
 <span class="cstat-no" title="statement not covered" >      result.status = ResolverStatus.ANALYZING;</span>
 <span class="cstat-no" title="statement not covered" >      result.impactAnalysis = await this.analyzeImpact(result.requirements, issueInfo);</span>
 &nbsp;
-      // 4. 変更計画を生成
+      // 4. Generate change plan
 <span class="cstat-no" title="statement not covered" >      result.status = ResolverStatus.IMPLEMENTING;</span>
 <span class="cstat-no" title="statement not covered" >      result.changes = await this.planChanges(issueInfo, result.requirements, result.impactAnalysis);</span>
 &nbsp;
-      // 5. テスト計画を生成
+      // 5. Generate test plan
 <span class="cstat-no" title="statement not covered" >      result.status = ResolverStatus.TESTING;</span>
 <span class="cstat-no" title="statement not covered" >      result.tests = await this.planTests(issueInfo, result.changes);</span>
 &nbsp;
-      // 6. ブランチ名を決定
+      // 6. Determine branch name
 <span class="cstat-no" title="statement not covered" >      result.branchName = this.generateBranchName(issueInfo);</span>
 &nbsp;
-      // 7. Dry run でなければ PR を作成
+      // 7. Create a PR unless in dry run
 <span class="cstat-no" title="statement not covered" >      if (!this.dryRun &amp;&amp; this.github) {</span>
 <span class="cstat-no" title="statement not covered" >        try {</span>
-          // ブランチ作成
+          // Create branch
 <span class="cstat-no" title="statement not covered" >          await this.github.createBranch(result.branchName);</span>
 &nbsp;
-          // 分析結果を Issue にコメント
+          // Comment the analysis result on the Issue
           const analysisComment = <span class="cstat-no" title="statement not covered" >this._formatAnalysisComment(result);</span>
 <span class="cstat-no" title="statement not covered" >          await this.github.addIssueComment(issueInfo.number, analysisComment);</span>
 &nbsp;
-          // ラベル追加
+          // Add labels
 <span class="cstat-no" title="statement not covered" >          await this.github.addLabels(issueInfo.number, ['musubi-analyzed']);</span>
 &nbsp;
-          // PR 作成（Draft）
+          // Create PR (Draft)
           const prBody = <span class="cstat-no" title="statement not covered" >this._formatPRBody(issueInfo, result);</span>
           const pr = <span class="cstat-no" title="statement not covered" >await this.github.createPullRequest({</span>
             title: `${issueInfo.type === IssueType.BUG ? 'fix' : 'feat'}: ${issueInfo.title} (Closes #${issueInfo.number})`,
@@ -1796,7 +1796,7 @@ class IssueResolver {
 <span class="cstat-no" title="statement not covered" >          result.prUrl = pr.html_url;</span>
         } catch (apiError) {
 <span class="cstat-no" title="statement not covered" >          console.warn(`GitHub API error: ${apiError.message}`);</span>
-          // API エラーでも解析結果は返す
+          // Return the analysis result even on API errors
         }
       }
 &nbsp;
@@ -1810,7 +1810,7 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * 分析コメントをフォーマット
+   * Format the analysis comment
    * @param {ResolverResult} result 
    * @returns {string}
    */
@@ -1841,7 +1841,7 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * PR 本文をフォーマット
+   * Format the PR body
    * @param {IssueInfo} issue 
    * @param {ResolverResult} result 
    * @returns {string}
@@ -1874,12 +1874,12 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * Issue を取得
-   * @param {string|number} issueRef - Issue URL または番号
+   * Get an Issue
+   * @param {string|number} issueRef - Issue URL or number
    * @returns {Promise&lt;IssueInfo&gt;}
    */
 <span class="fstat-no" title="function not covered" >  as</span>ync fetchIssue(issueRef) {
-    // URL からパース
+    // Parse from URL
     let issueNumber;
 <span class="cstat-no" title="statement not covered" >    if (typeof issueRef === 'string' &amp;&amp; issueRef.includes('github.com')) {</span>
       const match = <span class="cstat-no" title="statement not covered" >issueRef.match(/\/issues\/(\d+)/);</span>
@@ -1890,7 +1890,7 @@ class IssueResolver {
 <span class="cstat-no" title="statement not covered" >      issueNumber = typeof issueRef === 'number' ? issueRef : parseInt(issueRef);</span>
     }
 &nbsp;
-    // GitHub API で取得
+    // Fetch via the GitHub API
 <span class="cstat-no" title="statement not covered" >    if (this.github &amp;&amp; issueNumber) {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
         const issueData = <span class="cstat-no" title="statement not covered" >await this.github.getIssue(issueNumber);</span>
@@ -1911,11 +1911,11 @@ class IssueResolver {
         });
       } catch (error) {
 <span class="cstat-no" title="statement not covered" >        console.warn(`Failed to fetch issue #${issueNumber} from GitHub: ${error.message}`);</span>
-        // フォールバック
+        // Fallback
       }
     }
 &nbsp;
-    // フォールバック: ローカルモック
+    // Fallback: local mock
 <span class="cstat-no" title="statement not covered" >    return new IssueInfo({</span>
       number: issueNumber,
       title: `Issue #${issueNumber}`,
@@ -1925,7 +1925,7 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * Issue から要件を抽出
+   * Extract requirements from an Issue
    * @param {IssueInfo} issue 
    * @returns {string[]}
    */
@@ -1933,14 +1933,14 @@ class IssueResolver {
     const requirements = <span class="cstat-no" title="statement not covered" >[];</span>
     const content = <span class="cstat-no" title="statement not covered" >issue.fullContent;</span>
 &nbsp;
-    // タスクリスト（チェックボックス）を抽出
+    // Extract the task list (checkboxes)
     const taskPattern = <span class="cstat-no" title="statement not covered" >/- \[[ x]\] (.+)/g;</span>
     let match;
 <span class="cstat-no" title="statement not covered" >    while ((match = taskPattern.exec(content)) !== null) {</span>
 <span class="cstat-no" title="statement not covered" >      requirements.push(match[1].trim());</span>
     }
 &nbsp;
-    // 「should」「must」「need to」パターンを抽出
+    // Extract "should", "must", "need to" patterns
     const requirementPatterns = <span class="cstat-no" title="statement not covered" >[</span>
       /(?:should|must|need to|needs to)\s+(.+?)(?:\.|$)/gi,
       /(?:expected|expect|want)\s+(?:to\s+)?(.+?)(?:\.|$)/gi,
@@ -1955,7 +1955,7 @@ class IssueResolver {
       }
     }
 &nbsp;
-    // Issue タイプに基づくデフォルト要件
+    // Default requirements based on Issue type
 <span class="cstat-no" title="statement not covered" >    if (requirements.length === 0) {</span>
 <span class="cstat-no" title="statement not covered" >      switch (issue.type) {</span>
         case IssueType.BUG:
@@ -1973,7 +1973,7 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * 影響範囲を分析
+   * Analyze impact scope
    * @param {string[]} requirements 
    * @param {IssueInfo} issue 
    * @returns {Promise&lt;ImpactAnalysis&gt;}
@@ -1982,7 +1982,7 @@ class IssueResolver {
     const analysis = <span class="cstat-no" title="statement not covered" >new ImpactAnalysis();</span>
     const content = <span class="cstat-no" title="statement not covered" >issue.fullContent.toLowerCase();</span>
 &nbsp;
-    // ファイルパスの検出
+    // Detect file paths
     const filePattern = <span class="cstat-no" title="statement not covered" >/(?:in|at|file)\s+[`"]?([a-zA-Z0-9_\-./]+\.[a-zA-Z]+)[`"]?/gi;</span>
     let match;
 <span class="cstat-no" title="statement not covered" >    while ((match = filePattern.exec(content)) !== null) {</span>
@@ -1992,7 +1992,7 @@ class IssueResolver {
       }
     }
 &nbsp;
-    // バッククォートで囲まれたパスを検出
+    // Detect paths enclosed in backticks
     const backtickPattern = <span class="cstat-no" title="statement not covered" >/`([a-zA-Z0-9_\-./]+\.[a-zA-Z]+)`/g;</span>
 <span class="cstat-no" title="statement not covered" >    while ((match = backtickPattern.exec(content)) !== null) {</span>
       const filePath = <span class="cstat-no" title="statement not covered" >match[1];</span>
@@ -2001,7 +2001,7 @@ class IssueResolver {
       }
     }
 &nbsp;
-    // コンポーネントの検出
+    // Detect components
     const componentPatterns = <span class="cstat-no" title="statement not covered" >[</span>
       /(?:component|module|class|function)\s+[`"]?(\w+)[`"]?/gi,
       /(\w+)(?:Component|Module|Service|Controller|Manager)/g,
@@ -2016,22 +2016,22 @@ class IssueResolver {
       }
     }
 &nbsp;
-    // 要件IDの検出
+    // Detect requirement IDs
     const reqPattern = <span class="cstat-no" title="statement not covered" >/REQ-[A-Z0-9]+-\d+/g;</span>
     const reqMatches = <span class="cstat-no" title="statement not covered" >issue.fullContent.match(reqPattern) || [];</span>
 <span class="cstat-no" title="statement not covered" >    analysis.relatedRequirements = [...new Set(reqMatches)];</span>
 &nbsp;
-    // リスクレベルの推定
+    // Estimate risk level
 <span class="cstat-no" title="statement not covered" >    analysis.riskLevel = this._estimateRiskLevel(issue, analysis);</span>
 &nbsp;
-    // 工数の推定
+    // Estimate effort
 <span class="cstat-no" title="statement not covered" >    analysis.estimatedEffort = this._estimateEffort(issue, requirements);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return analysis;</span>
   }
 &nbsp;
   /**
-   * リスクレベルを推定
+   * Estimate risk level
    * @param {IssueInfo} issue 
    * @param {ImpactAnalysis} analysis 
    * @returns {string}
@@ -2039,13 +2039,13 @@ class IssueResolver {
 <span class="fstat-no" title="function not covered" >  _e</span>stimateRiskLevel(issue, analysis) {
     const content = <span class="cstat-no" title="statement not covered" >issue.fullContent.toLowerCase();</span>
     
-    // 高リスクキーワード
+    // High-risk keywords
     const highRiskKeywords = <span class="cstat-no" title="statement not covered" >['security', 'authentication', 'authorization', 'database', 'migration', 'production'];</span>
 <span class="cstat-no" title="statement not covered" >    if (highRiskKeywords.some(<span class="fstat-no" title="function not covered" >k </span>=&gt; <span class="cstat-no" title="statement not covered" >content.includes(k))</span>) {</span>
 <span class="cstat-no" title="statement not covered" >      return 'high';</span>
     }
 &nbsp;
-    // 中リスク
+    // Medium risk
 <span class="cstat-no" title="statement not covered" >    if (analysis.affectedFiles.length &gt; 5 || analysis.affectedComponents.length &gt; 3) {</span>
 <span class="cstat-no" title="statement not covered" >      return 'medium';</span>
     }
@@ -2054,7 +2054,7 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * 工数を推定
+   * Estimate effort
    * @param {IssueInfo} issue 
    * @param {string[]} requirements 
    * @returns {string}
@@ -2066,7 +2066,7 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * 変更計画を作成
+   * Create a change plan
    * @param {IssueInfo} issue 
    * @param {string[]} requirements 
    * @param {ImpactAnalysis} impact 
@@ -2075,7 +2075,7 @@ class IssueResolver {
 <span class="fstat-no" title="function not covered" >  as</span>ync planChanges(issue, requirements, impact) {
     const changes = <span class="cstat-no" title="statement not covered" >[];</span>
 &nbsp;
-    // 影響ファイルに対する変更を計画
+    // Plan changes for the affected files
 <span class="cstat-no" title="statement not covered" >    for (const file of impact.affectedFiles) {</span>
 <span class="cstat-no" title="statement not covered" >      changes.push({</span>
         file,
@@ -2084,10 +2084,10 @@ class IssueResolver {
       });
     }
 &nbsp;
-    // Issue タイプに基づく追加変更
+    // Additional changes based on Issue type
 <span class="cstat-no" title="statement not covered" >    if (issue.type === IssueType.BUG &amp;&amp; changes.length === 0) {</span>
 <span class="cstat-no" title="statement not covered" >      changes.push({</span>
-        file: 'src/fix.js', // プレースホルダー
+        file: 'src/fix.js', // Placeholder
         type: 'modify',
         description: `Fix: ${issue.title}`,
       });
@@ -2095,7 +2095,7 @@ class IssueResolver {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (issue.type === IssueType.FEATURE) {</span>
 <span class="cstat-no" title="statement not covered" >      changes.push({</span>
-        file: 'src/new-feature.js', // プレースホルダー
+        file: 'src/new-feature.js', // Placeholder
         type: 'create',
         description: `Implement: ${issue.title}`,
       });
@@ -2105,7 +2105,7 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * テスト計画を作成
+   * Create a test plan
    * @param {IssueInfo} issue 
    * @param {Object[]} changes 
    * @returns {Promise&lt;Object[]&gt;}
@@ -2124,7 +2124,7 @@ class IssueResolver {
       }
     }
 &nbsp;
-    // Issue タイプに基づく追加テスト
+    // Additional tests based on Issue type
 <span class="cstat-no" title="statement not covered" >    if (issue.type === IssueType.BUG) {</span>
 <span class="cstat-no" title="statement not covered" >      tests.push({</span>
         file: 'tests/regression.test.js',
@@ -2137,7 +2137,7 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * ブランチ名を生成
+   * Generate the branch name
    * @param {IssueInfo} issue 
    * @returns {string}
    */
@@ -2152,7 +2152,7 @@ class IssueResolver {
   }
 &nbsp;
   /**
-   * プレビューを生成（dry run用）
+   * Generate a preview (for dry run)
    * @param {ResolverResult} result 
    * @returns {string}
    */

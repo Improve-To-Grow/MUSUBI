@@ -1034,7 +1034,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * MUSUBI Stuck Detector
  * 
- * AIエージェントのスタック状態（無限ループ、繰り返しエラー）を検出
+ * Detects AI agent stuck states (infinite loops, repeated errors)
  * 
  * @module src/analyzers/stuck-detector
  * @see REQ-P0-B001
@@ -1044,7 +1044,7 @@
 const crypto = <span class="cstat-no" title="statement not covered" >require('crypto');</span>
 &nbsp;
 /**
- * スタックイベントの種類
+ * Types of stuck events
  */
 const EventType = <span class="cstat-no" title="statement not covered" >{</span>
   ACTION: 'action',
@@ -1054,7 +1054,7 @@ const EventType = <span class="cstat-no" title="statement not covered" >{</span>
 };
 &nbsp;
 /**
- * SDDステージ
+ * SDD stage
  */
 const Stage = <span class="cstat-no" title="statement not covered" >{</span>
   REQUIREMENTS: 'requirements',
@@ -1065,7 +1065,7 @@ const Stage = <span class="cstat-no" title="statement not covered" >{</span>
 };
 &nbsp;
 /**
- * スタックの種類
+ * Type of stuck state
  */
 const LoopType = <span class="cstat-no" title="statement not covered" >{</span>
   REPEATING_ACTION: 'repeating_action',
@@ -1076,7 +1076,7 @@ const LoopType = <span class="cstat-no" title="statement not covered" >{</span>
 };
 &nbsp;
 /**
- * 深刻度
+ * Severity
  */
 const Severity = <span class="cstat-no" title="statement not covered" >{</span>
   WARNING: 'warning',
@@ -1084,7 +1084,7 @@ const Severity = <span class="cstat-no" title="statement not covered" >{</span>
 };
 &nbsp;
 /**
- * イベントのハッシュを生成
+ * Generate a hash of the event
  * @param {Object} event 
  * @returns {string}
  */
@@ -1098,16 +1098,16 @@ function <span class="fstat-no" title="function not covered" >hashEvent(</span>e
 }
 &nbsp;
 /**
- * スタック分析結果
+ * Stuck analysis result
  */
 class StuckAnalysis {
   /**
    * @param {Object} options
-   * @param {string} options.loopType - スタックの種類
-   * @param {number} options.loopRepeatTimes - 繰り返し回数
-   * @param {number} options.loopStartIndex - ループ開始インデックス
-   * @param {string[]} options.suggestedActions - 推奨アクション
-   * @param {string} options.severity - 深刻度
+   * @param {string} options.loopType - Type of stuck state
+   * @param {number} options.loopRepeatTimes - Number of repetitions
+   * @param {number} options.loopStartIndex - Loop start index
+   * @param {string[]} options.suggestedActions - Suggested actions
+   * @param {string} options.severity - Severity
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    this.loopType = options.loopType;</span>
@@ -1119,18 +1119,18 @@ class StuckAnalysis {
   }
 &nbsp;
   /**
-   * 人間が読める形式のメッセージを生成
+   * Generate a human-readable message
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tMessage() {
     const typeMessages = <span class="cstat-no" title="statement not covered" >{</span>
-      [LoopType.REPEATING_ACTION]: `同じアクションが${this.loopRepeatTimes}回繰り返されています`,
-      [LoopType.ERROR_LOOP]: `同じエラーが${this.loopRepeatTimes}回繰り返されています`,
-      [LoopType.MONOLOGUE]: `出力なしの思考が${this.loopRepeatTimes}ステップ続いています`,
-      [LoopType.CONTEXT_OVERFLOW]: `コンテキスト超過エラーが${this.loopRepeatTimes}回発生しています`,
-      [LoopType.STAGE_OSCILLATION]: `同一ステージ間を${this.loopRepeatTimes}回往復しています`,
+      [LoopType.REPEATING_ACTION]: `The same action has been repeated ${this.loopRepeatTimes} times`,
+      [LoopType.ERROR_LOOP]: `The same error has been repeated ${this.loopRepeatTimes} times`,
+      [LoopType.MONOLOGUE]: `Thinking without output has continued for ${this.loopRepeatTimes} steps`,
+      [LoopType.CONTEXT_OVERFLOW]: `A context overflow error has occurred ${this.loopRepeatTimes} times`,
+      [LoopType.STAGE_OSCILLATION]: `Oscillated between the same stages ${this.loopRepeatTimes} times`,
     };
-<span class="cstat-no" title="statement not covered" >    return typeMessages[this.loopType] || 'スタック状態が検出されました';</span>
+<span class="cstat-no" title="statement not covered" >    return typeMessages[this.loopType] || 'Stuck state detected';</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  to</span>JSON() {
@@ -1147,16 +1147,16 @@ class StuckAnalysis {
 }
 &nbsp;
 /**
- * スタック検出システム
+ * Stuck detection system
  */
 class StuckDetector {
   /**
    * @param {Object} options
-   * @param {number} options.maxRepeatActions - アクション繰り返し検出閾値（デフォルト: 4）
-   * @param {number} options.maxRepeatErrors - エラー繰り返し検出閾値（デフォルト: 3）
-   * @param {number} options.maxMonologueSteps - モノローグ検出閾値（デフォルト: 10）
-   * @param {number} options.maxContextErrors - コンテキスト超過検出閾値（デフォルト: 3）
-   * @param {number} options.maxStageOscillations - ステージ往復検出閾値（デフォルト: 3）
+   * @param {number} options.maxRepeatActions - Action repetition detection threshold (default: 4)
+   * @param {number} options.maxRepeatErrors - Error repetition detection threshold (default: 3)
+   * @param {number} options.maxMonologueSteps - Monologue detection threshold (default: 10)
+   * @param {number} options.maxContextErrors - Context overflow detection threshold (default: 3)
+   * @param {number} options.maxStageOscillations - Stage oscillation detection threshold (default: 3)
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    this.maxRepeatActions = options.maxRepeatActions || 4;</span>
@@ -1170,11 +1170,11 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * イベントを履歴に追加
+   * Add events to history
    * @param {Object} event
-   * @param {string} event.type - イベント種類
-   * @param {string} event.stage - SDDステージ
-   * @param {string} event.content - 内容
+   * @param {string} event.type - Event type
+   * @param {string} event.stage - SDD stage
+   * @param {string} event.content - Content
    */
 <span class="fstat-no" title="function not covered" >  ad</span>dEvent(event) {
     const eventWithMeta = <span class="cstat-no" title="statement not covered" >{</span>
@@ -1190,7 +1190,7 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * 履歴をクリア
+   * Clear the history
    */
 <span class="fstat-no" title="function not covered" >  cl</span>earHistory() {
 <span class="cstat-no" title="statement not covered" >    this.history = [];</span>
@@ -1198,44 +1198,44 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * スタック状態を検出
+   * Detect stuck state
    * @returns {StuckAnalysis|null}
    */
 <span class="fstat-no" title="function not covered" >  de</span>tect() {
-    // 最低3イベント必要
+    // At least 3 events are required
 <span class="cstat-no" title="statement not covered" >    if (this.history.length &lt; 3) {</span>
 <span class="cstat-no" title="statement not covered" >      return null;</span>
     }
 &nbsp;
-    // シナリオ1: 同じアクション・同じ結果の繰り返し
+    // Scenario 1: Repetition of the same action with the same result
     const repeatingAction = <span class="cstat-no" title="statement not covered" >this._detectRepeatingAction();</span>
 <span class="cstat-no" title="statement not covered" >    if (repeatingAction) {</span>
 <span class="cstat-no" title="statement not covered" >      this.stuckAnalysis = repeatingAction;</span>
 <span class="cstat-no" title="statement not covered" >      return repeatingAction;</span>
     }
 &nbsp;
-    // シナリオ2: エラーループ
+    // Scenario 2: Error loop
     const errorLoop = <span class="cstat-no" title="statement not covered" >this._detectErrorLoop();</span>
 <span class="cstat-no" title="statement not covered" >    if (errorLoop) {</span>
 <span class="cstat-no" title="statement not covered" >      this.stuckAnalysis = errorLoop;</span>
 <span class="cstat-no" title="statement not covered" >      return errorLoop;</span>
     }
 &nbsp;
-    // シナリオ3: モノローグ
+    // Scenario 3: Monologue
     const monologue = <span class="cstat-no" title="statement not covered" >this._detectMonologue();</span>
 <span class="cstat-no" title="statement not covered" >    if (monologue) {</span>
 <span class="cstat-no" title="statement not covered" >      this.stuckAnalysis = monologue;</span>
 <span class="cstat-no" title="statement not covered" >      return monologue;</span>
     }
 &nbsp;
-    // シナリオ4: コンテキスト超過ループ
+    // Scenario 4: Context overflow loop
     const contextOverflow = <span class="cstat-no" title="statement not covered" >this._detectContextOverflow();</span>
 <span class="cstat-no" title="statement not covered" >    if (contextOverflow) {</span>
 <span class="cstat-no" title="statement not covered" >      this.stuckAnalysis = contextOverflow;</span>
 <span class="cstat-no" title="statement not covered" >      return contextOverflow;</span>
     }
 &nbsp;
-    // シナリオ5: ステージ往復
+    // Scenario 5: Stage oscillation
     const stageOscillation = <span class="cstat-no" title="statement not covered" >this._detectStageOscillation();</span>
 <span class="cstat-no" title="statement not covered" >    if (stageOscillation) {</span>
 <span class="cstat-no" title="statement not covered" >      this.stuckAnalysis = stageOscillation;</span>
@@ -1247,7 +1247,7 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * シナリオ1: 同じアクション・同じ結果の繰り返しを検出
+   * Scenario 1: Detect repetition of the same action with the same result
    * @private
    * @returns {StuckAnalysis|null}
    */
@@ -1274,7 +1274,7 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * シナリオ2: エラーループを検出
+   * Scenario 2: Detect error loops
    * @private
    * @returns {StuckAnalysis|null}
    */
@@ -1305,7 +1305,7 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * シナリオ3: モノローグ（出力なしの思考継続）を検出
+   * Scenario 3: Detect monologue (continued thinking without output)
    * @private
    * @returns {StuckAnalysis|null}
    */
@@ -1317,8 +1317,8 @@ class StuckDetector {
     const lastN = <span class="cstat-no" title="statement not covered" >this.history.slice(-this.maxMonologueSteps);</span>
     const allMessages = <span class="cstat-no" title="statement not covered" >lastN.every(<span class="fstat-no" title="function not covered" >e </span>=&gt; </span>
 <span class="cstat-no" title="statement not covered" >      e.type === EventType.MESSAGE &amp;&amp; </span>
-      !e.content.includes('```') &amp;&amp;  // コードブロックなし
-      e.content.length &lt; 500  // 短いメッセージ
+      !e.content.includes('```') &amp;&amp;  // No code block
+      e.content.length &lt; 500  // Short message
     );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (allMessages) {</span>
@@ -1335,7 +1335,7 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * シナリオ4: コンテキスト超過ループを検出
+   * Scenario 4: Detect context overflow loops
    * @private
    * @returns {StuckAnalysis|null}
    */
@@ -1374,7 +1374,7 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * シナリオ5: ステージ往復を検出
+   * Scenario 5: Detect stage oscillation
    * @private
    * @returns {StuckAnalysis|null}
    */
@@ -1387,13 +1387,13 @@ class StuckDetector {
     const lastN = <span class="cstat-no" title="statement not covered" >this.history.slice(-minEvents);</span>
     const stages = <span class="cstat-no" title="statement not covered" >lastN.map(<span class="fstat-no" title="function not covered" >e </span>=&gt; <span class="cstat-no" title="statement not covered" >e.stage)</span>;</span>
     
-    // 2つのステージ間を往復しているかチェック
+    // Check whether it is oscillating between two stages
     const uniqueStages = <span class="cstat-no" title="statement not covered" >[...new Set(stages)];</span>
 <span class="cstat-no" title="statement not covered" >    if (uniqueStages.length !== 2) {</span>
 <span class="cstat-no" title="statement not covered" >      return null;</span>
     }
 &nbsp;
-    // 交互パターンのチェック
+    // Check for an alternating pattern
     let oscillations = <span class="cstat-no" title="statement not covered" >0;</span>
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >1;</span> i &lt; stages.length; i++) {</span>
 <span class="cstat-no" title="statement not covered" >      if (stages[i] !== stages[i - 1]) {</span>
@@ -1415,49 +1415,49 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * 代替アプローチを提案
+   * Suggest alternative approaches
    * @param {string} loopType 
    * @returns {string[]}
    */
 <span class="fstat-no" title="function not covered" >  _s</span>uggestAlternatives(loopType) {
     const suggestions = <span class="cstat-no" title="statement not covered" >{</span>
       [LoopType.REPEATING_ACTION]: [
-        '別のアプローチを試してください',
-        '要件を再確認してください',
-        '問題を小さなステップに分解してください',
-        '一時的に別のタスクに取り組んでください',
+        'Try a different approach',
+        'Re-check the requirements',
+        'Break the problem down into smaller steps',
+        'Temporarily work on a different task',
       ],
       [LoopType.ERROR_LOOP]: [
-        'エラーメッセージを詳しく確認してください',
-        '依存関係を確認してください',
-        '環境設定を見直してください',
-        'デバッグ情報を追加してください',
+        'Review the error message in detail',
+        'Check the dependencies',
+        'Review the environment settings',
+        'Add debugging information',
       ],
       [LoopType.MONOLOGUE]: [
-        '具体的なアクションを実行してください',
-        'コードを書いてください',
-        'テストを実行してください',
-        'ユーザーに質問してください',
+        'Perform a concrete action',
+        'Write the code',
+        'Run the tests',
+        'Ask the user a question',
       ],
       [LoopType.CONTEXT_OVERFLOW]: [
-        'メモリコンデンサーを有効にしてください',
-        '不要なコンテキストを削除してください',
-        'セッションを分割してください',
-        '要約を生成してください',
+        'Enable the memory condenser',
+        'Remove unnecessary context',
+        'Split the session',
+        'Generate a summary',
       ],
       [LoopType.STAGE_OSCILLATION]: [
-        '現在のステージを完了させてください',
-        '受入基準を明確にしてください',
-        'ステージの完了条件を確認してください',
-        'ブロッカーを特定してください',
+        'Complete the current stage',
+        'Clarify the acceptance criteria',
+        'Check the stage completion conditions',
+        'Identify the blockers',
       ],
     };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return suggestions[loopType] || ['状態を確認してください'];</span>
+<span class="cstat-no" title="statement not covered" >    return suggestions[loopType] || ['Check the state'];</span>
   }
 &nbsp;
   /**
-   * 現在の分析結果を取得
+   * Get the current analysis result
    * @returns {StuckAnalysis|null}
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tAnalysis() {
@@ -1465,7 +1465,7 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * 履歴を取得
+   * Get the history
    * @returns {Object[]}
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tHistory() {
@@ -1473,7 +1473,7 @@ class StuckDetector {
   }
 &nbsp;
   /**
-   * 履歴をMarkdown形式でエクスポート
+   * Export the history in Markdown format
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  ex</span>portHistory() {

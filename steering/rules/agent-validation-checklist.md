@@ -23,69 +23,47 @@ All agents must meet these criteria:
 **Pattern**:
 ```markdown
 **📋 Steering Context (Project Memory):**
-このプロジェクトにsteeringファイルが存在する場合は、**必ず最初に参照**してください：
-- `steering/structure.md` - アーキテクチャパターン、ディレクトリ構造、命名規則
-- `steering/tech.md` - 技術スタック、フレームワーク、開発ツール
-- `steering/product.md` - ビジネスコンテキスト、製品目的、ユーザー
+If steering files exist in this project, **always refer to them first**:
+- `steering/structure.md` - Architecture patterns, directory structure, naming conventions
+- `steering/tech.md` - Technology stack, frameworks, development tools
+- `steering/product.md` - Business context, product purpose, users
 
-これらのファイルはプロジェクト全体の「記憶」であり、一貫性のある開発に不可欠です。
-ファイルが存在しない場合はスキップして通常通り進めてください。
+These files are the "memory" of the entire project and are essential for consistent development.
+If the files do not exist, skip this step and proceed as usual.
 ```
 
 ---
 
 ### 2. Document Language Policy
 
-**Requirement**: All agents that create documents must have bilingual policy
+**Requirement**: All agents that create documents must have a Documentation Language Policy
 
 **Check**:
 - [ ] Has "Documentation Language Policy" section
-- [ ] Specifies English-first, then Japanese translation
-- [ ] Has file naming convention (`.md` and `.ja.md`)
-- [ ] Instructs to create both versions for EACH deliverable
+- [ ] Specifies English documents (`filename.md`) and English user communication
 
 **Pattern**:
 ```markdown
 ## Documentation Language Policy
 
-**CRITICAL: 英語版と日本語版の両方を必ず作成**
-
-### Document Creation
-1. **Primary Language**: Create all documentation in **English** first
-2. **Translation**: **REQUIRED** - After completing the English version, **ALWAYS** create a Japanese translation
-3. **Both versions are MANDATORY** - Never skip the Japanese version
-4. **File Naming Convention**:
-   - English version: `filename.md`
-   - Japanese version: `filename.ja.md`
+- Write all documentation and deliverables in **English** (e.g. `design-document.md`).
+- Communicate with the user in English.
 ```
+
+Bilingual output (an additional translation such as `filename.ja.md`) is optional. When it is enabled,
+this section is replaced by the bilingual policy template in
+[BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md).
 
 ---
 
 ### 3. Document Reference Policy
 
-**Requirement**: Agents must reference English versions of documents
+**Requirement**: Agents must reference the canonical `.md` documents
 
 **Check**:
-- [ ] Has "Document Reference" section
-- [ ] Specifies to always reference `.md` files (not `.ja.md`)
-- [ ] Provides examples of correct/incorrect references
-
-**Pattern**:
-```markdown
-### Document Reference
-
-**CRITICAL: 他のエージェントの成果物を参照する際の必須ルール**
-
-1. **Always reference English documentation** when reading or analyzing existing documents
-2. **他のエージェントが作成した成果物を読み込む場合は、必ず英語版（`.md`）を参照する**
-3. When citing documentation in your deliverables, reference the English version
-
-**参照例:**
-```
-✅ 正しい: requirements/srs/srs-project-v1.0.md
-❌ 間違い: requirements/srs/srs-project-v1.0.ja.md
-```
-```
+- [ ] References other agents' deliverables by their `.md` file paths
+- [ ] If bilingual output is enabled: references the English `.md` files, never translations
+  (see [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md))
 
 ---
 
@@ -107,7 +85,7 @@ All agents must meet these criteria:
 **Check**:
 - [ ] Has structured dialogue phases
 - [ ] Each question is asked one at a time
-- [ ] Includes `👤 ユーザー: [回答待ち]` after each question
+- [ ] Includes `👤 User: [Awaiting response]` after each question
 - [ ] Prohibits asking multiple questions at once
 
 ---
@@ -377,7 +355,6 @@ If an agent fails validation:
 5. **Update Templates**:
    - Ensure templates use latest standards
    - Add EARS format where appropriate
-   - Include bilingual file naming
 
 ---
 

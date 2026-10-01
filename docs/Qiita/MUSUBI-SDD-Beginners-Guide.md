@@ -1,309 +1,309 @@
-# MUSUBI ではじめる仕様駆動開発入門 - Vibe CodingからSDD（Specification Driven Development）へ
+# Getting Started with Specification Driven Development using MUSUBI - From Vibe Coding to SDD (Specification Driven Development)
 
-> **MUSUBI v2.1.1** - 7つのAIエージェント対応、25スキル搭載の究極仕様駆動開発ツール
+> **MUSUBI v2.1.1** - The ultimate specification driven development tool: supports 7 AI agents and ships with 25 skills
 > 
-> 🆕 v2.0新機能: CodeGraph MCP統合によりプロジェクト全体のコード理解力を獲得！
+> 🆕 New in v2.0: CodeGraph MCP integration gives the AI an understanding of the entire project's code!
 
-## はじめに
+## Introduction
 
-「GitHub CopilotやClaude Codeを使えば、もう設計書なんていらないよね？」
+"If you use GitHub Copilot or Claude Code, you don't need design documents anymore, right?"
 
-そう思っているあなた、ちょっと待ってください。確かにAIコーディングアシスタントの登場で、コーディング速度は飛躍的に向上しました。しかし、**速く書けること**と**正しく作れること**は別問題です。
+If that's what you think, wait a moment. It's true that AI coding assistants have dramatically increased coding speed. However, **writing fast** and **building the right thing** are two different problems.
 
-この記事では、AIコーディング時代に真に必要な「仕様駆動開発（SDD）」と、それを実現する究極のツール「**MUSUBI**」の使い方を、実践を交えながらステップバイステップで解説します。
+In this article, I explain step by step, with practical examples, "Specification Driven Development (SDD)", which is truly needed in the age of AI coding, and how to use "**MUSUBI**", the ultimate tool for putting it into practice.
 
-**初心者の方へ**: MUSUBIには25の専門エージェントがありますが、最初は **`@orchestrator`（オーケストレーター）だけ覚えればOK** です。orchestratorがあなたの代わりに適切な専門エージェントを呼び出してくれます。
+**For beginners**: MUSUBI has 25 specialized agents, but at first **you only need to remember `@orchestrator`**. The orchestrator calls the appropriate specialized agents on your behalf.
 
-**v2.0の進化**: MUSUBI v2.0では[CodeGraph MCP Server](https://qiita.com/hisaho/items/b99ac51d78119ef60b6b)との統合により、AIエージェントが「ファイル単位」から「プロジェクト全体」を理解できるようになりました。
+**Evolution in v2.0**: MUSUBI v2.0 integrates with the [CodeGraph MCP Server](https://qiita.com/hisaho/items/b99ac51d78119ef60b6b), so AI agents can now understand the "entire project" rather than just "individual files".
 
-## Vibe Coding vs SDD（Specification Driven Development）
+## Vibe Coding vs SDD (Specification Driven Development)
 
-### Vibe Codingとは？
+### What Is Vibe Coding?
 
-**Vibe Coding**とは、詳細な設計や仕様書なしに、「なんとなく（Vibe）」でコードを書き進める開発スタイルです。
+**Vibe Coding** is a development style in which you keep writing code based on a "vague feeling (vibe)", without detailed design or specification documents.
 
 ```
-開発者「ユーザー認証機能を作って」
+Developer: "Build a user authentication feature"
 ↓
-AI「はい、こんな感じでコード書きました！」
+AI: "Sure, here's the code I wrote!"
 ↓
-開発者「いいね！次はパスワードリセット機能も」
+Developer: "Nice! Next, a password reset feature too"
 ↓
-AI「できました！」
+AI: "Done!"
 ↓
-繰り返し...
+Repeat...
 ```
 
-#### Vibe Codingの問題点
+#### Problems with Vibe Coding
 
-1. **仕様の曖昧性**: 「認証機能」と言っても、何をどこまで実装するか不明確
-2. **トレーサビリティ欠如**: なぜこのコードが必要なのか、後から追跡不可能
-3. **テストの不完全性**: 仕様がないので、何をテストすべきか不明
-4. **変更の困難性**: 既存コードへの影響範囲が不明
-5. **品質の不安定性**: AIの出力に依存、一貫性なし
+1. **Ambiguous specifications**: Even if you say "authentication feature", it's unclear what to implement and how far to go
+2. **Lack of traceability**: It's impossible to trace afterward why this code is needed
+3. **Incomplete testing**: With no specification, it's unclear what should be tested
+4. **Difficulty of change**: The impact on existing code is unknown
+5. **Unstable quality**: Depends on the AI's output, with no consistency
 
-実際の現場では：
-
-```
-❌ Vibe Codingの末路:
-- 「あれ、このコード何のためにあるんだっけ？」
-- 「テストケース足りてる？何をテストすればいい？」
-- 「この変更、他に影響ないよね？...たぶん」
-- 「リリース直前にバグ発覚、原因不明」
-```
-
-### SDD（Specification Driven Development）とは？
-
-**仕様駆動開発（SDD）** は、**明確な仕様を起点** として開発を進めるアプローチです。
+In real-world practice:
 
 ```
-要件定義（EARS形式）
-  ↓
-設計（C4モデル + ADR）
-  ↓
-タスク分解（要件カバレッジマトリックス）
-  ↓
-実装（テストファースト）
-  ↓
-テスト（要件に対するトレーサビリティ）
-  ↓
-デプロイ
-  ↓
-モニタリング
+❌ The fate of Vibe Coding:
+- "Wait, what is this code even for?"
+- "Do we have enough test cases? What should we test?"
+- "This change doesn't affect anything else, right?... probably"
+- "A bug was found right before release, and the cause is unknown"
 ```
 
-#### SDDの利点
+### What Is SDD (Specification Driven Development)?
 
-1. **明確な仕様**: 曖昧さのない要件（EARS形式）
-2. **完全なトレーサビリティ**: 要件 → 設計 → コード → テスト の追跡可能性
-3. **包括的なテスト**: すべての要件に対するテストケース
-4. **安全な変更**: 影響範囲の可視化（Delta Specs）
-5. **一貫した品質**: 憲法ガバナンスによる品質保証
+**Specification Driven Development (SDD)** is an approach that proceeds with development **starting from a clear specification**.
 
-## GitHub Copilot / Claude Code との違い
+```
+Requirements definition (EARS format)
+  ↓
+Design (C4 model + ADR)
+  ↓
+Task breakdown (requirements coverage matrix)
+  ↓
+Implementation (test-first)
+  ↓
+Testing (traceability to requirements)
+  ↓
+Deployment
+  ↓
+Monitoring
+```
 
-### 従来のAIコーディングアシスタント
+#### Benefits of SDD
 
-| ツール | 得意なこと | 苦手なこと |
+1. **Clear specifications**: Unambiguous requirements (EARS format)
+2. **Complete traceability**: Traceability of requirements → design → code → tests
+3. **Comprehensive testing**: Test cases for every requirement
+4. **Safe changes**: Visualization of impact scope (Delta Specs)
+5. **Consistent quality**: Quality assurance through Constitutional governance
+
+## Differences from GitHub Copilot / Claude Code
+
+### Traditional AI Coding Assistants
+
+| Tool | Strengths | Weaknesses |
 |--------|-----------|-----------|
-| **GitHub Copilot** | コード補完、関数生成 | 要件定義、アーキテクチャ設計、トレーサビリティ |
-| **Claude Code** | 対話的コーディング、リファクタリング | 仕様管理、品質ゲート、変更影響分析 |
-| **Cursor** | マルチファイル編集、コンテキスト理解 | 要件追跡、テスト戦略、憲法ガバナンス |
+| **GitHub Copilot** | Code completion, function generation | Requirements definition, architecture design, traceability |
+| **Claude Code** | Interactive coding, refactoring | Specification management, quality gates, change impact analysis |
+| **Cursor** | Multi-file editing, context understanding | Requirements tracking, test strategy, Constitutional governance |
 
-これらは **「コーディング支援ツール」** であり、**「開発プロセス全体」** はカバーしていません。
+These are **"coding assistance tools"** and do not cover the **"entire development process"**.
 
-### MUSUBIの違い - 開発プロセス全体をカバー
+### How MUSUBI Differs - Covers the Entire Development Process
 
-MUSUBIは、**7つのAIコーディングエージェント**と統合し、**25の専門エージェント**で**SDDワークフロー全体**を支援します。
+MUSUBI integrates with **7 AI coding agents** and supports the **entire SDD workflow** with **25 specialized agents**.
 
-#### MUSUBI = AIコーディングアシスタント + SDD完全フレームワーク
+#### MUSUBI = AI Coding Assistant + Complete SDD Framework
 
-| カテゴリ | 従来のツール（Copilot/Claude Code/Cursor） | MUSUBI |
+| Category | Traditional tools (Copilot/Claude Code/Cursor) | MUSUBI |
 |---------|------------------------------------------|--------|
-| **対応範囲** | コード補完・生成のみ | 開発プロセス全体（要件→モニタリング） |
-| **1. 要件定義** | ❌ 対応なし | ✅ EARS形式 + @requirements-analyst |
-| **2. 設計** | ❌ 対応なし | ✅ C4モデル + ADR + @system-architect |
-| **3. タスク分解** | ❌ 対応なし | ✅ 要件カバレッジマトリックス + @project-manager |
-| **4. 実装** | ✅ コード生成 | ✅ テストファースト + @software-developer |
-| **5. テスト** | △ 部分的 | ✅ 要件トレーサビリティ + @test-engineer |
-| **6. レビュー** | △ 部分的 | ✅ SOLID原則チェック + @code-reviewer |
-| **7. セキュリティ** | ❌ 対応なし | ✅ OWASP Top 10 + @security-auditor |
-| **8. デプロイ** | ❌ 対応なし | ✅ CI/CD自動化 + @devops-engineer |
-| **9. モニタリング** | ❌ 対応なし | ✅ SLO/SLI + @site-reliability-engineer |
-| **品質保証** | なし | ✅ 憲法ガバナンス（9条項） |
-| **トレーサビリティ** | なし | ✅ 要件→設計→コード→テスト 100%追跡 |
-| **プロジェクト記憶** | なし | ✅ Steering（構造・技術・製品コンテキスト） |
+| **Coverage** | Code completion and generation only | Entire development process (requirements → monitoring) |
+| **1. Requirements** | ❌ Not supported | ✅ EARS format + @requirements-analyst |
+| **2. Design** | ❌ Not supported | ✅ C4 model + ADR + @system-architect |
+| **3. Task Breakdown** | ❌ Not supported | ✅ Requirements coverage matrix + @project-manager |
+| **4. Implementation** | ✅ Code generation | ✅ Test-first + @software-developer |
+| **5. Testing** | △ Partial | ✅ Requirements traceability + @test-engineer |
+| **6. Review** | △ Partial | ✅ SOLID principles check + @code-reviewer |
+| **7. Security** | ❌ Not supported | ✅ OWASP Top 10 + @security-auditor |
+| **8. Deployment** | ❌ Not supported | ✅ CI/CD automation + @devops-engineer |
+| **9. Monitoring** | ❌ Not supported | ✅ SLO/SLI + @site-reliability-engineer |
+| **Quality Assurance** | None | ✅ Constitutional governance (9 Articles) |
+| **Traceability** | None | ✅ 100% tracking of requirements → design → code → tests |
+| **Project Memory** | None | ✅ Steering (structure, tech, and product context) |
 
-### 具体例: ユーザー認証機能の開発
+### Concrete Example: Developing a User Authentication Feature
 
-#### ❌ Vibe Coding（GitHub Copilot単体）
+#### ❌ Vibe Coding (GitHub Copilot alone)
 
 ```bash
-開発者: 「ユーザー認証機能を作って」
-Copilot: [コード生成]
+Developer: "Build a user authentication feature"
+Copilot: [Generates code]
 
-# 問題:
-- どんな認証方式？（JWT? Session? OAuth?）
-- パスワードポリシーは？
-- エラーハンドリングは？
-- テストケースは？
-- 既存コードへの影響は？
+# Problems:
+- What authentication method? (JWT? Session? OAuth?)
+- What about the password policy?
+- What about error handling?
+- What about test cases?
+- What is the impact on existing code?
 ```
 
 #### ✅ SDD with MUSUBI
 
 ```bash
-1. 要件定義（@requirements-analyst）
-   WHEN ユーザーが有効な認証情報を提供する場合、
-   THEN システムSHALLユーザーを認証する
-   AND システムSHALLセッショントークンを発行する
+1. Requirements definition (@requirements-analyst)
+   WHEN the user provides valid credentials,
+   THEN the system SHALL authenticate the user
+   AND the system SHALL issue a session token
 
-2. 設計（@system-architect）
-   - JWT認証方式
-   - BCrypt パスワードハッシュ
-   - Redis セッション管理
-   - ADR-001: なぜJWTを選択したか記録
+2. Design (@system-architect)
+   - JWT authentication method
+   - BCrypt password hashing
+   - Redis session management
+   - ADR-001: Record why JWT was chosen
 
-3. タスク分解（@project-manager）
-   - Task 1: User modelの作成（REQ-AUTH-001に対応）
-   - Task 2: JWT生成ロジック（REQ-AUTH-002に対応）
-   - Task 3: 認証ミドルウェア（REQ-AUTH-003に対応）
+3. Task breakdown (@project-manager)
+   - Task 1: Create User model (corresponds to REQ-AUTH-001)
+   - Task 2: JWT generation logic (corresponds to REQ-AUTH-002)
+   - Task 3: Authentication middleware (corresponds to REQ-AUTH-003)
 
-4. 実装（@software-developer）
-   [要件に基づくコード生成]
+4. Implementation (@software-developer)
+   [Code generation based on requirements]
 
-5. テスト（@test-engineer）
-   - REQ-AUTH-001: 有効な認証情報でトークン発行確認
-   - REQ-AUTH-002: 無効な認証情報でエラー確認
-   - REQ-AUTH-003: セッション有効期限確認
+5. Testing (@test-engineer)
+   - REQ-AUTH-001: Verify token issuance with valid credentials
+   - REQ-AUTH-002: Verify error with invalid credentials
+   - REQ-AUTH-003: Verify session expiration
 
-6. トレーサビリティ確認（@traceability-auditor）
+6. Traceability check (@traceability-auditor)
    ✅ REQ-AUTH-001 → Design Section 7 → AuthService.login() → test/auth.test.ts:L25
 ```
 
-**結果**: すべてが追跡可能、テスト完全、品質保証、変更影響明確
+**Result**: Everything is traceable, testing is complete, quality is assured, and change impact is clear
 
-## MUSUBIの基本概念
+## MUSUBI Core Concepts
 
-### 1. EARS形式要件
+### 1. EARS-Format Requirements
 
-**EARS（Easy Approach to Requirements Syntax）** は、曖昧さを排除した要件記述形式です。
+**EARS (Easy Approach to Requirements Syntax)** is a requirements notation format that eliminates ambiguity.
 
 ```markdown
-❌ 曖昧な要件:
-「ユーザーはログインできるようにする」
+❌ Ambiguous requirement:
+"Users should be able to log in"
 
-✅ EARS形式:
-WHEN ユーザーが有効なメールアドレスとパスワードを入力する場合、
-THEN システムSHALLユーザー認証を実行する
-AND システムSHALL JWTトークンを発行する
-AND システムSHALLユーザーをダッシュボードにリダイレクトする
+✅ EARS format:
+WHEN the user enters a valid email address and password,
+THEN the system SHALL perform user authentication
+AND the system SHALL issue a JWT token
+AND the system SHALL redirect the user to the dashboard
 
-IF パスワードが3回連続で間違っている場合、
-THEN システムSHALLアカウントを15分間ロックする
-AND システムSHALLユーザーにメール通知を送信する
+IF the password is wrong 3 times in a row,
+THEN the system SHALL lock the account for 15 minutes
+AND the system SHALL send an email notification to the user
 ```
 
-#### EARS 5パターン
+#### The 5 EARS Patterns
 
-1. **Event-driven（イベント駆動）**: `WHEN [event], the system SHALL [response]`
-2. **State-driven（状態駆動）**: `WHILE [state], the system SHALL [response]`
-3. **Unwanted behavior（望まない動作）**: `IF [error], THEN the system SHALL [response]`
-4. **Optional features（オプション機能）**: `WHERE [feature enabled], the system SHALL [response]`
-5. **Ubiquitous（普遍的）**: `The system SHALL [requirement]`
+1. **Event-driven**: `WHEN [event], the system SHALL [response]`
+2. **State-driven**: `WHILE [state], the system SHALL [response]`
+3. **Unwanted behavior**: `IF [error], THEN the system SHALL [response]`
+4. **Optional features**: `WHERE [feature enabled], the system SHALL [response]`
+5. **Ubiquitous**: `The system SHALL [requirement]`
 
-### 2. プロジェクトメモリ（Steering）
+### 2. Project Memory (Steering)
 
-**Steering**は、プロジェクトの「記憶」です。すべての専門エージェントがこれを参照することで、一貫性のある開発を実現します。
+**Steering** is the project's "memory". Every specialized agent refers to it, enabling consistent development.
 
 ```
 steering/
-├── product.md      # ビジネスコンテキスト、ユーザー、目的
-├── structure.md    # アーキテクチャパターン、ディレクトリ構造
-└── tech.md         # 技術スタック、ライブラリ、開発ツール
+├── product.md      # Business context, users, purpose
+├── structure.md    # Architecture patterns, directory structure
+└── tech.md         # Tech stack, libraries, development tools
 ```
 
-### 3. 憲法ガバナンス（9条項）
+### 3. Constitutional Governance (9 Articles)
 
-MUSUBIは**9つの不変憲法条項**で品質を保証します。
+MUSUBI assures quality through **9 immutable Constitutional Articles**.
 
 ```
-Article I:   ライブラリファースト（lib/から始める）
-Article II:  CLIインターフェース義務（すべてCLI実行可能）
-Article III: テストファースト（RED-GREEN-BLUE）
-Article IV:  EARS要件形式（曖昧性排除）
-Article V:   トレーサビリティ義務（100%追跡可能）
-Article VI:  プロジェクトメモリ参照（Steering優先）
-Article VII: シンプリシティゲート（最大3ライブラリから）
-Article VIII:アンチアブストラクション（不要なラッパー禁止）
-Article IX:  インテグレーションファーストテスト（実サービス使用）
+Article I:   Library-First (start from lib/)
+Article II:  CLI Interface Mandate (everything is runnable via CLI)
+Article III: Test-First (RED-GREEN-BLUE)
+Article IV:  EARS Requirements Format (eliminate ambiguity)
+Article V:   Traceability Mandate (100% traceable)
+Article VI:  Project Memory Reference (Steering first)
+Article VII: Simplicity Gate (start with at most 3 libraries)
+Article VIII: Anti-Abstraction (no unnecessary wrappers)
+Article IX:  Integration-First Testing (use real services)
 ```
 
-### 4. 25の専門エージェント
+### 4. 25 Specialized Agents
 
-MUSUBIは25の専門エージェントを提供し、**全7プラットフォーム**で利用可能です。
+MUSUBI provides 25 specialized agents, available on **all 7 platforms**.
 
-#### 🌟 オーケストレーション（3エージェント）- **初心者はここから！**
+#### 🌟 Orchestration (3 agents) - **Beginners start here!**
 
-- **`@orchestrator`** - **複雑なタスクの自動調整（初心者推奨！）**
-  - 他の24エージェントを自動的に呼び出し
-  - タスクを分析して最適なワークフローを実行
-  - **「タスクコメント機能を作って」だけで、要件定義→設計→実装→テストまで自動実行**
-- `@steering` - プロジェクトメモリ管理
-- `@constitution-enforcer` - 品質ゲート検証
+- **`@orchestrator`** - **Automatic coordination of complex tasks (recommended for beginners!)**
+  - Automatically calls the other 24 agents
+  - Analyzes the task and runs the optimal workflow
+  - **Just say "Build a task comment feature" and it runs everything automatically, from requirements definition to design, implementation, and testing**
+- `@steering` - Project memory management
+- `@constitution-enforcer` - Quality gate validation
 
-#### 要件・計画（3エージェント）
-- `@requirements-analyst` - EARS形式要件作成
-- `@project-manager` - タスク管理、スケジューリング
-- `@change-impact-analyzer` - 変更影響分析
+#### Requirements & Planning (3 agents)
+- `@requirements-analyst` - EARS-format requirements creation
+- `@project-manager` - Task management, scheduling
+- `@change-impact-analyzer` - Change impact analysis
 
-#### 設計（4エージェント）
-- `@system-architect` - システム設計、ADR
-- `@api-designer` - API設計
-- `@database-schema-designer` - DB設計
-- `@ui-ux-designer` - UI/UX設計
+#### Design (4 agents)
+- `@system-architect` - System design, ADR
+- `@api-designer` - API design
+- `@database-schema-designer` - DB design
+- `@ui-ux-designer` - UI/UX design
 
-#### 開発・品質（6エージェント）
-- `@software-developer` - コード実装
-- `@test-engineer` - テスト作成
-- `@code-reviewer` - コードレビュー
-- `@bug-hunter` - バグ調査
-- `@quality-assurance` - QA戦略
-- `@traceability-auditor` - トレーサビリティ監査
+#### Development & Quality (6 agents)
+- `@software-developer` - Code implementation
+- `@test-engineer` - Test creation
+- `@code-reviewer` - Code review
+- `@bug-hunter` - Bug investigation
+- `@quality-assurance` - QA strategy
+- `@traceability-auditor` - Traceability audit
 
-#### セキュリティ・パフォーマンス（2エージェント）
-- `@security-auditor` - セキュリティ監査
-- `@performance-optimizer` - パフォーマンス最適化
+#### Security & Performance (2 agents)
+- `@security-auditor` - Security audit
+- `@performance-optimizer` - Performance optimization
 
-#### インフラ・運用（5エージェント）
+#### Infrastructure & Operations (5 agents)
 - `@devops-engineer` - CI/CD
-- `@cloud-architect` - クラウド設計
-- `@database-administrator` - DB運用
-- `@site-reliability-engineer` - 本番監視
-- `@release-coordinator` - リリース管理
+- `@cloud-architect` - Cloud design
+- `@database-administrator` - DB operations
+- `@site-reliability-engineer` - Production monitoring
+- `@release-coordinator` - Release management
 
-#### ドキュメント・専門（2エージェント）
-- `@technical-writer` - 技術文書作成
-- `@ai-ml-engineer` - ML開発
+#### Documentation & Specialized (2 agents)
+- `@technical-writer` - Technical documentation
+- `@ai-ml-engineer` - ML development
 
-## 実践！MUSUBIで始めるSDD
+## Hands-On! Getting Started with SDD Using MUSUBI
 
-それでは、実際にMUSUBIを使ってプロジェクトを進めてみましょう。
+Now, let's actually move a project forward with MUSUBI.
 
-### 前提条件
+### Prerequisites
 
-- Node.js 18以上
-- 任意のAIコーディングエージェント（Claude Code、GitHub Copilot、Cursor など）
+- Node.js 18 or later
+- Any AI coding agent (Claude Code, GitHub Copilot, Cursor, etc.)
 
-### ステップ1: MUSUBIのインストール
+### Step 1: Install MUSUBI
 
 ```bash
-# npx経由（推奨）
-npx musubi-sdd init --claude      # Claude Code使用の場合
-npx musubi-sdd init --copilot     # GitHub Copilot使用の場合
-npx musubi-sdd init --cursor      # Cursor使用の場合
+# Via npx (recommended)
+npx musubi-sdd init --claude      # If using Claude Code
+npx musubi-sdd init --copilot     # If using GitHub Copilot
+npx musubi-sdd init --cursor      # If using Cursor
 
-# またはグローバルインストール
+# Or install globally
 npm install -g musubi-sdd
 musubi init --claude
 ```
 
-実行すると、以下のファイル・ディレクトリが作成されます。
+Running this creates the following files and directories.
 
 ```
 your-project/
-├── .claude/           # Claude Code Skills（Claude Code使用の場合）
-│   └── skills/        # 25個のスキル定義
-├── .github/           # GitHub Copilot Agents（Copilot使用の場合）
-│   └── agents/        # 25個のエージェント定義
-├── steering/          # プロジェクトメモリ（全エージェント共通）
+├── .claude/           # Claude Code Skills (if using Claude Code)
+│   └── skills/        # 25 skill definitions
+├── .github/           # GitHub Copilot Agents (if using Copilot)
+│   └── agents/        # 25 agent definitions
+├── steering/          # Project memory (shared by all agents)
 │   ├── product.md
 │   ├── structure.md
 │   └── tech.md
 └── steering/
     ├── rules/
-    │   ├── workflow.md           # 8段階SDDワークフロー
-    │   ├── ears-format.md        # EARS要件記述ガイド
+    │   ├── workflow.md           # 8-stage SDD workflow
+    │   ├── ears-format.md        # EARS requirements writing guide
     │   └── agent-validation-checklist.md
     └── templates/
         ├── requirements.md
@@ -312,55 +312,55 @@ your-project/
         └── research.md
 ```
 
-### ステップ2: プロジェクトメモリの生成
+### Step 2: Generate Project Memory
 
-MUSUBIの最初のステップは、プロジェクトの「記憶」を作ることです。
+The first step in MUSUBI is to create the project's "memory".
 
-#### 🎯 初心者向け（orchestrator使用）
+#### 🎯 For Beginners (Using the Orchestrator)
 
-**Claude Code の場合**:
+**For Claude Code**:
 ```
-あなた: @orchestrator このプロジェクトの初期設定をお願いします。タスク管理SaaSを開発予定です。
-```
-
-**GitHub Copilot / Cursor の場合**:
-```
-あなた: @orchestrator このプロジェクトの初期設定をお願いします。タスク管理SaaSを開発予定です。
+You: @orchestrator Please do the initial setup for this project. We plan to develop a task management SaaS.
 ```
 
-Orchestratorが自動的に:
-1. `@steering` を呼び出してプロジェクトメモリを生成
-2. 技術スタックの推奨を提示
-3. ディレクトリ構造の提案
-
-#### 💡 上級者向け（直接呼び出し）
-
+**For GitHub Copilot / Cursor**:
 ```
-あなた: @steering このプロジェクトのコンテキストを分析して、ステアリングファイルを生成してください
+You: @orchestrator Please do the initial setup for this project. We plan to develop a task management SaaS.
 ```
 
-Steeringエージェントが既存コード（あれば）を分析し、以下を自動生成します。
+The Orchestrator automatically:
+1. Calls `@steering` to generate project memory
+2. Presents tech stack recommendations
+3. Proposes a directory structure
+
+#### 💡 For Advanced Users (Direct Invocation)
+
+```
+You: @steering Analyze this project's context and generate the steering files
+```
+
+The Steering agent analyzes existing code (if any) and automatically generates the following.
 
 ```markdown
 # steering/product.md
-## プロジェクト概要
-タスク管理SaaS「TaskMaster」の開発
+## Project Overview
+Development of the task management SaaS "TaskMaster"
 
-## ユーザー
-- 小規模チーム（5-20人）
-- リモートワーク中心
-- 非エンジニア含む
+## Users
+- Small teams (5-20 people)
+- Primarily remote work
+- Including non-engineers
 
-## 主要機能
-1. タスク作成・編集
-2. チーム間共有
-3. 進捗可視化
-4. Slack統合
+## Key Features
+1. Task creation and editing
+2. Cross-team sharing
+3. Progress visualization
+4. Slack integration
 ```
 
 ```markdown
 # steering/tech.md
-## 技術スタック
+## Tech Stack
 - Frontend: Next.js 14 (App Router)
 - Backend: Next.js API Routes
 - Database: PostgreSQL (Supabase)
@@ -370,137 +370,137 @@ Steeringエージェントが既存コード（あれば）を分析し、以下
 
 ```markdown
 # steering/structure.md
-## アーキテクチャパターン
+## Architecture Patterns
 Clean Architecture + Repository Pattern
 
-## ディレクトリ構造
-lib/               # ビジネスロジック（フレームワーク非依存）
-  ├── tasks/       # タスク管理ドメイン
-  ├── users/       # ユーザー管理ドメイン
-  └── shared/      # 共通ユーティリティ
+## Directory Structure
+lib/               # Business logic (framework-independent)
+  ├── tasks/       # Task management domain
+  ├── users/       # User management domain
+  └── shared/      # Common utilities
 
 app/               # Next.js App Router
-  ├── tasks/       # タスクページ
+  ├── tasks/       # Task pages
   └── api/         # API Routes
 
-test/              # テストコード
+test/              # Test code
 ```
 
-**重要**: これ以降、すべてのエージェントが自動的にこのSteeringを参照します。
+**Important**: From this point on, all agents automatically refer to this Steering.
 
-### ステップ3: 機能開発（orchestratorに全部任せる）
+### Step 3: Feature Development (Leave It All to the Orchestrator)
 
-新機能「タスクへのコメント機能」を追加するとしましょう。
+Suppose we add a new feature, "comments on tasks".
 
-#### 🎯 初心者向け（orchestrator使用）- **推奨！**
+#### 🎯 For Beginners (Using the Orchestrator) - **Recommended!**
 
-**たった1つのコマンドで全工程を自動実行**:
-
-```
-あなた: @orchestrator タスクにコメント機能を追加したいです。ユーザーがコメントを投稿・編集・削除できるようにしてください。
-```
-
-Orchestratorが自動的に:
-
-1. **要件分析**: `@requirements-analyst` を呼び出してEARS形式要件を作成
-2. **設計**: `@system-architect` を呼び出してC4モデル + ADR設計
-3. **タスク分解**: `@project-manager` を呼び出して実装タスクリスト作成
-4. **実装計画**: `@software-developer` にテストファーストの実装手順を指示
-5. **品質確認**: `@constitution-enforcer` で憲法準拠チェック
-6. **進捗報告**: 各ステップの完了を報告
-
-**あなたがやること**: orchestratorの質問に答えるだけ！
+**Run the entire process automatically with just one command**:
 
 ```
-Orchestrator: コメント機能について確認します。以下の要件でよろしいですか？
+You: @orchestrator I want to add a comment feature to tasks. Let users post, edit, and delete comments.
+```
 
-1. コメント投稿（ユーザー情報・タイムスタンプ自動記録）
-2. コメント一覧表示（新しい順）
-3. コメント編集（投稿者のみ、編集履歴記録）
-4. コメント削除（ソフトデリート）
-5. エラーハンドリング（ネットワークエラー時リトライ）
+The Orchestrator automatically:
 
-あなた: はい、それで大丈夫です。
+1. **Requirements analysis**: Call `@requirements-analyst` to create EARS-format requirements
+2. **Design**: Call `@system-architect` to create the C4 model + ADR design
+3. **Task breakdown**: Call `@project-manager` to create the implementation task list
+4. **Implementation plan**: Instruct `@software-developer` on the test-first implementation steps
+5. **Quality check**: Check Constitutional compliance with `@constitution-enforcer`
+6. **Progress report**: Report the completion of each step
 
-Orchestrator: 了解しました。要件定義から順番に進めます...
-[Requirements Analyst を起動]
-[System Architect を起動]
-[Project Manager を起動]
+**What you do**: Just answer the orchestrator's questions!
+
+```
+Orchestrator: I'd like to confirm the comment feature. Are the following requirements OK?
+
+1. Post comments (user info and timestamp recorded automatically)
+2. Comment list display (newest first)
+3. Edit comments (author only, edit history recorded)
+4. Delete comments (soft delete)
+5. Error handling (retry on network errors)
+
+You: Yes, that's fine.
+
+Orchestrator: Understood. I'll proceed in order, starting from requirements definition...
+[Launching Requirements Analyst]
+[Launching System Architect]
+[Launching Project Manager]
 ...
 ```
 
-#### 💡 上級者向け（個別エージェント呼び出し）
+#### 💡 For Advanced Users (Invoking Individual Agents)
 
-各ステップを個別にコントロールしたい場合:
+If you want to control each step individually:
 
 ```
-あなた: @requirements-analyst タスクへのコメント機能の要件を作成してください
+You: @requirements-analyst Create requirements for the task comment feature
 ```
 
-Requirements Analystエージェントが対話的に要件を作成します。
+The Requirements Analyst agent creates the requirements interactively.
 
 ```markdown
 # docs/requirements/task-comments.md
 
-## REQ-COMMENT-001: コメント投稿
-WHEN ユーザーがタスク詳細画面でコメントを入力してSubmitボタンを押す場合、
-THEN システムSHALLコメントをデータベースに保存する
-AND システムSHALL投稿日時とユーザー情報を記録する
-AND システムSHALLコメント一覧に即座に表示する
-AND システムSHALLタスクの更新通知をチームメンバーに送信する
+## REQ-COMMENT-001: Post Comment
+WHEN the user enters a comment on the task detail screen and presses the Submit button,
+THEN the system SHALL save the comment to the database
+AND the system SHALL record the posting date/time and user information
+AND the system SHALL immediately display it in the comment list
+AND the system SHALL send a task update notification to team members
 
-## REQ-COMMENT-002: コメント表示
-WHEN ユーザーがタスク詳細画面を開く場合、
-THEN システムSHALLすべてのコメントを新しい順に表示する
-AND システムSHALL各コメントに投稿者名とアバターを表示する
-AND システムSHALL投稿日時を相対時間（"2時間前"）で表示する
+## REQ-COMMENT-002: Display Comments
+WHEN the user opens the task detail screen,
+THEN the system SHALL display all comments in newest-first order
+AND the system SHALL display the author name and avatar on each comment
+AND the system SHALL display the posting date/time as relative time ("2 hours ago")
 
-## REQ-COMMENT-003: コメント編集
-WHEN コメント投稿者が自分のコメントの編集アイコンをクリックする場合、
-THEN システムSHALLコメント編集フォームを表示する
-AND システムSHALL現在のコメント内容をフォームにプリフィルする
+## REQ-COMMENT-003: Edit Comment
+WHEN the comment author clicks the edit icon on their own comment,
+THEN the system SHALL display the comment edit form
+AND the system SHALL prefill the form with the current comment content
 
-WHEN 編集後にSaveボタンを押す場合、
-THEN システムSHALLコメントを更新する
-AND システムSHALL編集履歴に記録する（"edited 1 hour ago"）
+WHEN the user presses the Save button after editing,
+THEN the system SHALL update the comment
+AND the system SHALL record it in the edit history ("edited 1 hour ago")
 
-## REQ-COMMENT-004: コメント削除
-WHEN コメント投稿者が自分のコメントの削除アイコンをクリックする場合、
-THEN システムSHALL確認ダイアログを表示する
+## REQ-COMMENT-004: Delete Comment
+WHEN the comment author clicks the delete icon on their own comment,
+THEN the system SHALL display a confirmation dialog
 
-WHEN ユーザーが削除を確認する場合、
-THEN システムSHALLコメントをソフトデリートする
-AND システムSHALLコメント一覧から削除されたコメントを非表示にする
+WHEN the user confirms the deletion,
+THEN the system SHALL soft-delete the comment
+AND the system SHALL hide the deleted comment from the comment list
 
-## REQ-COMMENT-005: エラーハンドリング
-IF ネットワークエラーでコメント投稿が失敗する場合、
-THEN システムSHALLエラーメッセージを表示する
-AND システムSHALLユーザーの入力内容を保持する
-AND システムSHALLリトライボタンを表示する
+## REQ-COMMENT-005: Error Handling
+IF posting a comment fails due to a network error,
+THEN the system SHALL display an error message
+AND the system SHALL preserve the user's input
+AND the system SHALL display a retry button
 
-## 受け入れ基準
-- [ ] すべての要件がEARS形式
-- [ ] 各要件がテスト可能
-- [ ] エラーケースを網羅
-- [ ] ステアリング（技術スタック）に準拠
+## Acceptance Criteria
+- [ ] All requirements are in EARS format
+- [ ] Each requirement is testable
+- [ ] Error cases are covered
+- [ ] Complies with steering (tech stack)
 ```
 
-#### Orchestratorの実行結果
+#### Orchestrator Execution Results
 
-Orchestratorが自動的に各専門エージェントを呼び出し、以下のドキュメントを生成します:
+The Orchestrator automatically calls each specialized agent and generates the following documents:
 
-**1. 要件定義** (`docs/requirements/task-comments.md`):
+**1. Requirements definition** (`docs/requirements/task-comments.md`):
 
-Requirements Analystエージェントが生成した要件ドキュメント（上記参照）
+Requirements document generated by the Requirements Analyst agent (see above)
 
-**2. 設計** (`docs/design/task-comments.md`):
+**2. Design** (`docs/design/task-comments.md`):
 
-Orchestratorが `@system-architect` を自動起動し、設計ドキュメントを作成:
+The Orchestrator automatically launches `@system-architect` and creates the design document:
 
 ```markdown
 # docs/design/task-comments.md
 
-## アーキテクチャ概要（C4 Context）
+## Architecture Overview (C4 Context)
 
 ┌──────────────────────────────────────────┐
 │ TaskMaster System                        │
@@ -517,18 +517,18 @@ Orchestratorが `@system-architect` を自動起動し、設計ドキュメン�
          ↓
     [Slack API]
 
-## コンポーネント設計（C4 Component）
+## Component Design (C4 Component)
 
 ### Frontend Components
-- `CommentList` - コメント一覧表示（REQ-COMMENT-002）
-- `CommentForm` - コメント投稿フォーム（REQ-COMMENT-001）
-- `CommentItem` - 個別コメント表示・編集・削除（REQ-COMMENT-003, 004）
+- `CommentList` - Comment list display (REQ-COMMENT-002)
+- `CommentForm` - Comment posting form (REQ-COMMENT-001)
+- `CommentItem` - Individual comment display, edit, and delete (REQ-COMMENT-003, 004)
 
 ### Backend API
-- `POST /api/tasks/:taskId/comments` - コメント投稿（REQ-COMMENT-001）
-- `GET /api/tasks/:taskId/comments` - コメント取得（REQ-COMMENT-002）
-- `PATCH /api/comments/:commentId` - コメント編集（REQ-COMMENT-003）
-- `DELETE /api/comments/:commentId` - コメント削除（REQ-COMMENT-004）
+- `POST /api/tasks/:taskId/comments` - Post comment (REQ-COMMENT-001)
+- `GET /api/tasks/:taskId/comments` - Get comments (REQ-COMMENT-002)
+- `PATCH /api/comments/:commentId` - Edit comment (REQ-COMMENT-003)
+- `DELETE /api/comments/:commentId` - Delete comment (REQ-COMMENT-004)
 
 ### Database Schema
 \`\`\`sql
@@ -539,38 +539,38 @@ CREATE TABLE comments (
   content TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ,
-  deleted_at TIMESTAMPTZ,  -- ソフトデリート
-  edit_history JSONB        -- 編集履歴
+  deleted_at TIMESTAMPTZ,  -- Soft delete
+  edit_history JSONB        -- Edit history
 );
 
 CREATE INDEX idx_comments_task_id ON comments(task_id);
 CREATE INDEX idx_comments_created_at ON comments(created_at DESC);
 \`\`\`
 
-## ADR（Architecture Decision Record）
+## ADR (Architecture Decision Record)
 
-### ADR-001: ソフトデリート方式の採用
+### ADR-001: Adopt the Soft Delete Approach
 
 **Status**: Accepted
 
 **Context**:
-コメント削除時、物理削除（DELETE）かソフトデリート（deleted_atフラグ）か選択が必要。
+When deleting a comment, a choice is needed between physical deletion (DELETE) and soft delete (deleted_at flag).
 
 **Decision**:
-ソフトデリート方式を採用する。
+We adopt the soft delete approach.
 
 **Rationale**:
-1. 監査要件: 削除履歴の追跡が必要
-2. 復元可能性: 誤削除からの復旧が可能
-3. 関連データ保護: 削除コメントへの返信などを保持
+1. Audit requirement: Deletion history must be traceable
+2. Recoverability: Recovery from accidental deletion is possible
+3. Related data protection: Preserves replies to deleted comments, etc.
 
 **Consequences**:
-- Positive: データ復元可能、監査対応
-- Negative: クエリに`WHERE deleted_at IS NULL`が必要
+- Positive: Data can be restored, supports auditing
+- Negative: Queries need `WHERE deleted_at IS NULL`
 
-## 要件トレーサビリティマトリックス
+## Requirements Traceability Matrix
 
-| 要件ID | 設計コンポーネント | 実装ファイル（予定） |
+| Requirement ID | Design Component | Implementation File (Planned) |
 |--------|------------------|-------------------|
 | REQ-COMMENT-001 | POST /api/tasks/:taskId/comments | lib/comments/repository.ts |
 | REQ-COMMENT-002 | GET /api/tasks/:taskId/comments | lib/comments/repository.ts |
@@ -579,134 +579,134 @@ CREATE INDEX idx_comments_created_at ON comments(created_at DESC);
 | REQ-COMMENT-005 | Error boundary in CommentForm | app/components/CommentForm.tsx |
 ```
 
-### ステップ5: タスク分解
+### Step 5: Task Breakdown
 
-設計ができたら、実装タスクに分解します。
+Once the design is ready, break it down into implementation tasks.
 
-#### Claude Code の場合
-
-```
-あなた: /sdd-tasks task-comments
-```
-
-#### GitHub Copilot / Cursor の場合
+#### For Claude Code
 
 ```
-あなた: @project-manager design/task-comments.md に基づいてタスクを作成してください
+You: /sdd-tasks task-comments
 ```
 
-Project Managerエージェントがタスクリストを作成します。
+#### For GitHub Copilot / Cursor
+
+```
+You: @project-manager Create tasks based on design/task-comments.md
+```
+
+The Project Manager agent creates the task list.
 
 ``````markdown
 # docs/tasks/task-comments.md
 
-## タスク一覧
+## Task List
 
-### Phase 1: Database & API（2-3日）
+### Phase 1: Database & API (2-3 days)
 
 #### Task 1.1: Database Migration
-- [ ] comments テーブル作成（REQ-COMMENT-001, 002, 003, 004）
-- [ ] インデックス追加
-- [ ] マイグレーションファイル作成
-- **担当**: Backend Developer
-- **期限**: Day 1
-- **依存**: なし
+- [ ] Create comments table (REQ-COMMENT-001, 002, 003, 004)
+- [ ] Add indexes
+- [ ] Create migration file
+- **Owner**: Backend Developer
+- **Deadline**: Day 1
+- **Depends on**: None
 
 #### Task 1.2: Comment Repository
-- [ ] `lib/comments/repository.ts` 作成（Article I: Library First）
-- [ ] `createComment()` 実装（REQ-COMMENT-001）
-- [ ] `getCommentsByTaskId()` 実装（REQ-COMMENT-002）
-- [ ] `updateComment()` 実装（REQ-COMMENT-003）
-- [ ] `softDeleteComment()` 実装（REQ-COMMENT-004）
-- [ ] CLI インターフェース作成（Article II）
-- **担当**: Backend Developer
-- **期限**: Day 1-2
-- **依存**: Task 1.1
+- [ ] Create `lib/comments/repository.ts` (Article I: Library First)
+- [ ] Implement `createComment()` (REQ-COMMENT-001)
+- [ ] Implement `getCommentsByTaskId()` (REQ-COMMENT-002)
+- [ ] Implement `updateComment()` (REQ-COMMENT-003)
+- [ ] Implement `softDeleteComment()` (REQ-COMMENT-004)
+- [ ] Create CLI interface (Article II)
+- **Owner**: Backend Developer
+- **Deadline**: Day 1-2
+- **Depends on**: Task 1.1
 
 #### Task 1.3: Comment Repository Tests
-- [ ] テストファイル `lib/comments/repository.test.ts` 作成
-- [ ] REQ-COMMENT-001 のテスト（コメント投稿）
-- [ ] REQ-COMMENT-002 のテスト（コメント取得）
-- [ ] REQ-COMMENT-003 のテスト（コメント編集）
-- [ ] REQ-COMMENT-004 のテスト（コメント削除）
-- [ ] カバレッジ80%以上確認（Article III）
-- **担当**: Backend Developer
-- **期限**: Day 2
-- **依存**: Task 1.2
+- [ ] Create test file `lib/comments/repository.test.ts`
+- [ ] Test for REQ-COMMENT-001 (post comment)
+- [ ] Test for REQ-COMMENT-002 (get comments)
+- [ ] Test for REQ-COMMENT-003 (edit comment)
+- [ ] Test for REQ-COMMENT-004 (delete comment)
+- [ ] Verify coverage of 80% or higher (Article III)
+- **Owner**: Backend Developer
+- **Deadline**: Day 2
+- **Depends on**: Task 1.2
 
 #### Task 1.4: API Routes
-- [ ] `app/api/tasks/[taskId]/comments/route.ts` 作成
-- [ ] POST handler（REQ-COMMENT-001）
-- [ ] GET handler（REQ-COMMENT-002）
-- [ ] `app/api/comments/[commentId]/route.ts` 作成
-- [ ] PATCH handler（REQ-COMMENT-003）
-- [ ] DELETE handler（REQ-COMMENT-004）
-- [ ] エラーハンドリング（REQ-COMMENT-005）
-- **担当**: Backend Developer
-- **期限**: Day 2-3
-- **依存**: Task 1.2
+- [ ] Create `app/api/tasks/[taskId]/comments/route.ts`
+- [ ] POST handler (REQ-COMMENT-001)
+- [ ] GET handler (REQ-COMMENT-002)
+- [ ] Create `app/api/comments/[commentId]/route.ts`
+- [ ] PATCH handler (REQ-COMMENT-003)
+- [ ] DELETE handler (REQ-COMMENT-004)
+- [ ] Error handling (REQ-COMMENT-005)
+- **Owner**: Backend Developer
+- **Deadline**: Day 2-3
+- **Depends on**: Task 1.2
 
-### Phase 2: Frontend Components（3-4日）
+### Phase 2: Frontend Components (3-4 days)
 
 #### Task 2.1: CommentForm Component
-- [ ] `app/components/CommentForm.tsx` 作成
-- [ ] フォーム UI（REQ-COMMENT-001）
-- [ ] バリデーション
-- [ ] エラー表示（REQ-COMMENT-005）
-- [ ] リトライロジック
-- **担当**: Frontend Developer
-- **期限**: Day 3-4
-- **依存**: Task 1.4
+- [ ] Create `app/components/CommentForm.tsx`
+- [ ] Form UI (REQ-COMMENT-001)
+- [ ] Validation
+- [ ] Error display (REQ-COMMENT-005)
+- [ ] Retry logic
+- **Owner**: Frontend Developer
+- **Deadline**: Day 3-4
+- **Depends on**: Task 1.4
 
 #### Task 2.2: CommentList Component
-- [ ] `app/components/CommentList.tsx` 作成
-- [ ] コメント一覧表示（REQ-COMMENT-002）
-- [ ] 新しい順ソート
-- [ ] ローディング状態
-- **担当**: Frontend Developer
-- **期限**: Day 4
-- **依存**: Task 1.4
+- [ ] Create `app/components/CommentList.tsx`
+- [ ] Comment list display (REQ-COMMENT-002)
+- [ ] Newest-first sorting
+- [ ] Loading state
+- **Owner**: Frontend Developer
+- **Deadline**: Day 4
+- **Depends on**: Task 1.4
 
 #### Task 2.3: CommentItem Component
-- [ ] `app/components/CommentItem.tsx` 作成
-- [ ] コメント表示（投稿者、時間）
-- [ ] 編集ボタン（REQ-COMMENT-003）
-- [ ] 削除ボタン（REQ-COMMENT-004）
-- [ ] 編集フォーム切り替え
-- [ ] 削除確認ダイアログ
-- **担当**: Frontend Developer
-- **期限**: Day 5
-- **依存**: Task 2.2
+- [ ] Create `app/components/CommentItem.tsx`
+- [ ] Comment display (author, time)
+- [ ] Edit button (REQ-COMMENT-003)
+- [ ] Delete button (REQ-COMMENT-004)
+- [ ] Edit form toggle
+- [ ] Delete confirmation dialog
+- **Owner**: Frontend Developer
+- **Deadline**: Day 5
+- **Depends on**: Task 2.2
 
 #### Task 2.4: Frontend Tests
 - [ ] `app/components/CommentForm.test.tsx`
 - [ ] `app/components/CommentList.test.tsx`
 - [ ] `app/components/CommentItem.test.tsx`
-- [ ] カバレッジ80%以上確認
-- **担当**: Frontend Developer
-- **期限**: Day 6
-- **依存**: Task 2.1, 2.2, 2.3
+- [ ] Verify coverage of 80% or higher
+- **Owner**: Frontend Developer
+- **Deadline**: Day 6
+- **Depends on**: Task 2.1, 2.2, 2.3
 
-### Phase 3: Integration & Testing（1-2日）
+### Phase 3: Integration & Testing (1-2 days)
 
 #### Task 3.1: Integration Tests
-- [ ] E2E テスト作成
-- [ ] 全要件のテストケース実行
-- [ ] トレーサビリティマトリックス更新
-- **担当**: QA Engineer
-- **期限**: Day 7
-- **依存**: Task 2.4
+- [ ] Create E2E tests
+- [ ] Run test cases for all requirements
+- [ ] Update traceability matrix
+- **Owner**: QA Engineer
+- **Deadline**: Day 7
+- **Depends on**: Task 2.4
 
 #### Task 3.2: Documentation
-- [ ] API ドキュメント作成
-- [ ] ユーザーガイド更新
-- **担当**: Technical Writer
-- **期限**: Day 7
-- **依存**: Task 3.1
+- [ ] Create API documentation
+- [ ] Update user guide
+- **Owner**: Technical Writer
+- **Deadline**: Day 7
+- **Depends on**: Task 3.1
 
-## 要件カバレッジマトリックス
+## Requirements Coverage Matrix
 
-| 要件ID | フェーズ | タスク | 実装ファイル | テストファイル | ステータス |
+| Requirement ID | Phase | Task | Implementation File | Test File | Status |
 |--------|---------|--------|-------------|--------------|-----------|
 | REQ-COMMENT-001 | Phase 1 | Task 1.2, 1.4 | lib/comments/repository.ts | lib/comments/repository.test.ts | ⏳ |
 | REQ-COMMENT-002 | Phase 1 | Task 1.2, 1.4 | lib/comments/repository.ts | lib/comments/repository.test.ts | ⏳ |
@@ -714,37 +714,37 @@ Project Managerエージェントがタスクリストを作成します。
 | REQ-COMMENT-004 | Phase 1, 2 | Task 1.2, 1.4, 2.3 | lib/comments/repository.ts | lib/comments/repository.test.ts | ⏳ |
 | REQ-COMMENT-005 | Phase 2 | Task 2.1 | app/components/CommentForm.tsx | app/components/CommentForm.test.tsx | ⏳ |
 
-## スケジュール
+## Schedule
 
 ```
-Day 1-2:  Backend（DB + Repository）
+Day 1-2:  Backend (DB + Repository)
 Day 3-6:  Frontend Components
 Day 7:    Integration & Docs
-Total:    7日（1週間）
+Total:    7 days (1 week)
 ```
 ``````
 
-### ステップ4: 実装（orchestratorが続けてサポート）
+### Step 4: Implementation (the Orchestrator Continues to Support)
 
-Orchestrator がタスクリストを確認し、自動的に実装を開始します:
+The Orchestrator reviews the task list and automatically starts implementation:
 
 ```
-Orchestrator: タスクリストを確認しました。Phase 1から実装を開始します。
-テストファーストで進めます（Article III準拠）。
+Orchestrator: I've reviewed the task list. Starting implementation from Phase 1.
+Proceeding test-first (Article III compliant).
 
-[Task 1.2 実装中]
-✓ @test-engineer がテストを設計中...
-✓ @software-developer がRED-GREEN-REFACTOR実装中...
-✓ @code-reviewer がコードレビュー中...
-✓ @constitution-enforcer が憲法チェック中...
+[Task 1.2 in progress]
+✓ @test-engineer is designing tests...
+✓ @software-developer is implementing with RED-GREEN-REFACTOR...
+✓ @code-reviewer is reviewing the code...
+✓ @constitution-enforcer is running the Constitution check...
 
-Task 1.2 完了。次のタスクに進みます。
+Task 1.2 complete. Moving on to the next task.
 ```
 
-**💡 上級者向けTips**: 個別タスクを指定することもできます。  
-例: `@software-developer Task 2.1のみ実装してください`
+**💡 Tips for advanced users**: You can also specify individual tasks.  
+Example: `@software-developer Implement only Task 2.1`
 
-生成されたテストコード例:
+Example of generated test code:
 
 ```typescript
 // lib/comments/repository.test.ts
@@ -755,16 +755,16 @@ import { testDb } from '@/test/helpers/db';
 
 describe('Comment Repository', () => {
   beforeEach(async () => {
-    await testDb.clean(); // テスト用DBクリーンアップ
+    await testDb.clean(); // Clean up test DB
   });
 
-  // REQ-COMMENT-001: コメント投稿
+  // REQ-COMMENT-001: Post comment
   describe('createComment', () => {
     it('should create a new comment with user info and timestamp', async () => {
       // GIVEN
       const taskId = 'task-123';
       const userId = 'user-456';
-      const content = 'これは素晴らしいタスクです！';
+      const content = 'This is a wonderful task!';
 
       // WHEN
       const comment = await createComment({ taskId, userId, content });
@@ -788,7 +788,7 @@ describe('Comment Repository', () => {
     });
   });
 
-  // REQ-COMMENT-002: コメント取得
+  // REQ-COMMENT-002: Get comments
   describe('getCommentsByTaskId', () => {
     it('should return comments in descending order by created_at', async () => {
       // GIVEN
@@ -802,7 +802,7 @@ describe('Comment Repository', () => {
 
       // THEN
       expect(comments).toHaveLength(3);
-      expect(comments[0].content).toBe('Third comment'); // 新しい順
+      expect(comments[0].content).toBe('Third comment'); // Newest first
       expect(comments[2].content).toBe('First comment');
     });
 
@@ -820,7 +820,7 @@ describe('Comment Repository', () => {
     });
   });
 
-  // REQ-COMMENT-003: コメント編集
+  // REQ-COMMENT-003: Edit comment
   describe('updateComment', () => {
     it('should update comment content and set updated_at', async () => {
       // GIVEN
@@ -843,7 +843,7 @@ describe('Comment Repository', () => {
     });
   });
 
-  // REQ-COMMENT-004: コメント削除
+  // REQ-COMMENT-004: Delete comment
   describe('softDeleteComment', () => {
     it('should set deleted_at timestamp', async () => {
       // GIVEN
@@ -863,16 +863,16 @@ describe('Comment Repository', () => {
 });
 ```
 
-#### Task 1.2: Repository Implementation（RED → GREEN）
+#### Task 1.2: Repository Implementation (RED → GREEN)
 
-まずテストを実行（RED）：
+First, run the tests (RED):
 
 ```bash
 npm test lib/comments/repository.test.ts
-# ❌ すべて失敗（まだ実装してないので当然）
+# ❌ All fail (naturally, since nothing is implemented yet)
 ```
 
-次に実装（GREEN）：
+Next, implement (GREEN):
 
 ```typescript
 // lib/comments/repository.ts
@@ -882,10 +882,10 @@ import type { Comment, CreateCommentInput, UpdateCommentInput } from './types';
 
 /**
  * Article I: Library First
- * フレームワーク非依存のビジネスロジック
+ * Framework-independent business logic
  */
 
-// REQ-COMMENT-001: コメント投稿
+// REQ-COMMENT-001: Post comment
 export async function createComment(input: CreateCommentInput): Promise<Comment> {
   if (!input.content.trim()) {
     throw new Error('Content cannot be empty');
@@ -904,17 +904,17 @@ export async function createComment(input: CreateCommentInput): Promise<Comment>
   return comment;
 }
 
-// REQ-COMMENT-002: コメント取得
+// REQ-COMMENT-002: Get comments
 export async function getCommentsByTaskId(taskId: string): Promise<Comment[]> {
   return db
     .select('*')
     .from('comments')
     .where('taskId', taskId)
-    .whereNull('deletedAt') // ソフトデリート済みを除外
-    .orderBy('createdAt', 'desc'); // 新しい順
+    .whereNull('deletedAt') // Exclude soft-deleted
+    .orderBy('createdAt', 'desc'); // Newest first
 }
 
-// REQ-COMMENT-003: コメント編集
+// REQ-COMMENT-003: Edit comment
 export async function updateComment(
   commentId: string,
   input: UpdateCommentInput
@@ -940,7 +940,7 @@ export async function updateComment(
   return updated;
 }
 
-// REQ-COMMENT-004: コメント削除（ソフトデリート）
+// REQ-COMMENT-004: Delete comment (soft delete)
 export async function softDeleteComment(commentId: string): Promise<Comment> {
   const [deleted] = await db
     .update('comments')
@@ -952,7 +952,7 @@ export async function softDeleteComment(commentId: string): Promise<Comment> {
 }
 ```
 
-Article IIに従い、CLIインターフェースも作成：
+Following Article II, also create a CLI interface:
 
 ```typescript
 // lib/comments/cli.ts
@@ -985,7 +985,7 @@ async function main() {
 main();
 ```
 
-再度テスト実行（GREEN）：
+Run the tests again (GREEN):
 
 ```bash
 npm test lib/comments/repository.test.ts
@@ -993,25 +993,25 @@ npm test lib/comments/repository.test.ts
 # Coverage: 85%
 ```
 
-#### 憲法検証
+#### Constitutional Validation
 
-実装後、constitution-enforcerで憲法準拠を確認：
-
-```
-あなた: @constitution-enforcer lib/comments/ を検証してください
-```
+After implementation, confirm Constitutional compliance with the constitution-enforcer:
 
 ```
-✅ Article I (Library First): lib/comments/repository.ts - フレームワーク依存なし
-✅ Article II (CLI Interface): lib/comments/cli.ts - CLI実行可能
-✅ Article III (Test First): lib/comments/repository.test.ts - カバレッジ85%
-✅ Article V (Traceability): 全要件がテストに対応
-✅ Article VI (Project Memory): steering/tech.md の技術スタックに準拠
+You: @constitution-enforcer Please validate lib/comments/
 ```
 
-### ステップ7: フロントエンド実装
+```
+✅ Article I (Library First): lib/comments/repository.ts - No framework dependencies
+✅ Article II (CLI Interface): lib/comments/cli.ts - Runnable via CLI
+✅ Article III (Test First): lib/comments/repository.test.ts - 85% coverage
+✅ Article V (Traceability): All requirements map to tests
+✅ Article VI (Project Memory): Complies with the tech stack in steering/tech.md
+```
 
-同様にフロントエンドもテストファーストで実装します。
+### Step 7: Frontend Implementation
+
+Implement the frontend test-first in the same way.
 
 ```typescript
 // app/components/CommentForm.test.tsx
@@ -1023,45 +1023,45 @@ import { createComment } from '@/lib/comments/repository';
 jest.mock('@/lib/comments/repository');
 
 describe('CommentForm', () => {
-  // REQ-COMMENT-001: コメント投稿
+  // REQ-COMMENT-001: Post comment
   it('should submit comment when form is valid', async () => {
     render(<CommentForm taskId="task-123" />);
 
-    const textarea = screen.getByPlaceholderText('コメントを入力...');
-    const submitButton = screen.getByRole('button', { name: '投稿' });
+    const textarea = screen.getByPlaceholderText('Enter a comment...');
+    const submitButton = screen.getByRole('button', { name: 'Post' });
 
-    fireEvent.change(textarea, { target: { value: '素晴らしいタスクです！' } });
+    fireEvent.change(textarea, { target: { value: 'This is a wonderful task!' } });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
       expect(createComment).toHaveBeenCalledWith({
         taskId: 'task-123',
         userId: expect.any(String),
-        content: '素晴らしいタスクです！',
+        content: 'This is a wonderful task!',
       });
     });
   });
 
-  // REQ-COMMENT-005: エラーハンドリング
+  // REQ-COMMENT-005: Error handling
   it('should show error message and retry button when submission fails', async () => {
     (createComment as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
     render(<CommentForm taskId="task-123" />);
 
-    const textarea = screen.getByPlaceholderText('コメントを入力...');
+    const textarea = screen.getByPlaceholderText('Enter a comment...');
     fireEvent.change(textarea, { target: { value: 'Test comment' } });
-    fireEvent.click(screen.getByRole('button', { name: '投稿' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Post' }));
 
     await waitFor(() => {
-      expect(screen.getByText('コメントの投稿に失敗しました')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'リトライ' })).toBeInTheDocument();
-      expect(textarea).toHaveValue('Test comment'); // 入力内容保持
+      expect(screen.getByText('Failed to post the comment')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+      expect(textarea).toHaveValue('Test comment'); // Input preserved
     });
   });
 });
 ```
 
-実装：
+Implementation:
 
 ```tsx
 // app/components/CommentForm.tsx
@@ -1084,12 +1084,12 @@ export function CommentForm({ taskId }: { taskId: string }) {
     try {
       await createComment({
         taskId,
-        userId: 'current-user-id', // 実際は認証から取得
+        userId: 'current-user-id', // In practice, obtained from authentication
         content,
       });
-      setContent(''); // 成功時のみクリア
+      setContent(''); // Clear only on success
     } catch (err) {
-      setError('コメントの投稿に失敗しました'); // REQ-COMMENT-005
+      setError('Failed to post the comment'); // REQ-COMMENT-005
     } finally {
       setIsSubmitting(false);
     }
@@ -1100,7 +1100,7 @@ export function CommentForm({ taskId }: { taskId: string }) {
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="コメントを入力..."
+        placeholder="Enter a comment..."
         className="w-full p-3 border rounded-lg"
         rows={3}
       />
@@ -1113,7 +1113,7 @@ export function CommentForm({ taskId }: { taskId: string }) {
             onClick={handleSubmit}
             className="ml-2 underline"
           >
-            リトライ
+            Retry
           </button>
         </div>
       )}
@@ -1123,54 +1123,54 @@ export function CommentForm({ taskId }: { taskId: string }) {
         disabled={!content.trim() || isSubmitting}
         className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
       >
-        {isSubmitting ? '投稿中...' : '投稿'}
+        {isSubmitting ? 'Posting...' : 'Post'}
       </button>
     </form>
   );
 }
 ```
 
-#### Orchestratorによる品質確認
+#### Quality Check by the Orchestrator
 
-Orchestrator は実装完了を検知し、自動的に品質チェックを開始します:
+The Orchestrator detects that implementation is complete and automatically starts quality checks:
 
 ```
-Orchestrator: task-comments機能の実装を検出しました。品質チェックを開始します。
+Orchestrator: Detected the implementation of the task-comments feature. Starting quality checks.
 
-[自動実行中]
-✓ @traceability-auditor によるトレーサビリティ監査...
-✓ @code-reviewer によるコードレビュー...
-✓ @security-auditor によるセキュリティチェック...
-✓ @constitution-enforcer による憲法準拠確認...
+[Running automatically]
+✓ Traceability audit by @traceability-auditor...
+✓ Code review by @code-reviewer...
+✓ Security check by @security-auditor...
+✓ Constitutional compliance check by @constitution-enforcer...
 
-すべてのチェックが完了しました。結果を以下に示します。
+All checks are complete. The results are shown below.
 ```
 
-**💡 上級者向けTips**: 個別エージェントを直接呼び出すこともできます。  
-例: `@traceability-auditor task-commentsの要件カバレッジを確認してください`
+**💡 Tips for advanced users**: You can also call individual agents directly.  
+Example: `@traceability-auditor Check the requirements coverage of task-comments`
 
-生成されたトレーサビリティ監査レポート:
+Generated traceability audit report:
 
 ```markdown
-# トレーサビリティ監査レポート: task-comments
+# Traceability Audit Report: task-comments
 
-## 要件カバレッジ: 100% ✅
+## Requirements Coverage: 100% ✅
 
-| 要件ID | 要件概要 | 設計 | 実装 | テスト | ステータス |
+| Requirement ID | Requirement Summary | Design | Implementation | Tests | Status |
 |--------|---------|------|------|--------|-----------|
-| REQ-COMMENT-001 | コメント投稿 | Design Section 3.2 | lib/comments/repository.ts:L15 | repository.test.ts:L12 | ✅ |
-| REQ-COMMENT-002 | コメント表示 | Design Section 3.2 | lib/comments/repository.ts:L32 | repository.test.ts:L35 | ✅ |
-| REQ-COMMENT-003 | コメント編集 | Design Section 3.2 | lib/comments/repository.ts:L45 | repository.test.ts:L58 | ✅ |
-| REQ-COMMENT-004 | コメント削除 | Design Section 3.2 | lib/comments/repository.ts:L68 | repository.test.ts:L78 | ✅ |
-| REQ-COMMENT-005 | エラーハンドリング | Design Section 3.3 | app/components/CommentForm.tsx:L25 | CommentForm.test.tsx:L45 | ✅ |
+| REQ-COMMENT-001 | Post comment | Design Section 3.2 | lib/comments/repository.ts:L15 | repository.test.ts:L12 | ✅ |
+| REQ-COMMENT-002 | Display comments | Design Section 3.2 | lib/comments/repository.ts:L32 | repository.test.ts:L35 | ✅ |
+| REQ-COMMENT-003 | Edit comment | Design Section 3.2 | lib/comments/repository.ts:L45 | repository.test.ts:L58 | ✅ |
+| REQ-COMMENT-004 | Delete comment | Design Section 3.2 | lib/comments/repository.ts:L68 | repository.test.ts:L78 | ✅ |
+| REQ-COMMENT-005 | Error handling | Design Section 3.3 | app/components/CommentForm.tsx:L25 | CommentForm.test.tsx:L45 | ✅ |
 
-## テストカバレッジ: 87% ✅
+## Test Coverage: 87% ✅
 
 - Backend: 92%
 - Frontend: 81%
-- Overall: 87% (目標80%以上達成)
+- Overall: 87% (target of 80% or higher achieved)
 
-## 憲法準拠: 9/9 ✅
+## Constitutional Compliance: 9/9 ✅
 
 - Article I (Library First): ✅
 - Article II (CLI Interface): ✅
@@ -1182,35 +1182,35 @@ Orchestrator: task-comments機能の実装を検出しました。品質チェ�
 - Article VIII (Anti-Abstraction): ✅
 - Article IX (Integration First): ✅
 
-## 推奨事項
+## Recommendations
 
-すべての品質ゲートをパスしています。デプロイ可能です。
+All quality gates passed. Ready to deploy.
 ```
 
-### ステップ6: デプロイ準備（orchestratorが完結）
+### Step 6: Deployment Preparation (the Orchestrator Completes It)
 
-#### Orchestratorによるデプロイ準備
+#### Deployment Preparation by the Orchestrator
 
-Orchestrator は品質チェック完了後、自動的にデプロイ準備を開始します:
-
-```
-Orchestrator: 品質チェックをすべてクリアしました。デプロイ準備を開始します。
-
-[自動実行中]
-✓ @devops-engineer によるCI/CDパイプライン作成...
-✓ @technical-writer によるデプロイメントドキュメント作成...
-✓ @site-reliability-engineer による本番監視設定...
-
-デプロイ準備が完了しました。以下のファイルが生成されています。
-```
-
-**💡 上級者向けTips**: 個別エージェントで詳細設定も可能です。  
-例: `@devops-engineer カスタムCI/CD設定を作成してください`
-
-生成されたCI/CDパイプライン:
+After quality checks are complete, the Orchestrator automatically starts deployment preparation:
 
 ```
-あなた: @devops-engineer task-comments機能のCI/CDパイプラインを設定してください
+Orchestrator: All quality checks have been cleared. Starting deployment preparation.
+
+[Running automatically]
+✓ CI/CD pipeline creation by @devops-engineer...
+✓ Deployment documentation creation by @technical-writer...
+✓ Production monitoring setup by @site-reliability-engineer...
+
+Deployment preparation is complete. The following files have been generated.
+```
+
+**💡 Tips for advanced users**: Detailed configuration is also possible with individual agents.  
+Example: `@devops-engineer Create a custom CI/CD configuration`
+
+Generated CI/CD pipeline:
+
+```
+You: @devops-engineer Set up the CI/CD pipeline for the task-comments feature
 ```
 
 ```yaml
@@ -1257,338 +1257,338 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 ```
 
-## Vibe Coding vs SDD の結果比較
+## Comparison of Results: Vibe Coding vs SDD
 
-同じ「タスクコメント機能」を2つのアプローチで開発した結果：
+Results of developing the same "task comment feature" with the two approaches:
 
-### ❌ Vibe Coding（GitHub Copilot単体）
+### ❌ Vibe Coding (GitHub Copilot alone)
 
 ```
-開発時間: 3日
-コード行数: 500行
-テストカバレッジ: 45%
-バグ（本番）: 8件
-  - コメント削除でタスクごと消える
-  - 編集履歴が記録されない
-  - エラー時にフォーム内容が消える
-  - パフォーマンス問題（N+1クエリ）
+Development time: 3 days
+Lines of code: 500
+Test coverage: 45%
+Bugs (production): 8
+  - Deleting a comment deletes the whole task
+  - Edit history is not recorded
+  - Form content disappears on error
+  - Performance problem (N+1 queries)
 
-ドキュメント: なし
-トレーサビリティ: 0%
-リファクタリング難易度: 高（なぜこうなったか不明）
+Documentation: None
+Traceability: 0%
+Refactoring difficulty: High (unclear why it ended up this way)
 ```
 
 ### ✅ SDD with MUSUBI
 
 ```
-開発時間: 7日（設計・テスト含む）
-コード行数: 800行（テスト含む）
-テストカバレッジ: 87%
-バグ（本番）: 0件
-  - すべての要件がテスト済み
-  - エッジケース網羅
-  - エラーハンドリング完璧
+Development time: 7 days (including design and testing)
+Lines of code: 800 (including tests)
+Test coverage: 87%
+Bugs (production): 0
+  - All requirements are tested
+  - Edge cases covered
+  - Error handling is flawless
 
-ドキュメント: 完璧（要件、設計、ADR、トレーサビリティマトリックス）
-トレーサビリティ: 100%
-リファクタリング難易度: 低（すべてが追跡可能）
+Documentation: Complete (requirements, design, ADR, traceability matrix)
+Traceability: 100%
+Refactoring difficulty: Low (everything is traceable)
 ```
 
-**結論**: 初期投資（+4日）で、長期的な品質・保守性が圧倒的に向上
+**Conclusion**: With an initial investment (+4 days), long-term quality and maintainability improve overwhelmingly
 
-## ブラウンフィールドプロジェクト（既存コードへの機能追加）
+## Brownfield Projects (Adding Features to Existing Code)
 
-既存プロジェクトにMUSUBIを導入する場合は、Delta Specs（差分仕様）を使用します。
+When introducing MUSUBI to an existing project, use Delta Specs (differential specifications).
 
-### ステップ1: 既存コードでMUSUBI初期化
+### Step 1: Initialize MUSUBI in the Existing Codebase
 
 ```bash
 cd existing-project
 npx musubi-sdd init --claude
 ```
 
-### ステップ2: 既存コード分析
+### Step 2: Analyze Existing Code
 
 ```
-あなた: @steering 既存のコードベースを分析して、ステアリングファイルを生成してください
+You: @steering Analyze the existing codebase and generate the steering files
 ```
 
-Steeringエージェントが既存コードを分析し、現在のアーキテクチャ、技術スタック、構造を自動抽出します。
+The Steering agent analyzes the existing code and automatically extracts the current architecture, tech stack, and structure.
 
-### ステップ3: 変更影響分析
+### Step 3: Change Impact Analysis
 
-新機能「二要素認証（2FA）」を追加するとします。
+Suppose we add a new feature, "two-factor authentication (2FA)".
 
 ```
-あなた: @change-impact-analyzer 二要素認証機能の追加による影響を分析してください
+You: @change-impact-analyzer Analyze the impact of adding the two-factor authentication feature
 ```
 
-Change Impact Analyzerが分析レポートを生成：
+The Change Impact Analyzer generates an analysis report:
 
 ```markdown
-# 変更影響分析: 二要素認証（2FA）
+# Change Impact Analysis: Two-Factor Authentication (2FA)
 
-## ADDED（新規追加）
+## ADDED (New Additions)
 
-### 要件
-- REQ-2FA-001: TOTP生成・検証
-- REQ-2FA-002: QRコード表示
-- REQ-2FA-003: バックアップコード生成
+### Requirements
+- REQ-2FA-001: TOTP generation and verification
+- REQ-2FA-002: QR code display
+- REQ-2FA-003: Backup code generation
 
-### ファイル
-- lib/auth/totp.ts（新規）
-- lib/auth/backup-codes.ts（新規）
-- app/settings/security/page.tsx（新規）
+### Files
+- lib/auth/totp.ts (new)
+- lib/auth/backup-codes.ts (new)
+- app/settings/security/page.tsx (new)
 
-## MODIFIED（変更）
+## MODIFIED (Changes)
 
-### 要件
-- REQ-AUTH-001: ログイン処理に2FA検証ステップ追加
+### Requirements
+- REQ-AUTH-001: Add a 2FA verification step to the login process
 
-### ファイル
-- lib/auth/login.ts（2FA検証追加）
-- app/login/page.tsx（2FA入力フォーム追加）
-- database/schema.sql（usersテーブルに2fa_secret列追加）
+### Files
+- lib/auth/login.ts (add 2FA verification)
+- app/login/page.tsx (add 2FA input form)
+- database/schema.sql (add 2fa_secret column to the users table)
 
-## REMOVED（削除）
+## REMOVED (Deletions)
 
-なし
+None
 
-## 影響範囲
+## Impact Scope
 
-### 高リスク
-- 既存ログインフロー変更（全ユーザーに影響）
+### High Risk
+- Change to the existing login flow (affects all users)
 
-### 中リスク
-- データベーススキーマ変更（マイグレーション必要）
+### Medium Risk
+- Database schema change (migration required)
 
-### 低リスク
-- 新規画面追加（既存機能に影響なし）
+### Low Risk
+- Adding a new screen (no impact on existing features)
 
-## 推奨事項
+## Recommendations
 
-1. 段階的ロールアウト（Feature Flag使用）
-2. 既存ユーザーは2FA任意、新規ユーザーは必須
-3. バックアップコード必須生成
+1. Incremental rollout (using a Feature Flag)
+2. 2FA is optional for existing users and required for new users
+3. Backup code generation is mandatory
 ```
 
-### ステップ4: Delta Specs作成
+### Step 4: Create Delta Specs
 
 ```
-あなた: @requirements-analyst 2FA機能の差分仕様を作成してください
+You: @requirements-analyst Create the delta specification for the 2FA feature
 ```
 
 ```markdown
-# Delta Specs: 二要素認証（2FA）
+# Delta Specs: Two-Factor Authentication (2FA)
 
 ## ADDED Requirements
 
-### REQ-2FA-001: TOTP有効化
-WHEN ユーザーがセキュリティ設定で「2FA有効化」ボタンをクリックする場合、
-THEN システムSHALL TOTPシークレットを生成する
-AND システムSHALL QRコードを表示する
-AND システムSHALL 6桁のバックアップコードを10個生成する
+### REQ-2FA-001: Enable TOTP
+WHEN the user clicks the "Enable 2FA" button in the security settings,
+THEN the system SHALL generate a TOTP secret
+AND the system SHALL display a QR code
+AND the system SHALL generate ten 6-digit backup codes
 
-### REQ-2FA-002: TOTP検証
-WHEN 2FA有効化済みユーザーがログインする場合、
-THEN システムSHALLパスワード検証後に2FAコード入力を要求する
-AND システムSHALLユーザー入力の6桁コードを検証する
-AND システムSHALL検証成功時のみログインを許可する
+### REQ-2FA-002: Verify TOTP
+WHEN a user with 2FA enabled logs in,
+THEN the system SHALL require 2FA code entry after password verification
+AND the system SHALL verify the 6-digit code entered by the user
+AND the system SHALL allow login only when verification succeeds
 
 ## MODIFIED Requirements
 
-### REQ-AUTH-001: ログイン処理（変更）
+### REQ-AUTH-001: Login Process (Modified)
 **Before**:
-WHEN ユーザーが有効なメールアドレスとパスワードを入力する場合、
-THEN システムSHALLユーザー認証を実行する
+WHEN the user enters a valid email address and password,
+THEN the system SHALL perform user authentication
 
 **After**:
-WHEN ユーザーが有効なメールアドレスとパスワードを入力する場合、
-THEN システムSHALLパスワード検証を実行する
-AND IF ユーザーが2FA有効化済みの場合、THEN システムSHALL 2FA検証画面を表示する
-AND IF ユーザーが2FA未有効化の場合、THEN システムSHALLログインを完了する
+WHEN the user enters a valid email address and password,
+THEN the system SHALL perform password verification
+AND IF the user has 2FA enabled, THEN the system SHALL display the 2FA verification screen
+AND IF the user does not have 2FA enabled, THEN the system SHALL complete the login
 ```
 
-この差分仕様により、既存機能への影響を最小限に抑えながら、安全に新機能を追加できます。
+With this delta specification, you can safely add new features while minimizing the impact on existing functionality.
 
-## 🚀 MUSUBI v2.0: CodeGraph MCP統合でコード理解力を強化
+## 🚀 MUSUBI v2.0: Stronger Code Understanding with CodeGraph MCP Integration
 
-MUSUBI v2.0では、**CodeGraph MCP Server**との統合により、AIエージェントがプロジェクト全体のコード構造を理解できるようになりました。
+MUSUBI v2.0 integrates with the **CodeGraph MCP Server**, so AI agents can now understand the code structure of the entire project.
 
-### 従来の課題
+### Traditional Challenges
 
-従来のAIコーディングアシスタントには「ファイル単位の視野」という限界がありました：
+Traditional AI coding assistants had the limitation of a "file-level view":
 
-- 「この関数はどこから呼ばれている？」→ 回答不可
-- 「変更の影響範囲は？」→ 推測に頼る
-- 「プロジェクト全体の構造は？」→ 時間のかかる手動調査
+- "Where is this function called from?" → Cannot answer
+- "What is the impact scope of the change?" → Relies on guesswork
+- "What is the structure of the whole project?" → Time-consuming manual investigation
 
-### CodeGraph MCPで解決
+### Solved with CodeGraph MCP
 
-CodeGraph MCP Serverは、コードベースをグラフ構造として解析し、AIエージェントに「プロジェクト全体の地図」を提供します。
+The CodeGraph MCP Server analyzes the codebase as a graph structure and provides AI agents with a "map of the entire project".
 
-#### 主な機能
+#### Key Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| 🔍 **コード構造分析** | 関数、クラス、モジュールの依存関係を可視化 |
-| 🧠 **GraphRAG検索** | セマンティックなコード検索（意味ベース） |
-| 📊 **影響分析** | 変更の波及範囲を自動特定 |
-| 🏘️ **コミュニティ検出** | モジュール境界を自動分析 |
-| 🌐 **14言語対応** | Python, JS, TS, Java, Go, Rust, etc. |
+| 🔍 **Code structure analysis** | Visualize dependencies of functions, classes, and modules |
+| 🧠 **GraphRAG search** | Semantic code search (meaning-based) |
+| 📊 **Impact analysis** | Automatically identify the ripple range of changes |
+| 🏘️ **Community Detection** | Automatically analyzes module boundaries |
+| 🌐 **14 Languages Supported** | Python, JS, TS, Java, Go, Rust, etc. |
 
-### Before / After 比較
+### Before / After Comparison
 
-| タスク | Before (v1.x) | After (v2.0 + CodeGraph) |
+| Task | Before (v1.x) | After (v2.0 + CodeGraph) |
 |--------|---------------|--------------------------|
-| 関数の影響調査 | 手動grep（見落としリスク）| `find_callers`で完全リスト |
-| リファクタリング計画 | 経験と勘に依存 | `analyze_module_structure`で客観的分析 |
-| 依存関係の把握 | import文を目視確認 | `find_dependencies`で深い依存も検出 |
-| コードベースの理解 | ファイルを1つずつ読む | `stats`, `community`で全体把握 |
+| Investigating a function's impact | Manual grep (risk of missing things) | Complete list via `find_callers` |
+| Refactoring planning | Relies on experience and intuition | Objective analysis via `analyze_module_structure` |
+| Understanding dependencies | Visually checking import statements | Detects deep dependencies too via `find_dependencies` |
+| Understanding the codebase | Reading files one by one | Overall understanding via `stats` and `community` |
 
-### 実践例: 影響分析の強化
+### Practical Example: Enhanced Impact Analysis
 
 ```
-ユーザー: @change-impact-analyzer calculatePrice関数を変更したいです。影響範囲を教えてください。
+User: @change-impact-analyzer I want to change the calculatePrice function. Tell me the impact scope.
 
-🤖 Change Impact Analyzer (CodeGraph活用):
+🤖 Change Impact Analyzer (using CodeGraph):
 
-find_callers("calculatePrice") を実行...
+Running find_callers("calculatePrice")...
 
-【直接呼び出し元】(5件)
+[Direct Callers] (5 locations)
 - OrderService.createOrder() - line 45
 - CartController.updateCart() - line 78
 - InvoiceGenerator.generate() - line 112
 - PriceValidator.validate() - line 23
 - BatchProcessor.processAll() - line 89
 
-【間接呼び出し元】(3件) ← これが今まで見落としていた部分！
+[Indirect callers] (3) ← These are the parts that were missed until now!
 - APIController.handleRequest() → OrderService → calculatePrice
 - ScheduledTask.dailyReport() → BatchProcessor → calculatePrice
 - WebhookHandler.onPayment() → InvoiceGenerator → calculatePrice
 
-【テストへの影響】
-- tests/unit/price.test.ts (直接テスト)
-- tests/integration/order.test.ts (間接影響)
+[Affected Tests]
+- tests/unit/price.test.ts (direct test)
+- tests/integration/order.test.ts (indirect impact)
 ```
 
-### セットアップ方法
+### How to Set Up
 
 ```bash
-# Orchestratorに依頼するだけ
-@orchestrator CodeGraph MCP を設定してください
+# Just ask the Orchestrator
+@orchestrator Please set up CodeGraph MCP
 ```
 
-Orchestratorが自動的に：
-1. ✅ Python環境確認
-2. ✅ CodeGraph MCP Serverインストール
-3. ✅ プロジェクトのインデックス作成
-4. ✅ 設定ファイル生成
+The Orchestrator automatically:
+1. ✅ Check Python environment
+2. ✅ Installs the CodeGraph MCP Server
+3. ✅ Create the project index
+4. ✅ Generates the configuration file
 
-詳細は [MUSUBI × CodeGraph MCP Server 統合ガイド](https://qiita.com/hisaho/items/719210ccc20fe2514054) をご覧ください。
+For details, see the [MUSUBI × CodeGraph MCP Server Integration Guide](https://qiita.com/hisaho/items/719210ccc20fe2514054).
 
-## まとめ
+## Summary
 
 ### Vibe Coding vs SDD with MUSUBI
 
-| 項目 | Vibe Coding | SDD with MUSUBI |
+| Item | Vibe Coding | SDD with MUSUBI |
 |------|------------|-----------------|
-| **開発速度（短期）** | 速い（3日） | やや遅い（7日、設計含む） |
-| **品質** | 不安定 | 安定（憲法保証） |
-| **テストカバレッジ** | 低い（~50%） | 高い（80%以上） |
-| **バグ発生率** | 高い | 低い |
-| **ドキュメント** | なし | 完璧 |
-| **トレーサビリティ** | なし | 100% |
-| **保守性** | 低い | 高い |
-| **変更容易性** | 困難 | 容易（影響分析あり） |
-| **長期コスト** | 高い（技術的負債） | 低い |
+| **Development speed (short term)** | Fast (3 days) | Somewhat slower (7 days, including design) |
+| **Quality** | Unstable | Stable (guaranteed by the Constitution) |
+| **Test coverage** | Low (~50%) | High (80% or more) |
+| **Bug rate** | High | Low |
+| **Documentation** | None | Complete |
+| **Traceability** | None | 100% |
+| **Maintainability** | Low | High |
+| **Ease of change** | Difficult | Easy (with impact analysis) |
+| **Long-term cost** | High (technical debt) | Low |
 
-### MUSUBIを使うべきケース
+### When You Should Use MUSUBI
 
-✅ **強く推奨**:
-- プロダクション環境で動くシステム
-- チーム開発（トレーサビリティ必須）
-- 長期運用予定のプロジェクト
-- 規制対応が必要（監査、セキュリティ）
-- 変更頻度が高いプロジェクト
+✅ **Strongly recommended**:
+- Systems running in production environments
+- Team development (traceability is essential)
+- Projects planned for long-term operation
+- Projects requiring regulatory compliance (audit, security)
+- Projects with high change frequency
 
-△ **任意**:
-- 個人的な実験・学習プロジェクト
-- 使い捨てプロトタイプ
-- 極端に短期間のPoC
+△ **Optional**:
+- Personal experiments and learning projects
+- Throwaway prototypes
+- Extremely short-term PoCs
 
-### Orchestratorを使うメリット
+### Benefits of Using the Orchestrator
 
-🎯 **初心者でも安心**:
-- **1つのコマンドだけ覚えればOK**: `@orchestrator [やりたいこと]`
-- **25エージェントを覚える必要なし**: Orchestratorが自動選択
-- **質問形式で進む**: 必要なことだけ聞いてくれる
-- **失敗しにくい**: ベストプラクティスを自動適用
+🎯 **Reassuring even for beginners**:
+- **Just remember one command**: `@orchestrator [what you want to do]`
+- **No need to learn the 25 agents**: The Orchestrator selects them automatically
+- **Proceeds in a question format**: It asks only what's necessary
+- **Hard to fail**: Best practices are applied automatically
 
-🚀 **効率的な開発**:
-- **並行実行**: 複数エージェントを同時起動
-- **自動依存解決**: 必要なエージェントを自動判断
-- **進捗管理**: 全体の流れを可視化
-- **エラーハンドリング**: 問題を自動検知・修正提案
+🚀 **Efficient development**:
+- **Parallel execution**: Launches multiple agents simultaneously
+- **Automatic dependency resolution**: Automatically determines which agents are needed
+- **Progress management**: Visualizes the overall flow
+- **Error handling**: Automatically detects problems and suggests fixes
 
-📚 **学習にも最適**:
-- **SDDの流れを体験**: 要件→設計→実装を実際に見る
-- **専門家の判断を学ぶ**: なぜそのエージェントが必要か理解できる
-- **段階的に深く**: 最初はお任せ、慣れたら個別操作へ
+📚 **Also ideal for learning**:
+- **Experience the SDD flow**: See requirements → design → implementation in action
+- **Learn expert judgment**: Understand why each agent is needed
+- **Go deeper step by step**: Leave it all to the Orchestrator at first, then move to individual operation as you get comfortable
 
-### 次のステップ
+### Next Steps
 
-#### 🎯 初心者の方へ
+#### 🎯 For Beginners
 
-1. **MUSUBIをインストール**
+1. **Install MUSUBI**
    ```bash
-   npx musubi-sdd init --claude  # あなたのエージェントを選択
+   npx musubi-sdd init --claude  # Choose your agent
    ```
 
-2. **まずは @orchestrator だけ覚える**
+2. **First, remember only @orchestrator**
    ```
-   @orchestrator [やりたいこと]を実装してください
+   @orchestrator Please implement [what you want to do]
    ```
-   - 他の24エージェントは覚えなくてOK
-   - Orchestratorが自動的に適切なエージェントを呼び出します
+   - You don't need to learn the other 24 agents
+   - The Orchestrator automatically calls the appropriate agents
 
-3. **小さな機能から始める**
-   - 既存プロジェクトなら、次の小さな機能追加でMUSUBIを試す
-   - 新規プロジェクトなら、コア機能1つから始める
-   - **例**: `@orchestrator ログイン機能を作ってください`
+3. **Start with a small feature**
+   - For an existing project, try MUSUBI on your next small feature addition
+   - For a new project, start with one core feature
+   - **Example**: `@orchestrator Please build a login feature`
 
-4. **orchestratorの質問に答える**
-   - Orchestratorが要件を確認してくれます
-   - Yes/Noや簡単な説明を返すだけでOK
+4. **Answer the orchestrator's questions**
+   - The Orchestrator confirms the requirements for you
+   - Just reply with Yes/No or a brief explanation
 
-#### 💡 慣れてきたら
+#### 💡 Once You're Comfortable
 
-5. **個別エージェントを使ってみる**
-   - 要件だけ先に作りたい → `@requirements-analyst`
-   - 設計だけレビューしてほしい → `@system-architect`
-   - セキュリティだけチェック → `@security-auditor`
+5. **Try individual agents**
+   - Want to create only the requirements first → `@requirements-analyst`
+   - Want only the design reviewed → `@system-architect`
+   - Just check security → `@security-auditor`
 
-6. **SDDワークフローに慣れる**
-   - 要件 → 設計 → 実装 → テスト の流れを体験
-   - 最初は時間がかかるが、2-3回で慣れる
+6. **Get used to the SDD workflow**
+   - Experience the flow of requirements → design → implementation → testing
+   - It takes time at first, but you'll get used to it in 2-3 runs
 
-7. **チーム展開**
-   - 個人で成功したら、チームに共有
-   - Steeringでプロジェクト知識を共有
+7. **Roll out to the team**
+   - Once it succeeds individually, share it with the team
+   - Share project knowledge through Steering
 
-## リソース
+## Resources
 
 - **MUSUBI npm**: https://www.npmjs.com/package/musubi-sdd
 - **GitHub Repository**: https://github.com/nahisaho/MUSUBI
-- **Current Version**: v2.1.1（2025年6月現在）
+- **Current Version**: v2.1.1 (as of June 2025)
 
 ---
 
-**仕様駆動開発で、AIコーディングの可能性を最大限に引き出しましょう！** 🚀
+**Let's unleash the full potential of AI coding with specification driven development!** 🚀
 
 ---
 
-> この記事で紹介したMUSUBIはMITライセンスのオープンソースプロジェクトです。
-> コントリビューションやスター ⭐ をお待ちしています！
+> MUSUBI, introduced in this article, is an open-source project under the MIT license.
+> Contributions and stars ⭐ are welcome!
 
-#SDD #SpecificationDrivenDevelopment #MUSUBI #AI #ClaudeCode #GitHubCopilot #Cursor #開発プロセス #品質保証
+#SDD #SpecificationDrivenDevelopment #MUSUBI #AI #ClaudeCode #GitHubCopilot #Cursor #DevelopmentProcess #QualityAssurance

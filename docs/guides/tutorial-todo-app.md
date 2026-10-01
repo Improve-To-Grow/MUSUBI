@@ -1,47 +1,47 @@
-# 📱 実践チュートリアル: ToDoアプリ開発
+# 📱 Hands-On Tutorial: Building a ToDo App
 
-**MUSUBI v3.5.1** | 最終更新: 2025-12-08
+**MUSUBI v3.5.1** | Last updated: 2025-12-08
 
-> MUSUBIのSDDワークフローを使って、ToDoアプリを要件定義から実装まで開発する実践ガイド
-
----
-
-## 📋 目次
-
-1. [概要](#1-概要)
-2. [Stage 0: Research（調査）](#2-stage-0-research調査)
-3. [Stage 1: Requirements（要件定義）](#3-stage-1-requirements要件定義)
-4. [Stage 2: Design（設計）](#4-stage-2-design設計)
-5. [Stage 3: Tasks（タスク分解）](#5-stage-3-tasksタスク分解)
-6. [Stage 4: Implement（実装）](#6-stage-4-implement実装)
-7. [Stage 5: Validate（検証）](#7-stage-5-validate検証)
-8. [まとめ](#8-まとめ)
+> A hands-on guide to developing a ToDo app from requirements definition to implementation using MUSUBI's SDD workflow
 
 ---
 
-## 1. 概要
+## 📋 Table of Contents
 
-### 🎯 このチュートリアルで学ぶこと
+1. [Overview](#1-overview)
+2. [Stage 0: Research](#2-stage-0-research)
+3. [Stage 1: Requirements](#3-stage-1-requirements)
+4. [Stage 2: Design](#4-stage-2-design)
+5. [Stage 3: Tasks](#5-stage-3-tasks)
+6. [Stage 4: Implement](#6-stage-4-implement)
+7. [Stage 5: Validate](#7-stage-5-validate)
+8. [Summary](#8-summary)
 
-- SDDワークフローの実践的な使い方
-- EARS形式での要件定義
-- C4モデルでの設計
-- トレーサビリティの維持
-- 憲法（Constitution）に準拠した開発
+---
 
-### 🛠️ 作成するアプリ
+## 1. Overview
 
-**ToDoアプリ**（シンプルなタスク管理アプリ）
+### 🎯 What You Will Learn in This Tutorial
 
-| 機能 | 説明 |
+- Practical use of the SDD workflow
+- Defining requirements in EARS format
+- Designing with the C4 model
+- Maintaining traceability
+- Development compliant with the Constitution
+
+### 🛠️ The App You Will Build
+
+**ToDo App** (a simple task management app)
+
+| Feature | Description |
 |------|------|
-| タスク追加 | 新しいToDoを追加 |
-| タスク一覧 | ToDoリストを表示 |
-| タスク完了 | ToDoを完了マーク |
-| タスク削除 | ToDoを削除 |
-| フィルター | 完了/未完了でフィルタリング |
+| Add Task | Add a new ToDo |
+| Task List | Display the ToDo list |
+| Complete Task | Mark a ToDo as complete |
+| Delete Task | Delete a ToDo |
+| Filter | Filter by completed/incomplete |
 
-### 📁 最終的なプロジェクト構造
+### 📁 Final Project Structure
 
 ```
 todo-app/
@@ -75,21 +75,21 @@ todo-app/
 
 ---
 
-## 2. Stage 0: Research（調査）
+## 2. Stage 0: Research
 
-### 2.1 プロジェクト初期化
+### 2.1 Project Initialization
 
 ```bash
-# ディレクトリ作成
+# Create the directory
 mkdir todo-app && cd todo-app
 
-# MUSUBI初期化（GitHub Copilotの場合）
+# Initialize MUSUBI (for GitHub Copilot)
 npx musubi-sdd init --copilot
 ```
 
-### 2.2 技術スタック決定
+### 2.2 Tech Stack Decisions
 
-`steering/tech.md` を編集:
+Edit `steering/tech.md`:
 
 ```markdown
 # Tech Stack
@@ -111,53 +111,53 @@ npx musubi-sdd init --copilot
 - **Testing Library**: React Testing Library
 ```
 
-### 2.3 プロダクトコンテキスト
+### 2.3 Product Context
 
-`steering/product.md` を編集:
+Edit `steering/product.md`:
 
 ```markdown
 # Product Context
 
 ## Vision
-シンプルで使いやすいタスク管理アプリケーション
+A simple and easy-to-use task management application
 
 ## Target Users
-- 個人でタスクを管理したい人
-- シンプルなインターフェースを好む人
+- People who want to manage tasks personally
+- People who prefer a simple interface
 
 ## Key Features
-1. タスクの追加・削除
-2. 完了/未完了の切り替え
-3. フィルタリング機能
+1. Add and delete tasks
+2. Toggle complete/incomplete
+3. Filtering feature
 
 ## Success Metrics
-- タスク追加が3クリック以内で完了
-- ページ読み込み時間 < 1秒
+- Adding a task takes 3 clicks or fewer
+- Page load time < 1 second
 ```
 
 ---
 
-## 3. Stage 1: Requirements（要件定義）
+## 3. Stage 1: Requirements
 
-### 3.1 AIエージェントで要件生成
+### 3.1 Generate Requirements with an AI Agent
 
-**GitHub Copilot の場合:**
+**For GitHub Copilot:**
 ```
-#sdd-requirements ToDoアプリのタスク管理機能
-```
-
-**Claude Code の場合:**
-```
-/sdd-requirements ToDoアプリのタスク管理機能
+#sdd-requirements ToDo app task management feature
 ```
 
-### 3.2 CLIで要件生成
+**For Claude Code:**
+```
+/sdd-requirements ToDo app task management feature
+```
+
+### 3.2 Generate Requirements with the CLI
 
 ```bash
 npx musubi-sdd requirements --feature todo-management --output storage/specs/
 ```
 
-### 3.3 生成される要件書
+### 3.3 Generated Requirements Document
 
 `storage/specs/todo-management.md`:
 
@@ -171,7 +171,7 @@ npx musubi-sdd requirements --feature todo-management --output storage/specs/
 
 ## Overview
 
-ToDoアプリケーションのタスク管理機能。ユーザーがタスクを追加、表示、完了、削除できる。
+The task management feature of the ToDo application. Users can add, view, complete, and delete tasks.
 
 ---
 
@@ -186,9 +186,9 @@ ToDoアプリケーションのタスク管理機能。ユーザーがタスク�
 When a user submits a new task with title, the system shall add the task to the list with status "incomplete".
 
 **Acceptance Criteria**:
-- [ ] AC-001: 空のタイトルは拒否される
-- [ ] AC-002: 追加後、入力フィールドがクリアされる
-- [ ] AC-003: 新しいタスクがリストの末尾に表示される
+- [ ] AC-001: An empty title is rejected
+- [ ] AC-002: The input field is cleared after adding
+- [ ] AC-003: The new task appears at the end of the list
 
 ---
 
@@ -201,9 +201,9 @@ When a user submits a new task with title, the system shall add the task to the 
 The system shall display all tasks with their title and completion status.
 
 **Acceptance Criteria**:
-- [ ] AC-001: タスクがリスト形式で表示される
-- [ ] AC-002: 各タスクに完了チェックボックスが表示される
-- [ ] AC-003: タスクがない場合は空状態メッセージを表示
+- [ ] AC-001: Tasks are displayed as a list
+- [ ] AC-002: Each task shows a completion checkbox
+- [ ] AC-003: An empty-state message is displayed when there are no tasks
 
 ---
 
@@ -216,9 +216,9 @@ The system shall display all tasks with their title and completion status.
 When a user clicks the checkbox of a task, the system shall toggle the completion status.
 
 **Acceptance Criteria**:
-- [ ] AC-001: 未完了→完了に変更できる
-- [ ] AC-002: 完了→未完了に変更できる
-- [ ] AC-003: 完了タスクに取り消し線が表示される
+- [ ] AC-001: A task can be changed from incomplete to complete
+- [ ] AC-002: A task can be changed from complete to incomplete
+- [ ] AC-003: Completed tasks are shown with strikethrough
 
 ---
 
@@ -231,8 +231,8 @@ When a user clicks the checkbox of a task, the system shall toggle the completio
 When a user clicks the delete button of a task, the system shall remove the task from the list.
 
 **Acceptance Criteria**:
-- [ ] AC-001: 削除後、タスクがリストから消える
-- [ ] AC-002: 削除は元に戻せない（確認ダイアログなし）
+- [ ] AC-001: After deletion, the task disappears from the list
+- [ ] AC-002: Deletion cannot be undone (no confirmation dialog)
 
 ---
 
@@ -245,9 +245,9 @@ When a user clicks the delete button of a task, the system shall remove the task
 While a filter is active, the system shall display only tasks matching the filter condition (All/Active/Completed).
 
 **Acceptance Criteria**:
-- [ ] AC-001: "All" で全タスク表示
-- [ ] AC-002: "Active" で未完了のみ表示
-- [ ] AC-003: "Completed" で完了のみ表示
+- [ ] AC-001: "All" shows all tasks
+- [ ] AC-002: "Active" shows only incomplete tasks
+- [ ] AC-003: "Completed" shows only completed tasks
 
 ---
 
@@ -264,9 +264,9 @@ While a filter is active, the system shall display only tasks matching the filte
 
 ---
 
-## 4. Stage 2: Design（設計）
+## 4. Stage 2: Design
 
-### 4.1 設計生成
+### 4.1 Generate the Design
 
 ```bash
 npx musubi-sdd design --feature todo-management --output storage/specs/
@@ -302,7 +302,7 @@ graph TB
     useTodos --> TodoType
 ```
 
-### 4.3 データモデル
+### 4.3 Data Model
 
 ```typescript
 // src/types/todo.ts
@@ -316,7 +316,7 @@ interface Todo {
 type FilterType = 'all' | 'active' | 'completed';
 ```
 
-### 4.4 ADR（アーキテクチャ決定記録）
+### 4.4 ADR (Architecture Decision Record)
 
 `storage/specs/adr-001-state-management.md`:
 
@@ -327,33 +327,33 @@ type FilterType = 'all' | 'active' | 'completed';
 Accepted
 
 ## Context
-ToDoアプリの状態管理方法を決定する必要がある。
+We need to decide how to manage state in the ToDo app.
 
 ## Decision
-React useState を使用したローカル状態管理を採用する。
+Adopt local state management using React useState.
 
 ## Rationale
-- アプリが小規模でシンプル
-- 外部ライブラリ（Redux等）はオーバーエンジニアリング
-- 将来的な拡張時にContext APIへ移行可能
+- The app is small and simple
+- External libraries (such as Redux) would be over-engineering
+- Migration to the Context API is possible when extending in the future
 
 ## Consequences
-- ✅ 学習コストが低い
-- ✅ バンドルサイズが小さい
-- ⚠️ 複雑な状態管理には不向き
+- ✅ Low learning cost
+- ✅ Small bundle size
+- ⚠️ Not suited to complex state management
 ```
 
 ---
 
-## 5. Stage 3: Tasks（タスク分解）
+## 5. Stage 3: Tasks
 
-### 5.1 タスク生成
+### 5.1 Generate Tasks
 
 ```bash
 npx musubi-sdd tasks --feature todo-management
 ```
 
-### 5.2 タスク一覧
+### 5.2 Task List
 
 ```markdown
 # Tasks: ToDo Management
@@ -363,9 +363,9 @@ npx musubi-sdd tasks --feature todo-management
 **Dependencies**: None
 **Requirements**: All
 
-1. Vite + React + TypeScript プロジェクト作成
-2. Tailwind CSS 設定
-3. ディレクトリ構造作成
+1. Create Vite + React + TypeScript project
+2. Configure Tailwind CSS
+3. Create directory structure
 
 ---
 
@@ -374,8 +374,8 @@ npx musubi-sdd tasks --feature todo-management
 **Dependencies**: TASK-001
 **Requirements**: REQ-TODO-001, REQ-TODO-002
 
-1. ❌ テスト作成: todo.test.ts (RED)
-2. ✅ 型定義: src/types/todo.ts (GREEN)
+1. ❌ Write tests: todo.test.ts (RED)
+2. ✅ Type definitions: src/types/todo.ts (GREEN)
 
 ---
 
@@ -384,8 +384,8 @@ npx musubi-sdd tasks --feature todo-management
 **Dependencies**: TASK-002
 **Requirements**: REQ-TODO-001, REQ-TODO-003, REQ-TODO-004
 
-1. ❌ テスト作成: useTodos.test.ts (RED)
-2. ✅ Hook実装: src/hooks/useTodos.ts (GREEN)
+1. ❌ Write tests: useTodos.test.ts (RED)
+2. ✅ Hook implementation: src/hooks/useTodos.ts (GREEN)
    - addTodo()
    - toggleTodo()
    - deleteTodo()
@@ -397,8 +397,8 @@ npx musubi-sdd tasks --feature todo-management
 **Dependencies**: TASK-003
 **Requirements**: REQ-TODO-001
 
-1. ❌ テスト作成 (RED)
-2. ✅ コンポーネント実装 (GREEN)
+1. ❌ Write tests (RED)
+2. ✅ Component implementation (GREEN)
 
 ---
 
@@ -407,8 +407,8 @@ npx musubi-sdd tasks --feature todo-management
 **Dependencies**: TASK-003
 **Requirements**: REQ-TODO-002, REQ-TODO-003, REQ-TODO-004
 
-1. ❌ テスト作成 (RED)
-2. ✅ コンポーネント実装 (GREEN)
+1. ❌ Write tests (RED)
+2. ✅ Component implementation (GREEN)
 
 ---
 
@@ -417,8 +417,8 @@ npx musubi-sdd tasks --feature todo-management
 **Dependencies**: TASK-004, TASK-005
 **Requirements**: REQ-TODO-002, REQ-TODO-005
 
-1. ❌ テスト作成 (RED)
-2. ✅ コンポーネント実装 (GREEN)
+1. ❌ Write tests (RED)
+2. ✅ Component implementation (GREEN)
 
 ---
 
@@ -427,8 +427,8 @@ npx musubi-sdd tasks --feature todo-management
 **Dependencies**: TASK-006
 **Requirements**: REQ-TODO-005
 
-1. ❌ テスト作成 (RED)
-2. ✅ フィルター実装 (GREEN)
+1. ❌ Write tests (RED)
+2. ✅ Filter implementation (GREEN)
 
 ---
 
@@ -448,9 +448,9 @@ npx musubi-sdd tasks --feature todo-management
 
 ---
 
-## 6. Stage 4: Implement（実装）
+## 6. Stage 4: Implement
 
-### 6.1 プロジェクトセットアップ（TASK-001）
+### 6.1 Project Setup (TASK-001)
 
 ```bash
 npm create vite@latest . -- --template react-ts
@@ -459,7 +459,7 @@ npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init -p
 ```
 
-### 6.2 型定義（TASK-002）
+### 6.2 Type Definitions (TASK-002)
 
 ```typescript
 // src/types/todo.ts
@@ -473,7 +473,7 @@ export interface Todo {
 export type FilterType = 'all' | 'active' | 'completed';
 ```
 
-### 6.3 useTodos Hook（TASK-003）
+### 6.3 useTodos Hook (TASK-003)
 
 ```typescript
 // src/hooks/useTodos.ts
@@ -531,7 +531,7 @@ export function useTodos() {
 }
 ```
 
-### 6.4 コンポーネント実装
+### 6.4 Component Implementation
 
 ```typescript
 // src/components/AddTodo.tsx
@@ -547,7 +547,7 @@ export function AddTodo({ onAdd }: AddTodoProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     onAdd(title);
-    setTitle(''); // AC-002: 入力フィールドをクリア
+    setTitle(''); // AC-002: Clear the input field
   };
 
   return (
@@ -640,27 +640,27 @@ export function TodoList({ todos, onToggle, onDelete }: TodoListProps) {
 
 ---
 
-## 7. Stage 5: Validate（検証）
+## 7. Stage 5: Validate
 
-### 7.1 テスト実行
+### 7.1 Run Tests
 
 ```bash
 npm test
 ```
 
-### 7.2 トレーサビリティ検証
+### 7.2 Traceability Validation
 
 ```bash
 npx musubi-sdd trace --feature todo-management
 ```
 
-### 7.3 要件カバレッジ確認
+### 7.3 Check Requirements Coverage
 
 ```bash
 npx musubi-sdd validate --feature todo-management
 ```
 
-**出力例:**
+**Example output:**
 ```
 ✅ REQ-TODO-001: Add Task - Covered (AddTodo.tsx, useTodos.ts)
 ✅ REQ-TODO-002: Display Tasks - Covered (TodoList.tsx)
@@ -673,11 +673,11 @@ Coverage: 5/5 (100%)
 
 ---
 
-## 8. まとめ
+## 8. Summary
 
-### 📊 完了したSDDワークフロー
+### 📊 Completed SDD Workflow
 
-| Stage | 成果物 | 状態 |
+| Stage | Deliverables | Status |
 |-------|--------|------|
 | 0. Research | tech.md, product.md | ✅ |
 | 1. Requirements | todo-management.md (5 REQs) | ✅ |
@@ -686,7 +686,7 @@ Coverage: 5/5 (100%)
 | 4. Implement | 5 Components, 1 Hook, 1 Type | ✅ |
 | 5. Validate | 100% Coverage | ✅ |
 
-### 🔗 トレーサビリティマトリクス
+### 🔗 Traceability Matrix
 
 ```
 REQ-TODO-001 ─→ DES-TODO-001 ─→ AddTodo.tsx ─→ addTodo.test.ts
@@ -696,19 +696,19 @@ REQ-TODO-004 ─→ DES-TODO-004 ─→ TodoItem.tsx ─→ delete.test.ts
 REQ-TODO-005 ─→ DES-TODO-005 ─→ useTodos.ts ─→ filter.test.ts
 ```
 
-### 💡 学んだこと
+### 💡 What We Learned
 
-1. **EARS形式** - 曖昧さのない要件定義
-2. **Red-Green-Refactor** - テストファーストな実装
-3. **トレーサビリティ** - 要件→設計→コード→テストの追跡
-4. **憲法準拠** - 品質基準の一貫性
+1. **EARS format** - Requirements definition without ambiguity
+2. **Red-Green-Refactor** - Test-first implementation
+3. **Traceability** - Tracking requirements → design → code → tests
+4. **Constitutional compliance** - Consistent quality standards
 
-### 📚 次のステップ
+### 📚 Next Steps
 
-- [永続化機能の追加（LocalStorage）](./tutorial-todo-advanced.md)
-- [認証機能の追加](./tutorial-auth.md)
-- [デプロイ（Vercel）](./tutorial-deploy.md)
+- [Adding Persistence (LocalStorage)](./tutorial-todo-advanced.md)
+- [Adding Authentication](./tutorial-auth.md)
+- [Deployment (Vercel)](./tutorial-deploy.md)
 
 ---
 
-*ドキュメント生成: MUSUBI v3.5.1*
+*Documentation generated by MUSUBI v3.5.1*

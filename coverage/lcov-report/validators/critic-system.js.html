@@ -1380,7 +1380,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * MUSUBI Critic System
  * 
- * SDDステージの品質評価システム
+ * Quality evaluation system for SDD stages
  * 
  * @module src/validators/critic-system
  * @see REQ-P0-B005
@@ -1391,7 +1391,7 @@ const fs = <span class="cstat-no" title="statement not covered" >require('fs');<
 const path = <span class="cstat-no" title="statement not covered" >require('path');</span>
 &nbsp;
 /**
- * 評価グレード
+ * Evaluation grade
  */
 const Grade = <span class="cstat-no" title="statement not covered" >{</span>
   A: 'A',   // 0.8+
@@ -1401,7 +1401,7 @@ const Grade = <span class="cstat-no" title="statement not covered" >{</span>
 };
 &nbsp;
 /**
- * ステージタイプ
+ * Stage type
  */
 const StageType = <span class="cstat-no" title="statement not covered" >{</span>
   REQUIREMENTS: 'requirements',
@@ -1412,13 +1412,13 @@ const StageType = <span class="cstat-no" title="statement not covered" >{</span>
 };
 &nbsp;
 /**
- * 評価結果
+ * Evaluation result
  */
 class CriticResult {
   /**
-   * @param {number} score - スコア (0.0 - 1.0)
-   * @param {string} message - 評価メッセージ
-   * @param {Object} details - 詳細情報
+   * @param {number} score - Score (0.0 - 1.0)
+   * @param {string} message - Evaluation message
+   * @param {Object} details - Detailed information
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(score, message, details = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    this.score = Math.max(0, Math.min(1, score));</span>
@@ -1428,7 +1428,7 @@ class CriticResult {
   }
 &nbsp;
   /**
-   * 成功判定
+   * Success determination
    * @returns {boolean}
    */
 <span class="fstat-no" title="function not covered" >  ge</span>t success() {
@@ -1436,7 +1436,7 @@ class CriticResult {
   }
 &nbsp;
   /**
-   * グレードを取得
+   * Get the grade
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  ge</span>t grade() {
@@ -1447,7 +1447,7 @@ class CriticResult {
   }
 &nbsp;
   /**
-   * パーセンテージを取得
+   * Get the percentage
    * @returns {number}
    */
 <span class="fstat-no" title="function not covered" >  ge</span>t percentage() {
@@ -1467,7 +1467,7 @@ class CriticResult {
   }
 &nbsp;
   /**
-   * Markdown形式でレポート生成
+   * Generate a report in Markdown format
    * @returns {string}
    */
 <span class="fstat-no" title="function not covered" >  to</span>Markdown() {
@@ -1494,7 +1494,7 @@ class CriticResult {
 }
 &nbsp;
 /**
- * 基底クリティック
+ * Base critic
  */
 class BaseCritic {
   /**
@@ -1506,8 +1506,8 @@ class BaseCritic {
   }
 &nbsp;
   /**
-   * 評価を実行
-   * @param {Object} context - 評価コンテキスト
+   * Run the evaluation
+   * @param {Object} context - Evaluation context
    * @returns {CriticResult}
    */
 <span class="fstat-no" title="function not covered" >  ev</span>aluate(context = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -1515,8 +1515,8 @@ class BaseCritic {
   }
 &nbsp;
   /**
-   * 重み付けスコアを計算
-   * @param {Object} scores - 各項目のスコア
+   * Calculate the weighted score
+   * @param {Object} scores - Score for each item
    * @returns {number}
    */
 <span class="fstat-no" title="function not covered" >  ca</span>lculateWeightedScore(scores) {
@@ -1537,7 +1537,7 @@ class BaseCritic {
   }
 &nbsp;
   /**
-   * ファイルが存在するかチェック
+   * Check whether the file exists
    * @param {string} relativePath 
    * @returns {boolean}
    */
@@ -1546,7 +1546,7 @@ class BaseCritic {
   }
 &nbsp;
   /**
-   * ファイル内容を読み込み
+   * Read the file content
    * @param {string} relativePath 
    * @returns {string|null}
    */
@@ -1558,7 +1558,7 @@ class BaseCritic {
 }
 &nbsp;
 /**
- * 要件クリティック
+ * Requirements critic
  */
 class RequirementsCritic extends BaseCritic {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -1590,12 +1590,12 @@ class RequirementsCritic extends BaseCritic {
   }
 &nbsp;
   /**
-   * EARS形式準拠チェック
+   * EARS format compliance check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckEarsFormat(context) {
     const content = <span class="cstat-no" title="statement not covered" >context.content || this.readFile('docs/requirements/srs/srs-musubi-v3.0.0.ja.md') || '';</span>
     
-    // EARS キーワードパターン
+    // EARS keyword patterns
     const earsPatterns = <span class="cstat-no" title="statement not covered" >[</span>
       /\b(When|If|While|Where)\b.*\b(shall|should|must)\b/gi,
       /\bThe system shall\b/gi,
@@ -1607,27 +1607,27 @@ class RequirementsCritic extends BaseCritic {
     
 <span class="cstat-no" title="statement not covered" >    if (requirements.length === 0) <span class="cstat-no" title="statement not covered" >return 0;</span></span>
 &nbsp;
-    // EARS パターンの出現をカウント
+    // Count occurrences of EARS patterns
     let earsCount = <span class="cstat-no" title="statement not covered" >0;</span>
 <span class="cstat-no" title="statement not covered" >    earsPatterns.forEach(<span class="fstat-no" title="function not covered" >pa</span>ttern =&gt; {</span>
       const matches = <span class="cstat-no" title="statement not covered" >content.match(pattern) || [];</span>
 <span class="cstat-no" title="statement not covered" >      earsCount += matches.length;</span>
     });
 &nbsp;
-    // 要件数に対するEARS準拠率
+    // EARS compliance rate relative to the number of requirements
 <span class="cstat-no" title="statement not covered" >    return Math.min(1, earsCount / requirements.length);</span>
   }
 &nbsp;
   /**
-   * 完全性チェック
+   * Completeness check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckCompleteness(context) {
     const content = <span class="cstat-no" title="statement not covered" >context.content || this.readFile('docs/requirements/srs/srs-musubi-v3.0.0.ja.md') || '';</span>
     
     const requiredSections = <span class="cstat-no" title="statement not covered" >[</span>
-      /## 機能要件|## Functional Requirements/i,
-      /## 非機能要件|## Non-Functional Requirements/i,
-      /## 制約|## Constraints/i,
+      /## Functional Requirements/i,
+      /## Non-Functional Requirements/i,
+      /## Constraints/i,
     ];
 &nbsp;
     const presentSections = <span class="cstat-no" title="statement not covered" >requiredSections.filter(<span class="fstat-no" title="function not covered" >pa</span>ttern =&gt; <span class="cstat-no" title="statement not covered" >pattern.test(content))</span>;</span>
@@ -1635,17 +1635,17 @@ class RequirementsCritic extends BaseCritic {
   }
 &nbsp;
   /**
-   * テスト可能性チェック
+   * Testability check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckTestability(context) {
     const content = <span class="cstat-no" title="statement not covered" >context.content || this.readFile('docs/requirements/srs/srs-musubi-v3.0.0.ja.md') || '';</span>
     
-    // 数値目標や測定可能な基準があるかチェック
+    // Check for numeric targets or measurable criteria
     const measurablePatterns = <span class="cstat-no" title="statement not covered" >[</span>
-      /\d+%/g,                          // パーセンテージ
-      /\d+\s*(秒|ms|ミリ秒|seconds?)/gi,  // 時間
-      /\d+\s*(回|times?)/gi,            // 回数
-      /less than|greater than|at least|最大|最小/gi,
+      /\d+%/g,                          // Percentage
+      /\d+\s*(ms|seconds?)/gi,  // Time
+      /\d+\s*(times?)/gi,            // Count
+      /less than|greater than|at least|maximum|minimum/gi,
     ];
 &nbsp;
     let measurableCount = <span class="cstat-no" title="statement not covered" >0;</span>
@@ -1654,44 +1654,44 @@ class RequirementsCritic extends BaseCritic {
 <span class="cstat-no" title="statement not covered" >      measurableCount += matches.length;</span>
     });
 &nbsp;
-    // 測定可能な基準が10個以上あれば満点
+    // Full score if there are 10 or more measurable criteria
 <span class="cstat-no" title="statement not covered" >    return Math.min(1, measurableCount / 10);</span>
   }
 &nbsp;
   /**
-   * トレーサビリティチェック
+   * Traceability check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckTraceability(context) {
     const content = <span class="cstat-no" title="statement not covered" >context.content || '';</span>
     
-    // 要件IDへの参照をチェック
+    // Check references to requirement IDs
     const reqPattern = <span class="cstat-no" title="statement not covered" >/REQ-[A-Z0-9]+-\d+/g;</span>
     const requirements = <span class="cstat-no" title="statement not covered" >content.match(reqPattern) || [];</span>
     
-    // 重複を除去してユニークな要件数をカウント
+    // Remove duplicates and count unique requirements
     const uniqueReqs = <span class="cstat-no" title="statement not covered" >[...new Set(requirements)];</span>
     
-    // 5つ以上のユニーク要件があれば良好
+    // Good if there are 5 or more unique requirements
 <span class="cstat-no" title="statement not covered" >    return Math.min(1, uniqueReqs.length / 5);</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  _g</span>enerateMessage(score, scores) {
 <span class="cstat-no" title="statement not covered" >    if (score &gt;= 0.8) {</span>
-<span class="cstat-no" title="statement not covered" >      return '要件定義は高品質です。EARS形式に準拠し、テスト可能な基準が明確です。';</span>
+<span class="cstat-no" title="statement not covered" >      return 'The requirements specification is high quality. It complies with the EARS format and has clear, testable criteria.';</span>
     } else <span class="cstat-no" title="statement not covered" >if (score &gt;= 0.5) {</span>
-<span class="cstat-no" title="statement not covered" >      return '要件定義は基本的な品質基準を満たしています。いくつかの改善点があります。';</span>
+<span class="cstat-no" title="statement not covered" >      return 'The requirements specification meets basic quality standards. There are some areas for improvement.';</span>
     } else {
       const issues = <span class="cstat-no" title="statement not covered" >[];</span>
-<span class="cstat-no" title="statement not covered" >      if (scores.earsCompliance &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('EARS形式への準拠');</span></span>
-<span class="cstat-no" title="statement not covered" >      if (scores.completeness &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('必須セクションの追加');</span></span>
-<span class="cstat-no" title="statement not covered" >      if (scores.testability &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('測定可能な基準の追加');</span></span>
-<span class="cstat-no" title="statement not covered" >      return `要件定義には改善が必要です: ${issues.join(', ')}`;</span>
+<span class="cstat-no" title="statement not covered" >      if (scores.earsCompliance &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('Comply with the EARS format');</span></span>
+<span class="cstat-no" title="statement not covered" >      if (scores.completeness &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('Add required sections');</span></span>
+<span class="cstat-no" title="statement not covered" >      if (scores.testability &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('Add measurable criteria');</span></span>
+<span class="cstat-no" title="statement not covered" >      return `The requirements specification needs improvement: ${issues.join(', ')}`;</span>
     }
   }
 }
 &nbsp;
 /**
- * 設計クリティック
+ * Design critic
  */
 class DesignCritic extends BaseCritic {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -1721,13 +1721,13 @@ class DesignCritic extends BaseCritic {
   }
 &nbsp;
   /**
-   * C4モデル準拠チェック
+   * C4 model compliance check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckC4Format(context) {
     const designDir = <span class="cstat-no" title="statement not covered" >path.join(this.projectRoot, 'docs/design');</span>
 <span class="cstat-no" title="statement not covered" >    if (!fs.existsSync(designDir)) <span class="cstat-no" title="statement not covered" >return 0;</span></span>
 &nbsp;
-    // C4レベルのキーワードをチェック
+    // Check for C4 level keywords
     const c4Keywords = <span class="cstat-no" title="statement not covered" >['Context', 'Container', 'Component', 'Code'];</span>
     const files = <span class="cstat-no" title="statement not covered" >fs.readdirSync(designDir).filter(<span class="fstat-no" title="function not covered" >f </span>=&gt; <span class="cstat-no" title="statement not covered" >f.endsWith('.md'))</span>;</span>
     
@@ -1743,7 +1743,7 @@ class DesignCritic extends BaseCritic {
   }
 &nbsp;
   /**
-   * ADR存在チェック
+   * ADR presence check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckAdrPresence(context) {
     const adrDir = <span class="cstat-no" title="statement not covered" >path.join(this.projectRoot, 'docs/design/adr');</span>
@@ -1753,12 +1753,12 @@ class DesignCritic extends BaseCritic {
 <span class="cstat-no" title="statement not covered" >      f.startsWith('ADR-') &amp;&amp; f.endsWith('.md')</span>
     );
 &nbsp;
-    // 3つ以上のADRがあれば満点
+    // Full score if there are 3 or more ADRs
 <span class="cstat-no" title="statement not covered" >    return Math.min(1, adrFiles.length / 3);</span>
   }
 &nbsp;
   /**
-   * 要件カバレッジチェック
+   * Requirements coverage check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckRequirementCoverage(context) {
     const designDir = <span class="cstat-no" title="statement not covered" >path.join(this.projectRoot, 'docs/design');</span>
@@ -1773,27 +1773,27 @@ class DesignCritic extends BaseCritic {
 <span class="cstat-no" title="statement not covered" >      matches.forEach(<span class="fstat-no" title="function not covered" >m </span>=&gt; <span class="cstat-no" title="statement not covered" >reqReferences.add(m))</span>;</span>
     }
 &nbsp;
-    // 5つ以上の要件参照があれば満点
+    // Full score if there are 5 or more requirement references
 <span class="cstat-no" title="statement not covered" >    return Math.min(1, reqReferences.size / 5);</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  _g</span>enerateMessage(score, scores) {
 <span class="cstat-no" title="statement not covered" >    if (score &gt;= 0.8) {</span>
-<span class="cstat-no" title="statement not covered" >      return '設計ドキュメントは高品質です。C4モデルに準拠し、ADRが適切に作成されています。';</span>
+<span class="cstat-no" title="statement not covered" >      return 'The design document is high quality. It complies with the C4 model and ADRs are properly created.';</span>
     } else <span class="cstat-no" title="statement not covered" >if (score &gt;= 0.5) {</span>
-<span class="cstat-no" title="statement not covered" >      return '設計ドキュメントは基本的な品質を満たしています。';</span>
+<span class="cstat-no" title="statement not covered" >      return 'The design document meets basic quality standards.';</span>
     } else {
       const issues = <span class="cstat-no" title="statement not covered" >[];</span>
-<span class="cstat-no" title="statement not covered" >      if (scores.c4Compliance &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('C4モデルの適用');</span></span>
-<span class="cstat-no" title="statement not covered" >      if (scores.adrPresence &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('ADRの作成');</span></span>
-<span class="cstat-no" title="statement not covered" >      if (scores.reqCoverage &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('要件へのリンク');</span></span>
-<span class="cstat-no" title="statement not covered" >      return `設計には改善が必要です: ${issues.join(', ')}`;</span>
+<span class="cstat-no" title="statement not covered" >      if (scores.c4Compliance &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('Apply the C4 model');</span></span>
+<span class="cstat-no" title="statement not covered" >      if (scores.adrPresence &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('Create ADRs');</span></span>
+<span class="cstat-no" title="statement not covered" >      if (scores.reqCoverage &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('Link to requirements');</span></span>
+<span class="cstat-no" title="statement not covered" >      return `The design needs improvement: ${issues.join(', ')}`;</span>
     }
   }
 }
 &nbsp;
 /**
- * 実装クリティック
+ * Implementation critic
  */
 class ImplementationCritic extends BaseCritic {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -1823,10 +1823,10 @@ class ImplementationCritic extends BaseCritic {
   }
 &nbsp;
   /**
-   * テストカバレッジチェック
+   * Test coverage check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckTestCoverage(context) {
-    // coverage/lcov-report/index.html があればパース
+    // Parse coverage/lcov-report/index.html if it exists
     const coveragePath = <span class="cstat-no" title="statement not covered" >path.join(this.projectRoot, 'coverage/coverage-summary.json');</span>
 <span class="cstat-no" title="statement not covered" >    if (fs.existsSync(coveragePath)) {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
@@ -1836,11 +1836,11 @@ class ImplementationCritic extends BaseCritic {
 <span class="cstat-no" title="statement not covered" >          return total.lines.pct / 100;</span>
         }
       } catch (e) {
-        // パース失敗
+        // Parse failed
       }
     }
 &nbsp;
-    // テストファイルの存在をチェック
+    // Check for the existence of test files
     const testsDir = <span class="cstat-no" title="statement not covered" >path.join(this.projectRoot, 'tests');</span>
 <span class="cstat-no" title="statement not covered" >    if (!fs.existsSync(testsDir)) <span class="cstat-no" title="statement not covered" >return 0;</span></span>
 &nbsp;
@@ -1848,27 +1848,27 @@ class ImplementationCritic extends BaseCritic {
     const srcDir = <span class="cstat-no" title="statement not covered" >path.join(this.projectRoot, 'src');</span>
     const srcFiles = <span class="cstat-no" title="statement not covered" >fs.existsSync(srcDir) ? this._countFiles(srcDir, /\.js$/) : 1;</span>
 &nbsp;
-    // テストファイル数とソースファイル数の比率
+    // Ratio of test files to source files
 <span class="cstat-no" title="statement not covered" >    return Math.min(1, testFiles / Math.max(1, srcFiles * 0.5));</span>
   }
 &nbsp;
   /**
-   * コード品質チェック
+   * Code quality check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckCodeQuality(context) {
     let score = <span class="cstat-no" title="statement not covered" >0;</span>
 &nbsp;
-    // ESLint設定の存在
+    // Existence of ESLint config
 <span class="cstat-no" title="statement not covered" >    if (this.fileExists('.eslintrc.js') || this.fileExists('.eslintrc.json')) {</span>
 <span class="cstat-no" title="statement not covered" >      score += 0.3;</span>
     }
 &nbsp;
-    // Prettier設定の存在
+    // Existence of Prettier config
 <span class="cstat-no" title="statement not covered" >    if (this.fileExists('.prettierrc') || this.fileExists('.prettierrc.json')) {</span>
 <span class="cstat-no" title="statement not covered" >      score += 0.2;</span>
     }
 &nbsp;
-    // package.json に lint スクリプトがあるか
+    // Whether package.json has a lint script
     const pkg = <span class="cstat-no" title="statement not covered" >this.readFile('package.json');</span>
 <span class="cstat-no" title="statement not covered" >    if (pkg) {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
@@ -1880,7 +1880,7 @@ class ImplementationCritic extends BaseCritic {
 <span class="cstat-no" title="statement not covered" >          score += 0.2;</span>
         }
       } catch (e) {
-        // パース失敗
+        // Parse failed
       }
     }
 &nbsp;
@@ -1888,7 +1888,7 @@ class ImplementationCritic extends BaseCritic {
   }
 &nbsp;
   /**
-   * ドキュメントチェック
+   * Documentation check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckDocumentation(context) {
     let score = <span class="cstat-no" title="statement not covered" >0;</span>
@@ -1899,7 +1899,7 @@ class ImplementationCritic extends BaseCritic {
     // CONTRIBUTING.md
 <span class="cstat-no" title="statement not covered" >    if (this.fileExists('CONTRIBUTING.md')) <span class="cstat-no" title="statement not covered" >score += 0.2;</span></span>
 &nbsp;
-    // steering/ ディレクトリ
+    // steering/ directory
 <span class="cstat-no" title="statement not covered" >    if (this.fileExists('steering/product.md')) <span class="cstat-no" title="statement not covered" >score += 0.2;</span></span>
 <span class="cstat-no" title="statement not covered" >    if (this.fileExists('steering/structure.md')) <span class="cstat-no" title="statement not covered" >score += 0.2;</span></span>
 &nbsp;
@@ -1921,21 +1921,21 @@ class ImplementationCritic extends BaseCritic {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  _g</span>enerateMessage(score, scores) {
 <span class="cstat-no" title="statement not covered" >    if (score &gt;= 0.8) {</span>
-<span class="cstat-no" title="statement not covered" >      return '実装は高品質です。テストカバレッジが高く、コード品質ツールが設定されています。';</span>
+<span class="cstat-no" title="statement not covered" >      return 'The implementation is high quality. Test coverage is high and code quality tools are configured.';</span>
     } else <span class="cstat-no" title="statement not covered" >if (score &gt;= 0.5) {</span>
-<span class="cstat-no" title="statement not covered" >      return '実装は基本的な品質を満たしています。';</span>
+<span class="cstat-no" title="statement not covered" >      return 'The implementation meets basic quality standards.';</span>
     } else {
       const issues = <span class="cstat-no" title="statement not covered" >[];</span>
-<span class="cstat-no" title="statement not covered" >      if (scores.testCoverage &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('テストの追加');</span></span>
-<span class="cstat-no" title="statement not covered" >      if (scores.codeQuality &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('リンター/フォーマッターの設定');</span></span>
-<span class="cstat-no" title="statement not covered" >      if (scores.documentation &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('ドキュメントの充実');</span></span>
-<span class="cstat-no" title="statement not covered" >      return `実装には改善が必要です: ${issues.join(', ')}`;</span>
+<span class="cstat-no" title="statement not covered" >      if (scores.testCoverage &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('Add tests');</span></span>
+<span class="cstat-no" title="statement not covered" >      if (scores.codeQuality &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('Configure linter/formatter');</span></span>
+<span class="cstat-no" title="statement not covered" >      if (scores.documentation &lt; 0.5) <span class="cstat-no" title="statement not covered" >issues.push('Improve documentation');</span></span>
+<span class="cstat-no" title="statement not covered" >      return `The implementation needs improvement: ${issues.join(', ')}`;</span>
     }
   }
 }
 &nbsp;
 /**
- * クリティックシステム
+ * Critic system
  */
 class CriticSystem {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
@@ -1948,7 +1948,7 @@ class CriticSystem {
   }
 &nbsp;
   /**
-   * 特定ステージを評価
+   * Evaluate a specific stage
    * @param {string} stage 
    * @param {Object} context 
    * @returns {CriticResult}
@@ -1962,7 +1962,7 @@ class CriticSystem {
   }
 &nbsp;
   /**
-   * 全ステージを評価
+   * Evaluate all stages
    * @param {Object} context 
    * @returns {Object}
    */
@@ -1988,7 +1988,7 @@ class CriticSystem {
   }
 &nbsp;
   /**
-   * レポートを生成
+   * Generate a report
    * @param {Object} results 
    * @returns {string}
    */
@@ -2015,11 +2015,11 @@ class CriticSystem {
 <span class="fstat-no" title="function not covered" >  _g</span>enerateOverallMessage(results) {
     const avgScore = <span class="cstat-no" title="statement not covered" >Object.values(results).reduce(<span class="fstat-no" title="function not covered" >(s</span>um, r) =&gt; <span class="cstat-no" title="statement not covered" >sum + r.score,</span> 0) / Object.keys(results).length;</span>
 <span class="cstat-no" title="statement not covered" >    if (avgScore &gt;= 0.8) {</span>
-<span class="cstat-no" title="statement not covered" >      return 'プロジェクトは全体的に高品質です。';</span>
+<span class="cstat-no" title="statement not covered" >      return 'The project is high quality overall.';</span>
     } else <span class="cstat-no" title="statement not covered" >if (avgScore &gt;= 0.5) {</span>
-<span class="cstat-no" title="statement not covered" >      return 'プロジェクトは基本的な品質を満たしています。';</span>
+<span class="cstat-no" title="statement not covered" >      return 'The project meets basic quality standards.';</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      return 'プロジェクトには全体的な改善が必要です。';</span>
+<span class="cstat-no" title="statement not covered" >      return 'The project needs overall improvement.';</span>
     }
   }
 }

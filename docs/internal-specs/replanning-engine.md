@@ -10,21 +10,21 @@
 
 ## Overview
 
-リプラニング機能は、MUSUBIのオーケストレーションエンジンに動的なタスク再計画能力を追加します。
-エージェントが実行中にタスクリストを動的に編集し、ステップが失敗した場合やより良いパスが見つかった場合に適応できるようにします。
+The replanning feature adds dynamic task replanning capability to MUSUBI's orchestration engine.
+It allows agents to edit the task list dynamically during execution, so they can adapt when a step fails or a better path is found.
 
-### 背景
+### Background
 
-VentureBeat記事 "Vibe coding is dead: Agentic swarm coding is the new enterprise moat" で述べられているように、
-リプラニング能力は最新のAgentic Swarmシステムの重要な構成要素です。
-WarpフレームワークがSWE-benchで75.8%のスコアを達成した主要因の一つがこの機能です。
+As described in the VentureBeat article "Vibe coding is dead: Agentic swarm coding is the new enterprise moat",
+replanning capability is a key component of modern Agentic Swarm systems.
+This feature was one of the main factors behind the Warp framework achieving a 75.8% score on SWE-bench.
 
-### 目標
+### Goals
 
-1. タスク実行中の動的な計画修正を可能にする
-2. 失敗時の代替パス生成を自動化する
-3. 複数のLLMプラットフォームに対応する
-4. 既存のオーケストレーションパターンと統合する
+1. Enable dynamic plan revision during task execution
+2. Automate alternative path generation on failure
+3. Support multiple LLM platforms
+4. Integrate with existing orchestration patterns
 
 ---
 
@@ -39,11 +39,11 @@ WarpフレームワークがSWE-benchで75.8%のスコアを達成した主要�
 When a task execution fails, times out, or encounters an unexpected state, the system shall detect the replanning trigger and initiate the replanning process.
 
 **Acceptance Criteria**:
-- [ ] AC-001: タスク失敗を検出してReplanTrigger.TASK_FAILEDを発火
-- [ ] AC-002: タイムアウトを検出してReplanTrigger.TIMEOUTを発火
-- [ ] AC-003: コンテキスト変更を検出してReplanTrigger.CONTEXT_CHANGEDを発火
-- [ ] AC-004: 目標到達不能を検出してReplanTrigger.GOAL_UNREACHABLEを発火
-- [ ] AC-005: 人間による再計画要求を処理してReplanTrigger.HUMAN_REQUESTを発火
+- [ ] AC-001: Detect task failure and fire ReplanTrigger.TASK_FAILED
+- [ ] AC-002: Detect timeout and fire ReplanTrigger.TIMEOUT
+- [ ] AC-003: Detect context change and fire ReplanTrigger.CONTEXT_CHANGED
+- [ ] AC-004: Detect unreachable goal and fire ReplanTrigger.GOAL_UNREACHABLE
+- [ ] AC-005: Handle human replanning request and fire ReplanTrigger.HUMAN_REQUEST
 
 ---
 
@@ -56,12 +56,12 @@ When a task execution fails, times out, or encounters an unexpected state, the s
 The system shall provide APIs to dynamically add, remove, reorder, and modify tasks in the execution plan during runtime.
 
 **Acceptance Criteria**:
-- [ ] AC-001: `addTask(task, position)` でタスクを任意位置に追加可能
-- [ ] AC-002: `removeTask(taskId)` でタスクを削除可能
-- [ ] AC-003: `reorderTasks(taskIds)` でタスク順序を変更可能
-- [ ] AC-004: `modifyTask(taskId, updates)` でタスク内容を変更可能
-- [ ] AC-005: 変更履歴がplan historyに記録される
-- [ ] AC-006: 実行中のタスクは変更不可（pending/completedのみ変更可能）
+- [ ] AC-001: Tasks can be added at any position with `addTask(task, position)`
+- [ ] AC-002: Tasks can be removed with `removeTask(taskId)`
+- [ ] AC-003: Task order can be changed with `reorderTasks(taskIds)`
+- [ ] AC-004: Task content can be changed with `modifyTask(taskId, updates)`
+- [ ] AC-005: Change history is recorded in the plan history
+- [ ] AC-006: Running tasks cannot be modified (only pending/completed can be modified)
 
 ---
 
@@ -74,11 +74,11 @@ The system shall provide APIs to dynamically add, remove, reorder, and modify ta
 When a task fails and retry is exhausted, the system shall generate alternative execution paths using LLM to achieve the original goal.
 
 **Acceptance Criteria**:
-- [ ] AC-001: 失敗タスクのコンテキストを分析
-- [ ] AC-002: 元の目標を保持した代替タスクを生成
-- [ ] AC-003: 複数の代替パス候補を生成（最大3つ）
-- [ ] AC-004: 代替パスの推定成功確率を算出
-- [ ] AC-005: 最適な代替パスを自動選択または人間に提示
+- [ ] AC-001: Analyze the context of the failed task
+- [ ] AC-002: Generate alternative tasks that preserve the original goal
+- [ ] AC-003: Generate multiple alternative path candidates (up to 3)
+- [ ] AC-004: Calculate the estimated success probability of each alternative path
+- [ ] AC-005: Automatically select the best alternative path or present it to a human
 
 ---
 
@@ -91,12 +91,12 @@ When a task fails and retry is exhausted, the system shall generate alternative 
 The system shall provide a unified LLM interface that abstracts platform-specific LLM APIs (GitHub Copilot LM API, Anthropic, OpenAI, etc.).
 
 **Acceptance Criteria**:
-- [ ] AC-001: `LLMProvider` インターフェースを定義
-- [ ] AC-002: GitHub Copilot LM API プロバイダーを実装
-- [ ] AC-003: Anthropic Claude API プロバイダーを実装
-- [ ] AC-004: OpenAI API プロバイダーを実装
-- [ ] AC-005: 環境変数またはproject.ymlで使用するプロバイダーを設定可能
-- [ ] AC-006: フォールバックプロバイダーを設定可能
+- [ ] AC-001: Define the `LLMProvider` interface
+- [ ] AC-002: Implement the GitHub Copilot LM API provider
+- [ ] AC-003: Implement the Anthropic Claude API provider
+- [ ] AC-004: Implement the OpenAI API provider
+- [ ] AC-005: The provider to use can be configured via environment variables or project.yml
+- [ ] AC-006: A fallback provider can be configured
 
 ---
 
@@ -109,10 +109,10 @@ The system shall provide a unified LLM interface that abstracts platform-specifi
 While a plan is executing, the system shall continuously evaluate plan progress and determine if replanning is beneficial.
 
 **Acceptance Criteria**:
-- [ ] AC-001: 各タスク完了後に進捗を評価
-- [ ] AC-002: 目標達成までの残り工数を推定
-- [ ] AC-003: より効率的なパスが見つかった場合に`BETTER_PATH_FOUND`を発火
-- [ ] AC-004: 評価結果をメトリクスとして記録
+- [ ] AC-001: Evaluate progress after each task completes
+- [ ] AC-002: Estimate the remaining effort to reach the goal
+- [ ] AC-003: Fire `BETTER_PATH_FOUND` when a more efficient path is found
+- [ ] AC-004: Record evaluation results as metrics
 
 ---
 
@@ -125,10 +125,10 @@ While a plan is executing, the system shall continuously evaluate plan progress 
 The system shall integrate replanning capabilities with the existing SwarmPattern to enable dynamic task modification during parallel execution.
 
 **Acceptance Criteria**:
-- [ ] AC-001: SwarmPatternからReplanningEngineを利用可能
-- [ ] AC-002: 並列実行中のタスク失敗時に代替タスクを追加
-- [ ] AC-003: 依存関係グラフを動的に更新
-- [ ] AC-004: 完了タスクの結果を新規タスクに引き継ぎ
+- [ ] AC-001: ReplanningEngine can be used from SwarmPattern
+- [ ] AC-002: Add alternative tasks when a task fails during parallel execution
+- [ ] AC-003: Dynamically update the dependency graph
+- [ ] AC-004: Pass results of completed tasks on to new tasks
 
 ---
 
@@ -141,10 +141,10 @@ The system shall integrate replanning capabilities with the existing SwarmPatter
 The system shall integrate replanning capabilities with the existing SequentialPattern to enable step skip, insertion, and modification.
 
 **Acceptance Criteria**:
-- [ ] AC-001: SequentialPatternからReplanningEngineを利用可能
-- [ ] AC-002: 失敗ステップのスキップまたは代替挿入
-- [ ] AC-003: 条件付きステップの動的評価
-- [ ] AC-004: ステップ間の状態引き継ぎを維持
+- [ ] AC-001: ReplanningEngine can be used from SequentialPattern
+- [ ] AC-002: Skip a failed step or insert an alternative
+- [ ] AC-003: Dynamic evaluation of conditional steps
+- [ ] AC-004: Maintain state handover between steps
 
 ---
 
@@ -157,10 +157,10 @@ The system shall integrate replanning capabilities with the existing SequentialP
 The system shall integrate replanning capabilities with the WorkflowOrchestrator to enable checkpoint-based replanning and workflow recovery.
 
 **Acceptance Criteria**:
-- [ ] AC-001: チェックポイントからのリプラニング開始
-- [ ] AC-002: ワークフロー定義の動的修正
-- [ ] AC-003: サブワークフローの代替生成
-- [ ] AC-004: ワークフロー状態の永続化と復元
+- [ ] AC-001: Start replanning from a checkpoint
+- [ ] AC-002: Dynamic modification of workflow definitions
+- [ ] AC-003: Generate alternatives for sub-workflows
+- [ ] AC-004: Persist and restore workflow state
 
 ---
 
@@ -173,11 +173,11 @@ The system shall integrate replanning capabilities with the WorkflowOrchestrator
 The system shall maintain a complete history of all replanning decisions for audit, debugging, and learning purposes.
 
 **Acceptance Criteria**:
-- [ ] AC-001: リプラニングイベントをタイムスタンプ付きで記録
-- [ ] AC-002: 元の計画と修正後の計画を比較可能
-- [ ] AC-003: リプラニング理由を記録
-- [ ] AC-004: JSON/Markdown形式でエクスポート可能
-- [ ] AC-005: メトリクス（リプラニング回数、成功率等）を集計
+- [ ] AC-001: Record replanning events with timestamps
+- [ ] AC-002: The original plan and the revised plan can be compared
+- [ ] AC-003: Record the reason for replanning
+- [ ] AC-004: Can be exported in JSON/Markdown format
+- [ ] AC-005: Aggregate metrics (replanning count, success rate, etc.)
 
 ---
 
@@ -190,11 +190,11 @@ The system shall maintain a complete history of all replanning decisions for aud
 Where replanning involves high-risk changes or low-confidence alternatives, the system shall present options to the human operator for approval.
 
 **Acceptance Criteria**:
-- [ ] AC-001: 信頼度閾値を設定可能（デフォルト: 0.7）
-- [ ] AC-002: 閾値以下の代替パスは人間承認を要求
-- [ ] AC-003: 承認待ち状態でワークフローを一時停止
-- [ ] AC-004: 承認/拒否/修正のオプションを提供
-- [ ] AC-005: タイムアウト時の自動処理を設定可能
+- [ ] AC-001: The confidence threshold is configurable (default: 0.7)
+- [ ] AC-002: Alternative paths at or below the threshold require human approval
+- [ ] AC-003: Pause the workflow while awaiting approval
+- [ ] AC-004: Provide approve/reject/modify options
+- [ ] AC-005: Automatic handling on timeout is configurable
 
 ---
 
@@ -207,11 +207,11 @@ Where replanning involves high-risk changes or low-confidence alternatives, the 
 The system shall provide CLI commands for replanning configuration, monitoring, and manual intervention.
 
 **Acceptance Criteria**:
-- [ ] AC-001: `musubi orchestrate --replan` でリプラニング有効化
-- [ ] AC-002: `musubi orchestrate --replan-provider <provider>` でLLMプロバイダー指定
-- [ ] AC-003: `musubi replan status` で現在のリプラニング状態を表示
-- [ ] AC-004: `musubi replan history` でリプラニング履歴を表示
-- [ ] AC-005: `musubi replan approve <plan-id>` で保留中のリプラニングを承認
+- [ ] AC-001: Enable replanning with `musubi orchestrate --replan`
+- [ ] AC-002: Specify the LLM provider with `musubi orchestrate --replan-provider <provider>`
+- [ ] AC-003: Show the current replanning status with `musubi replan status`
+- [ ] AC-004: Show the replanning history with `musubi replan history`
+- [ ] AC-005: Approve a pending replan with `musubi replan approve <plan-id>`
 
 ---
 
@@ -224,14 +224,14 @@ The system shall provide CLI commands for replanning configuration, monitoring, 
 The system shall support replanning configuration through project.yml and environment variables.
 
 **Acceptance Criteria**:
-- [ ] AC-001: `project.yml` の `replanning` セクションで設定可能
-- [ ] AC-002: 環境変数 `MUSUBI_REPLAN_ENABLED` で有効/無効切り替え
-- [ ] AC-003: 環境変数 `MUSUBI_LLM_PROVIDER` でプロバイダー設定
-- [ ] AC-004: プラットフォーム別APIキー設定
+- [ ] AC-001: Configurable in the `replanning` section of `project.yml`
+- [ ] AC-002: Enable/disable via the `MUSUBI_REPLAN_ENABLED` environment variable
+- [ ] AC-003: Set the provider via the `MUSUBI_LLM_PROVIDER` environment variable
+- [ ] AC-004: Per-platform API key configuration
   - `GITHUB_COPILOT_TOKEN`
   - `ANTHROPIC_API_KEY`
   - `OPENAI_API_KEY`
-- [ ] AC-005: デフォルト設定のオーバーライド可能
+- [ ] AC-005: Default settings can be overridden
 
 ---
 
@@ -309,21 +309,21 @@ export MUSUBI_REPLAN_MIN_CONFIDENCE=0.7
 ## Non-Functional Requirements
 
 ### NFR-001: Performance
-- リプラニング判断は100ms以内に完了すること
-- LLM呼び出しは30秒以内にタイムアウト
-- メモリ使用量は既存オーケストレーションの2倍以内
+- Replanning decisions shall complete within 100ms
+- LLM calls shall time out within 30 seconds
+- Memory usage shall be within 2x that of existing orchestration
 
 ### NFR-002: Reliability
-- リプラニングエンジンの障害がオーケストレーション全体を停止させないこと
-- LLMプロバイダー障害時はフォールバックまたはリプラニング無効化
+- A failure of the replanning engine shall not halt the entire orchestration
+- On LLM provider failure, fall back or disable replanning
 
 ### NFR-003: Security
-- APIキーは環境変数または安全なシークレット管理で保持
-- LLMに送信するコンテキストから機密情報を除外
+- Keep API keys in environment variables or secure secret management
+- Exclude sensitive information from the context sent to the LLM
 
 ### NFR-004: Compatibility
-- 既存のオーケストレーションパターンとの後方互換性を維持
-- リプラニング無効時は既存動作と同一
+- Maintain backward compatibility with existing orchestration patterns
+- When replanning is disabled, behavior is identical to existing behavior
 
 ---
 
@@ -331,11 +331,11 @@ export MUSUBI_REPLAN_MIN_CONFIDENCE=0.7
 
 | Term | Definition |
 |------|------------|
-| **Replanning** | 実行中の計画を動的に修正すること |
-| **Alternative Path** | 失敗したタスクの代わりに目標達成するための代替手順 |
-| **LLM Provider** | LLM APIを提供するプラットフォーム（GitHub Copilot, Anthropic, OpenAI等） |
-| **Plan History** | リプラニングの履歴記録 |
-| **Confidence Score** | 代替パスの成功確率推定値（0.0-1.0） |
+| **Replanning** | Dynamically revising a plan during execution |
+| **Alternative Path** | An alternative procedure for achieving the goal in place of a failed task |
+| **LLM Provider** | A platform that provides an LLM API (GitHub Copilot, Anthropic, OpenAI, etc.) |
+| **Plan History** | A record of replanning history |
+| **Confidence Score** | Estimated success probability of an alternative path (0.0-1.0) |
 
 ---
 

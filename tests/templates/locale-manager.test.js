@@ -27,12 +27,12 @@ describe('LocaleManager', () => {
 
     await fs.writeFile(
       path.join(testTemplatesPath, 'requirements.ja.md'),
-      '# 要件定義\n\nデフォルト要件テンプレート（{{projectName}}）。'
+      '# Requirements (ja)\n\nJapanese requirements template for {{projectName}}.'
     );
 
     await fs.writeFile(
       path.join(testTemplatesPath, 'requirements.zh.md'),
-      '# 需求\n\n{{projectName}}的默认需求模板。'
+      '# Requirements (zh)\n\nChinese requirements template for {{projectName}}.'
     );
 
     await fs.writeFile(
@@ -101,9 +101,13 @@ describe('LocaleManager', () => {
   describe('getLocaleName', () => {
     test('should return display name for known locales', () => {
       expect(localeManager.getLocaleName('en')).toBe('English');
-      expect(localeManager.getLocaleName('ja')).toBe('日本語');
-      expect(localeManager.getLocaleName('zh')).toBe('中文');
-      expect(localeManager.getLocaleName('ko')).toBe('한국어');
+      expect(localeManager.getLocaleName('ja')).toBe('Japanese');
+      expect(localeManager.getLocaleName('zh')).toBe('Chinese');
+      expect(localeManager.getLocaleName('ko')).toBe('Korean');
+      expect(localeManager.getLocaleName('id')).toBe('Indonesian');
+      expect(localeManager.getLocaleName('es')).toBe('Spanish');
+      expect(localeManager.getLocaleName('de')).toBe('German');
+      expect(localeManager.getLocaleName('fr')).toBe('French');
     });
 
     test('should return locale code for unknown locales', () => {
@@ -121,13 +125,13 @@ describe('LocaleManager', () => {
     test('should get Japanese template', async () => {
       const template = await localeManager.getTemplate('requirements', 'ja');
       expect(template).toBeDefined();
-      expect(template).toContain('# 要件定義');
+      expect(template).toContain('# Requirements (ja)');
     });
 
     test('should get Chinese template', async () => {
       const template = await localeManager.getTemplate('requirements', 'zh');
       expect(template).toBeDefined();
-      expect(template).toContain('# 需求');
+      expect(template).toContain('# Requirements (zh)');
     });
 
     test('should fall back to English when locale template not found', async () => {
@@ -209,7 +213,7 @@ describe('LocaleManager', () => {
 
   describe('createLocalizedTemplate', () => {
     test('should create a new localized template', async () => {
-      const content = '# 요구사항\n\n한국어 템플릿.';
+      const content = '# Requirements (ko)\n\nKorean template.';
       const filePath = await localeManager.createLocalizedTemplate('requirements', 'ko', content);
 
       expect(filePath).toMatch(/requirements\.ko\.md$/);
@@ -228,7 +232,7 @@ describe('LocaleManager', () => {
       const metadata = localeManager.getTranslationMetadata(content, 'ja');
 
       expect(metadata.locale).toBe('ja');
-      expect(metadata.localeName).toBe('日本語');
+      expect(metadata.localeName).toBe('Japanese');
       expect(metadata.translatableSections).toBeGreaterThan(0);
 
       const headers = metadata.sections.filter(s => s.type === 'header');
@@ -255,6 +259,44 @@ describe('LocaleManager', () => {
       const manager = new LocaleManager('/nonexistent/path');
       const locale = await manager.detectProjectLocale();
       expect(locale).toBe('en');
+    });
+
+    describe('detection from steering/structure.md content', () => {
+      const detectProjectPath = path.join(__dirname, '../test-output/locale-detect-project');
+      const structurePath = path.join(detectProjectPath, 'steering', 'structure.md');
+
+      beforeEach(async () => {
+        await fs.ensureDir(path.dirname(structurePath));
+      });
+
+      afterAll(async () => {
+        await fs.rm(detectProjectPath, { recursive: true, force: true });
+      });
+
+      test('should detect Japanese from hiragana/katakana content', async () => {
+        // "Project structure" in Japanese, built from escape sequences
+        const japaneseHeading = '\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u306e\u69cb\u9020';
+        await fs.writeFile(structurePath, `# ${japaneseHeading}\n`);
+
+        const manager = new LocaleManager(detectProjectPath);
+        expect(await manager.detectProjectLocale()).toBe('ja');
+      });
+
+      test('should detect Korean from Hangul content', async () => {
+        // "Project structure" in Korean, built from escape sequences
+        const koreanHeading = '\ud504\ub85c\uc81d\ud2b8 \uad6c\uc870';
+        await fs.writeFile(structurePath, `# ${koreanHeading}\n`);
+
+        const manager = new LocaleManager(detectProjectPath);
+        expect(await manager.detectProjectLocale()).toBe('ko');
+      });
+
+      test('should fall back to default locale for English content', async () => {
+        await fs.writeFile(structurePath, '# Project Structure\n');
+
+        const manager = new LocaleManager(detectProjectPath);
+        expect(await manager.detectProjectLocale()).toBe('en');
+      });
     });
   });
 

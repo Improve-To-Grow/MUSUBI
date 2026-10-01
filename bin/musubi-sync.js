@@ -389,10 +389,10 @@ async function applyChanges(changes, currentConfig, actualState) {
       console.log(chalk.gray(`  Updated ${file}`));
     } else if (file === 'steering/tech.md') {
       await updateTechMd(changeList, actualState);
-      console.log(chalk.gray(`  Updated ${file} and tech.ja.md`));
+      console.log(chalk.gray(`  Updated ${file}`));
     } else if (file === 'steering/structure.md') {
       await updateStructureMd(changeList, actualState);
-      console.log(chalk.gray(`  Updated ${file} and structure.ja.md`));
+      console.log(chalk.gray(`  Updated ${file}`));
     }
   }
 
@@ -441,7 +441,6 @@ async function updateTechMd(changes, _actualState) {
 
   if (newFrameworks.length === 0) return;
 
-  // Update English version
   const techMdPath = 'steering/tech.md';
   if (await fs.pathExists(techMdPath)) {
     let content = await fs.readFile(techMdPath, 'utf8');
@@ -457,22 +456,6 @@ async function updateTechMd(changes, _actualState) {
 
     await fs.writeFile(techMdPath, content);
   }
-
-  // Update Japanese version
-  const techMdJaPath = 'steering/tech.ja.md';
-  if (await fs.pathExists(techMdJaPath)) {
-    let content = await fs.readFile(techMdJaPath, 'utf8');
-
-    const frameworkSection = '## フレームワーク';
-    if (content.includes(frameworkSection)) {
-      const newEntries = newFrameworks
-        .map(fw => `- **${fw}** (detected) - 自動検出されたフレームワーク`)
-        .join('\n');
-      content = content.replace(frameworkSection, `${frameworkSection}\n\n${newEntries}\n`);
-    }
-
-    await fs.writeFile(techMdJaPath, content);
-  }
 }
 
 /**
@@ -483,7 +466,6 @@ async function updateStructureMd(changes, _actualState) {
 
   if (newDirs.length === 0) return;
 
-  // Update English version
   const structureMdPath = 'steering/structure.md';
   if (await fs.pathExists(structureMdPath)) {
     let content = await fs.readFile(structureMdPath, 'utf8');
@@ -493,17 +475,6 @@ async function updateStructureMd(changes, _actualState) {
     content += `\n\n## New Directories (Detected ${new Date().toISOString().split('T')[0]})\n\n\`\`\`\n${dirList}\n\`\`\`\n`;
 
     await fs.writeFile(structureMdPath, content);
-  }
-
-  // Update Japanese version
-  const structureMdJaPath = 'steering/structure.ja.md';
-  if (await fs.pathExists(structureMdJaPath)) {
-    let content = await fs.readFile(structureMdJaPath, 'utf8');
-
-    const dirList = newDirs.map(dir => `${dir}/`).join('\n');
-    content += `\n\n## 新規ディレクトリ (検出日: ${new Date().toISOString().split('T')[0]})\n\n\`\`\`\n${dirList}\n\`\`\`\n`;
-
-    await fs.writeFile(structureMdJaPath, content);
   }
 }
 

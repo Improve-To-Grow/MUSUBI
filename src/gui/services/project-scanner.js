@@ -126,7 +126,7 @@ class ProjectScanner {
    */
   parseConstitutionArticles(content) {
     const articles = [];
-    const articleRegex = /#{2,3}\s+(?:Article|第)\s*(\d+)[:\s]+(.+?)(?=\n#{2,3}|\n##|$)/gs;
+    const articleRegex = /#{2,3}\s+Article\s*(\d+)[:\s]+(.+?)(?=\n#{2,3}|\n##|$)/gs;
 
     let match;
     while ((match = articleRegex.exec(content)) !== null) {

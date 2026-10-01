@@ -526,37 +526,20 @@ Document ADRs for:
 
 ---
 
-### 11. Save Design Document (Bilingual)
+### 11. Save Design Document
 
-**IMPORTANT**: Create BOTH English and Japanese versions.
-
-**English version (Primary/Reference)**:
-`storage/design/{{feature-name}}-design.md`
-
-**Japanese version (Translation)**:
-`storage/design/{{feature-name}}-design.ja.md`
+Save to: `storage/design/{{feature-name}}-design.md`
 
 **File Naming**:
 
 - Use kebab-case
 - Match requirements file name
 - Add `-design` suffix
-- Add `.ja` before `.md` for Japanese version
 
 **Examples**:
 
-- `storage/design/authentication-design.md` (English)
-- `storage/design/authentication-design.ja.md` (Japanese)
-- `storage/design/payment-processing-design.md` (English)
-- `storage/design/payment-processing-design.ja.md` (Japanese)
-
-**Generation Order**:
-
-1. Generate English version FIRST
-2. Then generate Japanese translation
-3. Keep technical terms in English (API endpoints, database names, requirement IDs)
-4. Translate explanations and design rationale
-5. Keep code examples and diagrams identical in both versions
+- `storage/design/authentication-design.md`
+- `storage/design/payment-processing-design.md`
 
 ---
 

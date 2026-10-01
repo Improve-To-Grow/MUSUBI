@@ -32,15 +32,13 @@ Perform comprehensive validation of the feature implementation against:
 
 ### 1. Read All Documentation
 
-**IMPORTANT**: Always read ENGLISH versions (.md) as they are the reference/source.
-
 ```bash
-# Requirements and Design (English versions)
+# Requirements and Design
 storage/specs/{{feature-name}}-requirements.md
 storage/design/{{feature-name}}-design.md
 storage/tasks/{{feature-name}}-tasks.md
 
-# Steering Context (English versions)
+# Steering Context
 steering/structure.md
 steering/tech.md
 steering/product.md
@@ -51,8 +49,6 @@ lib/{{feature}}/src/**/*.ts
 lib/{{feature}}/tests/**/*.test.ts
 app/api/{{resource}}/**/*.ts
 ```
-
-**Note**: Japanese versions (.ja.md) are translations only. Use English versions for validation.
 
 ---
 

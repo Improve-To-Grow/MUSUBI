@@ -1,263 +1,263 @@
-# MUSUBI v2.0 × CodeGraph MCP Server - AIエージェントにコード理解力を与える革新的統合
+# MUSUBI v2.0 × CodeGraph MCP Server - A Groundbreaking Integration That Gives AI Agents Code Understanding
 
-## はじめに
+## Introduction
 
-AIコーディングアシスタントの最大の課題は「**コードベース全体の理解**」です。ファイル単位では優秀でも、プロジェクト全体の構造、依存関係、影響範囲を把握することは困難でした。
+The biggest challenge for AI coding assistants is "**understanding the entire codebase**." Even when they excel at the file level, grasping the structure, dependencies, and impact scope of a whole project has been difficult.
 
-**MUSUBI v2.0**は、**CodeGraph MCP Server**との統合により、この課題を解決しました。GraphRAG（Graph Retrieval-Augmented Generation）技術を活用し、AIエージェントがコードベース全体を「グラフ」として理解できるようになりました。
+**MUSUBI v2.0** solves this challenge through integration with the **CodeGraph MCP Server**. Using GraphRAG (Graph Retrieval-Augmented Generation) technology, AI agents can now understand the entire codebase as a "graph."
 
-この記事では、MUSUBI v2.0の新機能と、CodeGraph MCPの設定方法、実践的な活用例を紹介します。
+This article introduces the new features of MUSUBI v2.0, how to set up CodeGraph MCP, and practical usage examples.
 
 :::note info
-**関連記事**
-- MUSUBIの詳細: [「MUSUBI」- 7つのAIエージェント対応、25スキル搭載の究極仕様駆動開発ツール](https://qiita.com/hisaho/items/a245c2ad5adf2ab5a409)
-- CodeGraph MCP Serverの詳細: [CodeGraph MCP Server - AIコーディングアシスタントにコード理解力を与える](https://qiita.com/hisaho/items/b99ac51d78119ef60b6b)
+**Related Articles**
+- MUSUBI details: ["MUSUBI" - The Ultimate Specification Driven Development Tool with 7 AI Agent Support and 25 Skills](https://qiita.com/hisaho/items/a245c2ad5adf2ab5a409)
+- CodeGraph MCP Server details: [CodeGraph MCP Server - Giving AI Coding Assistants Code Understanding](https://qiita.com/hisaho/items/b99ac51d78119ef60b6b)
 :::
 
-## CodeGraph MCP Serverとは？
+## What Is CodeGraph MCP Server?
 
-**CodeGraph MCP Server**は、ソースコードをグラフ構造として解析し、MCP（Model Context Protocol）経由でAIエージェントに提供するサーバーです。
+**CodeGraph MCP Server** is a server that analyzes source code as a graph structure and provides it to AI agents via MCP (Model Context Protocol).
 
-👉 詳細は [CodeGraph MCP Serverの紹介記事](https://qiita.com/hisaho/items/b99ac51d78119ef60b6b) をご覧ください。
+👉 See the [CodeGraph MCP Server introduction article](https://qiita.com/hisaho/items/b99ac51d78119ef60b6b) for details.
 
-### 主な特徴
+### Key Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |------|------|
-| 🔍 **コード構造分析** | 関数、クラス、モジュールの依存関係を可視化 |
-| 🧠 **GraphRAG検索** | セマンティックなコード検索（意味ベース） |
-| 🏘️ **コミュニティ検出** | Louvainアルゴリズムによるモジュール境界分析 |
-| 📊 **影響分析** | 変更の波及範囲を自動特定 |
-| 🌐 **14言語対応** | Python, JavaScript, TypeScript, Java, C#, Go, Rust, Ruby, PHP, C++, HCL, etc. |
+| 🔍 **Code structure analysis** | Visualize dependencies of functions, classes, and modules |
+| 🧠 **GraphRAG search** | Semantic code search (meaning-based) |
+| 🏘️ **Community detection** | Module boundary analysis using the Louvain algorithm |
+| 📊 **Impact analysis** | Automatically identify the ripple range of changes |
+| 🌐 **14 languages supported** | Python, JavaScript, TypeScript, Java, C#, Go, Rust, Ruby, PHP, C++, HCL, etc. |
 
-### 提供される14のMCPツール
+### The 14 MCP Tools Provided
 
 ```text
-# コードグラフ操作
-init_graph          - グラフ初期化
-get_code_snippet    - ソースコード取得
-find_callers        - 呼び出し元追跡
-find_callees        - 呼び出し先追跡
-find_dependencies   - 依存関係分析
+# Code graph operations
+init_graph          - Initialize graph
+get_code_snippet    - Retrieve source code
+find_callers        - Trace callers
+find_callees        - Trace callees
+find_dependencies   - Dependency analysis
 
-# 検索機能
-local_search        - ローカルコンテキスト検索
-global_search       - グローバル検索
-query_codebase      - 自然言語クエリ
+# Search features
+local_search        - Local context search
+global_search       - Global search
+query_codebase      - Natural language query
 
-# 分析機能
-analyze_module_structure  - モジュール構造分析
-suggest_refactoring       - リファクタリング提案
-stats                     - コードベース統計
-community                 - コミュニティ検出
+# Analysis features
+analyze_module_structure  - Module structure analysis
+suggest_refactoring       - Refactoring suggestions
+stats                     - Codebase statistics
+community                 - Community detection
 ```
 
-## 🚀 CodeGraph連携で新たに可能になったこと
+## 🚀 What CodeGraph Integration Newly Makes Possible
 
-従来のAIコーディングアシスタントには「**コードベース全体を理解できない**」という根本的な限界がありました。CodeGraph MCP Serverとの連携により、この限界を突破しました。
+Conventional AI coding assistants had a fundamental limitation: "**they cannot understand the entire codebase**." Integration with CodeGraph MCP Server breaks through this limit.
 
-### Before / After 比較
+### Before / After Comparison
 
-| シナリオ | Before（従来） | After（CodeGraph連携） |
+| Scenario | Before (Conventional) | After (With CodeGraph) |
 |----------|----------------|------------------------|
-| **関数の影響調査** | 手動でgrep検索、見落としリスク | `find_callers`で完全な呼び出し元リスト |
-| **リファクタリング計画** | 経験と勘に依存 | `analyze_module_structure`で客観的分析 |
-| **依存関係の把握** | import文を目視確認 | `find_dependencies`で深い依存も検出 |
-| **コードベースの理解** | ファイルを1つずつ読む | `stats`, `community`で全体構造を即座に把握 |
-| **類似コードの発見** | 記憶や文字列検索に依存 | `local_search`でセマンティック検索 |
-| **変更の波及範囲** | 「たぶん大丈夫」で進める | `find_callers` + `find_dependencies`で完全分析 |
+| **Investigating function impact** | Manual grep search, risk of missing things | Complete caller list with `find_callers` |
+| **Refactoring planning** | Relies on experience and intuition | Objective analysis with `analyze_module_structure` |
+| **Understanding dependencies** | Visually checking import statements | Detect deep dependencies too with `find_dependencies` |
+| **Understanding the codebase** | Reading files one by one | Instantly grasp the overall structure with `stats` and `community` |
+| **Finding similar code** | Relies on memory or string search | Semantic search with `local_search` |
+| **Change ripple range** | Proceeding with "it's probably fine" | Complete analysis with `find_callers` + `find_dependencies` |
 
-### 具体例: 今までできなかったことが可能に
+### Concrete Examples: Doing What Was Previously Impossible
 
-#### 1. 「この関数を変更したら、どこに影響する？」への完全回答
+#### 1. A Complete Answer to "If I Change This Function, What Is Affected?"
 
-**従来**: grep検索 → 見つかった箇所を目視確認 → 間接的な呼び出しは見落とし
+**Before**: grep search → visually check the hits → miss indirect calls
 
-**CodeGraph連携後**:
+**After CodeGraph integration**:
 
 ```text
-ユーザー: calculatePrice関数を変更したいです。影響範囲を教えてください。
+User: I want to change the calculatePrice function. Tell me the impact scope.
 
 🤖 Change Impact Analyzer:
-find_callers("calculatePrice") を実行...
+Running find_callers("calculatePrice")...
 
-【直接呼び出し元】(5件)
+[Direct Callers] (5 locations)
 - OrderService.createOrder() - line 45
 - CartController.updateCart() - line 78
 - InvoiceGenerator.generate() - line 112
 - PriceValidator.validate() - line 23
 - BatchProcessor.processAll() - line 89
 
-【間接呼び出し元】(3件) ← これが今まで見落としていた部分
+[Indirect Callers] (3 locations) ← The part that was previously missed
 - APIController.handleRequest() → OrderService → calculatePrice
 - ScheduledTask.dailyReport() → BatchProcessor → calculatePrice
 - WebhookHandler.onPayment() → InvoiceGenerator → calculatePrice
 
-【テストへの影響】
-- tests/unit/price.test.ts (直接テスト)
-- tests/integration/order.test.ts (間接影響)
+[Affected Tests]
+- tests/unit/price.test.ts (direct test)
+- tests/integration/order.test.ts (indirect impact)
 ```
 
-#### 2. 「このプロジェクトの構造を教えて」への即座の回答
+#### 2. An Instant Answer to "Tell Me About This Project's Structure"
 
-**従来**: ディレクトリ構造を見る → ファイルを開いて読む → 数時間かけて理解
+**Before**: Look at the directory structure → open and read files → spend hours understanding
 
-**CodeGraph連携後**:
+**After CodeGraph integration**:
 
 ```text
-ユーザー: このプロジェクトの構造を説明してください。
+User: Please explain the structure of this project.
 
 🤖 System Architect:
-stats + community を実行...
+Running stats + community...
 
-【コードベース統計】
-- ファイル数: 105
-- エンティティ数: 1,006（関数/クラス/モジュール）
-- 関係数: 5,359（呼び出し/依存/継承）
-- コミュニティ数: 36（論理的なモジュール群）
+[Codebase Statistics]
+- Files: 105
+- Entities: 1,006 (functions/classes/modules)
+- Relations: 5,359 (calls/dependencies/inheritance)
+- Communities: 36 (logical module groups)
 
-【主要コミュニティ（モジュール境界）】
-1. 認証・認可 (AuthService, TokenManager, PermissionChecker)
-2. 注文処理 (OrderService, CartService, PaymentProcessor)
-3. データアクセス (UserRepository, OrderRepository, BaseRepository)
-4. API層 (Controllers, Middleware, Routes)
-5. ユーティリティ (Logger, Validator, Formatter)
+[Main Communities (Module Boundaries)]
+1. Authentication & Authorization (AuthService, TokenManager, PermissionChecker)
+2. Order Processing (OrderService, CartService, PaymentProcessor)
+3. Data Access (UserRepository, OrderRepository, BaseRepository)
+4. API Layer (Controllers, Middleware, Routes)
+5. Utilities (Logger, Validator, Formatter)
 
-【アーキテクチャパターン】
-- レイヤードアーキテクチャ（Controller → Service → Repository）
-- 依存性注入パターンを使用
-- イベント駆動の非同期処理あり
+[Architecture Patterns]
+- Layered architecture (Controller → Service → Repository)
+- Uses the dependency injection pattern
+- Has event-driven asynchronous processing
 ```
 
-#### 3. 「セキュリティ的に危険なコードはある？」への網羅的調査
+#### 3. A Comprehensive Investigation of "Is There Any Security-Risky Code?"
 
-**従来**: 既知のパターンをgrep → 経験に基づく目視レビュー → 見落とし多発
+**Before**: grep for known patterns → experience-based visual review → frequent misses
 
-**CodeGraph連携後**:
+**After CodeGraph integration**:
 
 ```text
-ユーザー: セキュリティリスクのあるコードを特定してください。
+User: Please identify code with security risks.
 
 🤖 Security Auditor:
-query_codebase("eval, exec, shell execution, SQL injection, XSS") を実行...
-find_callers で各箇所への入力経路を追跡...
+query_codebase("eval, exec, shell execution, SQL injection, XSS") running...
+Tracing input paths to each location with find_callers...
 
-【高リスク】🔴
-1. src/utils/dynamicLoader.js:23 - eval()使用
-   - 入力経路: APIリクエスト → validateInput → dynamicLoader
-   - リスク: ユーザー入力がevalに到達可能
-   - 推奨: JSON.parseまたはvm.runInNewContextに置換
+[High Risk] 🔴
+1. src/utils/dynamicLoader.js:23 - eval() usage
+   - Input path: API request → validateInput → dynamicLoader
+   - Risk: User input can reach eval
+   - Recommendation: Replace with JSON.parse or vm.runInNewContext
 
-2. src/db/queries.js:89 - 文字列結合SQL
-   - 入力経路: WebForm → Controller → queries
-   - リスク: SQLインジェクション脆弱性
-   - 推奨: パラメータ化クエリに変更
+2. src/db/queries.js:89 - String-concatenated SQL
+   - Input path: WebForm → Controller → queries
+   - Risk: SQL injection vulnerability
+   - Recommendation: Change to parameterized queries
 
-【中リスク】🟡
-3. src/views/renderer.js:45 - innerHTML使用
-   - 入力経路: APIレスポンス → sanitize → renderer
-   - リスク: XSS（sanitize関数の実装次第）
-   - 推奨: textContentまたはDOMPurify使用
+[Medium Risk] 🟡
+3. src/views/renderer.js:45 - innerHTML usage
+   - Input path: API response → sanitize → renderer
+   - Risk: XSS (depends on the sanitize function implementation)
+   - Recommendation: Use textContent or DOMPurify
 ```
 
-#### 4. 「新機能をどこに実装すべき？」への根拠ある提案
+#### 4. A Well-Grounded Proposal for "Where Should I Implement a New Feature?"
 
-**従来**: 既存コードを読み漁る → なんとなく場所を決める → 後で「ここじゃなかった」と後悔
+**Before**: Read through existing code → pick a place by feel → regret later with "this wasn't the right place"
 
-**CodeGraph連携後**:
+**After CodeGraph integration**:
 
 ```text
-ユーザー: メール通知機能を追加したいです。どこに実装すべきですか？
+User: I want to add an email notification feature. Where should I implement it?
 
 🤖 System Architect:
-analyze_module_structure + query_codebase("notification, email, send") を実行...
+Running analyze_module_structure + query_codebase("notification, email, send")...
 
-【既存の類似機能】
-- src/services/NotificationService.ts - プッシュ通知（実装済み）
-- src/services/SMSService.ts - SMS通知（実装済み）
-- src/utils/Mailer.ts - メール送信ユーティリティ（低レベル）
+[Existing Similar Features]
+- src/services/NotificationService.ts - Push notifications (implemented)
+- src/services/SMSService.ts - SMS notifications (implemented)
+- src/utils/Mailer.ts - Email sending utility (low-level)
 
-【推奨実装場所】
-📁 src/services/EmailNotificationService.ts（新規作成）
+[Recommended Implementation Location]
+📁 src/services/EmailNotificationService.ts (new)
 
-【理由】
-1. NotificationService, SMSServiceと同じパターンで統一性を維持
-2. 既存のMailer.tsを内部で利用可能
-3. Controllerからの呼び出しパスが既存パターンと一致
+[Reason]
+1. Maintains consistency by following the same pattern as NotificationService and SMSService
+2. Can use the existing Mailer.ts internally
+3. The call path from the Controller matches existing patterns
 
-【実装構造案】
+[Proposed Implementation Structure]
 EmailNotificationService
-  ├── implements: INotificationService（既存インターフェース）
-  ├── uses: Mailer（既存ユーティリティ）
-  ├── uses: TemplateEngine（既存）
-  └── uses: UserRepository（メールアドレス取得）
+  ├── implements: INotificationService (existing interface)
+  ├── uses: Mailer (existing utility)
+  ├── uses: TemplateEngine (existing)
+  └── uses: UserRepository (to get email addresses)
 ```
 
-### なぜこれが重要なのか
+### Why This Matters
 
-従来のAIアシスタントは「**今開いているファイル**」しか見えませんでした。これは、地図なしで知らない街を歩くようなものです。
+Conventional AI assistants could only see "**the file currently open**." That is like walking through an unfamiliar city without a map.
 
-CodeGraph連携により、AIは「**プロジェクト全体の地図**」を持つようになりました：
+With CodeGraph integration, AI now has "**a map of the entire project**":
 
-- 🗺️ **全体俯瞰**: どこに何があるかを瞬時に把握
-- 🔗 **関係性理解**: コード間のつながりを完全に追跡
-- 🎯 **的確な判断**: 根拠に基づいた提案が可能
-- ⚡ **高速分析**: 人間なら数時間かかる調査を数秒で完了
+- 🗺️ **Bird's-eye view**: Instantly grasp what is where
+- 🔗 **Understanding relationships**: Fully trace connections between code
+- 🎯 **Accurate judgment**: Evidence-based proposals are possible
+- ⚡ **Fast analysis**: Complete investigations that would take humans hours in seconds
 
-## MUSUBI × CodeGraph の相乗効果
+## Synergy Between MUSUBI × CodeGraph
 
-MUSUBIの25の専門エージェントが、CodeGraph MCPを活用することで、より高度な分析と提案が可能になります。
+By leveraging CodeGraph MCP, MUSUBI's 25 specialized agents can provide more advanced analysis and proposals.
 
-### エージェントごとの活用例
+### Usage Examples by Agent
 
-| エージェント | CodeGraph活用 | 効果 |
+| Agent | CodeGraph Usage | Effect |
 |-------------|---------------|------|
-| **Orchestrator** | `global_search`, `stats` | プロジェクト全体把握、最適なエージェント選定 |
-| **System Architect** | `analyze_module_structure`, `community` | アーキテクチャ可視化、リファクタリング計画 |
-| **Software Developer** | `get_code_snippet`, `local_search` | 関連コードの迅速な発見 |
-| **Code Reviewer** | `find_callers`, `suggest_refactoring` | 影響範囲の確認、改善提案 |
-| **Test Engineer** | `find_dependencies` | テスト対象の依存関係把握 |
-| **Security Auditor** | `find_callers`, `query_codebase` | 脆弱な関数の利用箇所特定 |
-| **Change Impact Analyzer** | `find_dependencies`, `find_callers` | 変更影響の完全分析 |
-| **Bug Hunter** | `local_search`, `get_code_snippet` | バグの根本原因追跡 |
+| **Orchestrator** | `global_search`, `stats` | Grasp the whole project, select the optimal agent |
+| **System Architect** | `analyze_module_structure`, `community` | Architecture visualization, refactoring planning |
+| **Software Developer** | `get_code_snippet`, `local_search` | Quickly find related code |
+| **Code Reviewer** | `find_callers`, `suggest_refactoring` | Check impact scope, suggest improvements |
+| **Test Engineer** | `find_dependencies` | Understand dependencies of test targets |
+| **Security Auditor** | `find_callers`, `query_codebase` | Identify usage locations of vulnerable functions |
+| **Change Impact Analyzer** | `find_dependencies`, `find_callers` | Complete analysis of change impact |
+| **Bug Hunter** | `local_search`, `get_code_snippet` | Trace the root cause of bugs |
 
-## セットアップ方法
+## Setup
 
-### 方法1: Orchestratorによる自動セットアップ（推奨）
+### Method 1: Automatic Setup via Orchestrator (Recommended)
 
-MUSUBIのOrchestratorに依頼するだけで、自動的にセットアップが実行されます。
+Just ask MUSUBI's Orchestrator, and setup runs automatically.
 
 ```text
-ユーザー: CodeGraph MCP を設定して
+User: Configure CodeGraph MCP
 ```
 
-Orchestratorが以下を自動実行：
+The Orchestrator automatically runs the following:
 
-1. ✅ Python環境確認
-2. ✅ codegraph-mcp-server インストール
-3. ✅ プロジェクトのインデックス作成
-4. ✅ 使用環境に応じた設定ファイル生成
+1. ✅ Check Python environment
+2. ✅ Install codegraph-mcp-server
+3. ✅ Create the project index
+4. ✅ Generate configuration files for your environment
 
-### 方法2: 手動セットアップ
+### Method 2: Manual Setup
 
-#### Step 1: インストール
+#### Step 1: Installation
 
 ```bash
-# pipxでインストール（推奨）
-# --force で既存インストールも最新版に更新
+# Install with pipx (recommended)
+# Use --force to update an existing installation to the latest version
 pipx install --force codegraph-mcp-server
 
-# または GitHub から最新版
+# Or the latest version from GitHub
 pipx install --force git+https://github.com/nahisaho/CodeGraphMCPServer.git
 ```
 
-#### Step 2: プロジェクトのインデックス作成
+#### Step 2: Create the Project Index
 
 ```bash
 codegraph-mcp index /path/to/your/project --full
 ```
 
-出力例：
+Example output:
 
 ```text
 Full indexing...
@@ -267,15 +267,15 @@ Indexed 105 files
 - Communities: 36
 ```
 
-#### Step 3: 環境別設定
+#### Step 3: Per-Environment Configuration
 
-**Claude Code の場合:**
+**For Claude Code:**
 
 ```bash
 claude mcp add codegraph -- codegraph-mcp serve --repo /path/to/project
 ```
 
-**VS Code (Claude Extension) の場合:**
+**For VS Code (Claude Extension):**
 
 `.vscode/settings.json`:
 
@@ -290,7 +290,7 @@ claude mcp add codegraph -- codegraph-mcp serve --repo /path/to/project
 }
 ```
 
-**Claude Desktop の場合:**
+**For Claude Desktop:**
 
 `~/.claude/claude_desktop_config.json`:
 
@@ -305,156 +305,156 @@ claude mcp add codegraph -- codegraph-mcp serve --repo /path/to/project
 }
 ```
 
-## 実践的な活用シナリオ
+## Practical Usage Scenarios
 
-### シナリオ1: 大規模リファクタリングの影響分析
+### Scenario 1: Impact Analysis for Large-Scale Refactoring
 
 ```text
-ユーザー: UserService クラスをリファクタリングしたいです。影響範囲を教えてください。
+User: I want to refactor the UserService class. Tell me the impact scope.
 ```
 
-**Change Impact Analyzer の動作:**
+**Change Impact Analyzer behavior:**
 
-1. `find_callers("UserService")` で呼び出し元を特定
-2. `find_dependencies("UserService")` で依存関係を分析
-3. `analyze_module_structure` でモジュール境界を確認
-4. 影響を受けるファイル・関数のリストを生成
+1. Identify callers with `find_callers("UserService")`
+2. Analyze dependencies with `find_dependencies("UserService")`
+3. Check module boundaries with `analyze_module_structure`
+4. Generate a list of affected files and functions
 
-**出力例:**
+**Example output:**
 
 ```markdown
-## 影響分析レポート: UserService リファクタリング
+## Impact Analysis Report: UserService Refactoring
 
-### 直接影響（12ファイル）
-- src/controllers/AuthController.ts (3箇所)
-- src/services/OrderService.ts (5箇所)
-- src/api/routes/users.ts (2箇所)
+### Direct Impact (12 files)
+- src/controllers/AuthController.ts (3 locations)
+- src/services/OrderService.ts (5 locations)
+- src/api/routes/users.ts (2 locations)
 ...
 
-### 間接影響（8ファイル）
+### Indirect Impact (8 files)
 - tests/integration/auth.test.ts
 - src/middleware/authMiddleware.ts
 ...
 
-### 推奨アクション
-1. AuthController のモック更新
-2. OrderService の依存注入パターン適用
-3. 統合テストの更新
+### Recommended Actions
+1. Update mocks in AuthController
+2. Apply the dependency injection pattern to OrderService
+3. Update integration tests
 ```
 
-### シナリオ2: セキュリティ脆弱性の影響調査
+### Scenario 2: Investigating the Impact of a Security Vulnerability
 
 ```text
-ユーザー: eval() 関数を使っている箇所をすべて特定し、セキュリティリスクを評価してください。
+User: Identify every place that uses the eval() function and assess the security risk.
 ```
 
-**Security Auditor の動作:**
+**Security Auditor behavior:**
 
-1. `query_codebase("eval function usage")` で使用箇所を検索
-2. `find_callers` で各箇所への入力経路を追跡
-3. ユーザー入力が到達可能かを分析
-4. リスクレベルと修正提案を生成
+1. Search for usage locations with `query_codebase("eval function usage")`
+2. Trace input paths to each location with `find_callers`
+3. Analyze whether user input can reach them
+4. Generate risk levels and fix proposals
 
-### シナリオ3: 新機能の実装場所決定
+### Scenario 3: Deciding Where to Implement a New Feature
 
 ```text
-ユーザー: 通知機能を追加したいです。どこに実装すべきですか?
+User: I want to add a notification feature. Where should I implement it?
 ```
 
-**System Architect の動作:**
+**System Architect behavior:**
 
-1. `analyze_module_structure` で現在のアーキテクチャを分析
-2. `community` でモジュール境界を確認
-3. 類似機能（メール、SMS等）のパターンを検索
-4. 最適な配置場所を提案
+1. Analyze the current architecture with `analyze_module_structure`
+2. Check module boundaries with `community`
+3. Search for patterns of similar features (email, SMS, etc.)
+4. Propose the optimal placement
 
-## MUSUBIワークフローとの統合
+## Integration with the MUSUBI Workflow
 
-CodeGraph MCPは、MUSUBIの8段階SDDワークフローの各段階で活用されます。
+CodeGraph MCP is used at each stage of MUSUBI's 8-stage SDD workflow.
 
 ```mermaid
 graph TD
-    A[1. 調査・分析] -->|CodeGraph: stats, community| B[2. 要件定義]
-    B -->|query_codebase| C[3. 設計]
-    C -->|analyze_module_structure| D[4. タスク分解]
-    D -->|find_dependencies| E[5. 実装]
-    E -->|local_search, get_code_snippet| F[6. 検証]
-    F -->|find_callers| G[7. デプロイ]
-    G --> H[8. モニタリング]
+    A[1. Research & Analysis] -->|CodeGraph: stats, community| B[2. Requirements]
+    B -->|query_codebase| C[3. Design]
+    C -->|analyze_module_structure| D[4. Task Breakdown]
+    D -->|find_dependencies| E[5. Implementation]
+    E -->|local_search, get_code_snippet| F[6. Validation]
+    F -->|find_callers| G[7. Deployment]
+    G --> H[8. Monitoring]
 ```
 
-### ワークフロー別の活用
+### Usage by Workflow Stage
 
-| ワークフロー段階 | 主なMCPツール | 活用目的 |
+| Workflow Stage | Main MCP Tools | Purpose |
 |-----------------|--------------|----------|
-| 調査・分析 | `stats`, `community` | プロジェクト規模把握、モジュール境界理解 |
-| 要件定義 | `query_codebase` | 既存機能との重複確認 |
-| 設計 | `analyze_module_structure` | アーキテクチャ適合性確認 |
-| タスク分解 | `find_dependencies` | 実装順序の決定 |
-| 実装 | `local_search`, `get_code_snippet` | 類似コードの参照 |
-| 検証 | `find_callers` | テスト対象の特定 |
+| Research & Analysis | `stats`, `community` | Grasp project scale, understand module boundaries |
+| Requirements | `query_codebase` | Check for overlap with existing features |
+| Design | `analyze_module_structure` | Verify architectural fit |
+| Task Breakdown | `find_dependencies` | Determine implementation order |
+| Implementation | `local_search`, `get_code_snippet` | Reference similar code |
+| Validation | `find_callers` | Identify test targets |
 
-## CLI コマンドとの連携
+## Integration with CLI Commands
 
-MUSUBIのCLIコマンドもCodeGraphの分析結果を活用できます。
+MUSUBI's CLI commands can also use CodeGraph analysis results.
 
 ```bash
-# トレーサビリティ分析（CodeGraph活用）
+# Traceability analysis (using CodeGraph)
 musubi-trace matrix --use-codegraph
 
-# 影響分析
+# Impact analysis
 musubi-trace impact REQ-001 --use-codegraph
 
-# ギャップ検出
+# Gap detection
 musubi-gaps detect --use-codegraph
 
-# 変更管理
+# Change management
 musubi-change init feature-xyz --analyze-impact
 ```
 
-## パフォーマンス指標
+## Performance Metrics
 
-CodeGraph MCPの導入により、以下の効果が期待できます。
+Introducing CodeGraph MCP is expected to yield the following benefits.
 
-| 指標 | 導入前 | 導入後 | 改善率 |
+| Metric | Before | After | Improvement |
 |------|--------|--------|--------|
-| コード検索時間 | 手動5-10分 | 即時（<1秒） | **99%削減** |
-| 影響分析精度 | 60-70% | 95%以上 | **+35%** |
-| リファクタリング計画時間 | 2-4時間 | 15-30分 | **85%削減** |
-| バグ原因特定時間 | 30分-2時間 | 5-15分 | **75%削減** |
+| Code search time | 5-10 min manually | Instant (<1 sec) | **99% reduction** |
+| Impact analysis accuracy | 60-70% | 95% or higher | **+35%** |
+| Refactoring planning time | 2-4 hours | 15-30 min | **85% reduction** |
+| Bug cause identification time | 30 min-2 hours | 5-15 min | **75% reduction** |
 
-## まとめ
+## Summary
 
-MUSUBI v2.0 × CodeGraph MCP Serverの統合により、AIエージェントは「ファイル単位の支援」から「**プロジェクト全体を理解した支援**」へと進化しました。
+With the integration of MUSUBI v2.0 × CodeGraph MCP Server, AI agents have evolved from "file-level assistance" to "**assistance that understands the entire project**."
 
-### 主なメリット
+### Key Benefits
 
-1. 🎯 **精度向上**: コードベース全体の依存関係を把握した正確な分析
-2. ⚡ **効率化**: 手動での調査作業を大幅に削減
-3. 🔒 **品質向上**: 見落としがちな影響範囲も自動検出
-4. 🤝 **統合**: MUSUBIの25エージェントとシームレスに連携
+1. 🎯 **Improved accuracy**: Accurate analysis that understands dependencies across the whole codebase
+2. ⚡ **Efficiency**: Greatly reduces manual investigation work
+3. 🔒 **Improved quality**: Automatically detects overlooked impact ranges
+4. 🤝 **Integration**: Works seamlessly with MUSUBI's 25 agents
 
-### 始め方
+### Getting Started
 
 ```bash
-# MUSUBIをインストール
+# Install MUSUBI
 npm install -g musubi-sdd
 
-# プロジェクトで初期化
+# Initialize in your project
 musubi init --claude-code
 
-# Orchestratorに依頼
-# "CodeGraph MCP を設定して"
+# Ask the Orchestrator
+# "Configure CodeGraph MCP"
 ```
 
 ---
 
-## 関連リンク
+## Related Links
 
-### Qiita記事
+### Qiita Articles
 
-- 📚 [MUSUBI - 7つのAIエージェント対応、25スキル搭載の究極仕様駆動開発ツール](https://qiita.com/hisaho/items/a245c2ad5adf2ab5a409)
-- 📊 [CodeGraph MCP Server - AIコーディングアシスタントにコード理解力を与える](https://qiita.com/hisaho/items/b99ac51d78119ef60b6b)
+- 📚 [MUSUBI - The Ultimate Specification Driven Development Tool with 7 AI Agent Support and 25 Skills](https://qiita.com/hisaho/items/a245c2ad5adf2ab5a409)
+- 📊 [CodeGraph MCP Server - Giving AI Coding Assistants Code Understanding](https://qiita.com/hisaho/items/b99ac51d78119ef60b6b)
 
 ### GitHub
 
@@ -464,4 +464,4 @@ musubi init --claude-code
 
 ---
 
-**Tags:** `MUSUBI` `MCP` `CodeGraph` `AI` `コーディングアシスタント` `GraphRAG` `仕様駆動開発` `SDD`
+**Tags:** `MUSUBI` `MCP` `CodeGraph` `AI` `Coding Assistant` `GraphRAG` `Spec-Driven Development` `SDD`

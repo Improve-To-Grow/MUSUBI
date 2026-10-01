@@ -1,625 +1,625 @@
-# Ultimate SDD Tool "MUSUBI" - 7つのAIエージェント対応、25スキル搭載の究極仕様駆動開発ツール
+# Ultimate SDD Tool "MUSUBI" - The Ultimate Specification Driven Development Tool with 7 AI Agents Supported and 25 Skills
 
-> **MUSUBI v2.1.1** - 仕様、設計、コードを結びつける包括的SDDフレームワーク
+> **MUSUBI v2.1.1** - A comprehensive SDD framework that connects specifications, design, and code
 >
-> 🆕 v2.0新機能: [CodeGraph MCP統合](https://qiita.com/hisaho/items/719210ccc20fe2514054)でプロジェクト全体のコード理解力を獲得！
+> 🆕 New in v2.0: Gain project-wide code understanding with [CodeGraph MCP integration](https://qiita.com/hisaho/items/719210ccc20fe2514054)!
 
-## はじめに
+## Introduction
 
-ソフトウェア開発における最大の課題の一つは、**要件から実装、テスト、デプロイまでの一貫性を保つこと**です。AIコーディングアシスタントの登場により開発速度は向上しましたが、仕様の曖昧さやトレーサビリティの欠如により、品質問題が頻発しています。
+One of the biggest challenges in software development is **maintaining consistency from requirements through implementation, testing, and deployment**. AI coding assistants have increased development speed, but quality problems occur frequently because of ambiguous specifications and a lack of traceability.
 
-この記事では、Specification Driven Development（仕様駆動開発）を徹底的に支援する究極のツール **MUSUBI** を紹介します。MUSUBIは、spec-copilot（19エージェント）から始まり、MUSUHI（20エージェント）を経て、**7つのAIコーディングエージェント対応、25の専門スキルを搭載した最終形態**へと進化しました。
+This article introduces **MUSUBI**, the ultimate tool for thoroughly supporting Specification Driven Development. MUSUBI started as spec-copilot (19 agents), went through MUSUHI (20 agents), and has evolved into **its final form: support for 7 AI coding agents and 25 specialized skills**.
 
-**v2.0の革新**: CodeGraph MCP Serverとの統合により、AIエージェントが「ファイル単位の支援」から「プロジェクト全体を理解した支援」へと進化しました。
+**The v2.0 innovation**: Through integration with the CodeGraph MCP Server, AI agents have evolved from "file-level assistance" to "assistance that understands the whole project."
 
-## MUSUBIとは？
+## What Is MUSUBI?
 
-**MUSUBI**（むすび - "結び"）は、仕様、設計、コードを結びつける包括的なSDD（Specification Driven Development）フレームワークです。
+**MUSUBI** (musubi - "connection/binding") is a comprehensive SDD (Specification Driven Development) framework that connects specifications, design, and code.
 
-### 主な特徴
-
-
-- 🤖 **マルチエージェント対応**
-   - Claude Code、GitHub Copilot、Cursor、Gemini CLI、Codex CLI、Qwen Code、Windsurf
-   - 7つの主要AIエージェントで動作
-- 🎯 **25の専門エージェント（全プラットフォーム対応）**
-   - オーケストレーション、要件、アーキテクチャ、開発、品質、セキュリティ、インフラ
-   - Claude Code: Skills API、他6エージェント: AGENTS.md
-   - 完全なSDDワークフローカバレッジ
-- 📄 **柔軟なコマンド形式**
-   - Markdown形式（6エージェント）
-   - TOML形式（Gemini CLI専用）
-   - AGENTS.md形式（OpenAI仕様準拠）
-- 📋 **憲法ガバナンス**
-   - 9つの不変条項
-   - フェーズ-1ゲートによる品質保証
-- 📝 **EARS要件形式**
-   - 曖昧さのない、テスト可能な要件
-   - 完全なトレーサビリティ
-- 🧭 **自動更新プロジェクトメモリ**
-   - ステアリングシステムが自動更新
-   - アーキテクチャ、技術スタック、製品コンテキストを維持
+### Key Features
 
 
-## 進化の歴史: spec-copilot → MUSUHI → MUSUBI
+- 🤖 **Multi-Agent Support**
+   - Claude Code, GitHub Copilot, Cursor, Gemini CLI, Codex CLI, Qwen Code, Windsurf
+   - Works with 7 major AI agents
+- 🎯 **25 Specialized Agents (All Platforms Supported)**
+   - Orchestration, requirements, architecture, development, quality, security, infrastructure
+   - Claude Code: Skills API; other 6 agents: AGENTS.md
+   - Complete SDD workflow coverage
+- 📄 **Flexible Command Formats**
+   - Markdown format (6 agents)
+   - TOML format (Gemini CLI only)
+   - AGENTS.md format (OpenAI specification compliant)
+- 📋 **Constitutional Governance**
+   - 9 immutable articles
+   - Quality assurance through Phase -1 Gates
+- 📝 **EARS Requirements Format**
+   - Unambiguous, testable requirements
+   - Complete traceability
+- 🧭 **Auto-Updating Project Memory**
+   - The steering system updates automatically
+   - Maintains architecture, tech stack, and product context
 
-### 第1世代： spec-copilot(19エージェント)
 
-**spec-copilot**（"specification driven development を支援する copilot" - 仕様駆動開発を支援するAIペアプログラマーという意味）は、GitHub Copilot向けの19種類の専門AIエージェント群として誕生しました。
+## Evolution: spec-copilot → MUSUHI → MUSUBI
 
-**特徴**：
-- ✅ 専門特化型エージェント（19種類）
-- ✅ 構造化された対話フロー（1問1答形式）
-- ✅ 実践的なコード例とベストプラクティス
-- ✅ ファイル出力対応
-- ❌ **単一エージェント対応**（GitHub Copilotのみ）
-- ❌ **プロジェクトメモリなし**
-- ❌ **要件形式の標準化なし**
+### Generation 1: spec-copilot (19 agents)
 
-### 第2世代： MUSUHI（20エージェント）
+**spec-copilot** (a "copilot that supports specification driven development" - meaning an AI pair programmer that supports specification driven development) was born as a group of 19 specialized AI agents for GitHub Copilot.
 
-**MUSUHI**（"むすひ（産霊）" - 日本の古語や神道の概念で、**「結び」「生み出す力」** を意味する。仕様から実装を生み出す力を表現）は、spec-copilotを拡張し、マルチエージェント対応とプロジェクトメモリシステムを導入しました。
+**Features**:
+- ✅ Specialized agents (19 types)
+- ✅ Structured dialogue flow (one question at a time)
+- ✅ Practical code examples and best practices
+- ✅ File output support
+- ❌ **Single-agent support** (GitHub Copilot only)
+- ❌ **No project memory**
+- ❌ **No standardized requirements format**
 
-**追加機能**：
-- ✅ **マルチプラットフォーム対応**（Claude Code、GitHub Copilot、Cursor、Windsurf、Gemini、Codex、Qwen）
-- ✅ **プロジェクトメモリ（Steeringシステム）**
-  - `steering/structure.md` - アーキテクチャパターン
-  - `steering/tech.md` - 技術スタック
-  - `steering/product.md` - ビジネスコンテキスト
-- ✅ **EARS要件形式のサポート**
-- ✅ **自動コンテキスト認識**（全エージェントが自動的にステアリングを参照）
-- ✅ **バイリンガルドキュメント**（英語・日本語）
-- ❌ **Claude Code専用機能なし**
-- ❌ **憲法ガバナンスなし**
+### Generation 2: MUSUHI (20 agents)
 
-### 第3世代： MUSUBI（25スキル + 完全SDD対応）
+**MUSUHI** ("musuhi (creative spirit)" - an old Japanese word and Shinto concept meaning **"binding" and "the power to generate"**. It expresses the power to generate implementation from specifications) extended spec-copilot and introduced multi-agent support and a project memory system.
 
-**MUSUBI**（"むすび（結び）" - 仕様、設計、コードを結びつけるという本質的な役割を表現）は、MUSUHIをベースに、6つの主要SDDフレームワークの機能を統合した究極形態です。
+**Added features**:
+- ✅ **Multi-platform support** (Claude Code, GitHub Copilot, Cursor, Windsurf, Gemini, Codex, Qwen)
+- ✅ **Project memory (Steering system)**
+  - `steering/structure.md` - Architecture patterns
+  - `steering/tech.md` - Technology stack
+  - `steering/product.md` - Business context
+- ✅ **EARS requirements format support**
+- ✅ **Automatic context awareness** (all agents automatically reference steering)
+- ✅ **Bilingual documentation** (English and Japanese)
+- ❌ **No Claude Code-specific features**
+- ❌ **No constitutional governance**
 
-**革新的機能**：
-- ✅ **25の専門エージェント（全7プラットフォーム対応）**
-  - Claude Code: Skills API（25スキル）
-  - GitHub Copilot & Cursor: AGENTS.md（公式サポート）
-  - その他4エージェント: AGENTS.md（互換形式）
-- ✅ **憲法ガバナンス**（9つの不変条項）
-- ✅ **フェーズ-1ゲート**（品質保証の事前チェック）
-- ✅ **差分仕様（Delta Specs）**（ブラウンフィールド対応）
-- ✅ **完全トレーサビリティ**（要件 → 設計 → コード → テスト）
-- ✅ **8段階SDDワークフロー**（調査 → モニタリングまで）
-- ✅ **自動ステアリング更新**（エージェント作業後に自動更新）
+### Generation 3: MUSUBI (25 Skills + Full SDD Support)
 
-## MUSUBIが統合した6つのSDDフレームワーク
+**MUSUBI** ("musubi (binding)" - expressing its essential role of connecting specifications, design, and code) is the ultimate form built on MUSUHI, integrating the features of 6 major SDD frameworks.
 
-MUSUBIは、以下の6つの主要フレームワークのベスト機能を統合しています。
+**Innovative features**:
+- ✅ **25 specialized agents (all 7 platforms supported)**
+  - Claude Code: Skills API (25 skills)
+  - GitHub Copilot & Cursor: AGENTS.md (official support)
+  - Other 4 agents: AGENTS.md (compatible format)
+- ✅ **Constitutional governance** (9 immutable articles)
+- ✅ **Phase -1 Gates** (pre-checks for quality assurance)
+- ✅ **Delta Specs** (brownfield support)
+- ✅ **Complete traceability** (requirements → design → code → tests)
+- ✅ **8-stage SDD workflow** (from research to monitoring)
+- ✅ **Automatic steering updates** (updated automatically after agent work)
 
-### 1. **musuhi** - ステアリングシステム、EARS形式
+## The 6 SDD Frameworks Integrated into MUSUBI
 
-- 📌 **採用機能**: 20エージェントシステム、プロジェクトメモリ（Steering）、EARS要件形式
-- 🎯 **MUSUBIでの強化**: 25スキルに拡張、自動ステアリング更新
+MUSUBI integrates the best features of the following 6 major frameworks.
 
-### 2. **OpenSpec** - 差分仕様、ブラウンフィールド対応
+### 1. **musuhi** - Steering System, EARS Format
 
-- 📌 **採用機能**: Delta Specs（ADDED/MODIFIED/REMOVED）、変更影響分析
-- 🎯 **MUSUBIでの強化**: change-impact-analyzerスキル、トレーサビリティマトリックス
+- 📌 **Adopted features**: 20-agent system, project memory (Steering), EARS requirements format
+- 🎯 **Enhancements in MUSUBI**: Expanded to 25 skills, automatic steering updates
 
-### 3. **ag2 (AutoGen)** - マルチエージェントオーケストレーション
+### 2. **OpenSpec** - Delta Specs, Brownfield Support
 
-- 📌 **採用機能**: 複数エージェント連携、タスク分解、依存関係管理
-- 🎯 **MUSUBIでの強化**: Orchestratorスキル、25スキル間の自動連携
+- 📌 **Adopted features**: Delta Specs (ADDED/MODIFIED/REMOVED), change impact analysis
+- 🎯 **Enhancements in MUSUBI**: change-impact-analyzer skill, traceability matrix
 
-### 4. **ai-dev-tasks** - シンプリシティ、段階的複雑性
+### 3. **ag2 (AutoGen)** - Multi-Agent Orchestration
 
-- 📌 **採用機能**: 最小3プロジェクトルール、段階的な機能追加
-- 🎯 **MUSUBIでの強化**: 憲法条項VII（シンプリシティゲート）
+- 📌 **Adopted features**: Multi-agent coordination, task breakdown, dependency management
+- 🎯 **Enhancements in MUSUBI**: Orchestrator skill, automatic coordination among the 25 skills
 
-### 5. **cc-sdd** - マルチエージェント対応、検証ゲート
+### 4. **ai-dev-tasks** - Simplicity, Incremental Complexity
 
-- 📌 **採用機能**: エージェントレジストリ、動的CLIフラグ生成、検証フレームワーク
-- 🎯 **MUSUBIでの強化**: 7エージェント対応、憲法バリデーション
+- 📌 **Adopted features**: Minimum 3-project rule, incremental feature addition
+- 🎯 **Enhancements in MUSUBI**: Constitutional Article VII (Simplicity Gate)
 
-### 6. **spec-kit** - 憲法ガバナンス、テストファースト
+### 5. **cc-sdd** - Multi-Agent Support, Validation Gates
 
-- 📌 **採用機能**: 憲法条項、フェーズ-1ゲート、テストファースト命令
-- 🎯 **MUSUBIでの強化**: 9つの完全憲法条項、constitution-enforcerスキル
+- 📌 **Adopted features**: Agent registry, dynamic CLI flag generation, validation framework
+- 🎯 **Enhancements in MUSUBI**: 7-agent support, constitutional validation
 
-## MUSUBIの9つの憲法条項
+### 6. **spec-kit** - Constitutional Governance, Test-First
 
-MUSUBIは、品質を保証するための**9つの不変憲法条項**を施行します。
+- 📌 **Adopted features**: Constitutional Articles, Phase -1 Gates, Test-First imperative
+- 🎯 **Enhancements in MUSUBI**: 9 complete Constitutional Articles, constitution-enforcer skill
 
-### Article I: ライブラリファースト原則
+## MUSUBI's 9 Constitutional Articles
 
-```
-すべての機能は lib/ ディレクトリのライブラリとして開始する。
-フレームワーク非依存のコアロジックを強制。
-```
+MUSUBI enforces **9 immutable Constitutional Articles** to guarantee quality.
 
-**検証**:
-- ✅ `lib/{{feature-name}}/` にコア実装が存在
-- ✅ フレームワーク依存なし（`grep -r "from 'next"` で検証）
-- ✅ クリーンな公開API
-
-### Article II: CLIインターフェース義務
+### Article I: Library-First Principle
 
 ```
-すべてのライブラリは lib/{{feature}}/cli.ts を公開する。
-コマンドラインからの実行を強制。
+Every feature starts as a library in the lib/ directory.
+Enforces framework-independent core logic.
 ```
 
-**検証**:
-- ✅ `lib/{{feature}}/cli.ts` が存在
-- ✅ 主要機能がCLI経由で実行可能
-- ✅ ヘルプテキスト完備
+**Validation**:
+- ✅ Core implementation exists in `lib/{{feature-name}}/`
+- ✅ No framework dependencies (verified with `grep -r "from 'next"`)
+- ✅ Clean public API
 
-### Article III: テストファースト命令
-
-```
-コードの前にテストを書く（RED-GREEN-BLUE）。
-80%以上のカバレッジ必須。
-```
-
-**検証**:
-- ✅ すべてのモジュールにテストファイルが存在
-- ✅ カバレッジ >= 80%
-- ✅ RED-GREEN-BLUEパターン遵守（git履歴で確認）
-
-### Article IV: EARS要件形式
+### Article II: CLI Interface Mandate
 
 ```
-すべての要件はEARSパターンを使用する。
-曖昧性を排除し、テスト可能な要件を強制。
+Every library exposes lib/{{feature}}/cli.ts.
+Enforces execution from the command line.
 ```
 
-**EARSパターン**:
+**Validation**:
+- ✅ `lib/{{feature}}/cli.ts` exists
+- ✅ Main functionality can be run via the CLI
+- ✅ Help text is complete
+
+### Article III: Test-First Imperative
+
+```
+Write tests before code (RED-GREEN-BLUE).
+80% or higher coverage required.
+```
+
+**Validation**:
+- ✅ A test file exists for every module
+- ✅ Coverage >= 80%
+- ✅ RED-GREEN-BLUE pattern followed (verified in git history)
+
+### Article IV: EARS Requirements Format
+
+```
+All requirements use EARS patterns.
+Eliminates ambiguity and enforces testable requirements.
+```
+
+**EARS patterns**:
 ```markdown
-WHEN ユーザーが有効な認証情報を提供する場合、
-THEN システムSHALLユーザーを認証する
-AND システムSHALLセッションを作成する。
+WHEN the user provides valid credentials,
+THEN the system SHALL authenticate the user
+AND the system SHALL create a session.
 ```
 
-**検証**:
-- ✅ 全要件がEARSキーワード（WHEN、SHALL、IF、THEN）を使用
-- ✅ 曖昧性なし
-- ✅ 各要件がテスト可能
+**Validation**:
+- ✅ All requirements use EARS keywords (WHEN, SHALL, IF, THEN)
+- ✅ No ambiguity
+- ✅ Each requirement is testable
 
-### Article V: トレーサビリティ義務
+### Article V: Traceability Mandate
 
 ```
-要件 → 設計 → コード → テストの100%トレーサビリティ必須。
-すべての要件が実装とテストに追跡可能。
+100% traceability from requirements → design → code → tests is required.
+Every requirement is traceable to its implementation and tests.
 ```
 
-**トレーサビリティマトリックス例**:
-| 要件ID | 設計 | 実装 | テスト | ステータス |
+**Traceability matrix example**:
+| Requirement ID | Design | Implementation | Test | Status |
 |--------|------|------|--------|-----------|
 | REQ-AUTH-001 | Section 7 | AuthService.register() | auth-service.test.ts:L25 | ✅ |
 | REQ-AUTH-002 | Section 7 | PasswordValidator.validate() | password-validator.test.ts:L15 | ✅ |
 
-### Article VI: プロジェクトメモリ
+### Article VI: Project Memory
 
 ```
-すべてのスキルは意思決定前にステアリングを参照する。
-一貫性のあるアーキテクチャと技術スタックを強制。
+Every skill consults steering before making decisions.
+Enforces a consistent architecture and tech stack.
 ```
 
-**ステアリングファイル**:
-- `steering/structure.md` - アーキテクチャパターン
-- `steering/tech.md` - 技術スタック
-- `steering/product.md` - ビジネスコンテキスト
+**Steering files**:
+- `steering/structure.md` - Architecture patterns
+- `steering/tech.md` - Technology stack
+- `steering/product.md` - Business context
 
-### Article VII: シンプリシティゲート
-
-```
-初期は最大3つのライブラリまで。
-段階的な複雑性の追加を強制。
-```
-
-### Article VIII: アンチアブストラクションゲート
+### Article VII: Simplicity Gate
 
 ```
-フレームワーク機能を直接使用する。
-不要なラッパーやアダプターを禁止。
+Start with at most 3 libraries.
+Enforces incremental addition of complexity.
 ```
 
-**禁止例**:
-- ❌ カスタムORM Wrapper（Prismaを直接使用）
-- ❌ カスタムReact Wrapper
-- ❌ カスタムNext.js Wrapper
-
-### Article IX: インテグレーションファーストテスティング
+### Article VIII: Anti-Abstraction Gate
 
 ```
-実サービスを使用したテスト。
-モックの最小化を強制。
+Use framework features directly.
+Prohibits unnecessary wrappers and adapters.
 ```
 
-**検証**:
-- ✅ テスト用データベース使用（実PostgreSQL）
-- ✅ モック数最小限
-- ✅ 統合テスト存在
+**Prohibited examples**:
+- ❌ Custom ORM wrapper (use Prisma directly)
+- ❌ Custom React wrapper
+- ❌ Custom Next.js wrapper
 
-## 全プラットフォーム対応：25の専門エージェント
+### Article IX: Integration-First Testing
 
-MUSUBIの最大の特徴は、**7つのAIコーディングエージェント全てで利用できる25の専門エージェント**です。
+```
+Test with real services.
+Enforces minimal mocking.
+```
 
-### 実装形式
+**Validation**:
+- ✅ Use a test database (real PostgreSQL)
+- ✅ Minimal number of mocks
+- ✅ Integration tests exist
 
-- **Claude Code**: Skills API（モデルが自動起動）
-- **GitHub Copilot**: `.github/AGENTS.md`（公式サポート）
-- **Cursor**: `.cursor/AGENTS.md`（公式サポート）
-- **Gemini CLI**: `GEMINI.md`（既存ファイルに統合）
+## All-Platform Support: 25 Specialized Agents
+
+MUSUBI's biggest feature is **25 specialized agents available on all 7 AI coding agents**.
+
+### Implementation Formats
+
+- **Claude Code**: Skills API (the model invokes them automatically)
+- **GitHub Copilot**: `.github/AGENTS.md` (official support)
+- **Cursor**: `.cursor/AGENTS.md` (official support)
+- **Gemini CLI**: `GEMINI.md` (integrated into the existing file)
 - **Windsurf**: `.windsurf/AGENTS.md`
 - **Codex**: `.codex/AGENTS.md`
 - **Qwen Code**: `.qwen/AGENTS.md`
 
-### 25エージェント一覧
+### List of 25 Agents
 
-### オーケストレーションと管理（3スキル）
+### Orchestration and Management (3 skills)
 
-1. **orchestrator** - 25スキル間のマスターコーディネーター
-2. **steering** - プロジェクトメモリマネージャー（自動更新）
-3. **constitution-enforcer** - 憲法ガバナンス検証（9条項 + フェーズ-1ゲート）
+1. **orchestrator** - Master coordinator across the 25 skills
+2. **steering** - Project memory manager (auto-updating)
+3. **constitution-enforcer** - Constitutional governance validation (9 articles + Phase -1 Gates)
 
-### 要件と計画（3スキル）
+### Requirements and Planning (3 skills)
 
-4. **requirements-analyst** - EARS形式要件生成
-5. **project-manager** - プロジェクト計画、スケジューリング、リスク管理
-6. **change-impact-analyzer** - ブラウンフィールド変更分析（Delta Specs）
+4. **requirements-analyst** - EARS-format requirements generation
+5. **project-manager** - Project planning, scheduling, risk management
+6. **change-impact-analyzer** - Brownfield change analysis (Delta Specs)
 
-### アーキテクチャと設計（4スキル）
+### Architecture and Design (4 skills)
 
-7. **system-architect** - C4モデル + ADRアーキテクチャ設計
-8. **api-designer** - REST/GraphQL/gRPC API設計
-9. **database-schema-designer** - データベース設計、ER図、DDL
-10. **ui-ux-designer** - UI/UX設計、ワイヤーフレーム、プロトタイプ
+7. **system-architect** - C4 model + ADR architecture design
+8. **api-designer** - REST/GraphQL/gRPC API design
+9. **database-schema-designer** - Database design, ER diagrams, DDL
+10. **ui-ux-designer** - UI/UX design, wireframes, prototypes
 
-### 開発（1スキル）
+### Development (1 skill)
 
-11. **software-developer** - 多言語コード実装（TypeScript、Python、Goなど）
+11. **software-developer** - Multi-language code implementation (TypeScript, Python, Go, etc.)
 
-### 品質とレビュー（5スキル）
+### Quality and Review (5 skills)
 
-12. **test-engineer** - ユニット、統合、E2EテストとEARSマッピング
-13. **code-reviewer** - コードレビュー、SOLID原則
-14. **bug-hunter** - バグ調査、根本原因分析
-15. **quality-assurance** - QA戦略、テスト計画
-16. **traceability-auditor** - 要件 ↔ コード ↔ テストカバレッジ検証
+12. **test-engineer** - Unit, integration, and E2E tests with EARS mapping
+13. **code-reviewer** - Code review, SOLID principles
+14. **bug-hunter** - Bug investigation, root cause analysis
+15. **quality-assurance** - QA strategy, test planning
+16. **traceability-auditor** - Requirements ↔ code ↔ test coverage validation
 
-### セキュリティとパフォーマンス（2スキル）
+### Security and Performance (2 skills)
 
-17. **security-auditor** - OWASP Top 10、脆弱性検出
-18. **performance-optimizer** - パフォーマンス分析、最適化
+17. **security-auditor** - OWASP Top 10, vulnerability detection
+18. **performance-optimizer** - Performance analysis, optimization
 
-### インフラと運用（5スキル）
+### Infrastructure and Operations (5 skills)
 
-19. **devops-engineer** - CI/CDパイプライン、Docker/Kubernetes
-20. **cloud-architect** - AWS/Azure/GCP、IaC（Terraform/Bicep）
-21. **database-administrator** - データベース運用、チューニング
-22. **site-reliability-engineer** - 本番監視、SLO/SLI、インシデント対応
-23. **release-coordinator** - マルチコンポーネントリリース管理
+19. **devops-engineer** - CI/CD pipelines, Docker/Kubernetes
+20. **cloud-architect** - AWS/Azure/GCP, IaC (Terraform/Bicep)
+21. **database-administrator** - Database operations, tuning
+22. **site-reliability-engineer** - Production monitoring, SLO/SLI, incident response
+23. **release-coordinator** - Multi-component release management
 
-### ドキュメントと専門（2スキル）
+### Documentation and Specialty (2 skills)
 
-24. **technical-writer** - 技術ドキュメント、APIドキュメント
-25. **ai-ml-engineer** - MLモデル開発、MLOps
+24. **technical-writer** - Technical documentation, API documentation
+25. **ai-ml-engineer** - ML model development, MLOps
 
-## 8段階SDDワークフロー
+## 8-Stage SDD Workflow
 
-MUSUBIは、完全な8段階ワークフローをサポートします。
+MUSUBI supports a complete 8-stage workflow.
 
 ```
-1. Research（調査）
+1. Research
    ↓
-2. Requirements（要件）- EARS形式
+2. Requirements - EARS format
    ↓
-3. Design（設計）- C4モデル + ADR
+3. Design - C4 model + ADR
    ↓
-4. Tasks（タスク）- 要件カバレッジマトリックス
+4. Tasks - Requirements coverage matrix
    ↓
-5. Implementation（実装）- RED-GREEN-BLUE
+5. Implementation - RED-GREEN-BLUE
    ↓
-6. Testing（テスト）- 統合テスト優先
+6. Testing - Integration tests first
    ↓
-7. Deployment（デプロイ）- CI/CD自動化
+7. Deployment - CI/CD automation
    ↓
-8. Monitoring（モニタリング）- SLO/SLI、可観測性
+8. Monitoring - SLO/SLI, observability
 ```
 
-各段階には：
-- ✅ 専用スキル
-- ✅ 品質ゲート
-- ✅ トレーサビリティ要件
-- ✅ 憲法検証
+Each stage has:
+- ✅ A dedicated skill
+- ✅ Quality gates
+- ✅ Traceability requirements
+- ✅ Constitutional validation
 
-## 実際の使用例
+## Real-World Usage Examples
 
-### プロジェクトタイプとは？
+### What Are Project Types?
 
-MUSUBIは2つの異なるプロジェクトタイプに対応しています。
+MUSUBI supports two different project types.
 
-#### グリーンフィールドプロジェクト（0→1）
+#### Greenfield Projects (0→1)
 
-**何もない状態から新規プロジェクトを立ち上げる**シナリオです。
+This is the scenario of **launching a new project from nothing**.
 
-- **0→1の意味**: ゼロ（何もない）から1（最初のプロダクト）を作る
-- **特徴**:
-  - 既存コードベースなし
-  - 自由なアーキテクチャ設計が可能
-  - 技術スタックを自由に選択できる
-  - レガシーコードの制約がない
-- **例**: 新規スタートアップのMVP開発、新サービスの立ち上げ、POC（概念実証）プロジェクト
+- **Meaning of 0→1**: Building the first product (1) from zero (nothing)
+- **Characteristics**:
+  - No existing codebase
+  - Freedom in architecture design
+  - Free choice of tech stack
+  - No legacy code constraints
+- **Examples**: MVP development for a new startup, launching a new service, POC (proof of concept) projects
 
-#### ブラウンフィールドプロジェクト（1→n）
+#### Brownfield Projects (1→n)
 
-**既存のプロジェクトに新機能を追加したり、改修する**シナリオです。
+This is the scenario of **adding new features to, or modifying, an existing project**.
 
-- **1→nの意味**: 1（既存プロダクト）からn（改善・拡張版）へ進化させる
-- **特徴**:
-  - 既存コードベースあり
-  - レガシーコードへの配慮が必要
-  - 既存アーキテクチャの制約あり
-  - 変更影響分析が重要
-  - 段階的な移行が必要
-- **例**: 既存サービスへの新機能追加、リファクタリング、技術的負債の解消、セキュリティ強化
+- **Meaning of 1→n**: Evolving from 1 (the existing product) to n (the improved/extended version)
+- **Characteristics**:
+  - Existing codebase
+  - Legacy code must be taken into account
+  - Constraints from the existing architecture
+  - Change impact analysis is important
+  - Incremental migration is required
+- **Examples**: Adding new features to an existing service, refactoring, paying down technical debt, security hardening
 
-MUSUBIは両方のシナリオで**完全なSDDワークフロー**を提供します。特にブラウンフィールドでは、OpenSpecから採用した **Delta Specs（差分仕様）** により、変更影響を最小限に抑えながら安全に進化させることができます。
+MUSUBI provides a **complete SDD workflow** in both scenarios. In brownfield projects in particular, **Delta Specs**, adopted from OpenSpec, let you evolve safely while minimizing the impact of changes.
 
 ---
 
-### グリーンフィールドプロジェクト（0→1）の使用例
+### Usage Example for Greenfield Projects (0→1)
 
 ```bash
-# 1. 初期化（任意のエージェント向け）
+# 1. Initialize (for any agent)
 npx musubi-sdd init --claude      # Claude Code (Skills API)
 npx musubi-sdd init --copilot     # GitHub Copilot (AGENTS.md)
 npx musubi-sdd init --cursor      # Cursor (AGENTS.md)
-# その他: --gemini, --windsurf, --codex, --qwen
+# Others: --gemini, --windsurf, --codex, --qwen
 
-# 2. プロジェクトメモリ生成
+# 2. Generate project memory
 # Claude Code: /sdd-steering
-# GitHub Copilot/Cursor: @steering または自然言語で参照
+# GitHub Copilot/Cursor: reference with @steering or in natural language
 
-# 3. 要件作成（EARS形式）
+# 3. Create requirements (EARS format)
 # Claude Code: /sdd-requirements user-authentication
-# その他: @requirements-analyst を参照して対話
+# Others: reference @requirements-analyst and converse
 
-# 4. アーキテクチャ設計
+# 4. Architecture design
 # Claude Code: /sdd-design user-authentication
-# その他: @system-architect を参照して対話
+# Others: reference @system-architect and converse
 
-# 5-7. 以下同様にエージェントを活用
+# 5-7. Use the agents in the same way from here on
 ```
 
-### ブラウンフィールドプロジェクト（1→n）
+### Brownfield Projects (1→n)
 
 ```bash
-# 1. 既存コードベースで初期化
+# 1. Initialize in an existing codebase
 npx musubi-sdd init --claude
 
-# 2. 既存コードからステアリング生成
+# 2. Generate steering from the existing code
 /sdd-steering
 
-# 3. 変更提案作成（Delta Specs）
+# 3. Create a change proposal (Delta Specs)
 /sdd-change-init add-2fa
 
-# 4. 影響分析（change-impact-analyzerスキル自動起動）
-# → ADDED/MODIFIED/REMOVED要件を自動検出
+# 4. Impact analysis (the change-impact-analyzer skill is invoked automatically)
+# → Automatically detects ADDED/MODIFIED/REMOVED requirements
 
-# 5. 変更実装
+# 5. Implement the change
 /sdd-change-apply add-2fa
 
-# 6. 変更アーカイブ
+# 6. Archive the change
 /sdd-change-archive add-2fa
 ```
 
-## 他のSDDツールとの比較
+## Comparison with Other SDD Tools
 
-### 機能比較表
+### Feature Comparison Table
 
-| 機能 | spec-copilot | MUSUHI | MUSUBI | cc-sdd | OpenSpec | spec-kit |
+| Feature | spec-copilot | MUSUHI | MUSUBI | cc-sdd | OpenSpec | spec-kit |
 |------|--------------|--------|--------|--------|----------|----------|
-| **エージェント数** | 19 | 20 | **25エージェント** | 10 | 5 | 8 |
-| **マルチプラットフォーム** | ❌（Copilotのみ） | ✅（7エージェント） | ✅（**7エージェント**） | ✅（5エージェント） | ❌ | ❌ |
-| **25エージェント全対応** | ❌ | ❌ | ✅（**全7プラットフォーム**） | ❌ | ❌ | ❌ |
-| **プロジェクトメモリ** | ❌ | ✅ | ✅（**自動更新**） | ❌ | ❌ | ❌ |
-| **EARS要件形式** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| **憲法ガバナンス** | ❌ | ❌ | ✅（**9条項**） | ❌ | ❌ | ✅（基本） |
+| **Number of agents** | 19 | 20 | **25 agents** | 10 | 5 | 8 |
+| **Multi-platform** | ❌ (Copilot only) | ✅ (7 agents) | ✅ (**7 agents**) | ✅ (5 agents) | ❌ | ❌ |
+| **All 25 agents supported** | ❌ | ❌ | ✅ (**all 7 platforms**) | ❌ | ❌ | ❌ |
+| **Project memory** | ❌ | ✅ | ✅ (**auto-updating**) | ❌ | ❌ | ❌ |
+| **EARS requirements format** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| **Constitutional governance** | ❌ | ❌ | ✅ (**9 articles**) | ❌ | ❌ | ✅ (basic) |
 | **Delta Specs** | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ |
-| **トレーサビリティ** | 手動 | 自動参照 | **自動監査** | 手動 | 手動 | 手動 |
-| **SDDワークフロー** | 6段階 | 8段階 | **8段階（完全）** | 4段階 | 3段階 | 5段階 |
-| **Skills API対応** | ❌ | ❌ | ✅（**Claude Code**） | ❌ | ❌ | ❌ |
-| **AGENTS.md対応** | ❌ | ❌ | ✅（**6エージェント**） | ❌ | ❌ | ❌ |
-| **バイリンガル** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| **Traceability** | Manual | Auto-reference | **Auto-audit** | Manual | Manual | Manual |
+| **SDD workflow** | 6 stages | 8 stages | **8 stages (complete)** | 4 stages | 3 stages | 5 stages |
+| **Skills API support** | ❌ | ❌ | ✅ (**Claude Code**) | ❌ | ❌ | ❌ |
+| **AGENTS.md support** | ❌ | ❌ | ✅ (**6 agents**) | ❌ | ❌ | ❌ |
+| **Bilingual** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
 
-### MUSUBIの優位性
+### MUSUBI's Advantages
 
-#### 1. **最も包括的なエージェントセット（25エージェント × 7プラットフォーム）**
+#### 1. **The Most Comprehensive Agent Set (25 Agents x 7 Platforms)**
 
-- ✅ spec-copilot（19）、MUSUHI（20）を超える最大エージェント数
-- ✅ **全7プラットフォームで25エージェント利用可能**（業界初）
-- ✅ SDD全ステージ（調査→モニタリング）を100%カバー
-- ✅ Claude Code Skills API + AGENTS.md（OpenAI仕様準拠）のハイブリッド対応
+- ✅ The largest number of agents, surpassing spec-copilot (19) and MUSUHI (20)
+- ✅ **25 agents available on all 7 platforms** (an industry first)
+- ✅ 100% coverage of all SDD stages (research → monitoring)
+- ✅ Hybrid support for the Claude Code Skills API + AGENTS.md (OpenAI specification compliant)
 
-#### 2. **唯一の完全憲法ガバナンス**
+#### 2. **The Only Complete Constitutional Governance**
 
-- ✅ 9つの不変条項（spec-kitは3条項のみ）
-- ✅ constitution-enforcerスキルによる自動検証
-- ✅ フェーズ-1ゲート（実装前の品質チェック）
+- ✅ 9 immutable articles (spec-kit has only 3 articles)
+- ✅ Automatic validation via the constitution-enforcer skill
+- ✅ Phase -1 Gates (quality checks before implementation)
 
-#### 3. **最も強力なトレーサビリティ**
+#### 3. **The Strongest Traceability**
 
-- ✅ traceability-auditorスキルによる独立検証
-- ✅ 要件 ↔ 設計 ↔ コード ↔ テストの100%追跡
-- ✅ OpenSpecのDelta Specs統合
+- ✅ Independent verification via the traceability-auditor skill
+- ✅ 100% tracking of requirements ↔ design ↔ code ↔ tests
+- ✅ Integration of OpenSpec's Delta Specs
 
-#### 4. **最広範なマルチプラットフォーム対応**
+#### 4. **The Broadest Multi-Platform Support**
 
-- ✅ 7つのAIエージェント対応（最多）
-- ✅ Gemini CLI専用TOML形式サポート
-- ✅ エージェントレジストリパターン（cc-sddから採用）
+- ✅ Supports 7 AI agents (the most)
+- ✅ Dedicated TOML format support for Gemini CLI
+- ✅ Agent registry pattern (adopted from cc-sdd)
 
-#### 5. **自動更新プロジェクトメモリ**
+#### 5. **Auto-Updating Project Memory**
 
-- ✅ MUSUHIのステアリングシステムを拡張
-- ✅ スキル実行後に自動更新
-- ✅ 常に最新のプロジェクトコンテキスト維持
+- ✅ Extends MUSUHI's steering system
+- ✅ Updates automatically after skill execution
+- ✅ Always maintains up-to-date project context
 
-#### 6. **ブラウンフィールド完全対応**
+#### 6. **Complete Brownfield Support**
 
-- ✅ change-impact-analyzerスキル（OpenSpecの機能統合）
-- ✅ ADDED/MODIFIED/REMOVED自動検出
-- ✅ 既存プロジェクトへのシームレスな導入
+- ✅ change-impact-analyzer skill (integrates OpenSpec's functionality)
+- ✅ Automatic detection of ADDED/MODIFIED/REMOVED
+- ✅ Seamless adoption in existing projects
 
-## 🚀 v2.0新機能: CodeGraph MCP統合
+## 🚀 New in v2.0: CodeGraph MCP Integration
 
-MUSUBI v2.0では、[CodeGraph MCP Server](https://qiita.com/hisaho/items/b99ac51d78119ef60b6b)との統合により、AIエージェントが「プロジェクト全体のコード構造」を理解できるようになりました。
+With MUSUBI v2.0, integration with the [CodeGraph MCP Server](https://qiita.com/hisaho/items/b99ac51d78119ef60b6b) lets AI agents understand the "code structure of the entire project."
 
-### 従来の課題 → v2.0で解決
+### Previous Challenges → Solved in v2.0
 
-| 課題 | Before (v1.x) | After (v2.0 + CodeGraph) |
+| Challenge | Before (v1.x) | After (v2.0 + CodeGraph) |
 |------|---------------|--------------------------|
-| コードベース理解 | ファイル単位 | プロジェクト全体のグラフ構造 |
-| 関数の影響調査 | 手動grep（見落としリスク） | `find_callers`で完全リスト |
-| リファクタリング計画 | 経験と勘に依存 | `analyze_module_structure`で客観的分析 |
-| 依存関係の把握 | import文を目視 | `find_dependencies`で深い依存も検出 |
-| セキュリティ調査 | パターンマッチのみ | 入力経路の完全追跡 |
+| Codebase understanding | File-level | Graph structure of the whole project |
+| Function impact investigation | Manual grep (risk of omissions) | Complete list via `find_callers` |
+| Refactoring planning | Relies on experience and intuition | Objective analysis via `analyze_module_structure` |
+| Understanding dependencies | Eyeballing import statements | Deep dependencies detected via `find_dependencies` |
+| Security investigation | Pattern matching only | Complete tracing of input paths |
 
-### CodeGraph MCPの主な機能
+### Main Features of CodeGraph MCP
 
 ```
-# コードグラフ操作
-init_graph          - グラフ初期化
-find_callers        - 呼び出し元追跡
-find_callees        - 呼び出し先追跡
-find_dependencies   - 依存関係分析
+# Code graph operations
+init_graph          - Initialize graph
+find_callers        - Trace callers
+find_callees        - Trace callees
+find_dependencies   - Dependency analysis
 
-# 検索機能
-local_search        - ローカルコンテキスト検索
-global_search       - グローバル検索
-query_codebase      - 自然言語クエリ
+# Search features
+local_search        - Local context search
+global_search       - Global search
+query_codebase      - Natural language query
 
-# 分析機能
-analyze_module_structure  - モジュール構造分析
-suggest_refactoring       - リファクタリング提案
-community                 - コミュニティ（モジュール境界）検出
+# Analysis features
+analyze_module_structure  - Module structure analysis
+suggest_refactoring       - Refactoring suggestions
+community                 - Community (module boundary) detection
 ```
 
-### MUSUBIエージェントとの連携
+### Integration with MUSUBI Agents
 
-| エージェント | CodeGraph活用 | 効果 |
+| Agent | CodeGraph Usage | Effect |
 |-------------|---------------|------|
-| Orchestrator | `global_search`, `stats` | プロジェクト全体把握 |
-| System Architect | `analyze_module_structure` | アーキテクチャ可視化 |
-| Change Impact Analyzer | `find_callers`, `find_dependencies` | 完全な影響分析 |
-| Security Auditor | `query_codebase`, `find_callers` | 脆弱性の入力経路追跡 |
-| Code Reviewer | `suggest_refactoring` | 客観的な改善提案 |
+| Orchestrator | `global_search`, `stats` | Understanding the whole project |
+| System Architect | `analyze_module_structure` | Architecture visualization |
+| Change Impact Analyzer | `find_callers`, `find_dependencies` | Complete impact analysis |
+| Security Auditor | `query_codebase`, `find_callers` | Tracing input paths of vulnerabilities |
+| Code Reviewer | `suggest_refactoring` | Objective improvement suggestions |
 
-### セットアップ
+### Setup
 
 ```bash
-# Orchestratorに依頼するだけ
-@orchestrator CodeGraph MCP を設定してください
+# Just ask the Orchestrator
+@orchestrator Please set up CodeGraph MCP
 ```
 
-詳細は [MUSUBI × CodeGraph MCP Server 統合ガイド](https://qiita.com/hisaho/items/719210ccc20fe2514054) をご覧ください。
+For details, see the [MUSUBI × CodeGraph MCP Server Integration Guide](https://qiita.com/hisaho/items/719210ccc20fe2514054).
 
-## インストールと利用開始
+## Installation and Getting Started
 
-### インストール
+### Installation
 
 ```bash
-# npx経由（推奨）
+# Via npx (recommended)
 npx musubi-sdd init
 
-# またはグローバルインストール
+# Or install globally
 npm install -g musubi-sdd
 musubi init
 ```
 
-### エージェント別インストール
+### Per-Agent Installation
 
 ```bash
 # Claude Code - 25 Skills API
 npx musubi-sdd init --claude
 
-# GitHub Copilot - 25エージェント（AGENTS.md、公式サポート）
+# GitHub Copilot - 25 agents (AGENTS.md, official support)
 npx musubi-sdd init --copilot
 
-# Cursor IDE - 25エージェント（AGENTS.md、公式サポート）
+# Cursor IDE - 25 agents (AGENTS.md, official support)
 npx musubi-sdd init --cursor
 
-# Gemini CLI - 25エージェント（GEMINI.md統合）+ TOML形式
+# Gemini CLI - 25 agents (GEMINI.md integration) + TOML format
 npx musubi-sdd init --gemini
 
-# Windsurf IDE - 25エージェント（AGENTS.md）
+# Windsurf IDE - 25 agents (AGENTS.md)
 npx musubi-sdd init --windsurf
 
-# Codex CLI - 25エージェント（AGENTS.md）
+# Codex CLI - 25 agents (AGENTS.md)
 npx musubi-sdd init --codex
 
-# Qwen Code - 25エージェント（AGENTS.md）
+# Qwen Code - 25 agents (AGENTS.md)
 npx musubi-sdd init --qwen
 ```
 
-### CLIコマンド
+### CLI Commands
 
 ```bash
-# プロジェクトステータス確認
+# Check project status
 musubi status
 
-# 憲法準拠検証
+# Validate constitutional compliance
 musubi validate
 
-# 詳細情報表示
+# Show detailed information
 musubi info
 ```
 
-## まとめ
+## Summary
 
-**MUSUBI**は、spec-copilot（19エージェント）からMUSUHI（20エージェント）を経て進化した、**究極のSpecification Driven Development**ツールです。
+**MUSUBI** is the **ultimate Specification Driven Development** tool, which evolved from spec-copilot (19 agents) through MUSUHI (20 agents).
 
-### MUSUBIを選ぶべき理由
+### Why Choose MUSUBI
 
-1. ✅ **最も包括的**：25エージェント × 7プラットフォーム、8段階ワークフロー、9憲法条項
-2. ✅ **最も柔軟**：7つのAIエージェント全対応、Skills API + AGENTS.md
-3. ✅ **最も堅牢**：憲法ガバナンス、完全トレーサビリティ、自動検証
-4. ✅ **最も実践的**：グリーンフィールド/ブラウンフィールド両対応
-5. ✅ **最も先進的**：Claude Code Skills API、OpenAI AGENTS.md仕様準拠、自動ステアリング更新
-6. ✅ **業界初**：全7プラットフォームで25エージェント完全平等対応
+1. ✅ **Most comprehensive**: 25 agents x 7 platforms, 8-stage workflow, 9 Constitutional Articles
+2. ✅ **Most flexible**: Supports all 7 AI agents, Skills API + AGENTS.md
+3. ✅ **Most robust**: Constitutional governance, complete traceability, automatic validation
+4. ✅ **Most practical**: Supports both greenfield and brownfield
+5. ✅ **Most advanced**: Claude Code Skills API, OpenAI AGENTS.md specification compliance, automatic steering updates
+6. ✅ **Industry first**: Fully equal support for 25 agents on all 7 platforms
 
-### 6つのフレームワークの良いとこ取り
+### Taking the Best of the 6 Frameworks
 
-- **musuhi** → ステアリング、EARS形式
-- **OpenSpec** → Delta Specs、変更管理
-- **ag2** → オーケストレーション
-- **ai-dev-tasks** → シンプリシティ
-- **cc-sdd** → マルチエージェント
-- **spec-kit** → 憲法ガバナンス
+- **musuhi** → Steering, EARS format
+- **OpenSpec** → Delta Specs, change management
+- **ag2** → Orchestration
+- **ai-dev-tasks** → Simplicity
+- **cc-sdd** → Multi-agent
+- **spec-kit** → Constitutional governance
 
-### 今すぐ始める
+### Get Started Now
 
 ```bash
-# あなたのAIエージェントを選択
+# Choose your AI agent
 npx musubi-sdd init --claude     # Claude Code (Skills API)
 npx musubi-sdd init --copilot    # GitHub Copilot (AGENTS.md)
 npx musubi-sdd init --cursor     # Cursor (AGENTS.md)
-# その他: --gemini, --windsurf, --codex, --qwen
+# Others: --gemini, --windsurf, --codex, --qwen
 
-# どのエージェントでも25の専門エージェントが利用可能！
-# あなたの究極のSDD体験が始まります 🚀
+# All 25 specialized agents are available with any agent!
+# Your ultimate SDD experience begins 🚀
 ```
 
-## リソース
+## Resources
 
 - 📦 **npm**: [musubi-sdd](https://www.npmjs.com/package/musubi-sdd) (v2.1.1)
 - 📚 **GitHub**: [nahisaho/musubi](https://github.com/nahisaho/MUSUBI)
-- 🎯 **ブループリント**: [Ultimate-SDD-Tool-Blueprint-v3-25-Skills.md](https://github.com/nahisaho/MUSUBI/blob/main/Ultimate-SDD-Tool-Blueprint-v3-25-Skills.md)
-- 📊 **フレームワーク比較**: 本記事の比較表参照
+- 🎯 **Blueprint**: [Ultimate-SDD-Tool-Blueprint-v3-25-Skills.md](https://github.com/nahisaho/MUSUBI/blob/main/Ultimate-SDD-Tool-Blueprint-v3-25-Skills.md)
+- 📊 **Framework comparison**: See the comparison table in this article
 
 ---
 
-**MUSUBI** - むすび - 仕様、設計、コードを結びつける。
+**MUSUBI** - musubi - connecting specifications, design, and code.
 
-> 🌟 このプロジェクトはMITライセンスのオープンソースです。
-> スター ⭐ やコントリビューションをお待ちしています！
+> 🌟 This project is open source under the MIT license.
+> Stars ⭐ and contributions are welcome!
 
-#SDD #SpecificationDrivenDevelopment #AI #ClaudeCode #GitHubCopilot #Cursor #開発ツール #仕様駆動開発
+#SDD #SpecificationDrivenDevelopment #AI #ClaudeCode #GitHubCopilot #Cursor #DevTools #SpecDrivenDevelopment

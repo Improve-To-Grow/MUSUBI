@@ -20,11 +20,9 @@ Create a comprehensive requirements specification for the given feature using EA
 
 **ALWAYS read steering files FIRST to understand project context:**
 
-- Read `steering/structure.md` (English) - Architecture patterns
-- Read `steering/tech.md` (English) - Technology stack
-- Read `steering/product.md` (English) - Product context
-
-**Note**: Japanese versions (.ja.md) are translations only. Always use English versions (.md) for all work.
+- Read `steering/structure.md` - Architecture patterns
+- Read `steering/tech.md` - Technology stack
+- Read `steering/product.md` - Product context
 
 # Step 2: Understand the Feature
 
@@ -159,21 +157,9 @@ Ensure requirements align with Constitutional Articles:
 - Business assumptions
 - Dependencies on external factors
 
-# Step 6: Bilingual Output
+# Step 6: Save Document
 
-**IMPORTANT**: Create BOTH English and Japanese versions.
-
-**English version (Primary/Reference)**:
 Save to: `storage/specs/{{feature-name}}-requirements.md`
-
-**Japanese version (Translation)**:
-Save to: `storage/specs/{{feature-name}}-requirements.ja.md`
-
-Translation rules:
-- Keep requirement IDs in English (REQ-AUTH-001)
-- Keep EARS keywords in English (WHEN, SHALL, IF, THEN, etc.)
-- Keep technical terms in English (API, REST, JWT, etc.)
-- Translate explanations and descriptions to Japanese
 
 # Example Output
 
@@ -274,11 +260,6 @@ Before finalizing:
    - Non-functional requirements included
    - Dependencies identified
    - Acceptance criteria defined
-
-4. **Bilingual**:
-   - Both English and Japanese versions created
-   - Technical terms consistent
-   - Requirements IDs identical
 
 # Next Steps
 

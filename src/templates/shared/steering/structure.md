@@ -427,7 +427,7 @@ environments/
 ### Language Policy
 
 - **Primary Language**: English
-- **Documentation**: English first (`.md`), then Japanese (`.ja.md`)
+- **Documentation**: English (`.md`); optional translations (`<name>.<lang>.md`) when bilingual output is enabled
 - **Code Comments**: English
 - **UI Strings**: i18n framework
 

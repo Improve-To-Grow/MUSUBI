@@ -10,14 +10,14 @@
 
 ## Context
 
-MUSUBI SDDワークフローには現在、明示的なレビューゲートが存在しません。YAGOKOROプロジェクト（v1.0.0〜v5.0.0）の開発経験から、以下の問題が特定されました：
+The MUSUBI SDD workflow currently has no explicit review gates. From development experience on the YAGOKORO project (v1.0.0 to v5.0.0), the following problems were identified:
 
-1. 要件の曖昧さが設計段階で発覚する
-2. 設計変更が実装後に必要になる
-3. テストカバレッジの事後確認のみ
-4. Constitutional Articles遵守の手動確認
+1. Requirements ambiguities are discovered during the design stage
+2. Design changes are needed after implementation
+3. Test coverage is only checked after the fact
+4. Compliance with the Constitutional Articles is checked manually
 
-レビューゲートを追加することで、各フェーズ間での品質チェックを自動化し、問題の早期発見を可能にする必要があります。
+Adding review gates is necessary to automate quality checks between phases and enable early detection of problems.
 
 ---
 
@@ -25,7 +25,7 @@ MUSUBI SDDワークフローには現在、明示的なレビューゲートが�
 
 ### Architecture Pattern: Gate-Based Workflow
 
-各ワークフローフェーズ（Requirements → Design → Tasks → Implement → Validate）の間に独立したReviewGateクラスを配置します。
+Place an independent ReviewGate class between each workflow phase (Requirements → Design → Tasks → Implement → Validate).
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
@@ -73,7 +73,7 @@ interface ReviewGate {
 
 #### 3. ReviewPromptRegistry
 
-統一的なプロンプト管理を提供：
+Provides unified prompt management:
 
 ```typescript
 const REVIEW_PROMPTS = [
@@ -90,32 +90,32 @@ const REVIEW_PROMPTS = [
 
 ### Alternative 1: Monolithic ReviewEngine
 
-単一のReviewEngineクラスで全てのレビューを処理する。
+A single ReviewEngine class handles all reviews.
 
 **Pros**:
-- シンプルな実装
-- 共通ロジックの重複を避けられる
+- Simple implementation
+- Avoids duplicating common logic
 
 **Cons**:
-- 単一責任原則違反
-- テストが困難
-- 新しいゲートタイプの追加が困難
+- Violates the single responsibility principle
+- Difficult to test
+- Difficult to add new gate types
 
-**Rejected**: 拡張性と保守性を優先
+**Rejected**: Extensibility and maintainability take priority
 
 ### Alternative 2: Plugin-Based Architecture
 
-各ゲートをプラグインとして動的にロードする。
+Load each gate dynamically as a plugin.
 
 **Pros**:
-- 高い拡張性
-- サードパーティゲートのサポート
+- High extensibility
+- Supports third-party gates
 
 **Cons**:
-- 過度に複雑
-- Phase -1 Gate（Anti-Abstraction）違反の可能性
+- Overly complex
+- Possible violation of the Phase -1 Gate (Anti-Abstraction)
 
-**Rejected**: Constitutional Article VIII違反
+**Rejected**: Violates Constitutional Article VIII
 
 ---
 
@@ -123,22 +123,22 @@ const REVIEW_PROMPTS = [
 
 ### Positive
 
-1. **独立したテスト**: 各ゲートは独立してユニットテスト可能
-2. **拡張性**: 新しいゲートタイプの追加が容易
-3. **明確な責任分離**: 各ゲートは特定のフェーズのみを担当
-4. **AGENTS.md統合**: プロンプト追加で機能拡張可能
+1. **Independent testing**: Each gate can be unit tested independently
+2. **Extensibility**: New gate types are easy to add
+3. **Clear separation of responsibilities**: Each gate handles only a specific phase
+4. **AGENTS.md integration**: Functionality can be extended by adding prompts
 
 ### Negative
 
-1. **コード重複の可能性**: 共通チェックロジックが重複する可能性
-2. **学習コスト**: 開発者は複数のゲートクラスを理解する必要
-3. **設定の複雑さ**: 各ゲートに個別の設定が必要
+1. **Possible code duplication**: Common check logic may be duplicated
+2. **Learning cost**: Developers need to understand multiple gate classes
+3. **Configuration complexity**: Each gate needs individual configuration
 
 ### Mitigations
 
-- 共通ロジックは`ReviewGateBase`クラスに抽出
-- ドキュメントとサンプルを充実
-- デフォルト設定を提供し、カスタマイズはオプショナルに
+- Extract common logic into the `ReviewGateBase` class
+- Provide thorough documentation and samples
+- Provide default settings, with customization optional
 
 ---
 
@@ -149,7 +149,7 @@ const REVIEW_PROMPTS = [
 ```
 src/review/
 ├── gates/
-│   ├── base-review-gate.ts          # 共通基底クラス
+│   ├── base-review-gate.ts          # common base class
 │   ├── requirements-review-gate.ts
 │   ├── design-review-gate.ts
 │   └── implementation-review-gate.ts
@@ -187,7 +187,7 @@ storage/reviews/
 
 ## References
 
-- [IMP-6.2-001 Requirements](../../requirements/req_v6.2.md#imp-62-001-レビューステージのワークフロー統合)
+- [IMP-6.2-001 Requirements](../../requirements/req_v6.2.md#imp-62-001-integrating-review-stages-into-the-workflow)
 - [Constitutional Article VII](../../../steering/rules/constitution.md#article-vii-simplicity-gate-phase--1-gate)
 - [Constitutional Article VIII](../../../steering/rules/constitution.md#article-viii-anti-abstraction-gate-phase--1-gate)
 

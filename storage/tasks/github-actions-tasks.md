@@ -1,65 +1,65 @@
 # GitHub Actions Implementation Tasks
 
-## メタデータ
-- **ドキュメント種別**: タスク分解 (SDD Stage 4)
-- **作成日**: 2025-11-17
-- **プロジェクト**: MUSUBI v0.1.4
-- **関連要件**: [github-actions-requirements.md](./github-actions-requirements.md)
-- **関連設計**: [github-actions-design.md](./github-actions-design.md)
+## Metadata
+- **Document type**: Task breakdown (SDD Stage 4)
+- **Created**: 2025-11-17
+- **Project**: MUSUBI v0.1.4
+- **Related requirements**: [github-actions-requirements.md](./github-actions-requirements.md)
+- **Related design**: [github-actions-design.md](./github-actions-design.md)
 - **Constitutional Compliance**: Article VI (Implementation Excellence)
 
 ---
 
-## 実装フェーズ概要
+## Implementation Phases Overview
 
-### Phase 1: CI Workflow Foundation (優先度: P0 - Critical)
-**目標**: PR・push時の自動品質チェック確立  
-**期間**: Day 1-2  
-**依存**: なし
+### Phase 1: CI Workflow Foundation (Priority: P0 - Critical)
+**Goal**: Establish automated quality checks on PRs and pushes  
+**Duration**: Day 1-2  
+**Dependencies**: None
 
-### Phase 2: Platform Tests (優先度: P1 - High)
-**目標**: 全7プラットフォーム初期化テスト  
-**期間**: Day 2-3  
-**依存**: Phase 1完了
+### Phase 2: Platform Tests (Priority: P1 - High)
+**Goal**: Initialization tests for all 7 platforms  
+**Duration**: Day 2-3  
+**Dependencies**: Phase 1 complete
 
-### Phase 3: Release Workflow (優先度: P1 - High)
-**目標**: バージョンタグ時のnpm自動公開  
-**期間**: Day 3-4  
-**依存**: Phase 1完了
+### Phase 3: Release Workflow (Priority: P1 - High)
+**Goal**: Automatic npm publishing on version tags  
+**Duration**: Day 3-4  
+**Dependencies**: Phase 1 complete
 
-### Phase 4: Branch Protection (優先度: P1 - High)
-**目標**: mainブランチの品質ゲート強制  
-**期間**: Day 4  
-**依存**: Phase 1, 2完了
+### Phase 4: Branch Protection (Priority: P1 - High)
+**Goal**: Enforce quality gates on the main branch  
+**Duration**: Day 4  
+**Dependencies**: Phase 1, 2 complete
 
-### Phase 5: Dependabot (優先度: P2 - Medium)
-**目標**: 依存関係自動更新  
-**期間**: Day 5  
-**依存**: Phase 1, 3完了
+### Phase 5: Dependabot (Priority: P2 - Medium)
+**Goal**: Automatic dependency updates  
+**Duration**: Day 5  
+**Dependencies**: Phase 1, 3 complete
 
 ---
 
 ## Phase 1: CI Workflow Foundation
 
-### Task 1.1: CI Workflowファイル作成
+### Task 1.1: Create the CI Workflow File
 **ID**: TASK-GHA-001  
 **Priority**: P0  
 **Estimated Time**: 30 min  
 **Assignee**: TBD  
 
 **Description**:  
-`.github/workflows/ci.yml`を作成し、基本的なCI構造を実装する。
+Create `.github/workflows/ci.yml` and implement the basic CI structure.
 
 **Acceptance Criteria**:
-- ✅ ファイルが`.github/workflows/ci.yml`に存在する
-- ✅ `pull_request`および`push`(mainブランチ)でトリガーされる
-- ✅ `permissions`が適切に設定されている(`contents: read`, `pull-requests: write`)
-- ✅ `concurrency`グループが設定され、重複実行がキャンセルされる
-- ✅ YAML文法エラーがない(GitHub Actionsで検証)
+- ✅ The file exists at `.github/workflows/ci.yml`
+- ✅ Triggered by `pull_request` and `push` (main branch)
+- ✅ `permissions` is set appropriately (`contents: read`, `pull-requests: write`)
+- ✅ A `concurrency` group is configured so duplicate runs are canceled
+- ✅ No YAML syntax errors (validated in GitHub Actions)
 
 **Implementation Steps**:
-1. `.github/workflows/ci.yml`ファイル作成
-2. 基本構造の記述:
+1. Create the `.github/workflows/ci.yml` file
+2. Write the basic structure:
    ```yaml
    name: CI
    on:
@@ -74,34 +74,34 @@
      group: ci-${{ github.ref }}
      cancel-in-progress: true
    jobs:
-     # 次のタスクで実装
+     # To be implemented in the next task
    ```
-3. コミット・プッシュ
-4. GitHub Actions タブで構文検証
+3. Commit and push
+4. Validate syntax in the GitHub Actions tab
 
-**Dependencies**: なし  
+**Dependencies**: None  
 **Blocks**: TASK-GHA-002, TASK-GHA-003, TASK-GHA-004, TASK-GHA-005
 
 ---
 
-### Task 1.2: Lint ジョブ実装
+### Task 1.2: Implement the Lint Job
 **ID**: TASK-GHA-002  
 **Priority**: P0  
 **Estimated Time**: 20 min  
 **Assignee**: TBD  
 
 **Description**:  
-ESLintとPrettierによるコード品質チェックジョブを実装する。
+Implement a code quality check job with ESLint and Prettier.
 
 **Acceptance Criteria**:
-- ✅ `lint`ジョブが`ci.yml`に定義されている
-- ✅ `npm run lint`が実行される
-- ✅ `npm run format:check`(Prettier)が実行される
-- ✅ Node.js 18.xでのキャッシュが有効化されている
-- ✅ テストPRで正常に動作する
+- ✅ The `lint` job is defined in `ci.yml`
+- ✅ `npm run lint` is executed
+- ✅ `npm run format:check` (Prettier) is executed
+- ✅ Caching is enabled for Node.js 18.x
+- ✅ Works correctly in a test PR
 
 **Implementation Steps**:
-1. `ci.yml`に`lint`ジョブ追加:
+1. Add the `lint` job to `ci.yml`:
    ```yaml
    jobs:
      lint:
@@ -117,38 +117,38 @@ ESLintとPrettierによるコード品質チェックジョブを実装する。
          - run: npm run lint
          - run: npm run format:check
    ```
-2. `package.json`に`format:check`スクリプト追加(もし未定義なら):
+2. Add a `format:check` script to `package.json` (if not already defined):
    ```json
    "scripts": {
      "format:check": "prettier --check ."
    }
    ```
-3. コミット・プッシュ
-4. テストPR作成・動作確認
+3. Commit and push
+4. Create a test PR and verify behavior
 
 **Dependencies**: TASK-GHA-001  
 **Blocks**: TASK-GHA-011(Branch Protection)
 
 ---
 
-### Task 1.3: Test ジョブ実装
+### Task 1.3: Implement the Test Job
 **ID**: TASK-GHA-003  
 **Priority**: P0  
 **Estimated Time**: 30 min  
 **Assignee**: TBD  
 
 **Description**:  
-Jestテスト実行とカバレッジレポート生成ジョブを実装する。
+Implement a job that runs Jest tests and generates a coverage report.
 
 **Acceptance Criteria**:
-- ✅ `test`ジョブが`ci.yml`に定義されている
-- ✅ `npm test -- --coverage`が実行される
-- ✅ カバレッジレポートがアップロードされる(codecov)
-- ✅ PR時のみカバレッジレポートがコメント投稿される
-- ✅ テストPRで正常に動作する
+- ✅ The `test` job is defined in `ci.yml`
+- ✅ `npm test -- --coverage` is executed
+- ✅ The coverage report is uploaded (codecov)
+- ✅ The coverage report is posted as a comment only on PRs
+- ✅ Works correctly in a test PR
 
 **Implementation Steps**:
-1. `ci.yml`に`test`ジョブ追加:
+1. Add the `test` job to `ci.yml`:
    ```yaml
    test:
      name: Jest Tests
@@ -168,36 +168,36 @@ Jestテスト実行とカバレッジレポート生成ジョブを実装する�
            files: ./coverage/coverage-final.json
            flags: unittests
    ```
-2. Codecov設定(オプション: `.codecov.yml`で閾値設定)
-3. コミット・プッシュ
-4. テストPR作成・カバレッジレポート確認
+2. Configure Codecov (optional: set thresholds in `.codecov.yml`)
+3. Commit and push
+4. Create a test PR and check the coverage report
 
 **Dependencies**: TASK-GHA-001  
 **Blocks**: TASK-GHA-011(Branch Protection)
 
 **Notes**:
-- Codecov token不要(public repository)
-- カバレッジ閾値は80%を維持
+- No Codecov token needed (public repository)
+- Keep the coverage threshold at 80%
 
 ---
 
-### Task 1.4: Build ジョブ実装
+### Task 1.4: Implement the Build Job
 **ID**: TASK-GHA-004  
 **Priority**: P0  
 **Estimated Time**: 15 min  
 **Assignee**: TBD  
 
 **Description**:  
-パッケージングの検証ジョブを実装する。
+Implement a packaging validation job.
 
 **Acceptance Criteria**:
-- ✅ `build`ジョブが`ci.yml`に定義されている
-- ✅ `npm pack --dry-run`が実行される
-- ✅ パッケージング可能であることが検証される
-- ✅ テストPRで正常に動作する
+- ✅ The `build` job is defined in `ci.yml`
+- ✅ `npm pack --dry-run` is executed
+- ✅ Packaging is verified to be possible
+- ✅ Works correctly in a test PR
 
 **Implementation Steps**:
-1. `ci.yml`に`build`ジョブ追加:
+1. Add the `build` job to `ci.yml`:
    ```yaml
    build:
      name: Build Verification
@@ -211,31 +211,31 @@ Jestテスト実行とカバレッジレポート生成ジョブを実装する�
        - run: npm ci
        - run: npm pack --dry-run
    ```
-2. コミット・プッシュ
-3. テストPR作成・ビルド成功確認
+2. Commit and push
+3. Create a test PR and confirm the build succeeds
 
 **Dependencies**: TASK-GHA-001  
 **Blocks**: TASK-GHA-011(Branch Protection)
 
 ---
 
-### Task 1.5: Audit ジョブ実装
+### Task 1.5: Implement the Audit Job
 **ID**: TASK-GHA-005  
 **Priority**: P0  
 **Estimated Time**: 15 min  
 **Assignee**: TBD  
 
 **Description**:  
-セキュリティ脆弱性チェックジョブを実装する。
+Implement a security vulnerability check job.
 
 **Acceptance Criteria**:
-- ✅ `audit`ジョブが`ci.yml`に定義されている
-- ✅ `npm audit --audit-level=moderate`が実行される
-- ✅ moderate以上の脆弱性でビルド失敗する
-- ✅ テストPRで正常に動作する
+- ✅ The `audit` job is defined in `ci.yml`
+- ✅ `npm audit --audit-level=moderate` is executed
+- ✅ The build fails on moderate or higher vulnerabilities
+- ✅ Works correctly in a test PR
 
 **Implementation Steps**:
-1. `ci.yml`に`audit`ジョブ追加:
+1. Add the `audit` job to `ci.yml`:
    ```yaml
    audit:
      name: Security Audit
@@ -249,39 +249,39 @@ Jestテスト実行とカバレッジレポート生成ジョブを実装する�
        - run: npm ci
        - run: npm audit --audit-level=moderate
    ```
-2. コミット・プッシュ
-3. テストPR作成・監査成功確認
+2. Commit and push
+3. Create a test PR and confirm the audit succeeds
 
 **Dependencies**: TASK-GHA-001  
 **Blocks**: TASK-GHA-011(Branch Protection)
 
 **Notes**:
-- `--audit-level=moderate`: moderate, high, criticalの脆弱性でビルド失敗
-- lowは無視(開発効率とのバランス)
+- `--audit-level=moderate`: Build fails on moderate, high, and critical vulnerabilities
+- Ignore low (balance with development efficiency)
 
 ---
 
 ## Phase 2: Platform Tests
 
-### Task 2.1: Platform Initialization Testファイル作成
+### Task 2.1: Create the Platform Initialization Test File
 **ID**: TASK-GHA-006  
 **Priority**: P1  
 **Estimated Time**: 45 min  
 **Assignee**: TBD  
 
 **Description**:  
-全7プラットフォーム初期化テストを実装する。
+Implement initialization tests for all 7 platforms.
 
 **Acceptance Criteria**:
-- ✅ `tests/init-platforms.test.js`が作成されている
-- ✅ 7プラットフォーム全てのテストケースが実装されている
-- ✅ 各テストで必須ファイル生成が検証される
-- ✅ Claude Code専用のSkills API検証が条件分岐される
-- ✅ ローカルで`npm test tests/init-platforms.test.js`が成功する
+- ✅ `tests/init-platforms.test.js` is created
+- ✅ Test cases are implemented for all 7 platforms
+- ✅ Each test verifies generation of required files
+- ✅ Skills API validation for Claude Code only is conditionally branched
+- ✅ `npm test tests/init-platforms.test.js` succeeds locally
 
 **Implementation Steps**:
-1. `tests/init-platforms.test.js`ファイル作成
-2. テストコード実装:
+1. Create the `tests/init-platforms.test.js` file
+2. Implement the test code:
    ```javascript
    const fs = require('fs-extra');
    const path = require('path');
@@ -334,33 +334,33 @@ Jestテスト実行とカバレッジレポート生成ジョブを実装する�
      });
    });
    ```
-3. ローカルテスト実行: `npm test tests/init-platforms.test.js`
-4. 全プラットフォームで成功確認
-5. コミット・プッシュ
+3. Run the local test: `npm test tests/init-platforms.test.js`
+4. Confirm success on all platforms
+5. Commit and push
 
-**Dependencies**: なし  
+**Dependencies**: None  
 **Blocks**: TASK-GHA-007
 
 ---
 
-### Task 2.2: Platform Tests ジョブ実装
+### Task 2.2: Implement the Platform Tests Job
 **ID**: TASK-GHA-007  
 **Priority**: P1  
 **Estimated Time**: 30 min  
 **Assignee**: TBD  
 
 **Description**:  
-CI WorkflowにMatrix Strategyを使った7プラットフォーム並列テストを実装する。
+Implement parallel testing of 7 platforms in the CI Workflow using a Matrix Strategy.
 
 **Acceptance Criteria**:
-- ✅ `platform-tests`ジョブが`ci.yml`に定義されている
-- ✅ Matrix Strategyで7プラットフォーム並列実行される
-- ✅ `fail-fast: false`で全プラットフォームテストが完了する
-- ✅ 各プラットフォームで`tests/init-platforms.test.js`の該当テストが実行される
-- ✅ テストPRで全7プラットフォームが成功する
+- ✅ The `platform-tests` job is defined in `ci.yml`
+- ✅ 7 platforms run in parallel via the Matrix Strategy
+- ✅ `fail-fast: false` lets all platform tests complete
+- ✅ The relevant test in `tests/init-platforms.test.js` runs for each platform
+- ✅ All 7 platforms succeed in a test PR
 
 **Implementation Steps**:
-1. `ci.yml`に`platform-tests`ジョブ追加:
+1. Add the `platform-tests` job to `ci.yml`:
    ```yaml
    platform-tests:
      name: Platform Init Tests
@@ -386,41 +386,41 @@ CI WorkflowにMatrix Strategyを使った7プラットフォーム並列テス�
        - name: Test ${{ matrix.platform }} init
          run: npm test -- tests/init-platforms.test.js -t "${{ matrix.platform }}"
    ```
-2. コミット・プッシュ
-3. テストPR作成・全7ジョブの成功確認
+2. Commit and push
+3. Create a test PR and confirm all 7 jobs succeed
 
 **Dependencies**: TASK-GHA-006  
 **Blocks**: TASK-GHA-011(Branch Protection)
 
 **Notes**:
-- `fail-fast: false`: 1つ失敗しても残りを実行
-- `-t "${{ matrix.platform }}"`: Jestの`--testNamePattern`で該当プラットフォームのみ実行
+- `fail-fast: false`: Remaining jobs still run even if one fails
+- `-t "${{ matrix.platform }}"`: Runs only the relevant platform via Jest's `--testNamePattern`
 
 ---
 
 ## Phase 3: Release Workflow
 
-### Task 3.1: Release Workflowファイル作成
+### Task 3.1: Create the Release Workflow File
 **ID**: TASK-GHA-008  
 **Priority**: P1  
 **Estimated Time**: 60 min  
 **Assignee**: TBD  
 
 **Description**:  
-バージョンタグ時のnpm自動公開ワークフローを実装する。
+Implement a workflow that automatically publishes to npm on version tags.
 
 **Acceptance Criteria**:
-- ✅ `.github/workflows/release.yml`が作成されている
-- ✅ `v*.*.*`タグでトリガーされる
-- ✅ 3ジョブ(verify, publish-npm, create-github-release)が定義されている
-- ✅ `verify`ジョブで完全テスト実行される
-- ✅ `publish-npm`ジョブでnpm公開される(provenance署名付き)
-- ✅ `create-github-release`ジョブでGitHub Releaseが作成される
-- ✅ テストタグ(`v0.1.5-test`)で動作確認できる
+- ✅ `.github/workflows/release.yml` is created
+- ✅ Triggered by `v*.*.*` tags
+- ✅ 3 jobs (verify, publish-npm, create-github-release) are defined
+- ✅ The `verify` job runs the full test suite
+- ✅ The `publish-npm` job publishes to npm (with provenance signing)
+- ✅ The `create-github-release` job creates a GitHub Release
+- ✅ Behavior can be confirmed with a test tag (`v0.1.5-test`)
 
 **Implementation Steps**:
-1. `.github/workflows/release.yml`ファイル作成
-2. 完全なワークフロー実装:
+1. Create the `.github/workflows/release.yml` file
+2. Implement the complete workflow:
    ```yaml
    name: Release
 
@@ -506,101 +506,101 @@ CI WorkflowにMatrix Strategyを使った7プラットフォーム並列テス�
              draft: false
              prerelease: false
    ```
-3. コミット・プッシュ
-4. npm tokenの設定(次タスク)
+3. Commit and push
+4. Configure the npm token (next task)
 
-**Dependencies**: TASK-GHA-001(CI基盤完成)  
+**Dependencies**: TASK-GHA-001 (CI foundation complete)  
 **Blocks**: TASK-GHA-009
 
 **Notes**:
-- Provenance署名: npm v9.5.0以降で利用可能
-- `actions/create-release@v1`は非推奨だが安定しているため使用(将来的にGH CLIに移行検討)
+- Provenance signing: Available in npm v9.5.0 and later
+- `actions/create-release@v1` is deprecated but stable, so it is used (consider migrating to the GH CLI in the future)
 
 ---
 
-### Task 3.2: npm Token設定
+### Task 3.2: Configure the npm Token
 **ID**: TASK-GHA-009  
 **Priority**: P1  
 **Estimated Time**: 10 min  
 **Assignee**: TBD  
 
 **Description**:  
-GitHub Secretsにnpm Automation Tokenを設定する。
+Configure an npm Automation Token in GitHub Secrets.
 
 **Acceptance Criteria**:
-- ✅ npm Automation Tokenが生成されている
-- ✅ GitHub Repository SecretsにNPM_TOKENが設定されている
-- ✅ Tokenが正しく認証される(テストタグで検証)
+- ✅ An npm Automation Token is generated
+- ✅ NPM_TOKEN is set in GitHub Repository Secrets
+- ✅ The token authenticates correctly (validated with a test tag)
 
 **Implementation Steps**:
-1. npmにログイン → https://www.npmjs.com/settings/nahisaho/tokens
-2. "Generate New Token" → "Automation" 選択
-3. Token生成・コピー
+1. Log in to npm → https://www.npmjs.com/settings/nahisaho/tokens
+2. "Generate New Token" → Select "Automation"
+3. Generate and copy the token
 4. GitHub → Settings → Secrets and variables → Actions
-5. "New repository secret" → Name: `NPM_TOKEN`, Secret: (コピーしたトークン)
+5. "New repository secret" → Name: `NPM_TOKEN`, Secret: (the copied token)
 6. Save secret
 
 **Dependencies**: TASK-GHA-008  
-**Blocks**: TASK-GHA-010(Release検証)
+**Blocks**: TASK-GHA-010 (Release validation)
 
 **Security Notes**:
-- Automation Token使用(Classic Tokenより安全)
-- Read + Publishパーミッションのみ
-- Tokenは絶対にコミットしない
+- Use an Automation Token (safer than a Classic Token)
+- Read + Publish permissions only
+- Never commit the token
 
 ---
 
-### Task 3.3: Release Workflow動作検証
+### Task 3.3: Validate Release Workflow Behavior
 **ID**: TASK-GHA-010  
 **Priority**: P1  
 **Estimated Time**: 20 min  
 **Assignee**: TBD  
 
 **Description**:  
-テストタグでRelease Workflowの完全な動作を検証する。
+Validate the full behavior of the Release Workflow with a test tag.
 
 **Acceptance Criteria**:
-- ✅ テストタグ(`v0.1.5-test`)作成時にワークフローがトリガーされる
-- ✅ verifyジョブが成功する
-- ✅ publish-npmジョブが成功する(npmに公開される)
-- ✅ create-github-releaseジョブが成功する(GitHub Releaseが作成される)
-- ✅ npmでテストバージョンがインストールできる
+- ✅ The workflow is triggered when the test tag (`v0.1.5-test`) is created
+- ✅ The verify job succeeds
+- ✅ The publish-npm job succeeds (published to npm)
+- ✅ The create-github-release job succeeds (GitHub Release is created)
+- ✅ The test version can be installed from npm
 
 **Implementation Steps**:
-1. package.jsonのバージョンを`0.1.5-test`に変更
-2. コミット: `git commit -am "chore: test release workflow"`
-3. プッシュ: `git push origin main`
-4. タグ作成: `git tag v0.1.5-test`
-5. タグプッシュ: `git push origin v0.1.5-test`
-6. GitHub Actions タブで実行確認
-7. npm確認: `npm view musubi-sdd@0.1.5-test`
-8. GitHub Releasesページで確認
-9. テストタグ削除: `git tag -d v0.1.5-test && git push origin :refs/tags/v0.1.5-test`
-10. npm unpublish(オプション): `npm unpublish musubi-sdd@0.1.5-test`
+1. Change the version in package.json to `0.1.5-test`
+2. Commit: `git commit -am "chore: test release workflow"`
+3. Push: `git push origin main`
+4. Create the tag: `git tag v0.1.5-test`
+5. Push the tag: `git push origin v0.1.5-test`
+6. Confirm the run in the GitHub Actions tab
+7. Check npm: `npm view musubi-sdd@0.1.5-test`
+8. Check the GitHub Releases page
+9. Delete the test tag: `git tag -d v0.1.5-test && git push origin :refs/tags/v0.1.5-test`
+10. npm unpublish (optional): `npm unpublish musubi-sdd@0.1.5-test`
 
 **Dependencies**: TASK-GHA-009  
-**Blocks**: なし(本番リリース可能)
+**Blocks**: None (production release possible)
 
 **Notes**:
-- テストタグは検証後削除推奨
-- npm unpublishは72時間以内のみ可能
+- Deleting the test tag after validation is recommended
+- npm unpublish is only possible within 72 hours
 
 ---
 
 ## Phase 4: Branch Protection
 
-### Task 4.1: Branch Protection Rules設定
+### Task 4.1: Configure Branch Protection Rules
 **ID**: TASK-GHA-011  
 **Priority**: P1  
 **Estimated Time**: 15 min  
 **Assignee**: TBD  
 
 **Description**:  
-mainブランチにBranch Protection Rulesを設定し、CI通過を必須化する。
+Configure Branch Protection Rules on the main branch and require CI to pass.
 
 **Acceptance Criteria**:
-- ✅ mainブランチにProtection Rulesが設定されている
-- ✅ 以下のstatus checksが必須化されている:
+- ✅ Protection Rules are configured on the main branch
+- ✅ The following status checks are required:
   - `lint / ESLint & Prettier`
   - `test / Jest Tests`
   - `build / Build Verification`
@@ -612,57 +612,57 @@ mainブランチにBranch Protection Rulesを設定し、CI通過を必須化す
   - `platform-tests / Platform Init Tests (windsurf)`
   - `platform-tests / Platform Init Tests (codex)`
   - `platform-tests / Platform Init Tests (qwen)`
-- ✅ "Require branches to be up to date before merging"が有効
-- ✅ "Require linear history"が有効
-- ✅ テストPRでマージがブロックされる(CIが通っていない場合)
+- ✅ "Require branches to be up to date before merging" is enabled
+- ✅ "Require linear history" is enabled
+- ✅ Merges are blocked in a test PR (when CI has not passed)
 
 **Implementation Steps**:
 1. GitHub → Settings → Branches
 2. "Add branch protection rule"
 3. Branch name pattern: `main`
-4. 以下を有効化:
+4. Enable the following:
    - ✅ Require a pull request before merging
-     - Require approvals: 0 (小規模チーム)
+     - Require approvals: 0 (small team)
      - Dismiss stale pull request approvals when new commits are pushed
    - ✅ Require status checks to pass before merging
      - ✅ Require branches to be up to date before merging
-     - Search and add all 11 required checks (上記リスト)
+     - Search and add all 11 required checks (the list above)
    - ✅ Require conversation resolution before merging
    - ✅ Require linear history
-   - ❌ Do not allow bypassing the above settings (管理者も従う)
-5. "Create" ボタンクリック
-6. テストPRで動作確認
+   - ❌ Do not allow bypassing the above settings (administrators must also comply)
+5. Click the "Create" button
+6. Verify behavior with a test PR
 
 **Dependencies**: TASK-GHA-002, TASK-GHA-003, TASK-GHA-004, TASK-GHA-005, TASK-GHA-007  
-**Blocks**: なし
+**Blocks**: None
 
 **Notes**:
-- CI完了前にマージ不可
-- Force pushも禁止される
+- Cannot merge before CI completes
+- Force push is also prohibited
 
 ---
 
 ## Phase 5: Dependabot
 
-### Task 5.1: Dependabot設定ファイル作成
+### Task 5.1: Create the Dependabot Configuration File
 **ID**: TASK-GHA-012  
 **Priority**: P2  
 **Estimated Time**: 15 min  
 **Assignee**: TBD  
 
 **Description**:  
-Dependabotによる週次の依存関係自動更新を有効化する。
+Enable weekly automatic dependency updates via Dependabot.
 
 **Acceptance Criteria**:
-- ✅ `.github/dependabot.yml`が作成されている
-- ✅ npm packageのupdateが週次で設定されている
-- ✅ PRの最大数が5に制限されている
-- ✅ major versionのupdateが無視されている(破壊的変更回避)
-- ✅ 初回実行で依存関係更新PRが作成される
+- ✅ `.github/dependabot.yml` is created
+- ✅ npm package updates are configured weekly
+- ✅ The maximum number of PRs is limited to 5
+- ✅ Major version updates are ignored (to avoid breaking changes)
+- ✅ A dependency update PR is created on the first run
 
 **Implementation Steps**:
-1. `.github/dependabot.yml`ファイル作成
-2. 設定記述:
+1. Create the `.github/dependabot.yml` file
+2. Write the configuration:
    ```yaml
    version: 2
    updates:
@@ -688,38 +688,38 @@ Dependabotによる週次の依存関係自動更新を有効化する。
          - dependency-name: '*'
            update-types: ['version-update:semver-major']
    ```
-3. コミット・プッシュ
-4. GitHubが次週月曜9:00(JST)に初回PRを作成
-5. PR確認・CI通過後マージ
+3. Commit and push
+4. GitHub creates the first PR next Monday at 9:00 (JST)
+5. Review the PR and merge after CI passes
 
 **Dependencies**: TASK-GHA-001, TASK-GHA-011(CI + Branch Protection)  
-**Blocks**: なし
+**Blocks**: None
 
 **Notes**:
-- major versionは手動更新推奨(CHANGELOG確認)
-- PR数制限で負荷軽減
+- Manual updates are recommended for major versions (check the CHANGELOG)
+- Limiting the number of PRs reduces load
 
 ---
 
 ## Documentation & Final Steps
 
-### Task 6.1: README.md更新
+### Task 6.1: Update README.md
 **ID**: TASK-GHA-013  
 **Priority**: P2  
 **Estimated Time**: 20 min  
 **Assignee**: TBD  
 
 **Description**:  
-GitHub Actions CI/CDバッジと開発ワークフローをREADME.mdに追加する。
+Add GitHub Actions CI/CD badges and the development workflow to README.md.
 
 **Acceptance Criteria**:
-- ✅ CIバッジがREADMEに表示されている
-- ✅ npm versionバッジがREADMEに表示されている
-- ✅ "Development"セクションが追加されている
-- ✅ PR作成からマージまでのフローが記載されている
+- ✅ The CI badge is displayed in the README
+- ✅ The npm version badge is displayed in the README
+- ✅ A "Development" section is added
+- ✅ The flow from PR creation to merge is documented
 
 **Implementation Steps**:
-1. README.mdのトップにバッジ追加:
+1. Add badges to the top of README.md:
    ```markdown
    # MUSUBI - Ultimate Specification Driven Development
 
@@ -727,7 +727,7 @@ GitHub Actions CI/CDバッジと開発ワークフローをREADME.mdに追加す
    [![npm version](https://badge.fury.io/js/musubi-sdd.svg)](https://www.npmjs.com/package/musubi-sdd)
    [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
    ```
-2. "Development"セクション追加:
+2. Add the "Development" section:
    ```markdown
    ## Development
 
@@ -762,98 +762,98 @@ GitHub Actions CI/CDバッジと開発ワークフローをREADME.mdに追加す
    npm run format:check
    ```
    ```
-3. コミット・プッシュ
+3. Commit and push
 
-**Dependencies**: すべてのCI/CDタスク完了  
-**Blocks**: なし
+**Dependencies**: All CI/CD tasks complete  
+**Blocks**: None
 
 ---
 
-### Task 6.2: CONTRIBUTING.md作成
+### Task 6.2: Create CONTRIBUTING.md
 **ID**: TASK-GHA-014  
 **Priority**: P3  
 **Estimated Time**: 30 min  
 **Assignee**: TBD  
 
 **Description**:  
-コントリビューターガイドラインを作成し、CI/CD要件を明記する。
+Create contributor guidelines and state the CI/CD requirements explicitly.
 
 **Acceptance Criteria**:
-- ✅ `CONTRIBUTING.md`が作成されている
-- ✅ コーディング規約が記載されている
-- ✅ テスト要件が記載されている
-- ✅ CI/CD要件が記載されている
-- ✅ コミットメッセージ規約が記載されている
+- ✅ `CONTRIBUTING.md` is created
+- ✅ Coding conventions are documented
+- ✅ Test requirements are documented
+- ✅ CI/CD requirements are documented
+- ✅ Commit message conventions are documented
 
 **Implementation Steps**:
-1. `CONTRIBUTING.md`ファイル作成
-2. 以下のセクション記述:
+1. Create the `CONTRIBUTING.md` file
+2. Write the following sections:
    - Code of Conduct
    - How to Contribute
    - Coding Standards (ESLint, Prettier)
    - Testing Requirements (80% coverage)
    - Commit Message Convention (Conventional Commits)
-   - CI/CD Requirements (全チェック通過必須)
+   - CI/CD Requirements (all checks must pass)
    - Pull Request Process
-3. コミット・プッシュ
+3. Commit and push
 
-**Dependencies**: なし  
-**Blocks**: なし
+**Dependencies**: None  
+**Blocks**: None
 
 ---
 
 ## Task Summary & Priorities
 
 ### P0 - Critical (Must Have for v0.1.5)
-- TASK-GHA-001: CI Workflowファイル作成
-- TASK-GHA-002: Lintジョブ実装
-- TASK-GHA-003: Testジョブ実装
-- TASK-GHA-004: Buildジョブ実装
-- TASK-GHA-005: Auditジョブ実装
+- TASK-GHA-001: Create the CI Workflow file
+- TASK-GHA-002: Implement the Lint job
+- TASK-GHA-003: Implement the Test job
+- TASK-GHA-004: Implement the Build job
+- TASK-GHA-005: Implement the Audit job
 
 ### P1 - High (Essential for Quality)
-- TASK-GHA-006: Platform Initialization Testファイル作成
-- TASK-GHA-007: Platform Testsジョブ実装
-- TASK-GHA-008: Release Workflowファイル作成
-- TASK-GHA-009: npm Token設定
-- TASK-GHA-010: Release Workflow動作検証
-- TASK-GHA-011: Branch Protection Rules設定
+- TASK-GHA-006: Create the Platform Initialization Test file
+- TASK-GHA-007: Implement the Platform Tests job
+- TASK-GHA-008: Create the Release Workflow file
+- TASK-GHA-009: Configure the npm Token
+- TASK-GHA-010: Validate Release Workflow behavior
+- TASK-GHA-011: Configure Branch Protection Rules
 
 ### P2 - Medium (Nice to Have)
-- TASK-GHA-012: Dependabot設定ファイル作成
-- TASK-GHA-013: README.md更新
+- TASK-GHA-012: Create the Dependabot configuration file
+- TASK-GHA-013: Update README.md
 
 ### P3 - Low (Future Enhancement)
-- TASK-GHA-014: CONTRIBUTING.md作成
+- TASK-GHA-014: Create CONTRIBUTING.md
 
 ---
 
-## Implementation Order (推奨実装順序)
+## Implementation Order (Recommended)
 
 ### Day 1: CI Foundation
 1. TASK-GHA-001 → TASK-GHA-002 → TASK-GHA-003 → TASK-GHA-004 → TASK-GHA-005
-2. テストPR作成・全ジョブ成功確認
-3. コミット・プッシュ
+2. Create a test PR and confirm all jobs succeed
+3. Commit and push
 
 ### Day 2: Platform Tests
 1. TASK-GHA-006 → TASK-GHA-007
-2. テストPR作成・全7プラットフォーム成功確認
-3. コミット・プッシュ
+2. Create a test PR and confirm all 7 platforms succeed
+3. Commit and push
 
 ### Day 3: Release Workflow
 1. TASK-GHA-008 → TASK-GHA-009 → TASK-GHA-010
-2. テストタグで完全検証
-3. 問題なければ本番リリース準備
+2. Full validation with a test tag
+3. If there are no issues, prepare the production release
 
 ### Day 4: Branch Protection & Docs
-1. TASK-GHA-011(Branch Protection設定)
-2. TASK-GHA-013(README.md更新)
-3. 動作確認PR作成・マージ
+1. TASK-GHA-011 (Configure Branch Protection)
+2. TASK-GHA-013 (Update README.md)
+3. Create and merge a verification PR
 
 ### Day 5: Dependabot & Final Touches
-1. TASK-GHA-012(Dependabot設定)
-2. TASK-GHA-014(CONTRIBUTING.md作成)
-3. 全体レビュー・ドキュメント最終化
+1. TASK-GHA-012 (Configure Dependabot)
+2. TASK-GHA-014 (Create CONTRIBUTING.md)
+3. Overall review and finalize documentation
 
 ---
 
@@ -862,52 +862,52 @@ GitHub Actions CI/CDバッジと開発ワークフローをREADME.mdに追加す
 ### Risk 1: CI Timeout
 **Likelihood**: Low  
 **Impact**: Medium  
-**Mitigation**: キャッシュ戦略により5分以内完了を保証
+**Mitigation**: The caching strategy guarantees completion within 5 minutes
 
-### Risk 2: Platform Tests失敗
+### Risk 2: Platform Tests Fail
 **Likelihood**: Medium  
 **Impact**: High  
 **Mitigation**: 
-- `fail-fast: false`で全プラットフォームテスト
-- ローカルでの事前検証(TASK-GHA-006)
+- Test all platforms with `fail-fast: false`
+- Pre-validate locally (TASK-GHA-006)
 
-### Risk 3: npm Publish失敗
+### Risk 3: npm Publish Fails
 **Likelihood**: Low  
 **Impact**: High  
 **Mitigation**:
-- verifyジョブで事前検証
-- npm tokenの有効期限管理
-- 手動rollback手順のドキュメント化
+- Pre-validate with the verify job
+- Manage npm token expiration
+- Document the manual rollback procedure
 
 ---
 
 ## Success Criteria
 
 ### Phase 1 Success
-- ✅ 全PRでCI自動実行
-- ✅ CI実行時間 < 5分
-- ✅ キャッシュヒット率 > 80%
+- ✅ CI runs automatically on all PRs
+- ✅ CI execution time < 5 min
+- ✅ Cache hit rate > 80%
 
 ### Phase 2 Success
-- ✅ 全7プラットフォーム初期化テスト成功
-- ✅ プラットフォーム固有の問題早期発見
+- ✅ Initialization tests succeed on all 7 platforms
+- ✅ Early detection of platform-specific issues
 
 ### Phase 3 Success
-- ✅ バージョンタグでnpm自動公開
-- ✅ GitHub Release自動生成
-- ✅ Provenance署名付きパッケージ
+- ✅ Automatic npm publishing on version tags
+- ✅ Automatic GitHub Release generation
+- ✅ Packages with provenance signing
 
 ### Phase 4 Success
-- ✅ mainブランチへのCI未通過マージ不可
-- ✅ 品質ゲート確立
+- ✅ Merging to the main branch without passing CI is not possible
+- ✅ Quality gate established
 
 ### Phase 5 Success
-- ✅ 週次依存関係更新PR自動作成
-- ✅ 脆弱性早期発見
+- ✅ Weekly dependency update PRs are created automatically
+- ✅ Early detection of vulnerabilities
 
 ---
 
 **Constitutional Compliance**:
-- ✅ Article VI: Implementation Excellence (タスク分解・優先順位明確化)
-- ✅ Article V: Traceability (各タスクが要件・設計にトレース可能)
-- ✅ Article VIII: Performance Targets (実行時間目標明記)
+- ✅ Article VI: Implementation Excellence (task breakdown and clear prioritization)
+- ✅ Article V: Traceability (each task is traceable to requirements and design)
+- ✅ Article VIII: Performance Targets (execution time targets stated)

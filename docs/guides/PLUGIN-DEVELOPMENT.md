@@ -1,23 +1,23 @@
 # MUSUBI Plugin Development Guide
 
-サードパーティ拡張機能を作成するための完全ガイド。
+A complete guide to creating third-party extensions.
 
 ---
 
-## 📖 目次
+## 📖 Table of Contents
 
-1. [プラグインアーキテクチャ](#プラグインアーキテクチャ)
-2. [クイックスタート](#クイックスタート)
-3. [プラグインタイプ](#プラグインタイプ)
-4. [API リファレンス](#api-リファレンス)
-5. [ベストプラクティス](#ベストプラクティス)
-6. [配布とパブリッシング](#配布とパブリッシング)
+1. [Plugin Architecture](#plugin-architecture)
+2. [Quickstart](#quickstart)
+3. [Plugin Types](#plugin-types)
+4. [API Reference](#api-reference)
+5. [Best Practices](#best-practices)
+6. [Distribution and Publishing](#distribution-and-publishing)
 
 ---
 
-## プラグインアーキテクチャ
+## Plugin Architecture
 
-### 概要
+### Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -41,7 +41,7 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### プラグインライフサイクル
+### Plugin Lifecycle
 
 ```
 Discovery → Load → Initialize → Register → Execute → Dispose
@@ -56,15 +56,15 @@ Discovery → Load → Initialize → Register → Execute → Dispose
 
 ---
 
-## クイックスタート
+## Quickstart
 
-### ステップ 1: プラグインの雛形を生成
+### Step 1: Generate the Plugin Scaffold
 
 ```bash
-# プラグインスキャフォールディング
+# Plugin scaffolding
 musubi plugin create my-awesome-plugin
 
-# 生成されるファイル:
+# Generated files:
 # .musubi-plugins/my-awesome-plugin/
 # ├── package.json
 # ├── index.js
@@ -73,7 +73,7 @@ musubi plugin create my-awesome-plugin
 #     └── plugin.test.js
 ```
 
-### ステップ 2: プラグインの実装
+### Step 2: Implement the Plugin
 
 ```javascript
 // .musubi-plugins/my-awesome-plugin/index.js
@@ -84,19 +84,19 @@ musubi plugin create my-awesome-plugin
  * @type {import('musubi-sdd').PluginDefinition}
  */
 module.exports = {
-  // メタ情報
+  // Metadata
   name: 'my-awesome-plugin',
   version: '1.0.0',
   description: 'Adds awesome functionality to MUSUBI',
   author: 'Your Name',
   
-  // 互換性
+  // Compatibility
   musubi: {
     minVersion: '5.0.0',
     maxVersion: '6.x'
   },
   
-  // プラグイン設定スキーマ
+  // Plugin configuration schema
   configSchema: {
     type: 'object',
     properties: {
@@ -105,25 +105,25 @@ module.exports = {
     }
   },
   
-  // 初期化
+  // Initialization
   async initialize(context) {
     console.log('My Awesome Plugin initialized!');
     
-    // コンテキストからサービスを取得
+    // Get services from the context
     const { config, logger, storage } = context;
     
-    // 設定を読み込み
+    // Load configuration
     this.config = config.get('my-awesome-plugin');
     this.logger = logger.child({ plugin: 'my-awesome-plugin' });
   },
   
-  // フックの登録
+  // Register hooks
   hooks: {
-    // 要件検証前に実行
+    // Run before requirements validation
     'requirements:validate:before': async (requirements, context) => {
       context.logger.info('Validating requirements with custom rules...');
       
-      // カスタム検証ロジック
+      // Custom validation logic
       const customErrors = requirements.filter(req => {
         return !req.description.includes('shall');
       });
@@ -136,9 +136,9 @@ module.exports = {
       };
     },
     
-    // 設計生成後に実行
+    // Run after design generation
     'design:generate:after': async (design, context) => {
-      // 設計にカスタムセクションを追加
+      // Add a custom section to the design
       design.customSection = {
         generatedBy: 'my-awesome-plugin',
         timestamp: new Date().toISOString()
@@ -148,7 +148,7 @@ module.exports = {
     }
   },
   
-  // カスタムコマンド
+  // Custom commands
   commands: {
     'my-command': {
       description: 'Execute my custom command',
@@ -160,13 +160,13 @@ module.exports = {
           context.logger.info('Verbose mode enabled');
         }
         
-        // コマンドロジック
+        // Command logic
         return { success: true, message: 'Command executed!' };
       }
     }
   },
   
-  // カスタムサービス
+  // Custom services
   services: {
     'myService': {
       async doSomething(input) {
@@ -175,14 +175,14 @@ module.exports = {
     }
   },
   
-  // クリーンアップ
+  // Cleanup
   async dispose() {
     console.log('My Awesome Plugin disposed');
   }
 };
 ```
 
-### ステップ 3: プラグインのテスト
+### Step 3: Test the Plugin
 
 ```javascript
 // .musubi-plugins/my-awesome-plugin/tests/plugin.test.js
@@ -235,7 +235,7 @@ describe('My Awesome Plugin', () => {
 });
 ```
 
-### ステップ 4: プラグインの有効化
+### Step 4: Enable the Plugin
 
 ```yaml
 # .musubi/config.yml
@@ -248,11 +248,11 @@ plugins:
 
 ---
 
-## プラグインタイプ
+## Plugin Types
 
-### 1. Validator Plugin（検証プラグイン）
+### 1. Validator Plugin
 
-カスタム検証ルールを追加します。
+Adds custom validation rules.
 
 ```javascript
 module.exports = {
@@ -260,13 +260,13 @@ module.exports = {
   type: 'validator',
   
   validators: {
-    // 要件バリデーター
+    // Requirements validator
     requirements: {
       name: 'custom-ears-validator',
       async validate(requirement) {
         const errors = [];
         
-        // EARS パターンチェック
+        // EARS pattern check
         const earsPatterns = [
           /^When .+, the .+ shall/,
           /^While .+, the .+ shall/,
@@ -291,11 +291,11 @@ module.exports = {
       }
     },
     
-    // 設計バリデーター
+    // Design validator
     design: {
       name: 'c4-diagram-validator',
       async validate(design) {
-        // C4 ダイアグラムの存在チェック
+        // Check for the presence of a C4 diagram
         const hasContext = design.content.includes('C4Context');
         const hasContainer = design.content.includes('C4Container');
         
@@ -312,9 +312,9 @@ module.exports = {
 };
 ```
 
-### 2. Generator Plugin（生成プラグイン）
+### 2. Generator Plugin
 
-カスタムドキュメント生成を追加します。
+Adds custom document generation.
 
 ```javascript
 module.exports = {
@@ -322,7 +322,7 @@ module.exports = {
   type: 'generator',
   
   generators: {
-    // OpenAPI 仕様生成
+    // OpenAPI specification generation
     'openapi': {
       description: 'Generate OpenAPI specification from design',
       
@@ -337,7 +337,7 @@ module.exports = {
           paths: {}
         };
         
-        // エンドポイントを抽出
+        // Extract endpoints
         for (const component of design.components) {
           if (component.type === 'api-endpoint') {
             openapi.paths[component.path] = {
@@ -358,7 +358,7 @@ module.exports = {
       }
     },
     
-    // TypeScript 型定義生成
+    // TypeScript type definition generation
     'typescript-types': {
       description: 'Generate TypeScript types from design',
       
@@ -384,9 +384,9 @@ module.exports = {
 };
 ```
 
-### 3. Reporter Plugin（レポートプラグイン）
+### 3. Reporter Plugin
 
-カスタムレポート出力を追加します。
+Adds custom report output.
 
 ```javascript
 module.exports = {
@@ -461,9 +461,9 @@ module.exports = {
 };
 ```
 
-### 4. Integration Plugin（統合プラグイン）
+### 4. Integration Plugin
 
-外部サービスとの統合を追加します。
+Adds integration with external services.
 
 ```javascript
 module.exports = {
@@ -489,9 +489,9 @@ module.exports = {
     this.databaseId = context.config.get('notion-integration.databaseId');
   },
   
-  // 同期メソッド
+  // Sync methods
   sync: {
-    // 要件を Notion にエクスポート
+    // Export requirements to Notion
     async exportRequirements(requirements) {
       for (const req of requirements) {
         await this.notion.pages.create({
@@ -508,7 +508,7 @@ module.exports = {
       return { exported: requirements.length };
     },
     
-    // Notion から要件をインポート
+    // Import requirements from Notion
     async importRequirements() {
       const response = await this.notion.databases.query({
         database_id: this.databaseId
@@ -523,22 +523,22 @@ module.exports = {
     }
   },
   
-  // イベントリスナー
+  // Event listeners
   events: {
     'requirements:created': async (requirement) => {
       await this.sync.exportRequirements([requirement]);
     },
     
     'requirements:updated': async (requirement) => {
-      // Notion ページを更新
+      // Update the Notion page
     }
   }
 };
 ```
 
-### 5. Skill Plugin（スキルプラグイン）
+### 5. Skill Plugin
 
-エージェントに新しいスキルを追加します。
+Adds new skills to agents.
 
 ```javascript
 module.exports = {
@@ -550,7 +550,7 @@ module.exports = {
       name: 'Kubernetes Expert',
       description: 'Generates Kubernetes manifests and Helm charts',
       
-      // スキルが適用される条件
+      // Conditions under which the skill applies
       triggers: [
         'kubernetes',
         'k8s',
@@ -558,7 +558,7 @@ module.exports = {
         'container orchestration'
       ],
       
-      // コンテキスト情報
+      // Context information
       context: `
 ## Kubernetes Expert Skill
 
@@ -579,7 +579,7 @@ You are an expert in Kubernetes and cloud-native technologies.
 - Implement health checks (liveness/readiness probes)
       `,
       
-      // カスタムアクション
+      // Custom action
       actions: {
         'generate-deployment': {
           description: 'Generate a Kubernetes Deployment',
@@ -630,21 +630,21 @@ spec:
 
 ---
 
-## API リファレンス
+## API Reference
 
 ### Plugin Context
 
-プラグインの `initialize()` に渡されるコンテキストオブジェクト。
+The context object passed to the plugin's `initialize()`.
 
 ```typescript
 interface PluginContext {
-  // 設定管理
+  // Configuration management
   config: {
     get<T>(key: string): T;
     set(key: string, value: any): void;
   };
   
-  // ロギング
+  // Logging
   logger: {
     debug(message: string, ...args: any[]): void;
     info(message: string, ...args: any[]): void;
@@ -653,7 +653,7 @@ interface PluginContext {
     child(context: object): Logger;
   };
   
-  // ストレージ
+  // Storage
   storage: {
     read(path: string): Promise<string>;
     write(path: string, content: string): Promise<void>;
@@ -661,19 +661,19 @@ interface PluginContext {
     list(pattern: string): Promise<string[]>;
   };
   
-  // イベント
+  // Events
   events: {
     emit(event: string, data: any): void;
     on(event: string, handler: Function): void;
     off(event: string, handler: Function): void;
   };
   
-  // 他のサービスへのアクセス
+  // Access to other services
   services: {
     get<T>(name: string): T;
   };
   
-  // プロジェクト情報
+  // Project information
   project: {
     root: string;
     name: string;
@@ -684,58 +684,58 @@ interface PluginContext {
 
 ### Available Hooks
 
-| Hook | タイミング | パラメータ |
+| Hook | Timing | Parameters |
 |------|----------|-----------|
-| `requirements:validate:before` | 要件検証前 | `(requirements, context)` |
-| `requirements:validate:after` | 要件検証後 | `(requirements, results, context)` |
-| `requirements:generate:before` | 要件生成前 | `(input, context)` |
-| `requirements:generate:after` | 要件生成後 | `(requirements, context)` |
-| `design:validate:before` | 設計検証前 | `(design, context)` |
-| `design:validate:after` | 設計検証後 | `(design, results, context)` |
-| `design:generate:before` | 設計生成前 | `(requirements, context)` |
-| `design:generate:after` | 設計生成後 | `(design, context)` |
-| `tasks:generate:before` | タスク生成前 | `(design, context)` |
-| `tasks:generate:after` | タスク生成後 | `(tasks, context)` |
-| `orchestration:start` | オーケストレーション開始 | `(config, context)` |
-| `orchestration:complete` | オーケストレーション完了 | `(results, context)` |
-| `orchestration:error` | オーケストレーションエラー | `(error, context)` |
-| `agent:before` | エージェント実行前 | `(agent, task, context)` |
-| `agent:after` | エージェント実行後 | `(agent, task, result, context)` |
+| `requirements:validate:before` | Before requirements validation | `(requirements, context)` |
+| `requirements:validate:after` | After requirements validation | `(requirements, results, context)` |
+| `requirements:generate:before` | Before requirements generation | `(input, context)` |
+| `requirements:generate:after` | After requirements generation | `(requirements, context)` |
+| `design:validate:before` | Before design validation | `(design, context)` |
+| `design:validate:after` | After design validation | `(design, results, context)` |
+| `design:generate:before` | Before design generation | `(requirements, context)` |
+| `design:generate:after` | After design generation | `(design, context)` |
+| `tasks:generate:before` | Before task generation | `(design, context)` |
+| `tasks:generate:after` | After task generation | `(tasks, context)` |
+| `orchestration:start` | Orchestration start | `(config, context)` |
+| `orchestration:complete` | Orchestration complete | `(results, context)` |
+| `orchestration:error` | Orchestration error | `(error, context)` |
+| `agent:before` | Before agent execution | `(agent, task, context)` |
+| `agent:after` | After agent execution | `(agent, task, result, context)` |
 
 ### Available Events
 
-| Event | 説明 | データ |
+| Event | Description | Data |
 |-------|------|-------|
-| `requirements:created` | 要件作成 | `{ requirement }` |
-| `requirements:updated` | 要件更新 | `{ requirement, changes }` |
-| `requirements:deleted` | 要件削除 | `{ requirementId }` |
-| `design:created` | 設計作成 | `{ design }` |
-| `design:updated` | 設計更新 | `{ design, changes }` |
-| `task:created` | タスク作成 | `{ task }` |
-| `task:completed` | タスク完了 | `{ task, result }` |
-| `validation:passed` | 検証成功 | `{ type, target }` |
-| `validation:failed` | 検証失敗 | `{ type, target, errors }` |
-| `replan:triggered` | リプラン開始 | `{ reason, context }` |
-| `replan:completed` | リプラン完了 | `{ newPlan }` |
+| `requirements:created` | Requirement created | `{ requirement }` |
+| `requirements:updated` | Requirement updated | `{ requirement, changes }` |
+| `requirements:deleted` | Requirement deleted | `{ requirementId }` |
+| `design:created` | Design created | `{ design }` |
+| `design:updated` | Design updated | `{ design, changes }` |
+| `task:created` | Task created | `{ task }` |
+| `task:completed` | Task completed | `{ task, result }` |
+| `validation:passed` | Validation passed | `{ type, target }` |
+| `validation:failed` | Validation failed | `{ type, target, errors }` |
+| `replan:triggered` | Replan started | `{ reason, context }` |
+| `replan:completed` | Replan completed | `{ newPlan }` |
 
 ---
 
-## ベストプラクティス
+## Best Practices
 
-### 1. エラーハンドリング
+### 1. Error Handling
 
 ```javascript
 module.exports = {
   hooks: {
     'requirements:validate:before': async (requirements, context) => {
       try {
-        // メイン処理
+        // Main processing
         return await validateRequirements(requirements);
       } catch (error) {
-        // エラーをログに記録
+        // Log the error
         context.logger.error('Validation failed', { error: error.message });
         
-        // グレースフルデグラデーション
+        // Graceful degradation
         return {
           errors: [],
           warnings: [{
@@ -749,7 +749,7 @@ module.exports = {
 };
 ```
 
-### 2. 設定のバリデーション
+### 2. Configuration Validation
 
 ```javascript
 module.exports = {
@@ -771,31 +771,31 @@ module.exports = {
   },
   
   async initialize(context) {
-    // 設定は自動的にスキーマに対して検証される
-    // 無効な設定の場合、初期化は失敗する
+    // Configuration is automatically validated against the schema
+    // If the configuration is invalid, initialization fails
   }
 };
 ```
 
-### 3. 非同期処理の適切な管理
+### 3. Proper Management of Asynchronous Processing
 
 ```javascript
 module.exports = {
   async initialize(context) {
-    // 初期化時の非同期処理はawaitする
+    // Await asynchronous processing during initialization
     this.connection = await createConnection(context.config);
     
-    // バックグラウンドタスクは適切に管理
+    // Manage background tasks properly
     this.backgroundTask = this.startBackgroundSync();
   },
   
   async dispose() {
-    // バックグラウンドタスクの停止
+    // Stop background tasks
     if (this.backgroundTask) {
       await this.backgroundTask.stop();
     }
     
-    // リソースのクリーンアップ
+    // Clean up resources
     if (this.connection) {
       await this.connection.close();
     }
@@ -803,14 +803,14 @@ module.exports = {
 };
 ```
 
-### 4. テストカバレッジ
+### 4. Test Coverage
 
 ```javascript
 // tests/plugin.test.js
 const { createPluginTestContext, mockLogger } = require('musubi-sdd/testing');
 
 describe('My Plugin', () => {
-  // 各フックをテスト
+  // Test each hook
   describe('hooks', () => {
     test.each([
       ['requirements:validate:before', mockRequirements],
@@ -820,11 +820,11 @@ describe('My Plugin', () => {
       const result = await plugin.hooks[hookName](mockData, context);
       
       expect(result).toBeDefined();
-      // 具体的なアサーション
+      // Specific assertions
     });
   });
   
-  // エラーケースのテスト
+  // Test error cases
   describe('error handling', () => {
     test('handles API failures gracefully', async () => {
       const context = createPluginTestContext({
@@ -846,12 +846,12 @@ describe('My Plugin', () => {
 
 ---
 
-## 配布とパブリッシング
+## Distribution and Publishing
 
-### npm への公開
+### Publishing to npm
 
 ```bash
-# package.json の準備
+# Prepare package.json
 {
   "name": "musubi-plugin-my-awesome",
   "version": "1.0.0",
@@ -862,21 +862,21 @@ describe('My Plugin', () => {
   }
 }
 
-# 公開
+# Publish
 npm publish
 ```
 
-### ローカルプラグインとして配布
+### Distributing as a Local Plugin
 
 ```bash
-# プロジェクト内に配置
+# Place within the project
 .musubi-plugins/
 └── my-local-plugin/
     ├── package.json
     └── index.js
 ```
 
-### GitHub からインストール
+### Installing from GitHub
 
 ```yaml
 # .musubi/config.yml
@@ -887,26 +887,26 @@ plugins:
       option1: value1
 ```
 
-### プラグインの発見
+### Plugin Discovery
 
-MUSUBI プラグインレジストリに登録:
+Register with the MUSUBI plugin registry:
 
 ```bash
-# プラグインを登録（公開後）
+# Register the plugin (after publishing)
 musubi plugin register musubi-plugin-my-awesome
 
-# 利用可能なプラグインを検索
+# Search for available plugins
 musubi plugin search "notification"
 
-# プラグインをインストール
+# Install a plugin
 musubi plugin install musubi-plugin-slack-notifications
 ```
 
 ---
 
-## サンプルプラグイン
+## Sample Plugins
 
-### 1. Slack 通知プラグイン
+### 1. Slack Notification Plugin
 
 ```javascript
 // musubi-plugin-slack/index.js
@@ -967,7 +967,7 @@ module.exports = {
 };
 ```
 
-### 2. カスタムメトリクスプラグイン
+### 2. Custom Metrics Plugin
 
 ```javascript
 // musubi-plugin-metrics/index.js
@@ -983,7 +983,7 @@ module.exports = {
       errors: 0
     };
     
-    // メトリクス収集
+    // Metrics collection
     context.events.on('orchestration:complete', (data) => {
       this.metrics.orchestrations++;
       this.metrics.totalTokens += data.tokens;
@@ -1036,24 +1036,24 @@ Error Rate:     ${((metrics.errors / metrics.orchestrations) * 100).toFixed(1)}%
 
 ---
 
-## トラブルシューティング
+## Troubleshooting
 
-### プラグインがロードされない
+### Plugin Not Loading
 
 ```bash
-# プラグインの状態を確認
+# Check plugin status
 musubi plugin list --verbose
 
-# 一般的な問題:
-# 1. package.json が不正
-# 2. musubi バージョンの互換性
-# 3. 必須の依存関係が不足
+# Common issues:
+# 1. Invalid package.json
+# 2. musubi version compatibility
+# 3. Missing required dependencies
 ```
 
-### フックが呼び出されない
+### Hooks Not Being Called
 
 ```javascript
-// デバッグ用にログを追加
+// Add logging for debugging
 hooks: {
   'requirements:validate:before': async (requirements, context) => {
     context.logger.debug('Hook called', { 
@@ -1065,14 +1065,14 @@ hooks: {
 }
 ```
 
-### 設定が読み込まれない
+### Configuration Not Loading
 
 ```yaml
-# .musubi/config.yml で正しいパスを指定
+# Specify the correct path in .musubi/config.yml
 plugins:
   - name: my-plugin
     config:
-      # プラグイン名をキーとして使用しない
+      # Do not use the plugin name as a key
       # ❌ my-plugin:
       #      option: value
       # ✅

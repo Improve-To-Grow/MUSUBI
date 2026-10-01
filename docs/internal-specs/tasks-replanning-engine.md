@@ -4,7 +4,7 @@
 **Version**: 1.0.0
 **Created**: 2025-12-08
 **Related Design**: DES-REPLAN-001
-**Related Requirements**: REQ-REPLAN-001 〜 REQ-REPLAN-012
+**Related Requirements**: REQ-REPLAN-001 to REQ-REPLAN-012
 
 ---
 
@@ -14,23 +14,23 @@
 
 | Task ID | Task | Priority | Effort | Dependencies |
 |---------|------|----------|--------|--------------|
-| TSK-LLM-001 | `src/llm-providers/base-provider.js` - 基底クラス作成 | P0 | 30min | - |
-| TSK-LLM-002 | `src/llm-providers/copilot-provider.js` - GitHub Copilot LM API実装 | P0 | 45min | TSK-LLM-001 |
-| TSK-LLM-003 | `src/llm-providers/anthropic-provider.js` - Anthropic Claude API実装 | P1 | 45min | TSK-LLM-001 |
-| TSK-LLM-004 | `src/llm-providers/openai-provider.js` - OpenAI GPT API実装 | P1 | 45min | TSK-LLM-001 |
-| TSK-LLM-005 | `src/llm-providers/index.js` - Factory関数とエクスポート | P0 | 20min | TSK-LLM-001〜004 |
+| TSK-LLM-001 | `src/llm-providers/base-provider.js` - Create base class | P0 | 30min | - |
+| TSK-LLM-002 | `src/llm-providers/copilot-provider.js` - Implement GitHub Copilot LM API | P0 | 45min | TSK-LLM-001 |
+| TSK-LLM-003 | `src/llm-providers/anthropic-provider.js` - Implement Anthropic Claude API | P1 | 45min | TSK-LLM-001 |
+| TSK-LLM-004 | `src/llm-providers/openai-provider.js` - Implement OpenAI GPT API | P1 | 45min | TSK-LLM-001 |
+| TSK-LLM-005 | `src/llm-providers/index.js` - Factory function and exports | P0 | 20min | TSK-LLM-001 to 004 |
 
 ### 1.2 Replanning Core
 
 | Task ID | Task | Priority | Effort | Dependencies |
 |---------|------|----------|--------|--------------|
-| TSK-RPL-001 | `src/orchestration/replanning/config.js` - デフォルト設定 | P0 | 15min | - |
-| TSK-RPL-002 | `src/orchestration/replanning/plan-monitor.js` - トリガー監視 | P0 | 45min | TSK-RPL-001 |
-| TSK-RPL-003 | `src/orchestration/replanning/plan-evaluator.js` - プラン評価 | P0 | 45min | - |
-| TSK-RPL-004 | `src/orchestration/replanning/alternative-generator.js` - 代替パス生成 | P0 | 60min | TSK-LLM-005 |
-| TSK-RPL-005 | `src/orchestration/replanning/replan-history.js` - 履歴管理 | P1 | 30min | - |
-| TSK-RPL-006 | `src/orchestration/replanning/replanning-engine.js` - コアエンジン | P0 | 90min | TSK-RPL-001〜005 |
-| TSK-RPL-007 | `src/orchestration/replanning/index.js` - モジュールエクスポート | P0 | 10min | TSK-RPL-006 |
+| TSK-RPL-001 | `src/orchestration/replanning/config.js` - Default settings | P0 | 15min | - |
+| TSK-RPL-002 | `src/orchestration/replanning/plan-monitor.js` - Trigger monitoring | P0 | 45min | TSK-RPL-001 |
+| TSK-RPL-003 | `src/orchestration/replanning/plan-evaluator.js` - Plan evaluation | P0 | 45min | - |
+| TSK-RPL-004 | `src/orchestration/replanning/alternative-generator.js` - Alternative path generation | P0 | 60min | TSK-LLM-005 |
+| TSK-RPL-005 | `src/orchestration/replanning/replan-history.js` - History management | P1 | 30min | - |
+| TSK-RPL-006 | `src/orchestration/replanning/replanning-engine.js` - Core engine | P0 | 90min | TSK-RPL-001 to 005 |
+| TSK-RPL-007 | `src/orchestration/replanning/index.js` - Module exports | P0 | 10min | TSK-RPL-006 |
 
 ---
 
@@ -40,16 +40,16 @@
 
 | Task ID | Task | Priority | Effort | Dependencies |
 |---------|------|----------|--------|--------------|
-| TSK-PAT-001 | `src/orchestration/patterns/swarm.js` - Replanning統合 | P0 | 45min | TSK-RPL-006 |
-| TSK-PAT-002 | `src/orchestration/patterns/sequential.js` - Replanning統合 | P1 | 45min | TSK-RPL-006 |
-| TSK-PAT-003 | `src/orchestration/workflow-orchestrator.js` - Replanning統合 | P1 | 60min | TSK-RPL-006 |
+| TSK-PAT-001 | `src/orchestration/patterns/swarm.js` - Replanning integration | P0 | 45min | TSK-RPL-006 |
+| TSK-PAT-002 | `src/orchestration/patterns/sequential.js` - Replanning integration | P1 | 45min | TSK-RPL-006 |
+| TSK-PAT-003 | `src/orchestration/workflow-orchestrator.js` - Replanning integration | P1 | 60min | TSK-RPL-006 |
 
 ### 2.2 Engine Integration
 
 | Task ID | Task | Priority | Effort | Dependencies |
 |---------|------|----------|--------|--------------|
-| TSK-ENG-001 | `src/orchestration/orchestration-engine.js` - Replanning統合 | P0 | 45min | TSK-RPL-006 |
-| TSK-ENG-002 | `src/orchestration/index.js` - エクスポート更新 | P0 | 15min | TSK-ENG-001 |
+| TSK-ENG-001 | `src/orchestration/orchestration-engine.js` - Replanning integration | P0 | 45min | TSK-RPL-006 |
+| TSK-ENG-002 | `src/orchestration/index.js` - Update exports | P0 | 15min | TSK-ENG-001 |
 
 ---
 
@@ -59,15 +59,15 @@
 
 | Task ID | Task | Priority | Effort | Dependencies |
 |---------|------|----------|--------|--------------|
-| TSK-CLI-001 | `bin/musubi-orchestrate.js` - `--replan` オプション追加 | P1 | 30min | TSK-ENG-001 |
-| TSK-CLI-002 | `bin/musubi-orchestrate.js` - `--replan-config` オプション追加 | P2 | 20min | TSK-CLI-001 |
+| TSK-CLI-001 | `bin/musubi-orchestrate.js` - Add `--replan` option | P1 | 30min | TSK-ENG-001 |
+| TSK-CLI-002 | `bin/musubi-orchestrate.js` - Add `--replan-config` option | P2 | 20min | TSK-CLI-001 |
 
 ### 3.2 Configuration
 
 | Task ID | Task | Priority | Effort | Dependencies |
 |---------|------|----------|--------|--------------|
-| TSK-CFG-001 | `steering/project.yml` - replanning設定スキーマ追加 | P1 | 20min | - |
-| TSK-CFG-002 | `steering/project.yml.README.md` - ドキュメント更新 | P2 | 15min | TSK-CFG-001 |
+| TSK-CFG-001 | `steering/project.yml` - Add replanning configuration schema | P1 | 20min | - |
+| TSK-CFG-002 | `steering/project.yml.README.md` - Update documentation | P2 | 15min | TSK-CFG-001 |
 
 ---
 
@@ -90,7 +90,7 @@
 
 | Task ID | Task | Priority | Effort | Dependencies |
 |---------|------|----------|--------|--------------|
-| TSK-TST-009 | `tests/orchestration/replanning/integration.test.js` | P0 | 60min | TSK-TST-001〜008 |
+| TSK-TST-009 | `tests/orchestration/replanning/integration.test.js` | P0 | 60min | TSK-TST-001 to 008 |
 
 ---
 
@@ -115,8 +115,8 @@ TSK-TST-001 → TSK-TST-002 → TSK-TST-005 → TSK-TST-006 → TSK-TST-007 → 
 
 ### Step 4: Enhancements (Should Have)
 ```
-TSK-LLM-003, TSK-LLM-004 (並列)
-TSK-PAT-002, TSK-PAT-003 (並列)
+TSK-LLM-003, TSK-LLM-004 (parallel)
+TSK-PAT-002, TSK-PAT-003 (parallel)
 TSK-CLI-001 → TSK-CLI-002
 TSK-CFG-001 → TSK-CFG-002
 ```
@@ -142,7 +142,7 @@ TSK-CFG-001 → TSK-CFG-002
 | REQ-REPLAN-001 | TSK-RPL-002 |
 | REQ-REPLAN-002 | TSK-RPL-006 |
 | REQ-REPLAN-003 | TSK-RPL-004 |
-| REQ-REPLAN-004 | TSK-LLM-001〜005 |
+| REQ-REPLAN-004 | TSK-LLM-001 to 005 |
 | REQ-REPLAN-005 | TSK-RPL-003 |
 | REQ-REPLAN-006 | TSK-PAT-001 |
 | REQ-REPLAN-007 | TSK-PAT-002 |

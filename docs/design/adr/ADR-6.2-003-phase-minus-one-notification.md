@@ -10,15 +10,15 @@
 
 ## Context
 
-Phase -1 GateはConstitutional Article VII（Simplicity）またはArticle VIII（Anti-Abstraction）の違反を検出した際に自動的に発動する特別レビュープロセスです。
+The Phase -1 Gate is a special review process that is triggered automatically when a violation of Constitutional Article VII (Simplicity) or Article VIII (Anti-Abstraction) is detected.
 
-このゲートが発動した場合、以下のレビュアーに通知し、承認ワークフローを開始する必要があります：
+When this gate is triggered, the following reviewers must be notified and the approval workflow started:
 
-- **System Architect**（必須）
-- **Project Manager**（任意）
-- **Human Developer**（最終承認）
+- **System Architect** (Required)
+- **Project Manager** (Optional)
+- **Human Developer** (Final approval)
 
-通知チャネルとワークフローの設計を決定する必要があります。
+The notification channels and workflow design must be decided.
 
 ---
 
@@ -26,7 +26,7 @@ Phase -1 GateはConstitutional Article VII（Simplicity）またはArticle VIII�
 
 ### Primary Channel: GitHub/GitLab Integration
 
-GitHub Issues/Pull Request Commentsを主要な通知・ワークフローチャネルとして使用します。
+Use GitHub Issues/Pull Request Comments as the primary notification and workflow channel.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -134,7 +134,7 @@ body: |
 
 ### Secondary Channel: Webhooks
 
-オプションでSlack/Discord/Teams通知をサポート：
+Optionally support Slack/Discord/Teams notifications:
 
 ```yaml
 # musubi.config.yml
@@ -161,43 +161,43 @@ phaseMinusOne:
 ### Alternative 1: Email-Only Notification
 
 **Pros**:
-- シンプル
-- 全ての開発者がアクセス可能
+- Simple
+- Accessible to all developers
 
 **Cons**:
-- ワークフロー統合なし
-- トラッキングが困難
-- 非同期性が高すぎる
+- No workflow integration
+- Difficult to track
+- Too asynchronous
 
-**Rejected**: 開発ワークフローとの統合不足
+**Rejected**: Insufficient integration with the development workflow
 
 ### Alternative 2: Slack-First Approach
 
 **Pros**:
-- リアルタイム通知
-- スレッドでの議論
+- Real-time notifications
+- Discussion in threads
 
 **Cons**:
-- Slackアカウントが必要
-- 通知の永続化が不確実
-- GitHub/GitLabワークフローとの分離
+- Requires a Slack account
+- Notification persistence is uncertain
+- Separated from the GitHub/GitLab workflow
 
-**Rejected**: 開発ワークフローとの一貫性を優先
+**Rejected**: Consistency with the development workflow takes priority
 
 ### Alternative 3: Custom Review Tool
 
-専用のWebベースレビューツールを構築。
+Build a dedicated web-based review tool.
 
 **Pros**:
-- カスタマイズ性が高い
-- 専用ワークフロー
+- Highly customizable
+- Dedicated workflow
 
 **Cons**:
-- 開発コストが高い
-- 追加の認証が必要
-- Article VII（Simplicity）違反
+- High development cost
+- Requires additional authentication
+- Violates Article VII (Simplicity)
 
-**Rejected**: オーバーエンジニアリング
+**Rejected**: Over-engineering
 
 ---
 
@@ -205,22 +205,22 @@ phaseMinusOne:
 
 ### Positive
 
-1. **ワークフロー統合**: 既存のGitHub/GitLab開発フローに組み込み
-2. **永続化**: Issues/PRに記録が残る
-3. **非同期対応**: タイムゾーンをまたいだレビューが可能
-4. **トレーサビリティ**: コードとレビューの紐付けが自動
+1. **Workflow integration**: Built into the existing GitHub/GitLab development flow
+2. **Persistence**: Records remain in Issues/PRs
+3. **Asynchronous support**: Reviews are possible across time zones
+4. **Traceability**: Code and reviews are linked automatically
 
 ### Negative
 
-1. **GitHub/GitLab依存**: これらのプラットフォームを使用しない環境では制限
-2. **通知の見逃し**: 大量の通知に埋もれる可能性
-3. **オフライン制限**: ネットワーク接続が必要
+1. **GitHub/GitLab dependency**: Limited in environments that do not use these platforms
+2. **Missed notifications**: May be buried among a large volume of notifications
+3. **Offline limitation**: Requires a network connection
 
 ### Mitigations
 
-- **プラットフォーム依存**: Gitea/Bitbucket対応を将来的に検討
-- **通知管理**: `phase-minus-one`ラベルでフィルタリング可能に
-- **オフライン**: ローカルでの検出結果をキャッシュし、オンライン時に通知
+- **Platform dependency**: Consider Gitea/Bitbucket support in the future
+- **Notification management**: Make filtering possible with the `phase-minus-one` label
+- **Offline**: Cache local detection results and send notifications when online
 
 ---
 
@@ -290,13 +290,13 @@ phaseMinusOne:
     systemArchitect:
       required: true
       githubTeam: "@org/architects"
-      timeout: 48h  # 自動エスカレーション
+      timeout: 48h  # automatic escalation
     projectManager:
       required: false
       githubTeam: "@org/pms"
     humanDeveloper:
       required: true
-      autoAssign: true  # PR作成者
+      autoAssign: true  # PR author
 ```
 
 ---
@@ -310,7 +310,7 @@ phaseMinusOne:
 
 ## References
 
-- [IMP-6.2-005-02 Requirements](../../requirements/req_v6.2.md#imp-62-005-02-phase--1-gate-の自動トリガー)
+- [IMP-6.2-005-02 Requirements](../../requirements/req_v6.2.md#imp-62-005-02-automatic-triggering-of-the-phase--1-gate)
 - [Article VII: Simplicity Gate](../../../steering/rules/constitution.md#article-vii-simplicity-gate-phase--1-gate)
 - [Article VIII: Anti-Abstraction Gate](../../../steering/rules/constitution.md#article-viii-anti-abstraction-gate-phase--1-gate)
 

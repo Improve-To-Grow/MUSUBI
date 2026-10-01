@@ -1,51 +1,51 @@
 # MUSUBI Interactive Tutorials
 
-ガイド付きオンボーディングで MUSUBI SDD をマスターしましょう。
+Master MUSUBI SDD with guided onboarding.
 
 ---
 
-## 🎯 チュートリアル一覧
+## 🎯 Tutorial List
 
-| レベル | チュートリアル | 所要時間 | 学べること |
+| Level | Tutorial | Duration | What You'll Learn |
 |--------|---------------|---------|-----------|
-| 🟢 初級 | [1. 初めてのプロジェクト](#tutorial-1-初めてのプロジェクト) | 15分 | 基本セットアップ |
-| 🟢 初級 | [2. 要件定義の基礎](#tutorial-2-要件定義の基礎) | 20分 | EARS形式 |
-| 🟡 中級 | [3. 設計ドキュメント生成](#tutorial-3-設計ドキュメント生成) | 25分 | C4モデル、ADR |
-| 🟡 中級 | [4. タスク分解とトレーサビリティ](#tutorial-4-タスク分解とトレーサビリティ) | 30分 | タスク生成、追跡 |
-| 🔴 上級 | [5. マルチエージェント連携](#tutorial-5-マルチエージェント連携) | 45分 | オーケストレーション |
-| 🔴 上級 | [6. エンタープライズ統合](#tutorial-6-エンタープライズ統合) | 60分 | JIRA、CI/CD連携 |
+| 🟢 Beginner | [1. Your First Project](#tutorial-1-your-first-project) | 15 min | Basic setup |
+| 🟢 Beginner | [2. Requirements Basics](#tutorial-2-requirements-basics) | 20 min | EARS format |
+| 🟡 Intermediate | [3. Design Document Generation](#tutorial-3-design-document-generation) | 25 min | C4 model, ADR |
+| 🟡 Intermediate | [4. Task Breakdown and Traceability](#tutorial-4-task-breakdown-and-traceability) | 30 min | Task generation, tracking |
+| 🔴 Advanced | [5. Multi-Agent Collaboration](#tutorial-5-multi-agent-collaboration) | 45 min | Orchestration |
+| 🔴 Advanced | [6. Enterprise Integration](#tutorial-6-enterprise-integration) | 60 min | JIRA, CI/CD integration |
 
 ---
 
-## Tutorial 1: 初めてのプロジェクト
+## Tutorial 1: Your First Project
 
-### 🎯 学習目標
-- MUSUBI のインストールと初期化
-- プロジェクトメモリの理解
-- 基本的なコマンドの実行
+### 🎯 Learning Objectives
+- Install and initialize MUSUBI
+- Understand project memory
+- Run basic commands
 
-### ステップ 1: インストール
+### Step 1: Installation
 
 ```bash
-# グローバルインストール
+# Global installation
 npm install -g musubi-sdd
 
-# バージョン確認
+# Check version
 musubi --version
 ```
 
-### ステップ 2: プロジェクト初期化
+### Step 2: Project Initialization
 
 ```bash
-# 新しいプロジェクトディレクトリを作成
+# Create a new project directory
 mkdir my-first-musubi-project
 cd my-first-musubi-project
 
-# MUSUBI を初期化（対話モード）
+# Initialize MUSUBI (interactive mode)
 musubi init
 ```
 
-**初期化時の質問:**
+**Questions during initialization:**
 ```
 ? Select your AI coding agent: (Use arrow keys)
 ❯ GitHub Copilot
@@ -61,28 +61,34 @@ musubi init
   Go
   Rust
   
-? Enable Japanese (bilingual) support? (Y/n)
+? Documentation language: (Use arrow keys)
+❯ English
+  Japanese
+  ...
 ```
 
-### ステップ 3: 生成されたファイル確認
+> Keep **English** as the documentation language. Bilingual output (an extra translated copy of
+> every document) is enabled separately — see [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md).
+
+### Step 3: Check Generated Files
 
 ```
 my-first-musubi-project/
 ├── steering/
-│   ├── product.md      # 製品コンテキスト
-│   ├── structure.md    # アーキテクチャ構造
-│   ├── tech.md         # 技術スタック
+│   ├── product.md      # Product context
+│   ├── structure.md    # Architecture structure
+│   ├── tech.md         # Technology stack
 │   └── rules/
-│       ├── constitution.md  # 9条憲法
-│       └── workflow.md      # SDDワークフロー
+│       ├── constitution.md  # 9-article constitution
+│       └── workflow.md      # SDD workflow
 ├── storage/
-│   └── features/       # 機能仕様保存先
-└── AGENTS.md           # エージェント設定
+│   └── features/       # Feature spec storage
+└── AGENTS.md           # Agent configuration
 ```
 
-### ステップ 4: Steering ファイルのカスタマイズ
+### Step 4: Customize Steering Files
 
-`steering/product.md` を開いて編集：
+Open and edit `steering/product.md`:
 
 ```markdown
 # Product Context
@@ -91,48 +97,48 @@ my-first-musubi-project/
 My Awesome App
 
 ## Vision
-ユーザーの生産性を10倍にするタスク管理アプリ
+A task management app that makes users 10x more productive
 
 ## Target Users
-- フリーランス開発者
-- 小規模チーム
+- Freelance developers
+- Small teams
 
 ## Success Metrics
 - DAU 1,000+
-- タスク完了率 80%+
+- Task completion rate 80%+
 ```
 
-### ✅ チェックポイント
+### ✅ Checkpoint
 
 ```bash
-# 設定の検証
+# Validate configuration
 musubi validate
 
-# 期待される出力:
+# Expected output:
 # ✅ Constitution: Valid
 # ✅ Steering files: Complete
 # ✅ Ready for SDD workflow
 ```
 
-### 📝 演習問題
+### 📝 Exercises
 
-1. `steering/tech.md` を開いて、使用する技術スタックを記述してください
-2. `musubi validate` を実行して、エラーがないことを確認してください
+1. Open `steering/tech.md` and describe the technology stack you will use
+2. Run `musubi validate` and confirm there are no errors
 
 ---
 
-## Tutorial 2: 要件定義の基礎
+## Tutorial 2: Requirements Basics
 
-### 🎯 学習目標
-- EARS形式の要件記述
-- 要件の自動検証
-- 要件IDの管理
+### 🎯 Learning Objectives
+- Writing requirements in EARS format
+- Automatic requirements validation
+- Managing requirement IDs
 
-### EARS形式とは？
+### What is EARS format?
 
-**E**asy **A**pproach to **R**equirements **S**yntax - 曖昧さのない要件記述のための構造化形式。
+**E**asy **A**pproach to **R**equirements **S**yntax - a structured format for writing unambiguous requirements.
 
-| パターン | テンプレート | 例 |
+| Pattern | Template | Example |
 |----------|-------------|-----|
 | Ubiquitous | The [system] shall [action] | The system shall display error messages in red |
 | Event-Driven | When [trigger], the [system] shall [action] | When user clicks login, the system shall validate credentials |
@@ -140,14 +146,14 @@ musubi validate
 | Optional | Where [condition], the [system] shall [action] | Where user is admin, the system shall show settings panel |
 | Unwanted | If [condition], then the [system] shall [action] | If password is incorrect, then the system shall log the attempt |
 
-### ステップ 1: 要件生成
+### Step 1: Generate Requirements
 
 ```bash
-# 機能の要件を生成
-musubi requirements "ユーザー認証機能"
+# Generate requirements for a feature
+musubi requirements "User authentication feature"
 ```
 
-**生成される出力 (`storage/specs/user-authentication-requirements.md`):**
+**Generated output (`storage/specs/user-authentication-requirements.md`):**
 
 ```markdown
 # User Authentication Requirements
@@ -170,14 +176,14 @@ authenticate the user and create a session token.
 a minimum cost factor of 12.
 ```
 
-### ステップ 2: 要件の検証
+### Step 2: Validate Requirements
 
 ```bash
-# EARS形式の検証
+# Validate EARS format
 musubi validate --requirements storage/specs/user-authentication-requirements.md
 ```
 
-**検証結果:**
+**Validation results:**
 ```
 📋 Requirements Validation Report
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -189,14 +195,14 @@ musubi validate --requirements storage/specs/user-authentication-requirements.md
 Summary: 2/3 requirements valid
 ```
 
-### ステップ 3: 要件のトレーサビリティ
+### Step 3: Requirements Traceability
 
 ```bash
-# トレーサビリティマトリクス生成
+# Generate traceability matrix
 musubi trace --requirements
 ```
 
-**出力:**
+**Output:**
 ```
 📊 Traceability Matrix
 ━━━━━━━━━━━━━━━━━━━━━━━
@@ -209,28 +215,28 @@ musubi trace --requirements
 Coverage: 0% → Next step: Generate design documents
 ```
 
-### 📝 演習問題
+### 📝 Exercises
 
-1. 「商品検索機能」の要件を EARS 形式で 3 つ書いてください
-2. `musubi validate` で要件が正しいことを確認してください
+1. Write 3 requirements in EARS format for a "product search" feature
+2. Run `musubi validate` to confirm the requirements are correct
 
 ---
 
-## Tutorial 3: 設計ドキュメント生成
+## Tutorial 3: Design Document Generation
 
-### 🎯 学習目標
-- C4モデルによるアーキテクチャ設計
-- ADR（アーキテクチャ決定記録）の作成
-- 設計と要件の紐付け
+### 🎯 Learning Objectives
+- Architecture design using the C4 model
+- Creating ADRs (Architecture Decision Records)
+- Linking design to requirements
 
-### ステップ 1: 設計生成
+### Step 1: Generate Design
 
 ```bash
-# 要件から設計を生成
-musubi design "ユーザー認証機能"
+# Generate design from requirements
+musubi design "User authentication feature"
 ```
 
-**生成される出力 (`storage/design/user-authentication-design.md`):**
+**Generated output (`storage/design/user-authentication-design.md`):**
 
 ```markdown
 # User Authentication Design
@@ -278,21 +284,21 @@ C4Container
 - ⚠️ Additional infrastructure to manage
 ```
 
-### ステップ 2: 設計レビュー
+### Step 2: Design Review
 
 ```bash
-# 設計の妥当性チェック
+# Check design validity
 musubi validate --design storage/design/user-authentication-design.md
 ```
 
-### ステップ 3: トレーサビリティ更新
+### Step 3: Update Traceability
 
 ```bash
-# 再度トレーサビリティを確認
+# Check traceability again
 musubi trace --all
 ```
 
-**出力:**
+**Output:**
 ```
 📊 Traceability Matrix
 ━━━━━━━━━━━━━━━━━━━━━━━
@@ -305,28 +311,28 @@ musubi trace --all
 Coverage: 33% → Next step: Generate tasks
 ```
 
-### 📝 演習問題
+### 📝 Exercises
 
-1. 生成された C4 ダイアグラムを Mermaid プレビューで確認してください
-2. ADR を 1 つ追加してください（例: データベース選定理由）
+1. Review the generated C4 diagrams in a Mermaid preview
+2. Add one ADR (e.g., the rationale for choosing a database)
 
 ---
 
-## Tutorial 4: タスク分解とトレーサビリティ
+## Tutorial 4: Task Breakdown and Traceability
 
-### 🎯 学習目標
-- 設計からタスクへの分解
-- 実装優先順位の決定
-- 完全なトレーサビリティの達成
+### 🎯 Learning Objectives
+- Breaking down design into tasks
+- Deciding implementation priorities
+- Achieving complete traceability
 
-### ステップ 1: タスク生成
+### Step 1: Generate Tasks
 
 ```bash
-# 設計からタスクを生成
-musubi tasks "ユーザー認証機能"
+# Generate tasks from design
+musubi tasks "User authentication feature"
 ```
 
-**生成される出力 (`storage/tasks/user-authentication-tasks.md`):**
+**Generated output (`storage/tasks/user-authentication-tasks.md`):**
 
 ```markdown
 # User Authentication Tasks
@@ -367,14 +373,14 @@ musubi tasks "ユーザー認証機能"
 - [ ] Error handling
 ```
 
-### ステップ 2: 実装開始
+### Step 2: Start Implementation
 
 ```bash
-# 特定のタスクを実装
+# Implement a specific task
 musubi implement TASK-AUTH-001
 ```
 
-**エージェントへの指示が生成される:**
+**Instructions for the agent are generated:**
 ```markdown
 ## Implementation Task: TASK-AUTH-001
 
@@ -401,16 +407,16 @@ You are implementing the database schema for user authentication.
 - [ ] Migration is reversible
 ```
 
-### ステップ 3: 完了マーキング
+### Step 3: Mark as Complete
 
-タスク完了後:
+After completing the task:
 
 ```bash
-# タスクを完了としてマーク
+# Mark the task as complete
 musubi trace --complete TASK-AUTH-001
 ```
 
-**トレーサビリティ更新:**
+**Traceability update:**
 ```
 📊 Traceability Matrix (Updated)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -425,14 +431,14 @@ Coverage: 58%
 
 ---
 
-## Tutorial 5: マルチエージェント連携
+## Tutorial 5: Multi-Agent Collaboration
 
-### 🎯 学習目標
-- オーケストレーションパターンの理解
-- 複数エージェントの協調動作
-- 自動リプランニング
+### 🎯 Learning Objectives
+- Understanding orchestration patterns
+- Coordinated operation of multiple agents
+- Automatic replanning
 
-### オーケストレーションパターン
+### Orchestration Patterns
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -450,14 +456,14 @@ Coverage: 58%
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### ステップ 1: オーケストレーション開始
+### Step 1: Start Orchestration
 
 ```bash
-# マルチエージェントでタスク実行
-musubi orchestrate "ユーザー認証機能の完全実装" --pattern triage
+# Execute a task with multiple agents
+musubi orchestrate "Full implementation of the user authentication feature" --pattern triage
 ```
 
-**オーケストレーションフロー:**
+**Orchestration flow:**
 ```
 🎭 Orchestration Started
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -477,14 +483,14 @@ Progress:
 Current: Software Developer implementing TASK-AUTH-003
 ```
 
-### ステップ 2: リアルタイム監視
+### Step 2: Real-Time Monitoring
 
 ```bash
-# GUI でオーケストレーションを監視
+# Monitor orchestration in the GUI
 musubi gui start --port 3000
 ```
 
-ブラウザで `http://localhost:3000` を開く:
+Open `http://localhost:3000` in your browser:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -504,9 +510,9 @@ musubi gui start --port 3000
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### ステップ 3: 自動リプランニング
+### Step 3: Automatic Replanning
 
-問題発生時の自動対応:
+Automatic handling when problems occur:
 
 ```
 ⚠️ Issue Detected
@@ -528,14 +534,14 @@ Approve replan? [Y/n]
 
 ---
 
-## Tutorial 6: エンタープライズ統合
+## Tutorial 6: Enterprise Integration
 
-### 🎯 学習目標
-- JIRA との双方向同期
-- CI/CD パイプライン統合
-- チーム通知設定
+### 🎯 Learning Objectives
+- Bidirectional sync with JIRA
+- CI/CD pipeline integration
+- Team notification settings
 
-### ステップ 1: JIRA 統合設定
+### Step 1: JIRA Integration Setup
 
 ```javascript
 // .musubi/integrations.js
@@ -551,15 +557,15 @@ module.exports = {
     sync: {
       requirements: true,    // REQ → JIRA Epic
       tasks: true,           // TASK → JIRA Story
-      bidirectional: true    // 双方向同期
+      bidirectional: true    // Bidirectional sync
     }
   }
 };
 ```
 
-### ステップ 2: CI/CD 統合
+### Step 2: CI/CD Integration
 
-**GitHub Actions 設定 (`.github/workflows/musubi-validate.yml`):**
+**GitHub Actions configuration (`.github/workflows/musubi-validate.yml`):**
 
 ```yaml
 name: MUSUBI Validation
@@ -594,7 +600,7 @@ jobs:
         run: musubi analyze --security
 ```
 
-### ステップ 3: Slack 通知
+### Step 3: Slack Notifications
 
 ```javascript
 // .musubi/notifications.js
@@ -625,7 +631,7 @@ module.exports = {
 };
 ```
 
-### ステップ 4: SSO 設定（SAML）
+### Step 4: SSO Setup (SAML)
 
 ```javascript
 // .musubi/auth.js
@@ -649,32 +655,32 @@ module.exports = {
 
 ---
 
-## 🏆 認定チェックリスト
+## 🏆 Certification Checklist
 
-すべてのチュートリアルを完了したら、以下をセルフチェック：
+After completing all tutorials, self-check with the following:
 
-### 初級認定 🟢
-- [ ] MUSUBI をインストールし、プロジェクトを初期化できる
-- [ ] EARS 形式で要件を記述できる
-- [ ] `musubi validate` でエラーを解消できる
+### Beginner Certification 🟢
+- [ ] Can install MUSUBI and initialize a project
+- [ ] Can write requirements in EARS format
+- [ ] Can resolve errors with `musubi validate`
 
-### 中級認定 🟡
-- [ ] C4 モデルで設計を表現できる
-- [ ] ADR を適切に記録できる
-- [ ] タスク分解とトレーサビリティを維持できる
+### Intermediate Certification 🟡
+- [ ] Can express a design with the C4 model
+- [ ] Can record ADRs appropriately
+- [ ] Can maintain task breakdown and traceability
 
-### 上級認定 🔴
-- [ ] オーケストレーションパターンを選択・実行できる
-- [ ] リプランニングを理解し対応できる
-- [ ] エンタープライズ統合を設定できる
+### Advanced Certification 🔴
+- [ ] Can select and run orchestration patterns
+- [ ] Understand and handle replanning
+- [ ] Can configure enterprise integrations
 
 ---
 
-## 📚 次のステップ
+## 📚 Next Steps
 
-- [Plugin Development Guide](./PLUGIN-DEVELOPMENT.md) - 独自拡張の作成
-- [Architecture Deep Dive](./ARCHITECTURE-DEEP-DIVE.md) - 内部設計の理解
-- [API Reference](../API-REFERENCE.md) - 完全なAPIドキュメント
+- [Plugin Development Guide](./PLUGIN-DEVELOPMENT.md) - Create your own extensions
+- [Architecture Deep Dive](./ARCHITECTURE-DEEP-DIVE.md) - Understand the internal design
+- [API Reference](../API-REFERENCE.md) - Complete API documentation
 
 ---
 

@@ -1,175 +1,175 @@
-# 🔧 トラブルシューティングガイド
+# 🔧 Troubleshooting Guide
 
-**MUSUBI v3.5.1** | 最終更新: 2025-12-08
+**MUSUBI v3.5.1** | Last updated: 2025-12-08
 
-> よくある問題と解決方法
-
----
-
-## 📋 目次
-
-1. [インストール関連](#1-インストール関連)
-2. [初期化関連](#2-初期化関連)
-3. [AIエージェント関連](#3-aiエージェント関連)
-4. [CLI関連](#4-cli関連)
-5. [ワークフロー関連](#5-ワークフロー関連)
-6. [パフォーマンス関連](#6-パフォーマンス関連)
-7. [その他](#7-その他)
+> Common problems and solutions
 
 ---
 
-## 1. インストール関連
+## 📋 Table of Contents
 
-### ❌ エラー: `npm ERR! code EACCES`
+1. [Installation Issues](#1-installation-issues)
+2. [Initialization Issues](#2-initialization-issues)
+3. [AI Agent Issues](#3-ai-agent-issues)
+4. [CLI Issues](#4-cli-issues)
+5. [Workflow Issues](#5-workflow-issues)
+6. [Performance Issues](#6-performance-issues)
+7. [Other](#7-other)
 
-**症状:**
+---
+
+## 1. Installation Issues
+
+### ❌ Error: `npm ERR! code EACCES`
+
+**Symptoms:**
 ```bash
 npm install -g musubi-sdd
 npm ERR! code EACCES
 npm ERR! permission denied
 ```
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 方法1: sudo使用（非推奨）
+# Option 1: Use sudo (not recommended)
 sudo npm install -g musubi-sdd
 
-# 方法2: npm権限修正（推奨）
+# Option 2: Fix npm permissions (recommended)
 mkdir ~/.npm-global
 npm config set prefix '~/.npm-global'
 echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 npm install -g musubi-sdd
 
-# 方法3: npx使用（インストール不要）
+# Option 3: Use npx (no installation required)
 npx musubi-sdd init
 ```
 
 ---
 
-### ❌ エラー: `Node.js version not supported`
+### ❌ Error: `Node.js version not supported`
 
-**症状:**
+**Symptoms:**
 ```bash
 Error: musubi-sdd requires Node.js >= 18.0.0
 Current version: 16.x.x
 ```
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# nvm使用
+# Use nvm
 nvm install 18
 nvm use 18
 
-# 確認
-node --version  # v18.x.x 以上
+# Verify
+node --version  # v18.x.x or later
 
-# 再インストール
+# Reinstall
 npm install -g musubi-sdd
 ```
 
 ---
 
-### ❌ エラー: `Cannot find module 'musubi-sdd'`
+### ❌ Error: `Cannot find module 'musubi-sdd'`
 
-**症状:**
+**Symptoms:**
 ```bash
 Error: Cannot find module 'musubi-sdd'
 ```
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# グローバルインストール確認
+# Verify global installation
 npm list -g musubi-sdd
 
-# 見つからない場合、再インストール
+# If not found, reinstall
 npm install -g musubi-sdd
 
-# またはnpx使用
+# Or use npx
 npx musubi-sdd --version
 ```
 
 ---
 
-## 2. 初期化関連
+## 2. Initialization Issues
 
-### ❌ エラー: `AGENTS.md already exists`
+### ❌ Error: `AGENTS.md already exists`
 
-**症状:**
+**Symptoms:**
 ```bash
 musubi init
 Error: AGENTS.md already exists. Use --force to overwrite.
 ```
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 上書き許可
+# Allow overwrite
 musubi init --force
 
-# または別ディレクトリで初期化
+# Or initialize in a different directory
 mkdir new-project && cd new-project
 musubi init
 ```
 
 ---
 
-### ❌ エラー: `steering/ directory not created`
+### ❌ Error: `steering/ directory not created`
 
-**症状:**
-初期化後に `steering/` ディレクトリが見つからない
+**Symptoms:**
+The `steering/` directory cannot be found after initialization
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. 現在のディレクトリ確認
+# 1. Check the current directory
 pwd
 ls -la
 
-# 2. 権限確認
+# 2. Check permissions
 ls -la .
 
-# 3. 手動作成
+# 3. Create manually
 mkdir -p steering/rules steering/memories steering/templates
 musubi init --force
 ```
 
 ---
 
-### ❌ 問題: 既存プロジェクトで初期化したい
+### ❌ Problem: I want to initialize in an existing project
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# onboardコマンドを使用（既存プロジェクト向け）
+# Use the onboard command (for existing projects)
 musubi onboard
 
-# 自動検出される内容:
+# Automatically detected content:
 # - package.json → tech.md
-# - ディレクトリ構造 → structure.md
+# - Directory structure → structure.md
 # - README.md → product.md
 ```
 
 ---
 
-## 3. AIエージェント関連
+## 3. AI Agent Issues
 
-### ❌ 問題: GitHub Copilotがコマンドを認識しない
+### ❌ Problem: GitHub Copilot does not recognize commands
 
-**症状:**
-`#sdd-requirements` と入力しても通常のテキストとして扱われる
+**Symptoms:**
+Typing `#sdd-requirements` is treated as plain text
 
-**解決方法:**
+**Solution:**
 
-1. **AGENTS.md確認:**
+1. **Check AGENTS.md:**
 ```bash
 cat AGENTS.md | head -20
 ```
 
-2. **VS Code設定確認:**
+2. **Check VS Code settings:**
 `.vscode/settings.json`:
 ```json
 {
@@ -179,398 +179,400 @@ cat AGENTS.md | head -20
 }
 ```
 
-3. **Copilot再起動:**
-- VS Codeを再起動
-- または `Ctrl+Shift+P` → `GitHub Copilot: Restart`
+3. **Restart Copilot:**
+- Restart VS Code
+- Or `Ctrl+Shift+P` → `GitHub Copilot: Restart`
 
-4. **直接プロンプト:**
+4. **Direct prompt:**
 ```
-AGENTS.mdのsdd-requirementsセクションに従って、ログイン機能の要件を定義して
+Following the sdd-requirements section in AGENTS.md, define the requirements for the login feature
 ```
 
 ---
 
-### ❌ 問題: Claude Codeでスキルが見つからない
+### ❌ Problem: Claude Code cannot find skills
 
-**症状:**
+**Symptoms:**
 ```
 /sdd-requirements → Unknown command
 ```
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. ファイル構成確認
+# 1. Check the file structure
 ls -la .claude/commands/
 ls -la .claude/skills/
 
-# 2. 再初期化
+# 2. Reinitialize
 musubi init --claude-code --force
 
-# 3. Claude Code再起動
-# VS Codeを再起動
+# 3. Restart Claude Code
+# Restart VS Code
 
-# 4. パス確認（CLAUDE.md内）
+# 4. Check paths (in CLAUDE.md)
 cat CLAUDE.md | grep "commands"
 ```
 
 ---
 
-### ❌ 問題: Cursorでコンテキストが読み込まれない
+### ❌ Problem: Cursor does not load context
 
-**解決方法:**
+**Solution:**
 
-1. **.cursorrules確認:**
+1. **Check .cursorrules:**
 ```bash
 cat .cursorrules
 ```
 
-2. **AGENTS.mdをプロジェクトルートに配置:**
+2. **Place AGENTS.md in the project root:**
 ```bash
 ls AGENTS.md
 ```
 
-3. **Cursor設定:**
-- Settings → AI → Context Files → `AGENTS.md` 追加
+3. **Cursor settings:**
+- Settings → AI → Context Files → add `AGENTS.md`
 
-4. **明示的にファイル参照:**
+4. **Reference the file explicitly:**
 ```
-@AGENTS.md この手法に従って要件を書いて
+@AGENTS.md Write the requirements following this methodology
 ```
 
 ---
 
-## 4. CLI関連
+## 4. CLI Issues
 
-### ❌ エラー: `musubi: command not found`
+### ❌ Error: `musubi: command not found`
 
-**症状:**
+**Symptoms:**
 ```bash
 musubi --version
 bash: musubi: command not found
 ```
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. インストール確認
+# 1. Verify installation
 npm list -g musubi-sdd
 
-# 2. グローバルbin確認
+# 2. Check the global bin
 npm bin -g
 
-# 3. PATHに追加
+# 3. Add to PATH
 export PATH="$(npm bin -g):$PATH"
 
-# 4. または npx 使用
+# 4. Or use npx
 npx musubi-sdd --version
 ```
 
 ---
 
-### ❌ エラー: `Error: ENOENT: no such file or directory`
+### ❌ Error: `Error: ENOENT: no such file or directory`
 
-**症状:**
+**Symptoms:**
 ```bash
 musubi requirements --feature login
 Error: ENOENT: no such file or directory, open 'steering/project.yml'
 ```
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. プロジェクト初期化済み確認
+# 1. Verify the project is initialized
 ls steering/
 
-# 2. 初期化されていない場合
+# 2. If not initialized
 musubi init
 
-# 3. ファイルが欠損している場合
+# 3. If files are missing
 musubi onboard --force
 ```
 
 ---
 
-### ❌ エラー: `SyntaxError in project.yml`
+### ❌ Error: `SyntaxError in project.yml`
 
-**症状:**
+**Symptoms:**
 ```bash
 SyntaxError: Invalid YAML in steering/project.yml
 ```
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. YAML検証
+# 1. Validate the YAML
 npx yaml steering/project.yml
 
-# 2. よくある問題:
-# - インデントがスペースでなくタブ
-# - コロン後のスペース不足
-# - 特殊文字のエスケープ不足
+# 2. Common problems:
+# - Tabs used for indentation instead of spaces
+# - Missing space after the colon
+# - Unescaped special characters
 
-# 3. 修正例:
+# 3. Example fix:
 # NG: key:value
 # OK: key: value
 
-# 4. 再生成
+# 4. Regenerate
 musubi sync --force
 ```
 
 ---
 
-## 5. ワークフロー関連
+## 5. Workflow Issues
 
-### ❌ 問題: 要件が生成されない
+### ❌ Problem: Requirements are not generated
 
-**症状:**
-`musubi requirements` が空の結果を返す
+**Symptoms:**
+`musubi requirements` returns an empty result
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. feature名指定
+# 1. Specify the feature name
 musubi requirements --feature login
 
-# 2. 対話モード使用
+# 2. Use interactive mode
 musubi requirements --interactive
 
-# 3. 出力先確認
+# 3. Check the output destination
 musubi requirements --feature login --output ./storage/specs/
 ls storage/specs/
 ```
 
 ---
 
-### ❌ 問題: トレーサビリティが不完全
+### ❌ Problem: Traceability is incomplete
 
-**症状:**
-`musubi trace` で一部の要件がリンクされていない
+**Symptoms:**
+`musubi trace` shows some requirements are not linked
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. ギャップ分析
+# 1. Gap analysis
 musubi gaps --detailed
 
-# 2. 要件IDの形式確認
-# 正しい形式: REQ-LOGIN-001
-# 間違い: REQ_LOGIN_001, LOGIN-001
+# 2. Check the requirement ID format
+# Correct format: REQ-LOGIN-001
+# Incorrect: REQ_LOGIN_001, LOGIN-001
 
-# 3. コード内にコメント追加
+# 3. Add comments in the code
 # // REQ-LOGIN-001: Implements login validation
 
-# 4. テスト内にコメント追加
+# 4. Add comments in the tests
 # // Tests: REQ-LOGIN-001
 
-# 5. 再スキャン
+# 5. Rescan
 musubi trace --rebuild
 ```
 
 ---
 
-### ❌ 問題: 検証が失敗する
+### ❌ Problem: Validation fails
 
-**症状:**
+**Symptoms:**
 ```bash
 musubi validate
 ❌ Constitution violation: Article 3
 ```
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. 詳細確認
+# 1. Check details
 musubi validate --verbose
 
-# 2. 憲法条項確認
+# 2. Check Constitutional Articles
 cat steering/rules/constitution.md
 
-# 3. よくある違反:
-# - Article 3: 要件にIDがない
-# - Article 5: テストカバレッジ不足
-# - Article 7: ドキュメント不足
+# 3. Common violations:
+# - Article 3: Requirements have no ID
+# - Article 5: Insufficient test coverage
+# - Article 7: Insufficient documentation
 
-# 4. 修正後に再検証
+# 4. Re-validate after fixing
 musubi validate
 ```
 
 ---
 
-## 6. パフォーマンス関連
+## 6. Performance Issues
 
-### ❌ 問題: 初期化が遅い
+### ❌ Problem: Initialization is slow
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. 最小構成で初期化
+# 1. Initialize with a minimal configuration
 musubi init --minimal
 
-# 2. キャッシュクリア
+# 2. Clear the cache
 npm cache clean --force
 
-# 3. ネットワーク確認
+# 3. Check the network
 ping registry.npmjs.org
 ```
 
 ---
 
-### ❌ 問題: 大規模プロジェクトで分析が遅い
+### ❌ Problem: Analysis is slow on large projects
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. 特定機能のみ分析
+# 1. Analyze specific features only
 musubi analyze --feature login
 
-# 2. 除外パターン設定
-# steering/project.yml に追加:
+# 2. Set exclusion patterns
+# Add to steering/project.yml:
 # exclude:
 #   - node_modules/**
 #   - dist/**
 #   - coverage/**
 
-# 3. インクリメンタル分析
+# 3. Incremental analysis
 musubi analyze --incremental
 ```
 
 ---
 
-### ❌ 問題: GUIが起動しない
+### ❌ Problem: The GUI does not start
 
-**症状:**
+**Symptoms:**
 ```bash
 musubi gui start
 Error: EADDRINUSE: address already in use
 ```
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. 既存プロセス確認
+# 1. Check existing processes
 lsof -i :3000
 
-# 2. プロセス終了
+# 2. Kill the process
 kill -9 <PID>
 
-# 3. 別ポート使用
+# 3. Use a different port
 musubi gui start --port 8080
 
-# 4. ブラウザで開く
+# 4. Open in the browser
 open http://localhost:8080
 ```
 
 ---
 
-## 7. その他
+## 7. Other
 
-### ❌ 問題: Git連携が動作しない
+### ❌ Problem: Git integration does not work
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. Git初期化確認
+# 1. Verify Git is initialized
 git status
 
-# 2. 初期化されていない場合
+# 2. If not initialized
 git init
 
-# 3. GitHub CLI確認（Issue解決に必要）
+# 3. Check GitHub CLI (required for resolving Issues)
 gh auth status
 
-# 4. 認証されていない場合
+# 4. If not authenticated
 gh auth login
 ```
 
 ---
 
-### ❌ 問題: 日本語が文字化けする
+### ❌ Problem: Non-English text (e.g. translated documents) is garbled
 
-**解決方法:**
+This applies when bilingual output is enabled (see [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md)).
+
+**Solution:**
 
 ```bash
-# 1. 環境変数設定
-export LANG=ja_JP.UTF-8
-export LC_ALL=ja_JP.UTF-8
+# 1. Set a UTF-8 locale
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 
-# 2. エディタ設定
+# 2. Editor settings
 # VS Code: settings.json
 # "files.encoding": "utf8"
 
-# 3. ターミナル設定
-# UTF-8対応ターミナル使用
+# 3. Terminal settings
+# Use a UTF-8-capable terminal
 ```
 
 ---
 
-### ❌ 問題: バージョンアップ後に動作しない
+### ❌ Problem: Things stop working after an upgrade
 
-**解決方法:**
+**Solution:**
 
 ```bash
-# 1. キャッシュクリア
+# 1. Clear the cache
 npm cache clean --force
 
-# 2. 再インストール
+# 2. Reinstall
 npm uninstall -g musubi-sdd
 npm install -g musubi-sdd
 
-# 3. プロジェクト同期
+# 3. Sync the project
 musubi sync --force
 
-# 4. バージョン確認
+# 4. Verify the version
 musubi --version
 ```
 
 ---
 
-## 🆘 サポート
+## 🆘 Support
 
-### ログ収集
+### Log Collection
 
-問題報告時は以下の情報を含めてください:
+When reporting a problem, include the following information:
 
 ```bash
-# 環境情報
+# Environment information
 node --version
 npm --version
 musubi --version
 
-# エラーログ
+# Error log
 musubi <command> --verbose 2>&1 | tee musubi-error.log
 ```
 
-### 問い合わせ先
+### Contact
 
-| 方法 | リンク |
+| Method | Link |
 |------|--------|
 | **GitHub Issues** | https://github.com/nahisaho/MUSUBI/issues |
 | **Discussions** | https://github.com/nahisaho/MUSUBI/discussions |
 | **Documentation** | https://nahisaho.github.io/musubi/ |
 
-### 🔍 デバッグモード
+### 🔍 Debug Mode
 
-詳細なデバッグ情報を取得:
+Get detailed debug information:
 
 ```bash
-# デバッグモード有効化
+# Enable debug mode
 DEBUG=musubi:* musubi <command>
 
-# 特定モジュールのみ
+# Specific modules only
 DEBUG=musubi:cli musubi init
 DEBUG=musubi:analyze musubi analyze
 ```
 
 ---
 
-## 📚 関連ドキュメント
+## 📚 Related Documents
 
-- [5分間クイックスタート](./quick-start-5min.md)
-- [CLI完全リファレンス](./cli-reference.md)
-- [プラットフォーム別セットアップ](./platform-setup.md)
-- [実践チュートリアル](./tutorial-todo-app.md)
+- [5-Minute Quick Start](./quick-start-5min.md)
+- [Complete CLI Reference](./cli-reference.md)
+- [Platform-Specific Setup](./platform-setup.md)
+- [Hands-On Tutorial](./tutorial-todo-app.md)
 
 ---
 
-*ドキュメント生成: MUSUBI v3.5.1*
+*Documentation generated by MUSUBI v3.5.1*

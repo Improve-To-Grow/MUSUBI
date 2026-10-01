@@ -1,167 +1,167 @@
-# REQ-P0-B: OpenHands由来機能 - タスク分解
+# REQ-P0-B: OpenHands-Derived Features - Task Breakdown
 
-| 項目 | 内容 |
+| Item | Content |
 |------|------|
-| **文書ID** | TASKS-P0-B-001 |
-| **作成日** | 2025-12-07 |
-| **更新日** | 2025-12-07 |
-| **対象要件** | REQ-P0-B001 〜 REQ-P0-B008 |
-| **対象バージョン** | MUSUBI v2.2.0 |
-| **ステータス** | ✅ **完了** |
+| **Document ID** | TASKS-P0-B-001 |
+| **Created** | 2025-12-07 |
+| **Updated** | 2025-12-07 |
+| **Target Requirements** | REQ-P0-B001 ~ REQ-P0-B008 |
+| **Target Version** | MUSUBI v2.2.0 |
+| **Status** | ✅ **Complete** |
 
 ---
 
-## Phase 1: コア機能（Week 1-2） ✅ 完了
+## Phase 1: Core Features (Week 1-2) ✅ Complete
 
-### TASK-001: スタック検出システム (REQ-P0-B001) ✅
+### TASK-001: Stuck Detection System (REQ-P0-B001) ✅
 
-| タスクID | タスク名 | 見積もり | 依存関係 | ステータス |
+| Task ID | Task Name | Estimate | Dependencies | Status |
 |----------|----------|----------|----------|-----------|
-| TASK-001-1 | StuckDetectorクラス実装 | 2h | - | ✅ 完了 |
-| TASK-001-2 | 検出シナリオ実装（5種類） | 3h | TASK-001-1 | ✅ 完了 |
-| TASK-001-3 | 代替アプローチ提案機能 | 1h | TASK-001-2 | ✅ 完了 |
-| TASK-001-4 | CLI統合（--detect-stuck） | 1h | TASK-001-1 | ✅ 完了 |
-| TASK-001-5 | ユニットテスト | 2h | TASK-001-3 | ✅ 完了 (74 tests) |
+| TASK-001-1 | Implement StuckDetector class | 2h | - | ✅ Complete |
+| TASK-001-2 | Implement detection scenarios (5 types) | 3h | TASK-001-1 | ✅ Complete |
+| TASK-001-3 | Alternative approach suggestion feature | 1h | TASK-001-2 | ✅ Complete |
+| TASK-001-4 | CLI integration (--detect-stuck) | 1h | TASK-001-1 | ✅ Complete |
+| TASK-001-5 | Unit tests | 2h | TASK-001-3 | ✅ Complete (74 tests) |
 
-**実装ファイル**: `src/analyzers/stuck-detector.js`
+**Implementation files**: `src/analyzers/stuck-detector.js`
 
 ---
 
-### TASK-002: キーワードトリガー型スキル (REQ-P0-B002) ✅
+### TASK-002: Keyword-Triggered Skills (REQ-P0-B002) ✅
 
-| タスクID | タスク名 | 見積もり | 依存関係 | ステータス |
+| Task ID | Task Name | Estimate | Dependencies | Status |
 |----------|----------|----------|----------|-----------|
-| TASK-002-1 | SkillsLoaderクラス実装 | 2h | - | ✅ 完了 |
-| TASK-002-2 | YAML frontmatterパーサー | 1h | TASK-002-1 | ✅ 完了 |
-| TASK-002-3 | トリガーマッチング実装 | 1h | TASK-002-2 | ✅ 完了 |
-| TASK-002-4 | 正規表現サポート | 1h | TASK-002-3 | ✅ 完了 |
-| TASK-002-5 | ユニットテスト | 2h | TASK-002-4 | ✅ 完了 (26 tests) |
+| TASK-002-1 | Implement SkillsLoader class | 2h | - | ✅ Complete |
+| TASK-002-2 | YAML frontmatter parser | 1h | TASK-002-1 | ✅ Complete |
+| TASK-002-3 | Implement trigger matching | 1h | TASK-002-2 | ✅ Complete |
+| TASK-002-4 | Regular expression support | 1h | TASK-002-3 | ✅ Complete |
+| TASK-002-5 | Unit tests | 2h | TASK-002-4 | ✅ Complete (26 tests) |
 
-**実装ファイル**: `src/managers/skills-loader.js`
+**Implementation files**: `src/managers/skills-loader.js`
 
 ---
 
-### TASK-003: リポジトリ固有スキル (REQ-P0-B003) ✅
+### TASK-003: Repository-Specific Skills (REQ-P0-B003) ✅
 
-| タスクID | タスク名 | 見積もり | 依存関係 | ステータス |
+| Task ID | Task Name | Estimate | Dependencies | Status |
 |----------|----------|----------|----------|-----------|
-| TASK-003-1 | .musubi/skills/ディレクトリ対応 | 1h | TASK-002-1 | ✅ 完了 |
-| TASK-003-2 | repo.md自動生成機能 | 2h | TASK-003-1 | ✅ 完了 |
-| TASK-003-3 | musubi-onboard統合 | 1h | TASK-003-2 | ✅ 完了 |
-| TASK-003-4 | スキル優先順位処理 | 1h | TASK-003-1 | ✅ 完了 |
-| TASK-003-5 | ユニットテスト | 1h | TASK-003-4 | ✅ 完了 |
+| TASK-003-1 | .musubi/skills/ directory support | 1h | TASK-002-1 | ✅ Complete |
+| TASK-003-2 | repo.md auto-generation feature | 2h | TASK-003-1 | ✅ Complete |
+| TASK-003-3 | musubi-onboard integration | 1h | TASK-003-2 | ✅ Complete |
+| TASK-003-4 | Skill priority handling | 1h | TASK-003-1 | ✅ Complete |
+| TASK-003-5 | Unit tests | 1h | TASK-003-4 | ✅ Complete |
 
-**実装ファイル**: `src/managers/skills-loader.js`, `bin/musubi-onboard.js`
+**Implementation files**: `src/managers/skills-loader.js`, `bin/musubi-onboard.js`
 
 ---
 
-## Phase 2: 品質機能（Week 3-4） ✅ 完了
+## Phase 2: Quality Features (Week 3-4) ✅ Complete
 
-### TASK-004: メモリコンデンサー (REQ-P0-B004) ✅
+### TASK-004: Memory Condenser (REQ-P0-B004) ✅
 
-| タスクID | タスク名 | 見積もり | 依存関係 | ステータス |
+| Task ID | Task Name | Estimate | Dependencies | Status |
 |----------|----------|----------|----------|-----------|
-| TASK-004-1 | MemoryCondenserクラス実装 | 2h | - | ✅ 完了 |
-| TASK-004-2 | LLM要約機能 | 2h | TASK-004-1 | ✅ 完了 |
-| TASK-004-3 | 圧縮アルゴリズム実装 | 2h | TASK-004-2 | ✅ 完了 |
-| TASK-004-4 | project.yml設定対応 | 1h | TASK-004-1 | ✅ 完了 |
-| TASK-004-5 | ユニットテスト | 2h | TASK-004-3 | ✅ 完了 (24 tests) |
+| TASK-004-1 | Implement MemoryCondenser class | 2h | - | ✅ Complete |
+| TASK-004-2 | LLM summarization feature | 2h | TASK-004-1 | ✅ Complete |
+| TASK-004-3 | Implement compression algorithm | 2h | TASK-004-2 | ✅ Complete |
+| TASK-004-4 | project.yml configuration support | 1h | TASK-004-1 | ✅ Complete |
+| TASK-004-5 | Unit tests | 2h | TASK-004-3 | ✅ Complete (24 tests) |
 
-**実装ファイル**: `src/managers/memory-condenser.js`
+**Implementation files**: `src/managers/memory-condenser.js`
 
 ---
 
-### TASK-005: クリティックシステム (REQ-P0-B005) ✅
+### TASK-005: Critic System (REQ-P0-B005) ✅
 
-| タスクID | タスク名 | 見積もり | 依存関係 | ステータス |
+| Task ID | Task Name | Estimate | Dependencies | Status |
 |----------|----------|----------|----------|-----------|
-| TASK-005-1 | BaseCritic基底クラス | 1h | - | ✅ 完了 |
-| TASK-005-2 | RequirementsCritic実装 | 1h | TASK-005-1 | ✅ 完了 |
-| TASK-005-3 | DesignCritic実装 | 1h | TASK-005-1 | ✅ 完了 |
-| TASK-005-4 | ImplementationCritic実装 | 1h | TASK-005-1 | ✅ 完了 |
-| TASK-005-5 | CLI統合（musubi-validate score） | 1h | TASK-005-4 | ✅ 完了 |
-| TASK-005-6 | ユニットテスト | 2h | TASK-005-5 | ✅ 完了 (35 tests) |
+| TASK-005-1 | BaseCritic base class | 1h | - | ✅ Complete |
+| TASK-005-2 | Implement RequirementsCritic | 1h | TASK-005-1 | ✅ Complete |
+| TASK-005-3 | Implement DesignCritic | 1h | TASK-005-1 | ✅ Complete |
+| TASK-005-4 | Implement ImplementationCritic | 1h | TASK-005-1 | ✅ Complete |
+| TASK-005-5 | CLI integration (musubi-validate score) | 1h | TASK-005-4 | ✅ Complete |
+| TASK-005-6 | Unit tests | 2h | TASK-005-5 | ✅ Complete (35 tests) |
 
-**実装ファイル**: `src/validators/critic-system.js`
+**Implementation files**: `src/validators/critic-system.js`
 
 ---
 
-### TASK-006: エージェントメモリ (REQ-P0-B008) ✅
+### TASK-006: Agent Memory (REQ-P0-B008) ✅
 
-| タスクID | タスク名 | 見積もり | 依存関係 | ステータス |
+| Task ID | Task Name | Estimate | Dependencies | Status |
 |----------|----------|----------|----------|-----------|
-| TASK-006-1 | AgentMemoryManagerクラス | 2h | - | ✅ 完了 |
-| TASK-006-2 | 学習事項抽出機能 | 2h | TASK-006-1 | ✅ 完了 |
-| TASK-006-3 | メモリマージ機能 | 1h | TASK-006-2 | ✅ 完了 |
-| TASK-006-4 | CLIコマンド（musubi-remember） | 1h | TASK-006-3 | ✅ 完了 |
-| TASK-006-5 | ユニットテスト | 1h | TASK-006-4 | ✅ 完了 (30 tests) |
+| TASK-006-1 | AgentMemoryManager class | 2h | - | ✅ Complete |
+| TASK-006-2 | Learning extraction feature | 2h | TASK-006-1 | ✅ Complete |
+| TASK-006-3 | Memory merge feature | 1h | TASK-006-2 | ✅ Complete |
+| TASK-006-4 | CLI command (musubi-remember) | 1h | TASK-006-3 | ✅ Complete |
+| TASK-006-5 | Unit tests | 1h | TASK-006-4 | ✅ Complete (30 tests) |
 
-**実装ファイル**: `src/managers/agent-memory-manager.js`, `bin/musubi-remember.js`
+**Implementation files**: `src/managers/agent-memory-manager.js`, `bin/musubi-remember.js`
 
 ---
 
-## Phase 3: 自動化機能（Week 5-6） ✅ 完了
+## Phase 3: Automation Features (Week 5-6) ✅ Complete
 
-### TASK-007: GitHub Issue自動解決 (REQ-P0-B006) ✅
+### TASK-007: GitHub Issue Auto-Resolution (REQ-P0-B006) ✅
 
-| タスクID | タスク名 | 見積もり | 依存関係 | ステータス |
+| Task ID | Task Name | Estimate | Dependencies | Status |
 |----------|----------|----------|----------|-----------|
-| TASK-007-1 | IssueResolverクラス実装 | 3h | - | ✅ 完了 |
-| TASK-007-2 | GitHub API連携 | 2h | TASK-007-1 | ✅ 完了 |
-| TASK-007-3 | 要件抽出機能 | 2h | TASK-007-2 | ✅ 完了 |
-| TASK-007-4 | PR生成機能 | 2h | TASK-007-3 | ✅ 完了 |
-| TASK-007-5 | GitHub Actions作成 | 1h | TASK-007-4 | ✅ 完了 |
-| TASK-007-6 | CLIコマンド（musubi-resolve） | 1h | TASK-007-4 | ✅ 完了 |
-| TASK-007-7 | ユニットテスト | 2h | TASK-007-6 | ✅ 完了 (35 tests) |
+| TASK-007-1 | Implement IssueResolver class | 3h | - | ✅ Complete |
+| TASK-007-2 | GitHub API integration | 2h | TASK-007-1 | ✅ Complete |
+| TASK-007-3 | Requirements extraction feature | 2h | TASK-007-2 | ✅ Complete |
+| TASK-007-4 | PR generation feature | 2h | TASK-007-3 | ✅ Complete |
+| TASK-007-5 | Create GitHub Actions | 1h | TASK-007-4 | ✅ Complete |
+| TASK-007-6 | CLI command (musubi-resolve) | 1h | TASK-007-4 | ✅ Complete |
+| TASK-007-7 | Unit tests | 2h | TASK-007-6 | ✅ Complete (35 tests) |
 
-**実装ファイル**: `src/resolvers/issue-resolver.js`, `src/integrations/github-client.js`, `bin/musubi-resolve.js`
+**Implementation files**: `src/resolvers/issue-resolver.js`, `src/integrations/github-client.js`, `bin/musubi-resolve.js`
 
 ---
 
-### TASK-008: セキュリティアナライザー (REQ-P0-B007) ✅
+### TASK-008: Security Analyzer (REQ-P0-B007) ✅
 
-| タスクID | タスク名 | 見積もり | 依存関係 | ステータス |
+| Task ID | Task Name | Estimate | Dependencies | Status |
 |----------|----------|----------|----------|-----------|
-| TASK-008-1 | SecurityAnalyzerクラス | 2h | - | ✅ 完了 |
-| TASK-008-2 | シークレット検出パターン | 1h | TASK-008-1 | ✅ 完了 |
-| TASK-008-3 | 危険コマンド検出 | 1h | TASK-008-1 | ✅ 完了 |
-| TASK-008-4 | 脆弱性パターン検出 | 1h | TASK-008-1 | ✅ 完了 |
-| TASK-008-5 | 確認モード実装 | 1h | TASK-008-4 | ✅ 完了 |
-| TASK-008-6 | ユニットテスト | 2h | TASK-008-5 | ✅ 完了 (35 tests) |
+| TASK-008-1 | SecurityAnalyzer class | 2h | - | ✅ Complete |
+| TASK-008-2 | Secret detection patterns | 1h | TASK-008-1 | ✅ Complete |
+| TASK-008-3 | Dangerous command detection | 1h | TASK-008-1 | ✅ Complete |
+| TASK-008-4 | Vulnerability pattern detection | 1h | TASK-008-1 | ✅ Complete |
+| TASK-008-5 | Implement confirmation mode | 1h | TASK-008-4 | ✅ Complete |
+| TASK-008-6 | Unit tests | 2h | TASK-008-5 | ✅ Complete (35 tests) |
 
-**実装ファイル**: `src/analyzers/security-analyzer.js`
+**Implementation files**: `src/analyzers/security-analyzer.js`
 
 ---
 
-## 総工数サマリー
+## Total Effort Summary
 
-| Phase | タスク数 | 見積もり合計 | ステータス |
+| Phase | Task Count | Total Estimate | Status |
 |-------|---------|-------------|-----------|
-| Phase 1 | 15 | 21h | ✅ 完了 |
-| Phase 2 | 17 | 21h | ✅ 完了 |
-| Phase 3 | 13 | 18h | ✅ 完了 |
-| **合計** | **45** | **60h** | ✅ **全完了** |
+| Phase 1 | 15 | 21h | ✅ Complete |
+| Phase 2 | 17 | 21h | ✅ Complete |
+| Phase 3 | 13 | 18h | ✅ Complete |
+| **Total** | **45** | **60h** | ✅ **All Complete** |
 
 ---
 
-## 追加実装 (CLI統合・GitHub Actions)
+## Additional Implementation (CLI Integration, GitHub Actions)
 
-| 機能 | ファイル | ステータス |
+| Feature | File | Status |
 |------|---------|-----------|
-| `musubi-analyze --detect-stuck` | `bin/musubi-analyze.js` | ✅ 完了 |
-| `musubi-validate score` | `bin/musubi-validate.js` | ✅ 完了 |
-| `musubi-remember` | `bin/musubi-remember.js` | ✅ 完了 |
-| `musubi-resolve` | `bin/musubi-resolve.js` | ✅ 完了 |
-| GitHub Actions: Issue Resolver | `src/templates/shared/github-actions/musubi-issue-resolver.yml` | ✅ 完了 |
-| GitHub Actions: Security Check | `src/templates/shared/github-actions/musubi-security-check.yml` | ✅ 完了 |
-| GitHub Actions: Validate | `src/templates/shared/github-actions/musubi-validate.yml` | ✅ 完了 |
-| GitHub API Client | `src/integrations/github-client.js` | ✅ 完了 |
+| `musubi-analyze --detect-stuck` | `bin/musubi-analyze.js` | ✅ Complete |
+| `musubi-validate score` | `bin/musubi-validate.js` | ✅ Complete |
+| `musubi-remember` | `bin/musubi-remember.js` | ✅ Complete |
+| `musubi-resolve` | `bin/musubi-resolve.js` | ✅ Complete |
+| GitHub Actions: Issue Resolver | `src/templates/shared/github-actions/musubi-issue-resolver.yml` | ✅ Complete |
+| GitHub Actions: Security Check | `src/templates/shared/github-actions/musubi-security-check.yml` | ✅ Complete |
+| GitHub Actions: Validate | `src/templates/shared/github-actions/musubi-validate.yml` | ✅ Complete |
+| GitHub API Client | `src/integrations/github-client.js` | ✅ Complete |
 
 ---
 
-## トレーサビリティ
+## Traceability
 
-| 要件ID | タスクグループ | 実装ファイル |
+| Requirement ID | Task Group | Implementation Files |
 |--------|---------------|-------------|
 | REQ-P0-B001 | TASK-001 | `stuck-detector.js` |
 | REQ-P0-B002 | TASK-002 | `skills-loader.js` |
@@ -174,4 +174,4 @@
 
 ---
 
-*― タスク分解終了 ―*
+*- End of Task Breakdown -*

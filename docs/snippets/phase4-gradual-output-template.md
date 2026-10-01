@@ -1,135 +1,121 @@
 # Phase 4: Gradual Output Template
 
+> Bilingual output (an additional translated copy of each deliverable) is optional. For the
+> template that adds translation steps, see
+> [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md) (Step 4.3).
+
 ## Copy this template to Phase 4 section of each agent
 
 ```markdown
-### Phase 4: 段階的成果物生成
+### Phase 4: Incremental Deliverable Generation
 
-**CRITICAL: コンテキスト長オーバーフロー防止**
+**CRITICAL: Prevent context length overflow**
 
-**出力方式の原則:**
-- ✅ 1ファイルずつ順番に生成・保存
-- ✅ 各ファイル生成後に進捗を報告
-- ✅ 大きなファイル(>300行)は複数に分割
-- ✅ エラー発生時も部分的な成果物が残る
-- ✅ ユーザーに進捗が見える形で実行
-
-```
-🤖 確認ありがとうございます。以下の成果物を順番に生成します。
-
-【生成予定の成果物】（英語版と日本語版の両方）
-1. [成果物1の名称]
-2. [成果物2の名称]
-3. [成果物3の名称]
-4. [成果物4の名称]
-5. [成果物5の名称]
-6. [成果物6の名称]
-
-合計: N個のファイル（X個 × 2言語）
-
-**重要: 段階的生成方式**
-各ドキュメント/コードファイルを1つずつ生成・保存し、進捗を報告します。
-これにより、途中経過が見え、エラーが発生しても部分的な成果物が残ります。
-
-生成を開始してよろしいですか？
-👤 ユーザー: [回答待ち]
-```
-
-ユーザーが承認後、**各ファイルを順番に生成**:
-
-**Step 1: [成果物1の名称] - 英語版**
+**Output Principles:**
+- ✅ Generate and save one file at a time, in order
+- ✅ Report progress after each file is generated
+- ✅ Split large files (>300 lines) into multiple files
+- ✅ Partial deliverables remain even if an error occurs
+- ✅ Execute in a way that makes progress visible to the user
 
 ```
-🤖 [1/N] [成果物1の名称]英語版を生成しています...
+🤖 Thank you for confirming. I will generate the following deliverables in order.
 
-📝 ./[適切なパス]/[ファイル名]-[日付].md
-✅ 保存が完了しました
+[Deliverables to generate]
+1. [Deliverable 1 name]
+2. [Deliverable 2 name]
+3. [Deliverable 3 name]
+4. [Deliverable 4 name]
+5. [Deliverable 5 name]
+6. [Deliverable 6 name]
 
-[1/N] 完了。次のファイルに進みます。
+Total: N files
+
+**Important: Incremental generation method**
+I will generate and save each document/code file one at a time and report progress.
+This lets you see intermediate progress, and partial deliverables remain even if an error occurs.
+
+May I start generating?
+👤 User: [Awaiting response]
 ```
 
-**Step 2: [成果物2の名称] - 英語版**
+After user approval, **generate each file in order**:
+
+**Step 1: [Deliverable 1 name]**
 
 ```
-🤖 [2/N] [成果物2の名称]英語版を生成しています...
+🤖 [1/N] Generating [Deliverable 1 name]...
 
-📝 ./[適切なパス]/[ファイル名]-[日付].md
-✅ 保存が完了しました
+📝 ./[appropriate-path]/[file-name]-[date].md
+✅ Save complete
 
-[2/N] 完了。次のファイルに進みます。
+[1/N] Complete. Proceeding to the next file.
 ```
 
-**Step 3: [成果物3の名称] - 英語版**
+**Step 2: [Deliverable 2 name]**
 
 ```
-🤖 [3/N] [成果物3の名称]英語版を生成しています...
+🤖 [2/N] Generating [Deliverable 2 name]...
 
-📝 ./[適切なパス]/[ファイル名]-[日付].md
-✅ 保存が完了しました
+📝 ./[appropriate-path]/[file-name]-[date].md
+✅ Save complete
 
-[3/N] 完了。次のファイルに進みます。
+[2/N] Complete. Proceeding to the next file.
 ```
 
-... (英語版を全て生成後、日本語版へ)
-
-**Step X: [成果物1の名称] - 日本語版**
+**Step 3: [Deliverable 3 name]**
 
 ```
-🤖 [X/N] [成果物1の名称]日本語版を生成しています...
+🤖 [3/N] Generating [Deliverable 3 name]...
 
-📝 ./[適切なパス]/[ファイル名]-[日付].ja.md
-✅ 保存が完了しました
+📝 ./[appropriate-path]/[file-name]-[date].md
+✅ Save complete
 
-[X/N] 完了。次のファイルに進みます。
+[3/N] Complete. Proceeding to the next file.
 ```
 
-... (日本語版を全て生成)
+... (Generate the remaining deliverables)
 
-**Final Step: すべての成果物の生成完了**
+**Final Step: All Deliverables Generated**
 
 ```
-🤖 ✨ すべての成果物の生成が完了しました！
+🤖 ✨ All deliverables have been generated!
 
-## 📊 生成サマリー
-- **作成ファイル数**: N個
-- **英語版**: X個
-- **日本語版**: Y個
+## 📊 Generation Summary
+- **Files created**: N
 
-## 📂 生成されたファイル
-1. ✅ ./[パス]/[ファイル1]-[日付].md (英語版)
-2. ✅ ./[パス]/[ファイル2]-[日付].md (英語版)
-3. ✅ ./[パス]/[ファイル3]-[日付].md (英語版)
-...
-X. ✅ ./[パス]/[ファイル1]-[日付].ja.md (日本語版)
-X+1. ✅ ./[パス]/[ファイル2]-[日付].ja.md (日本語版)
+## 📂 Generated Files
+1. ✅ ./[path]/[file1]-[date].md
+2. ✅ ./[path]/[file2]-[date].md
+3. ✅ ./[path]/[file3]-[date].md
 ...
 
-## 🔍 次のステップ
-1. 成果物を確認して、フィードバックをお願いします
-2. 不足や修正が必要な箇所があれば教えてください
-3. [関連する次のエージェント名]を呼び出して次の工程に進めます
+## 🔍 Next Steps
+1. Please review the deliverables and provide feedback
+2. Let me know if anything is missing or needs revision
+3. Invoke [related next agent name] to proceed to the next step
 
-## 🔗 関連エージェント
-- **前工程**: [前のエージェント名] - [何をするエージェントか]
-- **次工程**: [次のエージェント名] - [何をするエージェントか]
+## 🔗 Related Agents
+- **Previous step**: [Previous agent name] - [What this agent does]
+- **Next step**: [Next agent name] - [What this agent does]
 
-👤 ユーザー: [フィードバック待ち]
+👤 User: [Awaiting feedback]
 ```
 
-**メリット:**
+**Benefits:**
 
-- ✅ エラーが発生しても部分的な成果物が残る
-- ✅ 進捗が可視化され、ユーザーが待ち時間を把握できる
-- ✅ コンテキスト長制限に引っかからない
-- ✅ いつでも中断・再開可能
-- ✅ 大量の出力でもUI/UXが破綻しない
+- ✅ Partial deliverables remain even if an error occurs
+- ✅ Progress is visualized, so users can gauge the wait time
+- ✅ Avoids hitting context length limits
+- ✅ Can be interrupted and resumed at any time
+- ✅ UI/UX does not break down even with large outputs
 ```
 
 ## Agent-Specific Customizations
 
 ### For Code Generators (software-developer, test-engineer, etc.)
 
-Replace "[成果物X]" with specific code file names:
+Replace "[Deliverable X]" with specific code file names:
 - Component files (.tsx, .jsx)
 - Service files (.ts, .js)
 - Test files (.test.ts)
@@ -140,17 +126,17 @@ Replace "[成果物X]" with specific code file names:
 
 Example output message:
 ```
-🤖 [1/8] 型定義ファイルを生成しています...
+🤖 [1/8] Generating type definition file...
 
 📝 src/features/user-auth/types/auth.types.ts
-✅ 保存が完了しました (120行)
+✅ Save complete (120 lines)
 
-[1/8] 完了。次のファイルに進みます。
+[1/8] Complete. Moving on to the next file.
 ```
 
 ### For Document Generators (technical-writer, requirements-analyst, etc.)
 
-Replace "[成果物X]" with specific document types:
+Replace "[Deliverable X]" with specific document types:
 - README files
 - API documentation
 - User guides
@@ -160,17 +146,17 @@ Replace "[成果物X]" with specific document types:
 
 Example output message:
 ```
-🤖 [1/6] README英語版を生成しています...
+🤖 [1/6] Generating the README...
 
 📝 docs/README.md
-✅ 保存が完了しました
+✅ Save complete
 
-[1/6] 完了。次のドキュメントに進みます。
+[1/6] Complete. Proceeding to the next document.
 ```
 
 ### For Design Generators (system-architect, ui-ux-designer, etc.)
 
-Replace "[成果物X]" with specific design artifacts:
+Replace "[Deliverable X]" with specific design artifacts:
 - Architecture diagrams (C4 model)
 - Database schemas (ERD)
 - UI wireframes
@@ -179,12 +165,12 @@ Replace "[成果物X]" with specific design artifacts:
 
 Example output message:
 ```
-🤖 [1/12] C4 Contextダイアグラム英語版を生成しています...
+🤖 [1/12] Generating the C4 Context diagram...
 
 📝 design/architecture/c4-context-diagram-myapp-20251122.md
-✅ 保存が完了しました
+✅ Save complete
 
-[1/12] 完了。次のダイアグラムに進みます。
+[1/12] Complete. Proceeding to the next diagram.
 ```
 
 ---
@@ -193,9 +179,9 @@ Example output message:
 
 1. Copy the entire template above
 2. Paste into the appropriate Phase 4 section of each agent's SKILL.md
-3. Replace [成果物X] placeholders with agent-specific output types
+3. Replace [Deliverable X] placeholders with agent-specific output types
 4. Customize file paths to match agent's output directory structure
-5. Update "関連エージェント" section with actual agent names
+5. Update "Related Agents" section with actual agent names
 6. Test with a sample prompt to ensure proper file-by-file generation
 
 ---

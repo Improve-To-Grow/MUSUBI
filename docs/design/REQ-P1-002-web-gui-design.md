@@ -1,17 +1,17 @@
-# REQ-P1-002: Web GUI Dashboard 設計書
+# REQ-P1-002: Web GUI Dashboard Design Document
 
-## 概要
+## Overview
 
-MUSUBI Web GUI Dashboard は、プロジェクトの仕様、ワークフロー、トレーサビリティをブラウザ上で可視化・編集できる Web アプリケーションです。
+The MUSUBI Web GUI Dashboard is a web application that lets you visualize and edit project specifications, workflows, and traceability in the browser.
 
-### 目的
+### Purpose
 
-1. **可視化**: MUSUBI プロジェクト構造をダッシュボードで一覧
-2. **トレーサビリティ**: 要件→設計→実装→テストの関係をグラフ表示
-3. **リアルタイム更新**: ファイル変更を即座に反映
-4. **編集機能**: ブラウザ上での仕様編集
+1. **Visualization**: View the MUSUBI project structure at a glance on the dashboard
+2. **Traceability**: Display the relationships between requirements → design → implementation → tests as a graph
+3. **Real-time updates**: Reflect file changes immediately
+4. **Editing**: Edit specifications in the browser
 
-## アーキテクチャ
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -49,56 +49,56 @@ MUSUBI Web GUI Dashboard は、プロジェクトの仕様、ワークフロー�
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## REST API 設計
+## REST API Design
 
-### プロジェクト
+### Project
 
-| エンドポイント | メソッド | 説明 |
+| Endpoint | Method | Description |
 |---------------|----------|------|
-| `/api/project` | GET | プロジェクト情報取得 |
-| `/api/project/validate` | POST | プロジェクト検証 |
+| `/api/project` | GET | Get project information |
+| `/api/project/validate` | POST | Validate project |
 
-### 憲法（Constitution）
+### Constitution
 
-| エンドポイント | メソッド | 説明 |
+| Endpoint | Method | Description |
 |---------------|----------|------|
-| `/api/constitution` | GET | 憲法取得 |
-| `/api/constitution` | PUT | 憲法更新 |
+| `/api/constitution` | GET | Get Constitution |
+| `/api/constitution` | PUT | Update Constitution |
 
-### 仕様（Specifications）
+### Specifications
 
-| エンドポイント | メソッド | 説明 |
+| Endpoint | Method | Description |
 |---------------|----------|------|
-| `/api/specs` | GET | 仕様一覧 |
-| `/api/specs/:id` | GET | 仕様詳細 |
-| `/api/specs/:id` | PUT | 仕様更新 |
-| `/api/specs/:id/tasks` | GET | タスク一覧 |
-| `/api/specs/:id/tasks/:taskId` | PUT | タスク更新 |
+| `/api/specs` | GET | List specifications |
+| `/api/specs/:id` | GET | Specification details |
+| `/api/specs/:id` | PUT | Update specification |
+| `/api/specs/:id/tasks` | GET | List tasks |
+| `/api/specs/:id/tasks/:taskId` | PUT | Update task |
 
-### トレーサビリティ
+### Traceability
 
-| エンドポイント | メソッド | 説明 |
+| Endpoint | Method | Description |
 |---------------|----------|------|
-| `/api/traceability` | GET | トレーサビリティマトリクス |
-| `/api/traceability/graph` | GET | グラフデータ（D3.js用） |
+| `/api/traceability` | GET | Traceability matrix |
+| `/api/traceability/graph` | GET | Graph data (for D3.js) |
 
-### ワークフロー
+### Workflow
 
-| エンドポイント | メソッド | 説明 |
+| Endpoint | Method | Description |
 |---------------|----------|------|
-| `/api/workflow` | GET | ワークフロー状態 |
-| `/api/workflow/stage` | PUT | ステージ更新 |
+| `/api/workflow` | GET | Workflow status |
+| `/api/workflow/stage` | PUT | Update stage |
 
-## WebSocket イベント
+## WebSocket Events
 
-| イベント | 方向 | 説明 |
+| Event | Direction | Description |
 |---------|------|------|
-| `file:changed` | Server→Client | ファイル変更通知 |
-| `spec:updated` | Server→Client | 仕様更新通知 |
-| `task:completed` | Server→Client | タスク完了通知 |
-| `validation:result` | Server→Client | 検証結果通知 |
+| `file:changed` | Server→Client | File change notification |
+| `spec:updated` | Server→Client | Specification update notification |
+| `task:completed` | Server→Client | Task completion notification |
+| `validation:result` | Server→Client | Validation result notification |
 
-## フロントエンド構成
+## Frontend Structure
 
 ```
 gui/
@@ -138,12 +138,12 @@ gui/
 └── vite.config.js
 ```
 
-## バックエンド構成
+## Backend Structure
 
 ```
 src/
 ├── gui/
-│   ├── server.js           # Express サーバー
+│   ├── server.js           # Express server
 │   ├── routes/
 │   │   ├── project.js
 │   │   ├── constitution.js
@@ -161,87 +161,87 @@ src/
 └── ...
 ```
 
-## CLI 統合
+## CLI Integration
 
-### `musubi gui` コマンド
+### `musubi gui` Command
 
 ```bash
-# サーバー起動
+# Start the server
 npx musubi gui
 
-# ポート指定
+# Specify the port
 npx musubi gui --port 8080
 
-# プロジェクトパス指定
+# Specify the project path
 npx musubi gui --project ./my-project
 
-# 読み取り専用モード
+# Read-only mode
 npx musubi gui --readonly
 ```
 
-## 実装フェーズ
+## Implementation Phases
 
-### Phase 1: バックエンド基盤（Week 1）
-- [ ] Express サーバー設定
-- [ ] REST API 基本エンドポイント
-- [ ] プロジェクトスキャナー
-- [ ] 静的ファイル配信
+### Phase 1: Backend Foundation (Week 1)
+- [ ] Express server setup
+- [ ] Basic REST API endpoints
+- [ ] Project scanner
+- [ ] Static file serving
 
-### Phase 2: フロントエンド基盤（Week 2）
-- [ ] Vite + React セットアップ
-- [ ] Tailwind CSS 設定
-- [ ] ダッシュボードレイアウト
-- [ ] API クライアント
+### Phase 2: Frontend Foundation (Week 2)
+- [ ] Vite + React setup
+- [ ] Tailwind CSS configuration
+- [ ] Dashboard layout
+- [ ] API client
 
-### Phase 3: リアルタイム機能（Week 3）
-- [ ] WebSocket 統合
-- [ ] ファイルウォッチャー
-- [ ] リアルタイム更新
+### Phase 3: Real-Time Features (Week 3)
+- [ ] WebSocket integration
+- [ ] File watcher
+- [ ] Real-time updates
 
-### Phase 4: 高度な機能（Week 4）
-- [ ] トレーサビリティグラフ（D3.js）
-- [ ] 仕様エディター
-- [ ] ワークフローエディター
+### Phase 4: Advanced Features (Week 4)
+- [ ] Traceability graph (D3.js)
+- [ ] Specification editor
+- [ ] Workflow editor
 
-## 技術選定根拠
+## Technology Selection Rationale
 
 ### React 18
-- 豊富なエコシステム
-- コンポーネント再利用性
-- 並行レンダリング対応
+- Rich ecosystem
+- Component reusability
+- Concurrent rendering support
 
 ### Tailwind CSS
-- ユーティリティファースト
-- カスタマイズ容易
-- バンドルサイズ最適化
+- Utility-first
+- Easy to customize
+- Optimized bundle size
 
 ### Express.js
-- 軽量で高速
-- ミドルウェアエコシステム
-- WebSocket 統合容易
+- Lightweight and fast
+- Middleware ecosystem
+- Easy WebSocket integration
 
 ### D3.js
-- 強力な可視化機能
-- カスタマイズ性高
-- トレーサビリティグラフに最適
+- Powerful visualization capabilities
+- Highly customizable
+- Ideal for traceability graphs
 
 ### Vite
-- 高速な開発サーバー
-- ES Modules ベース
-- HMR 対応
+- Fast development server
+- ES Modules based
+- HMR support
 
-## 成功基準
+## Success Criteria
 
-| 基準 | 目標 |
+| Criterion | Target |
 |------|------|
-| 初期表示速度 | 2秒以内 |
-| ファイル変更反映 | 500ms以内 |
-| API レスポンス | 200ms以内 |
-| ブラウザサポート | Chrome, Firefox, Safari |
+| Initial render speed | Within 2 seconds |
+| File change reflection | Within 500ms |
+| API response | Within 200ms |
+| Browser support | Chrome, Firefox, Safari |
 
-## 依存関係
+## Dependencies
 
-### バックエンド
+### Backend
 ```json
 {
   "express": "^4.18.0",
@@ -251,7 +251,7 @@ npx musubi gui --readonly
 }
 ```
 
-### フロントエンド
+### Frontend
 ```json
 {
   "react": "^18.2.0",
@@ -263,7 +263,7 @@ npx musubi gui --readonly
 }
 ```
 
-### 開発
+### Development
 ```json
 {
   "vite": "^5.0.0",

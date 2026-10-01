@@ -12,8 +12,8 @@ const PLATFORMS = [
 ];
 
 describe('Platform Initialization Tests', () => {
-  // テストはテンプレートファイルの存在を確認
-  // 実際の初期化は対話的なため、ファイル構造の検証のみ
+  // These tests check that the template files exist.
+  // Actual initialization is interactive, so only the file structure is verified.
 
   const TEMPLATE_DIR = path.join(__dirname, '..', 'src', 'templates', 'agents');
 
@@ -60,7 +60,7 @@ describe('Platform Initialization Tests', () => {
     });
   });
 
-  // Claude Code専用: Skillsディレクトリのテスト
+  // Claude Code only: skills directory test
   test('should have claude-code skills directory with 27 skills', () => {
     const skillsPath = path.join(TEMPLATE_DIR, 'claude-code', 'skills');
     expect(fs.existsSync(skillsPath)).toBe(true);
@@ -68,7 +68,7 @@ describe('Platform Initialization Tests', () => {
     const skills = fs.readdirSync(skillsPath);
     expect(skills.length).toBeGreaterThanOrEqual(27);
 
-    // コアスキルの存在確認
+    // Verify that the core skills exist
     const coreSkills = [
       'orchestrator',
       'steering',
@@ -83,7 +83,7 @@ describe('Platform Initialization Tests', () => {
     });
   });
 
-  // 共有テンプレートのテスト
+  // Shared template tests
   test('should have shared steering templates', () => {
     const sharedPath = path.join(__dirname, '..', 'src', 'templates', 'shared', 'steering');
     expect(fs.existsSync(sharedPath)).toBe(true);

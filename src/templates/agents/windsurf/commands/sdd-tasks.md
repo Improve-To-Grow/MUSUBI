@@ -482,26 +482,12 @@ Before marking feature complete, verify:
 
 ---
 
-### 11. Save Task Breakdown (Bilingual)
+### 11. Save Task Breakdown
 
-**IMPORTANT**: Create BOTH English and Japanese versions.
-
-**English version (Primary/Reference)**:
-`storage/tasks/{{feature-name}}-tasks.md`
-
-**Japanese version (Translation)**:
-`storage/tasks/{{feature-name}}-tasks.ja.md`
+Save to: `storage/tasks/{{feature-name}}-tasks.md`
 
 **File Naming**:
 - Match requirements and design files
-- Add `.ja` before `.md` for Japanese version
-
-**Generation Order**:
-1. Generate English version FIRST
-2. Then generate Japanese translation
-3. Keep task IDs (TASK-XXX) identical in both versions
-4. Keep requirement IDs (REQ-XXX-NNN) in English in Japanese version
-5. Translate task descriptions and acceptance criteria
 
 ---
 
@@ -511,9 +497,7 @@ Before marking feature complete, verify:
 ## ✅ Task Breakdown Complete
 
 **Feature**: {{FEATURE_NAME}}
-**Files**:
-- English: storage/tasks/{{feature-name}}-tasks.md
-- Japanese: storage/tasks/{{feature-name}}-tasks.ja.md
+**File**: storage/tasks/{{feature-name}}-tasks.md
 
 ### Summary:
 - **Total Tasks**: [N]

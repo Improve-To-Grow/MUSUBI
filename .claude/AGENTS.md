@@ -16,16 +16,16 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 | MCP Tool                   | Primary Agents                                             | Usage                  |
 | -------------------------- | ---------------------------------------------------------- | ---------------------- |
-| `query_codebase`           | @orchestrator, @steering                                   | コードベース全体の検索 |
-| `find_dependencies`        | @change-impact-analyzer, @constitution-enforcer            | 依存関係分析・違反検出 |
-| `find_callers`             | @change-impact-analyzer, @test-engineer, @security-auditor | 呼び出し元追跡         |
-| `find_callees`             | @software-developer                                        | 呼び出し先追跡         |
-| `find_implementations`     | @api-designer, @system-architect                           | 実装クラス検索         |
-| `analyze_module_structure` | @system-architect, @steering                               | モジュール構造分析     |
-| `get_code_snippet`         | @software-developer, @code-reviewer                        | ソースコード取得       |
-| `global_search`            | @orchestrator, @technical-writer                           | GraphRAGグローバル検索 |
-| `local_search`             | @software-developer, @bug-hunter                           | GraphRAGローカル検索   |
-| `suggest_refactoring`      | @code-reviewer, @performance-optimizer                     | リファクタリング提案   |
+| `query_codebase`           | @orchestrator, @steering                                   | Search the entire codebase |
+| `find_dependencies`        | @change-impact-analyzer, @constitution-enforcer            | Dependency analysis and violation detection |
+| `find_callers`             | @change-impact-analyzer, @test-engineer, @security-auditor | Caller tracing         |
+| `find_callees`             | @software-developer                                        | Callee tracing         |
+| `find_implementations`     | @api-designer, @system-architect                           | Implementation class search         |
+| `analyze_module_structure` | @system-architect, @steering                               | Module structure analysis     |
+| `get_code_snippet`         | @software-developer, @code-reviewer                        | Source code retrieval       |
+| `global_search`            | @orchestrator, @technical-writer                           | GraphRAG global search |
+| `local_search`             | @software-developer, @bug-hunter                           | GraphRAG local search   |
+| `suggest_refactoring`      | @code-reviewer, @performance-optimizer                     | Refactoring suggestions   |
 
 **Setup**: See `steering/tech.md` for MCP configuration.
 
@@ -98,9 +98,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_callers` - バグの影響範囲特定
-- `local_search` - ローカルコンテキストで根本原因分析
-- `get_code_snippet` - 問題のコード取得
+- `find_callers` - Identify the blast radius of a bug
+- `local_search` - Root cause analysis in local context
+- `get_code_snippet` - Retrieve the problematic code
 
 **Example Usage**:
 
@@ -125,9 +125,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_dependencies` - 変更対象の依存関係を分析
-- `find_callers` - 変更影響範囲を特定（呼び出し元追跡）
-- `query_codebase` - 関連コードの検索
+- `find_dependencies` - Analyze dependencies of the change target
+- `find_callers` - Identify the change impact scope (caller tracing)
+- `query_codebase` - Search related code
 
 **Example Usage**:
 
@@ -173,9 +173,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `suggest_refactoring` - リファクタリング提案
-- `find_dependencies` - 依存関係の複雑度分析
-- `get_code_snippet` - ソースコード取得
+- `suggest_refactoring` - Refactoring suggestions
+- `find_dependencies` - Complexity analysis of dependencies
+- `get_code_snippet` - Retrieve source code
 
 **Example Usage**:
 
@@ -200,8 +200,8 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_dependencies` - Article I（Library-First）違反検出
-- `analyze_module_structure` - モジュール構造の憲法遵守確認
+- `find_dependencies` - Detect Article I (Library-First) violations
+- `analyze_module_structure` - Verify Constitution compliance of module structure
 
 **Example Usage**:
 
@@ -289,8 +289,8 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `global_search` - コードベース全体の俯瞰とコミュニティ検出
-- `query_codebase` - タスクに関連するコードの検索
+- `global_search` - Overview of the entire codebase and community detection
+- `query_codebase` - Search code related to the task
 
 **Example Usage**:
 
@@ -420,9 +420,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_callers` - 危険な関数の呼び出し元追跡
-- `query_codebase` - 脆弱性パターンの検索
-- `find_dependencies` - セキュリティ依存関係の分析
+- `find_callers` - Trace callers of dangerous functions
+- `query_codebase` - Search for vulnerability patterns
+- `find_dependencies` - Analyze security dependencies
 
 **Example Usage**:
 
@@ -468,10 +468,10 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `get_code_snippet` - 既存コードの参照
-- `find_callees` - 呼び出し先の確認
-- `local_search` - 類似実装パターンの発見
-- `query_codebase` - 関連コードの検索
+- `get_code_snippet` - Reference existing code
+- `find_callees` - Check callees
+- `local_search` - Discover similar implementation patterns
+- `query_codebase` - Search related code
 
 **Example Usage**:
 
@@ -496,9 +496,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `global_search` - コードベース構造の理解
-- `analyze_module_structure` - モジュール構造の分析
-- `query_codebase` - 技術スタックの検出
+- `global_search` - Understand the codebase structure
+- `analyze_module_structure` - Analyze module structure
+- `query_codebase` - Detect the technology stack
 
 **Example Usage**:
 
@@ -523,9 +523,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `global_search` - コミュニティ検出でモジュール境界を発見
-- `analyze_module_structure` - モジュール構造分析
-- `find_dependencies` - コンポーネント間依存関係の可視化
+- `global_search` - Discover module boundaries via community detection
+- `analyze_module_structure` - Module structure analysis
+- `find_dependencies` - Visualize dependencies between components
 
 **Example Usage**:
 
@@ -571,9 +571,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `find_callers` - テストカバレッジの自動判定
-- `find_dependencies` - 未テストコードパスの発見
-- `query_codebase` - テスト対象の検索
+- `find_callers` - Automatically determine test coverage
+- `find_dependencies` - Discover untested code paths
+- `query_codebase` - Search for test targets
 
 **Example Usage**:
 
@@ -598,9 +598,9 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **MCP Tools** (when CodeGraphMCPServer available):
 
-- `query_codebase` - 要件IDでコードベースを検索
-- `find_callers` - 要件→コード→テストのマッピング検証
-- `find_dependencies` - トレーサビリティチェーンの確認
+- `query_codebase` - Search the codebase by requirement ID
+- `find_callers` - Verify requirement → code → test mapping
+- `find_dependencies` - Verify the traceability chain
 
 **Example Usage**:
 
@@ -646,8 +646,8 @@ All agents must comply with the 9 Constitutional Articles defined in `steering/r
 4. **Article IV**: EARS Requirements Format - All requirements use EARS patterns
 5. **Article V**: Traceability Obligation - Maintain requirement ↔ design ↔ code ↔ test mapping
 6. **Article VI**: Project Memory - Read steering files before starting work
-7. **Article VII**: Bilingual Documentation - Create English first, then Japanese translation
-8. **Article VIII**: Single Source of Truth - One canonical version per document
+7. **Article VII**: Simplicity Gate - Maximum 3 projects initially
+8. **Article VIII**: Anti-Abstraction Gate - Use framework features directly
 9. **Article IX**: Real Services in Tests - Use actual services/APIs in tests
 
 Use `@constitution-enforcer` to validate compliance.

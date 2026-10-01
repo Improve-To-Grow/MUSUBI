@@ -18,7 +18,7 @@ Create a detailed implementation task breakdown following test-first development
 
 # Step 1: Read Project Context
 
-**IMPORTANT: Read these files FIRST (English versions only):**
+**IMPORTANT: Read these files FIRST:**
 
 1. **Steering Context**:
    - `steering/structure.md` - Architecture patterns
@@ -29,8 +29,6 @@ Create a detailed implementation task breakdown following test-first development
 
 3. **Design**:
    - `storage/design/{{feature-name}}-design.md`
-
-**Note**: Always read English versions (.md), not Japanese translations (.ja.md)
 
 # Step 2: Task Breakdown Methodology
 
@@ -385,22 +383,9 @@ TASK-002 (Env Config) ──> All tasks
 
 **Total Estimate**: 3-5 days
 
-# Step 5: Bilingual Output
+# Step 5: Save Task Breakdown
 
-**IMPORTANT**: Create BOTH English and Japanese versions.
-
-**English version (Primary/Reference)**:
 Save to: `storage/tasks/{{feature-name}}-tasks.md`
-
-**Japanese version (Translation)**:
-Save to: `storage/tasks/{{feature-name}}-tasks.ja.md`
-
-Translation rules:
-- Keep task IDs in English (TASK-001)
-- Keep requirement IDs in English (REQ-AUTH-001)
-- Keep file paths in English
-- Keep code examples unchanged
-- Translate descriptions and criteria to Japanese
 
 # Validation Checklist
 
@@ -424,11 +409,6 @@ Before finalizing:
    - Task order logical
    - No circular dependencies
    - Prerequisites clear
-
-5. **Bilingual**:
-   - Both English and Japanese versions created
-   - Technical terms consistent
-   - Task IDs identical
 
 # Next Steps
 

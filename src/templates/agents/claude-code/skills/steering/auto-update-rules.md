@@ -126,7 +126,6 @@ git diff --name-only --diff-filter=A | grep "requirements\.md"
 2. Read new dependencies
 3. Categorize (production/development)
 4. Update steering/tech.md
-5. Generate steering/tech.ja.md (Japanese translation)
 ```
 
 ### Workflow 2: Structure Update
@@ -135,7 +134,6 @@ git diff --name-only --diff-filter=A | grep "requirements\.md"
 1. Detect new directory creation
 2. Analyze directory purpose
 3. Update steering/structure.md
-4. Generate steering/structure.ja.md (Japanese translation)
 ```
 
 ### Workflow 3: Product Context Update
@@ -145,7 +143,6 @@ git diff --name-only --diff-filter=A | grep "requirements\.md"
 2. Read requirements.md
 3. Extract feature purpose
 4. Update steering/product.md
-5. Generate steering/product.ja.md (Japanese translation)
 ```
 
 ---
@@ -329,8 +326,7 @@ jobs:
 1. **Run After Major Changes**: Always run steering skill after significant codebase changes
 2. **Review Before Commit**: Manually review auto-generated steering updates
 3. **Keep Atomic**: Update steering files in the same commit as codebase changes
-4. **Bilingual Updates**: Always update both `.md` and `.ja.md` versions
-5. **Version Control**: Track all steering changes in git history
+4. **Version Control**: Track all steering changes in git history
 
 ---
 

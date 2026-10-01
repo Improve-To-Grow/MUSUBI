@@ -1,6 +1,6 @@
 # What is MUSUBI?
 
-**MUSUBI** (結び - "connection/binding") is a comprehensive **Specification Driven Development (SDD)** framework that brings structure, traceability, and governance to AI-assisted software development.
+**MUSUBI** (musubi - "connection/binding") is a comprehensive **Specification Driven Development (SDD)** framework that brings structure, traceability, and governance to AI-assisted software development.
 
 ## The Problem
 

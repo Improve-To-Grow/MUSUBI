@@ -1,156 +1,156 @@
 # Stage Validation Guide
 
-ステージ間の自動検証とフィードバックループのガイド。
+Guide to automated validation and feedback loops between stages.
 
-## ステージ検証コマンド
+## Stage Validation Commands
 
-各ステージ完了時に実行する検証コマンド：
+Validation commands to run when each stage is complete:
 
 ```bash
-# 要件定義完了時
+# On completion of requirements definition
 musubi-validate requirements
 
-# 設計完了時
+# On completion of design
 musubi-validate design
 
-# タスク分解完了時
+# On completion of task breakdown
 musubi-validate tasks
 
-# 実装完了時（テスト前）
+# On completion of implementation (before testing)
 musubi-validate implementation
 
-# 全体検証
+# Full validation
 musubi-validate all
 ```
 
-## ステージ遷移チェックリスト
+## Stage Transition Checklist
 
 ### Requirements → Design
 
-**必須条件**:
-- [ ] すべての要件が EARS 形式で記述されている
-- [ ] 各要件にユニーク ID がある（REQ-XXX-NNN）
-- [ ] すべての要件がテスト可能
-- [ ] 優先度（MoSCoW）が設定されている
-- [ ] ステークホルダーレビュー完了
+**Required conditions**:
+- [ ] All requirements are written in EARS format
+- [ ] Each requirement has a unique ID (REQ-XXX-NNN)
+- [ ] All requirements are testable
+- [ ] Priority (MoSCoW) is set
+- [ ] Stakeholder review complete
 
-**検証コマンド**:
+**Validation commands**:
 ```bash
 musubi-validate requirements
 musubi-trace matrix --check-gaps
 ```
 
-**ゲートキーパー**: Product Manager / System Architect
+**Gatekeeper**: Product Manager / System Architect
 
 ---
 
 ### Design → Tasks
 
-**必須条件**:
-- [ ] すべての要件が設計コンポーネントにマッピングされている
-- [ ] アーキテクチャが `steering/structure.md` に準拠
-- [ ] 技術スタックが `steering/tech.md` に準拠
-- [ ] C4 ダイアグラムが作成されている
-- [ ] ADR（Architecture Decision Records）が記録されている
-- [ ] セキュリティ・パフォーマンス考慮事項が文書化
+**Required conditions**:
+- [ ] All requirements are mapped to design components
+- [ ] Architecture complies with `steering/structure.md`
+- [ ] Technology stack complies with `steering/tech.md`
+- [ ] C4 diagrams are created
+- [ ] ADRs (Architecture Decision Records) are recorded
+- [ ] Security and performance considerations are documented
 
-**検証コマンド**:
+**Validation commands**:
 ```bash
 musubi-validate design
 musubi-gaps detect --stage design
 ```
 
-**ゲートキーパー**: System Architect / Tech Lead
+**Gatekeeper**: System Architect / Tech Lead
 
 ---
 
 ### Tasks → Implementation
 
-**必須条件**:
-- [ ] すべての要件にタスクが割り当てられている
-- [ ] タスク依存関係が明確
-- [ ] 各タスクに完了条件がある
-- [ ] 工数見積もりがある
-- [ ] 100% 要件カバレッジ
+**Required conditions**:
+- [ ] Tasks are assigned to all requirements
+- [ ] Task dependencies are clear
+- [ ] Each task has completion criteria
+- [ ] Effort estimates are provided
+- [ ] 100% requirements coverage
 
-**検証コマンド**:
+**Validation commands**:
 ```bash
 musubi-validate tasks
 musubi-trace coverage --requirements
 ```
 
-**ゲートキーパー**: Project Manager / Tech Lead
+**Gatekeeper**: Project Manager / Tech Lead
 
 ---
 
 ### Implementation → Testing
 
-**必須条件**:
-- [ ] すべてのタスクが完了
-- [ ] コードレビュー承認済み
-- [ ] ユニットテストカバレッジ ≥ 80%
-- [ ] Lint/Format エラーなし
-- [ ] クリティカルバグなし
+**Required conditions**:
+- [ ] All tasks are complete
+- [ ] Code review approved
+- [ ] Unit test coverage ≥ 80%
+- [ ] No Lint/Format errors
+- [ ] No critical bugs
 
-**検証コマンド**:
+**Validation commands**:
 ```bash
 npm test
 npm run lint
 musubi-validate implementation
 ```
 
-**ゲートキーパー**: Tech Lead
+**Gatekeeper**: Tech Lead
 
 ---
 
 ### Testing → Deployment
 
-**必須条件**:
-- [ ] すべての EARS 要件にテストケースがある
-- [ ] すべてのテストがパス
-- [ ] パフォーマンステストが NFR を満たす
-- [ ] セキュリティテストがパス
-- [ ] テストカバレッジレポート生成
+**Required conditions**:
+- [ ] Every EARS requirement has test cases
+- [ ] All tests pass
+- [ ] Performance tests meet NFRs
+- [ ] Security tests pass
+- [ ] Test coverage report generated
 
-**検証コマンド**:
+**Validation commands**:
 ```bash
 npm run test:coverage
 musubi-validate testing
 musubi-trace coverage --tests
 ```
 
-**ゲートキーパー**: QA Lead
+**Gatekeeper**: QA Lead
 
 ---
 
 ### Deployment → Monitoring
 
-**必須条件**:
-- [ ] ステージングデプロイ成功
-- [ ] スモークテストパス
-- [ ] 本番デプロイ成功
-- [ ] ヘルスチェック正常
-- [ ] 監視・アラート設定完了
-- [ ] ロールバック手順テスト済み
+**Required conditions**:
+- [ ] Staging deployment succeeded
+- [ ] Smoke tests pass
+- [ ] Production deployment succeeded
+- [ ] Health checks are normal
+- [ ] Monitoring and alert setup complete
+- [ ] Rollback procedure tested
 
-**検証コマンド**:
+**Validation commands**:
 ```bash
 musubi-validate deployment
 ```
 
-**ゲートキーパー**: DevOps Lead / SRE
+**Gatekeeper**: DevOps Lead / SRE
 
 ---
 
-## フィードバックループ
+## Feedback Loops
 
-### テスト → 要件へのフィードバック
+### Feedback from Testing to Requirements
 
-テストで問題が見つかった場合：
+When testing uncovers a problem:
 
-1. **バグ**: Implementation に戻る
-2. **要件漏れ**: Requirements に戻り EARS 要件を追加
-3. **設計問題**: Design に戻りアーキテクチャ修正
+1. **Bug**: Return to Implementation
+2. **Missing requirement**: Return to Requirements and add EARS requirements
+3. **Design issue**: Return to Design and fix the architecture
 
 ```
 Testing ──[Bug]────────→ Implementation
@@ -160,45 +160,45 @@ Testing ──[Bug]────────→ Implementation
     └──[Design Issue]─────→ Design
 ```
 
-### 監視 → 改善へのフィードバック
+### Feedback from Monitoring to Improvement
 
-本番での問題発見時：
+When problems are found in production:
 
-1. **パフォーマンス問題**: NFR を見直し、Design 修正
-2. **セキュリティ問題**: Security Audit → Design 修正
-3. **機能要望**: Requirements に新規要件追加
-
----
-
-## 振り返りチェックリスト
-
-各イテレーション/リリース後に実施：
-
-### プロセス振り返り
-
-- [ ] ワークフローのボトルネックはどこか？
-- [ ] スキップされたステージはあるか？
-- [ ] 手戻りが多かったステージはどこか？
-- [ ] 検証で見逃した問題はあるか？
-
-### 成果物振り返り
-
-- [ ] 要件の品質は十分だったか？
-- [ ] 設計は実装を適切にガイドしたか？
-- [ ] テストは問題を検出できたか？
-- [ ] ドキュメントは最新に保たれたか？
-
-### 改善アクション
-
-振り返り結果は `steering/memories/lessons_learned.md` に記録。
+1. **Performance issue**: Review NFRs and revise Design
+2. **Security issue**: Security Audit → revise Design
+3. **Feature request**: Add new requirements to Requirements
 
 ---
 
-## 自動検証の設定
+## Retrospective Checklist
 
-### CI/CD での検証
+Perform after each iteration/release:
 
-`.github/workflows/validate.yml` で自動検証を設定：
+### Process Retrospective
+
+- [ ] Where are the workflow bottlenecks?
+- [ ] Were any stages skipped?
+- [ ] Which stages had the most rework?
+- [ ] Were there problems that validation missed?
+
+### Deliverables Retrospective
+
+- [ ] Was the quality of the requirements sufficient?
+- [ ] Did the design guide the implementation appropriately?
+- [ ] Were the tests able to detect problems?
+- [ ] Was the documentation kept up to date?
+
+### Improvement Actions
+
+Record retrospective results in `steering/memories/lessons_learned.md`.
+
+---
+
+## Automated Validation Setup
+
+### Validation in CI/CD
+
+Set up automated validation in `.github/workflows/validate.yml`:
 
 ```yaml
 name: SDD Validation
@@ -220,9 +220,9 @@ jobs:
 
 ---
 
-## 関連ドキュメント
+## Related Documents
 
-- `steering/rules/workflow.md` - 完全なワークフローガイド
-- `steering/rules/ears-format.md` - EARS 形式ガイド
-- `steering/rules/constitution.md` - 9条憲法
-- `steering/memories/lessons_learned.md` - 振り返り記録
+- `steering/rules/workflow.md` - Complete workflow guide
+- `steering/rules/ears-format.md` - EARS format guide
+- `steering/rules/constitution.md` - 9-Article Constitution
+- `steering/memories/lessons_learned.md` - Retrospective records

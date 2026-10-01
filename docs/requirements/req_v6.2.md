@@ -1,93 +1,93 @@
-# MUSUBI SDD 改善要求
+# MUSUBI SDD Improvement Requirements
 
-**Document Type**: 改善要求仕様書 (Improvement Requirements Specification)
+**Document Type**: Improvement Requirements Specification
 **Format**: EARS (Easy Approach to Requirements Syntax)
 **Version**: 1.1.0
 **Created**: 2025-12-31
 **Last Updated**: 2025-12-31
-**Author**: YAGOKORO v5.0.0 開発経験に基づく
+**Author**: Based on YAGOKORO v5.0.0 development experience
 **Requirement ID Prefix**: IMP-6.2
 
 ---
 
-## 用語集 (Glossary)
+## Glossary
 
-| 用語 | 定義 |
+| Term | Definition |
 |------|------|
-| **レビューゲート** | ワークフローの各フェーズ間に設置される品質チェックポイント。次フェーズへの進行可否を判断する |
-| **Phase -1 Gate** | Article VII (Simplicity) / Article VIII (Anti-Abstraction) 違反時に発動する特別レビュー。[steering/rules/constitution.md](../../steering/rules/constitution.md) 参照 |
-| **トレーサビリティマトリクス** | 要件→設計→実装→テストの対応関係を示す双方向追跡表 |
-| **EARS** | Easy Approach to Requirements Syntax - 自然言語ベースの要件記述パターン |
-| **Constitutional Articles** | MUSUBI SDDの9つの基本原則。[constitution.md](../../steering/rules/constitution.md) で定義 |
-| **Steering Files** | プロジェクトのコンテキストを維持するメモリファイル群（tech.md, structure.md, product.md） |
+| **Review Gate** | A quality checkpoint placed between workflow phases. It determines whether progression to the next phase is allowed |
+| **Phase -1 Gate** | A special review triggered upon violations of Article VII (Simplicity) / Article VIII (Anti-Abstraction). See [steering/rules/constitution.md](../../steering/rules/constitution.md) |
+| **Traceability Matrix** | A bidirectional tracking table showing the correspondence between requirements, design, implementation, and tests |
+| **EARS** | Easy Approach to Requirements Syntax - A natural-language-based requirements description pattern |
+| **Constitutional Articles** | The 9 fundamental principles of MUSUBI SDD. Defined in [constitution.md](../../steering/rules/constitution.md) |
+| **Steering Files** | A group of memory files that maintain project context (tech.md, structure.md, product.md) |
 
 ---
 
-## 概要
+## Overview
 
-YAGOKOROプロジェクト（v1.0.0〜v5.0.0）の開発を通じて特定された、MUSUBI SDD（Specification Driven Development）フレームワークの改善要求を定義します。
+This document defines improvement requirements for the MUSUBI SDD (Specification Driven Development) framework, identified through development of the YAGOKORO project (v1.0.0 to v5.0.0).
 
-### 背景
+### Background
 
-YAGOKOROは5つのメジャーバージョンを通じて以下を実装しました：
-- v1.0.0: 基盤構築（ドメインモデル、Neo4j/Qdrant統合）
-- v2.0.0: GraphRAG（LazyGraphRAG、MCP基本ツール）
-- v3.0.0: 自動化（LLMレス関係抽出、論文自動取り込み）
-- v4.0.0: 時系列・研究者（時系列分析、研究者ネットワーク）
-- v5.0.0: 多言語（多言語NER、翻訳、クロスリンガルリンキング）
+YAGOKORO implemented the following across five major versions:
+- v1.0.0: Foundation (domain model, Neo4j/Qdrant integration)
+- v2.0.0: GraphRAG (LazyGraphRAG, basic MCP tools)
+- v3.0.0: Automation (LLM-less relation extraction, automatic paper ingestion)
+- v4.0.0: Time series and researchers (time series analysis, researcher network)
+- v5.0.0: Multilingual (multilingual NER, translation, cross-lingual linking)
 
-この過程で、MUSUBIワークフローに不足している機能や改善点が明らかになりました。
+This process revealed missing features and areas for improvement in the MUSUBI workflow.
 
 ---
 
-## ステークホルダー識別
+## Stakeholder Identification
 
-| ステークホルダー | 役割 | レビュー権限 |
+| Stakeholder | Role | Review Authority |
 |------------------|------|-------------|
-| **Human Developer** | 最終承認者、設計判断 | 全フェーズ |
-| **AI Agent (Copilot)** | 自動検証、ドラフト生成 | 自動チェック |
-| **System Architect** | アーキテクチャ決定 | Phase -1 Gate |
-| **Project Manager** | 進捗管理、優先度決定 | スプリント計画 |
+| **Human Developer** | Final approver, design decisions | All phases |
+| **AI Agent (Copilot)** | Automated validation, draft generation | Automated checks |
+| **System Architect** | Architecture decisions | Phase -1 Gate |
+| **Project Manager** | Progress management, prioritization | Sprint planning |
 
 ---
 
-## 要件間依存関係
+## Requirement Dependencies
 
 ```mermaid
 graph TD
-    IMP001[IMP-6.2-001<br>レビューワークフロー] --> IMP004[IMP-6.2-004<br>トレーサビリティ]
+    IMP001[IMP-6.2-001<br>Review Workflow] --> IMP004[IMP-6.2-004<br>Traceability]
     IMP001 --> IMP005[IMP-6.2-005<br>Constitutional Compliance]
-    IMP002[IMP-6.2-002<br>進捗可視化] --> IMP003[IMP-6.2-003<br>スプリント管理]
+    IMP002[IMP-6.2-002<br>Progress Visualization] --> IMP003[IMP-6.2-003<br>Sprint Management]
     IMP004 --> IMP002
-    IMP007[IMP-6.2-007<br>Steering管理] --> IMP006[IMP-6.2-006<br>ドキュメント生成]
-    IMP008[IMP-6.2-008<br>エラーハンドリング] --> IMP001
+    IMP007[IMP-6.2-007<br>Steering Management] --> IMP006[IMP-6.2-006<br>Document Generation]
+    IMP008[IMP-6.2-008<br>Error Handling] --> IMP001
 ```
 
 ---
 
-## Constitutional Articles マッピング
+## Constitutional Articles Mapping
 
-| 要件カテゴリ | 関連Article | 理由 |
+| Requirement Category | Related Articles | Reason |
 |--------------|-------------|------|
-| IMP-6.2-001 (レビュー) | II, VII, VIII | 品質保証、シンプルさ検証 |
-| IMP-6.2-002 (可視化) | III | 透明性の確保 |
-| IMP-6.2-003 (スプリント) | IV, V | 計画性、一貫性 |
-| IMP-6.2-004 (トレーサビリティ) | I, VI | 仕様準拠、変更追跡 |
+| IMP-6.2-001 (Review) | II, VII, VIII | Quality assurance, simplicity verification |
+| IMP-6.2-002 (Visualization) | III | Ensuring transparency |
+| IMP-6.2-003 (Sprint) | IV, V | Planning, consistency |
+| IMP-6.2-004 (Traceability) | I, VI | Specification compliance, change tracking |
 | IMP-6.2-005 (Constitutional) | VII, VIII | Simplicity, Anti-Abstraction |
-| IMP-6.2-006 (ドキュメント) | III, IX | 透明性、文書化 |
-| IMP-6.2-007 (Steering) | I | 仕様の整合性 |
-| IMP-6.2-008 (エラー処理) | II | 品質保証 |
+| IMP-6.2-006 (Documentation) | III, IX | Transparency, documentation |
+| IMP-6.2-007 (Steering) | I | Specification consistency |
+| IMP-6.2-008 (Error Handling) | II | Quality assurance |
 
 ---
 
-## カテゴリ1: レビューワークフローの追加
+## Category 1: Adding a Review Workflow
 
-### IMP-6.2-001: レビューステージのワークフロー統合
+### IMP-6.2-001: Integrating Review Stages into the Workflow
 
-**現状の問題**:
-現在のMUSUBI SDDワークフローには明示的なレビューステージが存在せず、各フェーズ（Requirements, Design, Tasks, Implement, Validate）間でのレビューゲートが定義されていません。
+**Current problem**:
+The current MUSUBI SDD workflow has no explicit review stage, and no review gates are defined between phases (Requirements, Design, Tasks, Implement, Validate).
 
-#### IMP-6.2-001-01: 要件レビューゲート
+#### IMP-6.2-001-01: Requirements Review Gate
 
 **EARS Pattern**: Event-driven
 
@@ -99,13 +99,13 @@ BEFORE proceeding to design phase.
 ```
 
 **Acceptance Criteria**:
-- [x] 要件ドキュメント作成後、自動的にレビューゲートがトリガーされる
-- [x] EARS形式の構文チェックが実行される
-- [x] ステークホルダーカバレッジが検証される
-- [x] 受入基準の完全性がチェックされる
-- [x] レビュー結果が記録される
+- [x] A review gate is automatically triggered after a requirements document is created
+- [x] EARS format syntax check is executed
+- [x] Stakeholder coverage is verified
+- [x] Completeness of acceptance criteria is checked
+- [x] Review results are recorded
 
-#### IMP-6.2-001-02: 設計レビューゲート
+#### IMP-6.2-001-02: Design Review Gate
 
 **EARS Pattern**: Event-driven
 
@@ -117,12 +117,12 @@ BEFORE proceeding to task breakdown phase.
 ```
 
 **Acceptance Criteria**:
-- [x] 設計ドキュメント作成後、レビューゲートがトリガーされる
-- [x] C4モデル（Context, Container, Component, Code）の完全性が検証される
-- [x] ADR（Architecture Decision Record）の存在と品質がチェックされる
-- [x] Constitutional Articles（特にI, II, VII, VIII）への準拠が検証される
+- [x] A review gate is triggered after a design document is created
+- [x] Completeness of the C4 model (Context, Container, Component, Code) is verified
+- [x] Existence and quality of ADRs (Architecture Decision Records) are checked
+- [x] Compliance with Constitutional Articles (especially I, II, VII, VIII) is verified
 
-#### IMP-6.2-001-03: 実装レビューゲート
+#### IMP-6.2-001-03: Implementation Review Gate
 
 **EARS Pattern**: Event-driven
 
@@ -134,19 +134,19 @@ BEFORE marking the sprint as complete.
 ```
 
 **Configuration Parameters**:
-| パラメータ | デフォルト値 | 説明 |
+| Parameter | Default Value | Description |
 |-----------|-------------|------|
-| `MIN_TEST_COVERAGE` | 80% | 最小テストカバレッジ閾値 |
-| `COVERAGE_TYPE` | line | カバレッジ種別（line/branch/function） |
-| `LINT_STRICT` | true | Lintエラー時にブロックするか |
+| `MIN_TEST_COVERAGE` | 80% | Minimum test coverage threshold |
+| `COVERAGE_TYPE` | line | Coverage type (line/branch/function) |
+| `LINT_STRICT` | true | Whether to block on lint errors |
 
 **Acceptance Criteria**:
-- [x] Sprint完了時に実装レビューがトリガーされる
-- [x] テストカバレッジが設定閾値（デフォルト: 80%）以上であることを検証
-- [x] 要件→設計→コード→テストのトレーサビリティが検証される
-- [x] コード品質メトリクス（lint, type check）がパスすることを確認
+- [x] An implementation review is triggered when a Sprint completes
+- [x] Verify that test coverage meets or exceeds the configured threshold (default: 80%)
+- [x] Traceability across requirements -> design -> code -> tests is verified
+- [x] Confirm that code quality metrics (lint, type check) pass
 
-#### IMP-6.2-001-04: レビュープロンプトの追加
+#### IMP-6.2-001-04: Adding Review Prompts
 
 **EARS Pattern**: Ubiquitous
 
@@ -159,17 +159,17 @@ The MUSUBI system SHALL provide dedicated review prompts:
 ```
 
 **Acceptance Criteria**:
-- [x] 各レビュープロンプトがAGENTS.mdに定義される
-- [x] プロンプト実行時に適切なレビューチェックリストが生成される
-- [x] レビュー結果がstorage/reviews/ディレクトリに保存される
+- [x] Each review prompt is defined in AGENTS.md
+- [x] An appropriate review checklist is generated when a prompt is executed
+- [x] Review results are saved in the storage/reviews/ directory
 
 ---
 
-## カテゴリ2: ワークフロー可視化と進捗追跡
+## Category 2: Workflow Visualization and Progress Tracking
 
-### IMP-6.2-002: ステージ進捗の可視化
+### IMP-6.2-002: Visualizing Stage Progress
 
-#### IMP-6.2-002-01: ワークフローダッシュボード
+#### IMP-6.2-002-01: Workflow Dashboard
 
 **EARS Pattern**: State-driven
 
@@ -180,12 +180,12 @@ that displays current stage, completion percentage, blockers, and next actions.
 ```
 
 **Acceptance Criteria**:
-- [x] 各機能のワークフローステージが可視化される
-- [x] 完了率（%）が計算・表示される
-- [x] ブロッカーが明示的に表示される
-- [x] 次のアクションが提案される
+- [x] The workflow stage of each feature is visualized
+- [x] Completion rate (%) is calculated and displayed
+- [x] Blockers are explicitly displayed
+- [x] Next actions are suggested
 
-#### IMP-6.2-002-02: ステージ間トランジション記録
+#### IMP-6.2-002-02: Recording Stage Transitions
 
 **EARS Pattern**: Event-driven
 
@@ -196,18 +196,18 @@ with timestamp, reviewer, and approval status.
 ```
 
 **Acceptance Criteria**:
-- [x] ステージ遷移が自動的に記録される
-- [x] タイムスタンプが付与される
-- [x] 承認者（人間またはAI）が記録される
-- [x] 承認ステータスが保存される
+- [x] Stage transitions are recorded automatically
+- [x] Timestamps are attached
+- [x] The approver (human or AI) is recorded
+- [x] Approval status is saved
 
 ---
 
-## カテゴリ3: スプリント管理の強化
+## Category 3: Enhanced Sprint Management
 
-### IMP-6.2-003: スプリント定義と追跡
+### IMP-6.2-003: Sprint Definition and Tracking
 
-#### IMP-6.2-003-01: スプリント計画テンプレート
+#### IMP-6.2-003-01: Sprint Planning Template
 
 **EARS Pattern**: Ubiquitous
 
@@ -217,13 +217,13 @@ that includes sprint goals, task breakdown, effort estimation, and dependency ma
 ```
 
 **Acceptance Criteria**:
-- [x] スプリント計画テンプレートが提供される
-- [x] スプリントゴールが明確に定義できる
-- [x] タスク分解が要件にトレースできる
-- [x] 工数見積もりが記録できる
-- [x] 依存関係がマッピングできる
+- [x] A sprint planning template is provided
+- [x] Sprint goals can be clearly defined
+- [x] Task breakdown can be traced to requirements
+- [x] Effort estimates can be recorded
+- [x] Dependencies can be mapped
 
-#### IMP-6.2-003-02: スプリント完了レポート自動生成
+#### IMP-6.2-003-02: Automatic Sprint Completion Report Generation
 
 **EARS Pattern**: Event-driven
 
@@ -234,21 +234,21 @@ that includes delivered features, test results, metrics, and lessons learned.
 ```
 
 **Acceptance Criteria**:
-- [x] スプリント完了時にレポートが自動生成される
-- [x] 配信された機能一覧が含まれる
-- [x] テスト結果（pass/fail/skip）が含まれる
-- [x] パフォーマンスメトリクスが含まれる
-- [x] 振り返り（Lessons Learned）セクションがある
+- [x] A report is generated automatically when a sprint completes
+- [x] A list of delivered features is included
+- [x] Test results (pass/fail/skip) are included
+- [x] Performance metrics are included
+- [x] A Lessons Learned (retrospective) section is included
 
 ---
 
-## カテゴリ4: トレーサビリティの自動化
+## Category 4: Traceability Automation
 
-### IMP-6.2-004: 双方向トレーサビリティマトリクス
+### IMP-6.2-004: Bidirectional Traceability Matrix
 
-**依存関係**: IMP-6.2-001（レビューワークフロー）が前提
+**Dependencies**: Requires IMP-6.2-001 (Review Workflow)
 
-#### IMP-6.2-004-01: トレーサビリティ自動抽出
+#### IMP-6.2-004-01: Automatic Traceability Extraction
 
 **EARS Pattern**: Ubiquitous
 
@@ -258,12 +258,12 @@ from requirement IDs in code comments, test descriptions, and commit messages.
 ```
 
 **Acceptance Criteria**:
-- [x] コードコメントからREQ-XXX-NNNパターンを自動抽出
-- [x] テスト記述からREQ-XXX-NNNパターンを自動抽出
-- [x] コミットメッセージからREQ-XXX-NNNパターンを自動抽出
-- [x] 抽出結果がトレーサビリティマトリクスに反映される
+- [x] Automatically extract REQ-XXX-NNN patterns from code comments
+- [x] Automatically extract REQ-XXX-NNN patterns from test descriptions
+- [x] Automatically extract REQ-XXX-NNN patterns from commit messages
+- [x] Extraction results are reflected in the traceability matrix
 
-#### IMP-6.2-004-02: トレーサビリティギャップ検出
+#### IMP-6.2-004-02: Traceability Gap Detection
 
 **EARS Pattern**: State-driven
 
@@ -274,20 +274,20 @@ and suggest required actions to close the gaps.
 ```
 
 **Acceptance Criteria**:
-- [x] 実装のない要件が検出される
-- [x] テストのない要件が検出される
-- [x] ギャップが警告として表示される
-- [x] ギャップを埋めるためのアクションが提案される
+- [x] Requirements without implementation are detected
+- [x] Requirements without tests are detected
+- [x] Gaps are displayed as warnings
+- [x] Actions to close the gaps are suggested
 
 ---
 
-## カテゴリ5: Constitutional Compliance の強化
+## Category 5: Strengthening Constitutional Compliance
 
-### IMP-6.2-005: 憲法遵守の自動検証
+### IMP-6.2-005: Automated Verification of Constitution Compliance
 
-**参照**: [steering/rules/constitution.md](../../steering/rules/constitution.md)
+**Reference**: [steering/rules/constitution.md](../../steering/rules/constitution.md)
 
-#### IMP-6.2-005-01: Article遵守チェッカー
+#### IMP-6.2-005-01: Article Compliance Checker
 
 **EARS Pattern**: Event-driven
 
@@ -298,16 +298,16 @@ and block merge if violations are detected.
 ```
 
 **Acceptance Criteria**:
-- [x] コミット時にArticle遵守がチェックされる
-- [x] PRマージ前にArticle遵守が検証される
-- [x] 違反がある場合はマージがブロックされる
-- [x] 違反内容と修正方法が提示される
+- [x] Article compliance is checked at commit time
+- [x] Article compliance is verified before PR merge
+- [x] Merge is blocked if there are violations
+- [x] Violation details and remediation steps are presented
 
-#### IMP-6.2-005-02: Phase -1 Gate の自動トリガー
+#### IMP-6.2-005-02: Automatic Triggering of the Phase -1 Gate
 
 **EARS Pattern**: Event-driven
 
-**Phase -1 Gate 定義**: Article VII (Simplicity) または Article VIII (Anti-Abstraction) に違反する変更を検出した際に発動する特別レビュープロセス。詳細は [constitution.md Section 7-8](../../steering/rules/constitution.md) を参照。
+**Phase -1 Gate definition**: A special review process triggered when a change violating Article VII (Simplicity) or Article VIII (Anti-Abstraction) is detected. For details, see [constitution.md Section 7-8](../../steering/rules/constitution.md).
 
 ```
 WHEN Article VII (Simplicity) or Article VIII (Anti-Abstraction) violation is detected,
@@ -316,23 +316,23 @@ and notify required reviewers.
 ```
 
 **Required Reviewers**:
-- System Architect（必須）
-- Project Manager（任意）
-- Human Developer（最終承認）
+- System Architect (required)
+- Project Manager (optional)
+- Human Developer (final approval)
 
 **Acceptance Criteria**:
-- [x] Article VII/VIII違反が自動検出される
-- [x] Phase -1 Gateレビューが自動的にトリガーされる
-- [x] 必要なレビュアー（system-architect, project-manager等）に通知される
-- [x] 承認/却下のワークフローが提供される
+- [x] Article VII/VIII violations are detected automatically
+- [x] A Phase -1 Gate review is triggered automatically
+- [x] Required reviewers (system-architect, project-manager, etc.) are notified
+- [x] An approval/rejection workflow is provided
 
 ---
 
-## カテゴリ6: ドキュメント生成の自動化
+## Category 6: Document Generation Automation
 
-### IMP-6.2-006: 実験レポート自動生成
+### IMP-6.2-006: Automatic Experiment Report Generation
 
-#### IMP-6.2-006-01: テスト結果からの実験レポート生成
+#### IMP-6.2-006-01: Generating Experiment Reports from Test Results
 
 **EARS Pattern**: Event-driven
 
@@ -343,14 +343,14 @@ that includes test summary, performance metrics, and experimental observations.
 ```
 
 **Acceptance Criteria**:
-- [x] テスト実行後に実験レポートが自動生成される
-- [x] テストサマリー（pass/fail/skip）が含まれる
-- [x] パフォーマンスメトリクス（実行時間、メモリ等）が含まれる
-- [x] 実験観察（Observations）セクションが含まれる
+- [x] An experiment report is generated automatically after tests run
+- [x] A test summary (pass/fail/skip) is included
+- [x] Performance metrics (execution time, memory, etc.) are included
+- [x] An experiment Observations section is included
 
-#### IMP-6.2-006-02: 技術記事テンプレート生成
+#### IMP-6.2-006-02: Technical Article Template Generation
 
-**EARS Pattern**: Optional (WHERE) - ユーザーリクエスト起点
+**EARS Pattern**: Optional (WHERE) - Triggered by user request
 
 ```
 WHERE user requests technical article generation,
@@ -359,26 +359,26 @@ following specified format guidelines (e.g., Qiita, Zenn, Medium).
 ```
 
 **Supported Platforms**:
-| プラットフォーム | フォーマット | 特殊対応 |
+| Platform | Format | Special Handling |
 |-----------------|-------------|----------|
-| Qiita | Markdown + Qiita拡張 | タグ、組織 |
-| Zenn | Markdown + Zenn拡張 | 本/スクラップ対応 |
-| Medium | Rich Text変換 | コードブロック最適化 |
+| Qiita | Markdown + Qiita extensions | Tags, organizations |
+| Zenn | Markdown + Zenn extensions | Book/scrap support |
+| Medium | Rich Text conversion | Code block optimization |
 | Dev.to | Markdown | Front Matter |
 
 **Acceptance Criteria**:
-- [x] 技術記事テンプレートが生成される
-- [x] 指定されたプラットフォーム形式（Qiita, Zenn, Medium）に対応
-- [x] コードサンプル、図表、ベンチマーク結果が含まれる
-- [x] 公開可能な品質のドラフトが生成される
+- [x] A technical article template is generated
+- [x] Supports the specified platform formats (Qiita, Zenn, Medium)
+- [x] Code samples, diagrams, and benchmark results are included
+- [x] A draft of publishable quality is generated
 
 ---
 
-## カテゴリ7: Steering ファイル管理
+## Category 7: Steering File Management
 
-### IMP-6.2-007: Steering 自動同期
+### IMP-6.2-007: Automatic Steering Synchronization
 
-#### IMP-6.2-007-01: バージョン更新時のSteering自動更新
+#### IMP-6.2-007-01: Automatic Steering Update on Version Updates
 
 **EARS Pattern**: Event-driven
 
@@ -389,12 +389,12 @@ to reflect current version, features, and status.
 ```
 
 **Acceptance Criteria**:
-- [x] バージョンリリース時にsteering/*.mdが自動更新される
-- [x] product.md/tech.md/structure.mdが同期される
-- [x] バージョン番号、機能一覧、ステータスが更新される
-- [x] 更新内容がコミットされる
+- [x] steering/*.md is updated automatically upon version release
+- [x] product.md/tech.md/structure.md are synchronized
+- [x] Version number, feature list, and status are updated
+- [x] The updates are committed
 
-#### IMP-6.2-007-02: Steering 整合性チェック
+#### IMP-6.2-007-02: Steering Consistency Check
 
 **EARS Pattern**: Ubiquitous
 
@@ -404,19 +404,19 @@ and ensure tech.md, structure.md, and product.md are synchronized.
 ```
 
 **Acceptance Criteria**:
-- [x] steering/*.md間の整合性がチェックされる
-- [x] 不整合が検出された場合に警告される
-- [x] 自動修正の提案が行われる
+- [x] Consistency among steering/*.md files is checked
+- [x] A warning is issued when inconsistencies are detected
+- [x] Automatic fixes are suggested
 
 ---
 
-## カテゴリ8: エラーハンドリングとリカバリー
+## Category 8: Error Handling and Recovery
 
-### IMP-6.2-008: ワークフロー障害対応
+### IMP-6.2-008: Handling Workflow Failures
 
-**優先度再評価**: 運用上の重要性を考慮し、優先度を Medium に引き上げ
+**Priority reassessment**: Priority raised to Medium in consideration of operational importance
 
-#### IMP-6.2-008-01: 失敗したステージのリカバリー
+#### IMP-6.2-008-01: Recovering from Failed Stages
 
 **EARS Pattern**: Unwanted behavior (IF-THEN)
 
@@ -427,12 +427,12 @@ including root cause analysis and remediation steps.
 ```
 
 **Acceptance Criteria**:
-- [x] ステージ失敗時に自動的に失敗分析が行われる
-- [x] 根本原因が特定される
-- [x] 修正手順が提案される
-- [x] 失敗履歴が記録される
+- [x] Failure analysis is performed automatically when a stage fails
+- [x] The root cause is identified
+- [x] Remediation steps are suggested
+- [x] Failure history is recorded
 
-#### IMP-6.2-008-02: ロールバック機能
+#### IMP-6.2-008-02: Rollback Feature
 
 **EARS Pattern**: Optional (WHERE)
 
@@ -442,120 +442,120 @@ the MUSUBI system SHALL support rollback to previous state
 with cleanup of partial changes.
 ```
 
-**ロールバック粒度定義**:
-| 粒度レベル | 対象 | 説明 |
+**Rollback granularity definition**:
+| Granularity Level | Target | Description |
 |-----------|------|------|
-| **File-level** | 個別ファイル | 特定ファイルのみを前バージョンに戻す |
-| **Commit-level** | Git コミット | 指定コミットまでリバート |
-| **Stage-level** | ワークフローステージ | Requirements/Design/Tasks/Implement 単位で戻す |
-| **Sprint-level** | スプリント全体 | スプリント開始時点まで戻す |
+| **File-level** | Individual files | Revert only specific files to the previous version |
+| **Commit-level** | Git commits | Revert up to the specified commit |
+| **Stage-level** | Workflow stages | Roll back per Requirements/Design/Tasks/Implement unit |
+| **Sprint-level** | Entire sprint | Roll back to the start of the sprint |
 
 **Acceptance Criteria**:
-- [x] 前のステージ状態へのロールバックが可能（粒度選択可能）
-- [x] 部分的な変更がクリーンアップされる
-- [x] ロールバック履歴が記録される
-- [x] ロールバック前の確認プロンプトが表示される
+- [x] Rollback to a previous stage state is possible (granularity selectable)
+- [x] Partial changes are cleaned up
+- [x] Rollback history is recorded
+- [x] A confirmation prompt is displayed before rollback
 
 ---
 
-## 優先度マトリクス
+## Priority Matrix
 
-| カテゴリ | 要件ID | 優先度 | 影響度 | 実装難易度 | 依存関係 |
+| Category | Requirement ID | Priority | Impact | Implementation Difficulty | Dependencies |
 |---------|--------|--------|--------|------------|----------|
-| レビューワークフロー | IMP-6.2-001-01〜04 | **Critical** | 高 | 中 | なし |
-| 進捗可視化 | IMP-6.2-002-01〜02 | High | 中 | 低 | IMP-6.2-004 |
-| スプリント管理 | IMP-6.2-003-01〜02 | High | 中 | 低 | IMP-6.2-002 |
-| トレーサビリティ | IMP-6.2-004-01〜02 | High | 高 | 中 | IMP-6.2-001 |
-| Constitutional | IMP-6.2-005-01〜02 | Medium | 高 | 高 | IMP-6.2-001 |
-| ドキュメント生成 | IMP-6.2-006-01〜02 | Medium | 中 | 中 | IMP-6.2-007 |
-| Steering管理 | IMP-6.2-007-01〜02 | Medium | 中 | 低 | なし |
-| エラーハンドリング | IMP-6.2-008-01〜02 | **Medium** | 中 | 高 | IMP-6.2-001 |
+| Review Workflow | IMP-6.2-001-01 to 04 | **Critical** | High | Medium | None |
+| Progress Visualization | IMP-6.2-002-01 to 02 | High | Medium | Low | IMP-6.2-004 |
+| Sprint Management | IMP-6.2-003-01 to 02 | High | Medium | Low | IMP-6.2-002 |
+| Traceability | IMP-6.2-004-01 to 02 | High | High | Medium | IMP-6.2-001 |
+| Constitutional | IMP-6.2-005-01 to 02 | Medium | High | High | IMP-6.2-001 |
+| Document Generation | IMP-6.2-006-01 to 02 | Medium | Medium | Medium | IMP-6.2-007 |
+| Steering Management | IMP-6.2-007-01 to 02 | Medium | Medium | Low | None |
+| Error Handling | IMP-6.2-008-01 to 02 | **Medium** | Medium | High | IMP-6.2-001 |
 
 ---
 
-## 実装提案
+## Implementation Proposal
 
-### Phase 1: レビューワークフロー（最優先）
+### Phase 1: Review Workflow (Top Priority)
 
-1. AGENTS.mdにレビュープロンプト追加
-2. steering/rules/workflow.mdにレビューステージ定義
-3. レビューチェックリストテンプレート作成
-4. storage/reviews/ディレクトリ構造定義
+1. Add review prompts to AGENTS.md
+2. Define review stages in steering/rules/workflow.md
+3. Create review checklist templates
+4. Define the storage/reviews/ directory structure
 
-### Phase 2: トレーサビリティと進捗追跡 (IMP-6.2-002, IMP-6.2-004)
+### Phase 2: Traceability and Progress Tracking (IMP-6.2-002, IMP-6.2-004)
 
-1. traceability-auditorスキル強化
-2. ワークフローダッシュボード仕様定義
-3. ステージ遷移記録フォーマット定義
+1. Strengthen the traceability-auditor skill
+2. Define the workflow dashboard specification
+3. Define the stage transition record format
 
-### Phase 3: 自動化とConstitutional強化 (IMP-6.2-005, IMP-6.2-007)
+### Phase 3: Automation and Constitutional Strengthening (IMP-6.2-005, IMP-6.2-007)
 
-1. GitHub Actions/CI統合
-2. Phase -1 Gate自動トリガー実装
-3. Steering自動同期実装
+1. GitHub Actions/CI integration
+2. Implement automatic Phase -1 Gate triggering
+3. Implement automatic Steering synchronization
 
 ---
 
-## 参考: YAGOKOROプロジェクトでの具体的課題
+## Reference: Specific Challenges in the YAGOKORO Project
 
-### 課題1: レビューなしでの実装進行
+### Challenge 1: Proceeding with Implementation Without Review
 
-v1.0.0〜v5.0.0の開発において、要件→設計→実装の各フェーズ間で明示的なレビューゲートがなく、以下の問題が発生しました：
+During development of v1.0.0 to v5.0.0, there were no explicit review gates between the requirements, design, and implementation phases, which led to the following problems:
 
-- 要件の曖昧さが設計段階で発覚
-- 設計変更が実装後に必要になるケース
-- テストカバレッジの事後確認のみ
+- Requirement ambiguities surfaced only at the design stage
+- Cases where design changes were needed after implementation
+- Test coverage was only checked after the fact
 
-**解決策**: IMP-6.2-001（レビューワークフロー追加）
+**Solution**: IMP-6.2-001 (Add Review Workflow)
 
-### 課題2: Steering更新の手動作業
+### Challenge 2: Manual Steering Updates
 
-各バージョンリリース時に、tech.ja.md、product.ja.md、structure.ja.mdを手動で更新する必要があり、更新漏れや不整合が発生しました。
+At each version release, tech.ja.md, product.ja.md, and structure.ja.md had to be updated manually, resulting in missed updates and inconsistencies.
 
-**解決策**: IMP-6.2-007（Steering自動同期）
+**Solution**: IMP-6.2-007 (Automatic Steering Synchronization)
 
-### 課題3: トレーサビリティの手動管理
+### Challenge 3: Manual Traceability Management
 
-REQ-XXX-NNNとコード/テストの対応関係が手動管理であり、ギャップの検出が困難でした。
+The correspondence between REQ-XXX-NNN and code/tests was managed manually, making it difficult to detect gaps.
 
-**解決策**: IMP-6.2-004（トレーサビリティ自動化）
+**Solution**: IMP-6.2-004 (Traceability Automation)
 
 ---
 
 ## Non-Functional Requirements (NFR)
 
-### NFR-6.2-001: パフォーマンス要件
+### NFR-6.2-001: Performance Requirements
 
-| 項目 | 要件 | 測定方法 |
+| Item | Requirement | Measurement Method |
 |------|------|----------|
-| レビューゲート実行時間 | < 30秒 | CI/CDログ |
-| トレーサビリティスキャン | < 60秒（1000ファイルまで） | 実行時間計測 |
-| ダッシュボード更新 | < 5秒 | UI応答時間 |
-| Steering同期 | < 10秒 | コミット時間 |
+| Review gate execution time | < 30 seconds | CI/CD logs |
+| Traceability scan | < 60 seconds (up to 1000 files) | Execution time measurement |
+| Dashboard update | < 5 seconds | UI response time |
+| Steering sync | < 10 seconds | Commit time |
 
-### NFR-6.2-002: スケーラビリティ要件
+### NFR-6.2-002: Scalability Requirements
 
-| 項目 | 要件 |
+| Item | Requirement |
 |------|------|
-| 最大要件数 | 10,000件 |
-| 最大トレースリンク数 | 100,000件 |
-| 同時レビューセッション | 10並列 |
-| Steering履歴保持 | 365日 |
+| Maximum number of requirements | 10,000 |
+| Maximum number of trace links | 100,000 |
+| Concurrent review sessions | 10 in parallel |
+| Steering history retention | 365 days |
 
-### NFR-6.2-003: 互換性要件
+### NFR-6.2-003: Compatibility Requirements
 
-- Node.js 18.x 以上
-- Git 2.30 以上
-- VS Code 1.80 以上（拡張機能使用時）
-- GitHub / GitLab / Azure DevOps 対応
+- Node.js 18.x or later
+- Git 2.30 or later
+- VS Code 1.80 or later (when using the extension)
+- Supports GitHub / GitLab / Azure DevOps
 
 ---
 
-## 結論
+## Conclusion
 
-MUSUBI SDDは強力な仕様駆動開発フレームワークですが、本プロジェクトの経験から、特に**レビューワークフローの統合**が最も重要な改善点として特定されました。
+MUSUBI SDD is a powerful specification-driven development framework, but based on this project's experience, **integrating a review workflow** was identified as the most important improvement.
 
-9つのConstitutional Articlesは優れた設計原則を提供していますが、それらを実際のワークフローに組み込むためのレビューゲートが不足しています。本改善要求の実装により、MUSUBIはより堅牢で実用的なSDDフレームワークとなることが期待されます。
+The 9 Constitutional Articles provide excellent design principles, but there are insufficient review gates to incorporate them into the actual workflow. Implementing these improvement requirements is expected to make MUSUBI a more robust and practical SDD framework.
 
 ---
 
@@ -566,4 +566,4 @@ MUSUBI SDDは強力な仕様駆動開発フレームワークですが、本プ�
 **Implementation Version**: MUSUBI v6.2.0
 **Implementation Date**: 2025-01-21
 **Test Coverage**: 4,827 tests passing (159 test suites)
-**Next Review**: リリース後の振り返り
+**Next Review**: Post-release retrospective

@@ -447,27 +447,19 @@ Use template from `templates/change-proposal.md`:
 
 ---
 
-### 9. Save Document (Bilingual)
+### 9. Save Document
 
-**IMPORTANT**: Create BOTH English and Japanese versions.
-
-**English version (Primary/Reference)**:
 Save to: `storage/changes/{{change-name}}-proposal.md`
-
-**Japanese version (Translation)**:
-Save to: `storage/changes/{{change-name}}-proposal.ja.md`
 
 **File Naming**:
 
 - Use kebab-case
 - Include change name
 - Add `-proposal` suffix
-- Add `.ja` before `.md` for Japanese version
 
 **Examples**:
 
-- `storage/changes/add-2fa-proposal.md` (English)
-- `storage/changes/add-2fa-proposal.ja.md` (Japanese)
+- `storage/changes/add-2fa-proposal.md`
 
 **Update Change Log**:
 Add entry to `storage/changes/change-log.md`:
@@ -487,10 +479,7 @@ Present summary to user:
 
 **Change**: {{CHANGE_NAME}}
 **Change ID**: CHG-{{NUMBER}}
-**Files**:
-
-- English: storage/changes/{{change-name}}-proposal.md
-- Japanese: storage/changes/{{change-name}}-proposal.ja.md
+**File**: storage/changes/{{change-name}}-proposal.md
 
 ### Summary:
 

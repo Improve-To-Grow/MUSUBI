@@ -247,10 +247,8 @@ npx musubi-sdd init --windsurf     # Windsurf IDE
    - Same Phase -1 Gates
    - Same validation checklist
 
-3. **Bilingual Documentation** - All agents generate English + Japanese
-   - Steering files: structure.md + structure.ja.md
-   - Specifications: requirements.md + requirements.ja.md
-   - Design docs: design.md + design.ja.md
+3. **Documentation Language** - All agents generate English documents; bilingual output
+   (e.g. `requirements.md` + `requirements.ja.md`) is optional — see [BILINGUAL-IMPLEMENTATION.md](BILINGUAL-IMPLEMENTATION.md)
 
 4. **Library-First Pattern** - All agents enforce Article I
    - Features in `lib/` directory
@@ -374,7 +372,7 @@ All agents share:
 | Steering | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Constitution | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | EARS Format | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Bilingual | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Bilingual (optional) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Library-First | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Benefits

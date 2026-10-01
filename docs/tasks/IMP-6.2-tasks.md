@@ -110,7 +110,7 @@ graph TD
 **Status**: ✅ Completed
 
 **Description**: 
-Article I準拠のライブラリ構造でBase ReviewGateクラスを実装。全ReviewGateの共通インターフェースと機能を提供。
+Implement the Base ReviewGate class with an Article I-compliant library structure. Provides the common interface and functionality for all ReviewGates.
 
 **Implementation Path**: 
 - `lib/musubi-review-gate/src/base/review-gate.ts`
@@ -145,7 +145,7 @@ tests/review/gates/base-review-gate.test.ts
 **Dependencies**: T-001, T-006
 
 **Description**: 
-要件ドキュメントのレビューゲート。EARS形式検証、ステークホルダーカバレッジ、受入基準完全性をチェック。
+Review gate for requirements documents. Checks EARS format validation, stakeholder coverage, and acceptance criteria completeness.
 
 **Implementation Path**: 
 - `lib/musubi-review-gate/src/gates/requirements-review-gate.ts`
@@ -156,10 +156,10 @@ tests/review/gates/requirements-review-gate.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] EARS形式の構文チェック実行
-- [ ] ステークホルダーカバレッジ検証
-- [ ] 受入基準完全性チェック
-- [ ] レビュー結果の記録
+- [ ] Run EARS format syntax check
+- [ ] Verify stakeholder coverage
+- [ ] Check acceptance criteria completeness
+- [ ] Record review results
 - [ ] Unit tests passing with 90% coverage
 
 ---
@@ -174,7 +174,7 @@ tests/review/gates/requirements-review-gate.test.ts
 **Dependencies**: T-001, T-007
 
 **Description**: 
-設計ドキュメントのレビューゲート。C4モデル完全性、ADR存在、Constitutional Article準拠を検証。
+Review gate for design documents. Verifies C4 model completeness, ADR existence, and Constitutional Article compliance.
 
 **Implementation Path**: 
 - `lib/musubi-review-gate/src/gates/design-review-gate.ts`
@@ -185,9 +185,9 @@ tests/review/gates/design-review-gate.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] C4モデル（Context, Container, Component）完全性検証
-- [ ] ADR存在と品質チェック
-- [ ] Constitutional Articles（I, II, VII, VIII）準拠検証
+- [ ] Verify C4 model (Context, Container, Component) completeness
+- [ ] Check ADR existence and quality
+- [ ] Verify compliance with Constitutional Articles (I, II, VII, VIII)
 - [ ] Unit tests passing with 90% coverage
 
 ---
@@ -202,7 +202,7 @@ tests/review/gates/design-review-gate.test.ts
 **Dependencies**: T-001, T-008
 
 **Description**: 
-実装完了時のレビューゲート。テストカバレッジ、コード品質、トレーサビリティを検証。
+Review gate at implementation completion. Verifies test coverage, code quality, and traceability.
 
 **Implementation Path**: 
 - `lib/musubi-review-gate/src/gates/implementation-review-gate.ts`
@@ -220,9 +220,9 @@ tests/review/gates/implementation-review-gate.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] テストカバレッジ閾値（設定可能、デフォルト80%）検証
-- [ ] Lint/Type checkパス確認
-- [ ] 要件→設計→コード→テストのトレーサビリティ検証
+- [ ] Verify test coverage threshold (configurable, default 80%)
+- [ ] Confirm Lint/Type check passes
+- [ ] Verify requirements → design → code → test traceability
 - [ ] Unit tests passing with 90% coverage
 
 ---
@@ -237,7 +237,7 @@ tests/review/gates/implementation-review-gate.test.ts
 **Dependencies**: T-002, T-003, T-004
 
 **Description**: 
-レビュープロンプト（#sdd-review-*）の登録と実行を管理。
+Manages registration and execution of review prompts (#sdd-review-*).
 
 **Implementation Path**: 
 - `lib/musubi-review-gate/src/registry/prompt-registry.ts`
@@ -255,9 +255,9 @@ tests/review/registry/prompt-registry.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] 4つのレビュープロンプトが登録される
-- [ ] プロンプト実行時に適切なReviewGateがトリガー
-- [ ] レビュー結果が `storage/reviews/` に保存
+- [ ] 4 review prompts are registered
+- [ ] Appropriate ReviewGate is triggered when a prompt is executed
+- [ ] Review results are saved to `storage/reviews/`
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -271,7 +271,7 @@ tests/review/registry/prompt-registry.test.ts
 **Status**: ✅ Completed
 
 **Description**: 
-EARS（Easy Approach to Requirements Syntax）パターンの検証ロジック。
+Validation logic for EARS (Easy Approach to Requirements Syntax) patterns.
 
 **Implementation Path**: 
 - `lib/musubi-review-gate/src/checkers/ears-checker.ts`
@@ -291,9 +291,9 @@ tests/review/checkers/ears-checker.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] 5つのEARSパターンを検出
-- [ ] 不正なパターンをエラーとして報告
-- [ ] パターン別の使用統計を生成
+- [ ] Detect the 5 EARS patterns
+- [ ] Report invalid patterns as errors
+- [ ] Generate usage statistics per pattern
 - [ ] Unit tests passing with 90% coverage
 
 ---
@@ -307,7 +307,7 @@ tests/review/checkers/ears-checker.test.ts
 **Status**: ✅ Completed
 
 **Description**: 
-C4アーキテクチャモデル（Context, Container, Component）の完全性検証。
+Completeness verification of the C4 architecture model (Context, Container, Component).
 
 **Implementation Path**: 
 - `lib/musubi-review-gate/src/checkers/c4-checker.ts`
@@ -324,9 +324,9 @@ tests/review/checkers/c4-checker.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] Level 1-3の存在チェック
-- [ ] Mermaidダイアグラム構文検証
-- [ ] 欠落レベルのエラー報告
+- [ ] Check existence of Levels 1-3
+- [ ] Validate Mermaid diagram syntax
+- [ ] Report missing levels as errors
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -340,7 +340,7 @@ tests/review/checkers/c4-checker.test.ts
 **Status**: ✅ Completed
 
 **Description**: 
-テストカバレッジの検証ロジック。Jest/NYC出力のパース、閾値検証。
+Test coverage validation logic. Parses Jest/NYC output and validates thresholds.
 
 **Implementation Path**: 
 - `lib/musubi-review-gate/src/checkers/coverage-checker.ts`
@@ -360,9 +360,9 @@ tests/review/checkers/coverage-checker.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] Jest coverage JSON/LCOVのパース
-- [ ] 設定可能な閾値との比較
-- [ ] line/branch/function単位での検証
+- [ ] Parse Jest coverage JSON/LCOV
+- [ ] Compare against configurable thresholds
+- [ ] Validate per line/branch/function
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -379,7 +379,7 @@ tests/review/checkers/coverage-checker.test.ts
 **Dependencies**: T-005
 
 **Description**: 
-ワークフロー進捗の可視化ダッシュボード。ステージ表示、完了率、ブロッカー、次アクション提案。
+Dashboard visualizing workflow progress. Shows stages, completion rate, blockers, and next action suggestions.
 
 **Implementation Path**: 
 - `src/dashboard/workflow-dashboard.ts`
@@ -411,10 +411,10 @@ tests/dashboard/workflow-dashboard.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] 各機能のワークフローステージ可視化
-- [ ] 完了率（%）計算・表示
-- [ ] ブロッカー明示表示
-- [ ] 次アクション提案
+- [ ] Visualize workflow stages for each feature
+- [ ] Calculate and display completion rate (%)
+- [ ] Explicitly display blockers
+- [ ] Suggest next actions
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -428,7 +428,7 @@ tests/dashboard/workflow-dashboard.test.ts
 **Status**: ✅ Completed
 
 **Description**: 
-ステージ間遷移の記録。タイムスタンプ、承認者、ステータス。
+Records transitions between stages. Timestamp, approver, status.
 
 **Implementation Path**: 
 - `src/dashboard/transition-recorder.ts`
@@ -455,10 +455,10 @@ tests/dashboard/transition-recorder.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] ステージ遷移の自動記録
-- [ ] タイムスタンプ付与
-- [ ] 承認者（Human/AI）記録
-- [ ] 承認ステータス保存
+- [ ] Automatically record stage transitions
+- [ ] Add timestamps
+- [ ] Record approver (Human/AI)
+- [ ] Save approval status
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -472,7 +472,7 @@ tests/dashboard/transition-recorder.test.ts
 **Status**: ✅ Completed
 
 **Description**: 
-スプリント計画テンプレートの生成と管理。
+Generate and manage sprint planning templates.
 
 **Implementation Path**: 
 - `src/sprint/sprint-planner.ts`
@@ -501,11 +501,11 @@ tests/sprint/sprint-planner.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] スプリント計画テンプレート生成
-- [ ] スプリントゴール定義
-- [ ] タスク分解と要件トレース
-- [ ] 工数見積もり記録
-- [ ] 依存関係マッピング
+- [ ] Generate sprint planning template
+- [ ] Define sprint goals
+- [ ] Task breakdown and requirements tracing
+- [ ] Record effort estimates
+- [ ] Dependency mapping
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -520,16 +520,16 @@ tests/sprint/sprint-planner.test.ts
 **Dependencies**: T-011
 
 **Description**: 
-スプリント完了レポートの自動生成。
+Automatic generation of sprint completion reports.
 
 **Implementation Path**: 
 - `src/sprint/sprint-reporter.ts`
 
 **Report Contents**:
-- スプリントサマリー（計画/完了/キャリーオーバー）
-- 配信機能一覧
-- テスト結果（pass/fail/skip, coverage）
-- パフォーマンスメトリクス（velocity, defects）
+- Sprint summary (planned/completed/carry-over)
+- List of delivered features
+- Test results (pass/fail/skip, coverage)
+- Performance metrics (velocity, defects)
 - Lessons Learned
 
 **Test First (Article III)**:
@@ -538,11 +538,11 @@ tests/sprint/sprint-reporter.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] スプリント完了時のレポート自動生成
-- [ ] 配信機能一覧含む
-- [ ] テスト結果（pass/fail/skip）含む
-- [ ] パフォーマンスメトリクス含む
-- [ ] Lessons Learnedセクションあり
+- [ ] Automatically generate a report when the sprint completes
+- [ ] Include list of delivered features
+- [ ] Include test results (pass/fail/skip)
+- [ ] Include performance metrics
+- [ ] Include a Lessons Learned section
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -556,7 +556,7 @@ tests/sprint/sprint-reporter.test.ts
 **Status**: ✅ Completed
 
 **Description**: 
-コード、テスト、コミットからの要件IDパターン自動抽出。
+Automatic extraction of requirement ID patterns from code, tests, and commits.
 
 **Implementation Path**: 
 - `src/traceability/extractor.ts`
@@ -575,10 +575,10 @@ tests/traceability/extractor.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] コードコメントからREQ/IMP抽出
-- [ ] テスト記述からREQ/IMP抽出
-- [ ] コミットメッセージからREQ/IMP抽出
-- [ ] トレーサビリティマトリクスに反映
+- [ ] Extract REQ/IMP from code comments
+- [ ] Extract REQ/IMP from test descriptions
+- [ ] Extract REQ/IMP from commit messages
+- [ ] Reflect in the traceability matrix
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -593,7 +593,7 @@ tests/traceability/extractor.test.ts
 **Dependencies**: T-013
 
 **Description**: 
-実装/テストのない要件（トレーサビリティギャップ）の検出。
+Detection of requirements without implementation/tests (traceability gaps).
 
 **Implementation Path**: 
 - `src/traceability/gap-detector.ts`
@@ -601,10 +601,10 @@ tests/traceability/extractor.test.ts
 **Gap Types**:
 | Gap Type | Severity | Description |
 |----------|----------|-------------|
-| Missing Design | High | 要件に設計セクションがない |
-| Missing Code | Critical | 要件に実装コードがない |
-| Missing Test | Critical | 要件にテストがない |
-| Missing Commit | Low | 要件に関連コミットがない |
+| Missing Design | High | Requirement has no design section |
+| Missing Code | Critical | Requirement has no implementation code |
+| Missing Test | Critical | Requirement has no tests |
+| Missing Commit | Low | Requirement has no related commits |
 
 **Test First (Article III)**:
 ```bash
@@ -612,10 +612,10 @@ tests/traceability/gap-detector.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] 実装のない要件検出
-- [ ] テストのない要件検出
-- [ ] ギャップ警告表示
-- [ ] 修正アクション提案
+- [ ] Detect requirements without implementation
+- [ ] Detect requirements without tests
+- [ ] Display gap warnings
+- [ ] Suggest corrective actions
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -630,7 +630,7 @@ tests/traceability/gap-detector.test.ts
 **Dependencies**: T-013
 
 **Description**: 
-トレーサビリティマトリクスのYAML永続化（ADR-6.2-002準拠）。
+YAML persistence of the traceability matrix (compliant with ADR-6.2-002).
 
 **Implementation Path**: 
 - `src/traceability/matrix-storage.ts`
@@ -657,9 +657,9 @@ tests/traceability/matrix-storage.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] YAML形式でマトリクス保存
-- [ ] 要件→成果物のマッピング
-- [ ] 読み込み・更新・差分検出
+- [ ] Save matrix in YAML format
+- [ ] Requirements → deliverables mapping
+- [ ] Load, update, and diff detection
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -674,7 +674,7 @@ tests/traceability/matrix-storage.test.ts
 **Dependencies**: T-009
 
 **Description**: 
-ダッシュボードのCLIインターフェース（Article II準拠）。
+CLI interface for the dashboard (Article II compliant).
 
 **Implementation Path**: 
 - `bin/musubi-dash.js`
@@ -694,9 +694,9 @@ tests/cli/musubi-dash.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] `musubi dash` コマンド実装
-- [ ] ターミナル表示とJSON出力
-- [ ] 機能フィルタリング
+- [ ] Implement `musubi dash` command
+- [ ] Terminal display and JSON output
+- [ ] Feature filtering
 - [ ] Unit tests passing with 80% coverage
 
 ---
@@ -713,7 +713,7 @@ tests/cli/musubi-dash.test.ts
 **Dependencies**: T-004
 
 **Description**: 
-全9 Constitutional Articlesの自動検証。コミット/PR時にブロック。
+Automatic validation of all 9 Constitutional Articles. Blocks on commit/PR.
 
 **Implementation Path**: 
 - `src/constitution/checker.ts`
@@ -738,11 +738,11 @@ tests/constitution/checker.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] 全9 Article検証ロジック
-- [ ] コミット時チェック実行
-- [ ] PR/MRマージ前検証
-- [ ] 違反時のブロック
-- [ ] 修正方法提示
+- [ ] Validation logic for all 9 Articles
+- [ ] Run checks at commit time
+- [ ] Validation before PR/MR merge
+- [ ] Block on violations
+- [ ] Present remediation steps
 - [ ] Unit tests passing with 90% coverage
 
 ---
@@ -757,7 +757,7 @@ tests/constitution/checker.test.ts
 **Dependencies**: T-017
 
 **Description**: 
-Article VII/VIII違反検出時の自動Phase -1 Gateトリガー。
+Automatic Phase -1 Gate trigger when Article VII/VIII violations are detected.
 
 **Implementation Path**: 
 - `src/constitution/phase-minus-one-gate.ts`
@@ -775,10 +775,10 @@ tests/constitution/phase-minus-one-gate.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] Article VII/VIII違反自動検出
-- [ ] Phase -1 Gateレビュー自動トリガー
-- [ ] レビュアー通知（GitHub/GitLab連携）
-- [ ] 承認/却下ワークフロー
+- [ ] Automatically detect Article VII/VIII violations
+- [ ] Automatically trigger Phase -1 Gate review
+- [ ] Notify reviewers (GitHub/GitLab integration)
+- [ ] Approval/rejection workflow
 - [ ] Unit tests passing with 90% coverage
 
 ---
@@ -793,7 +793,7 @@ tests/constitution/phase-minus-one-gate.test.ts
 **Dependencies**: T-012
 
 **Description**: 
-テスト結果からの実験レポート自動生成。
+Automatic generation of experiment reports from test results.
 
 **Implementation Path**: 
 - `src/docs/experiment-reporter.ts`
@@ -810,10 +810,10 @@ tests/docs/experiment-reporter.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] テスト実行後にレポート自動生成
-- [ ] テストサマリー含む
-- [ ] パフォーマンスメトリクス含む
-- [ ] Observationsセクション含む
+- [ ] Automatically generate a report after test execution
+- [ ] Include test summary
+- [ ] Include performance metrics
+- [ ] Include Observations section
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -827,7 +827,7 @@ tests/docs/experiment-reporter.test.ts
 **Status**: ✅ Completed
 
 **Description**: 
-技術記事テンプレートの生成（Qiita, Zenn, Medium, Dev.to対応）。
+Generate technical article templates (supports Qiita, Zenn, Medium, Dev.to).
 
 **Implementation Path**: 
 - `src/docs/article-generator.ts`
@@ -835,9 +835,9 @@ tests/docs/experiment-reporter.test.ts
 **Platforms**:
 | Platform | Format | Special Support |
 |----------|--------|-----------------|
-| Qiita | Markdown + Qiita拡張 | タグ、組織 |
-| Zenn | Markdown + Zenn拡張 | 本/スクラップ |
-| Medium | Rich Text変換 | コードブロック最適化 |
+| Qiita | Markdown + Qiita extensions | Tags, organizations |
+| Zenn | Markdown + Zenn extensions | Books/Scraps |
+| Medium | Rich Text conversion | Code block optimization |
 | Dev.to | Markdown | Front Matter |
 
 **Test First (Article III)**:
@@ -846,10 +846,10 @@ tests/docs/article-generator.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] 技術記事テンプレート生成
-- [ ] 4プラットフォーム対応
-- [ ] コードサンプル、図表含む
-- [ ] 公開可能品質のドラフト生成
+- [ ] Generate technical article templates
+- [ ] Support 4 platforms
+- [ ] Include code samples and diagrams
+- [ ] Generate publication-quality drafts
 - [ ] Unit tests passing with 80% coverage
 
 ---
@@ -863,15 +863,15 @@ tests/docs/article-generator.test.ts
 **Status**: ✅ Completed
 
 **Description**: 
-バージョンリリース時のsteering/*.md自動更新。
+Automatic update of steering/*.md on version release.
 
 **Implementation Path**: 
 - `src/steering/syncer.ts`
 
 **Sync Targets**:
-- `steering/product.md` - バージョン、機能一覧
-- `steering/tech.md` - 技術スタック更新
-- `steering/structure.md` - 構造更新
+- `steering/product.md` - Version, feature list
+- `steering/tech.md` - Tech stack update
+- `steering/structure.md` - Structure update
 
 **Test First (Article III)**:
 ```bash
@@ -879,10 +879,10 @@ tests/steering/syncer.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] バージョンリリース時に自動更新
-- [ ] product.md/tech.md/structure.md同期
-- [ ] バージョン番号、機能一覧更新
-- [ ] 自動コミット（オプション）
+- [ ] Automatically update on version release
+- [ ] Sync product.md/tech.md/structure.md
+- [ ] Update version number and feature list
+- [ ] Automatic commit (optional)
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -896,16 +896,16 @@ tests/steering/syncer.test.ts
 **Status**: ✅ Completed
 
 **Description**: 
-steering/*.md間の整合性チェック。
+Consistency check across steering/*.md.
 
 **Implementation Path**: 
 - `src/steering/validator.ts`
 
 **Validation Rules**:
-- バージョン番号の一致
-- 機能リストの一致
-- 技術スタックの整合性
-- 構造記述の整合性
+- Version numbers match
+- Feature lists match
+- Tech stack consistency
+- Structure description consistency
 
 **Test First (Article III)**:
 ```bash
@@ -913,9 +913,9 @@ tests/steering/validator.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] steering/*.md間の整合性チェック
-- [ ] 不整合時の警告
-- [ ] 自動修正提案
+- [ ] Consistency check across steering/*.md
+- [ ] Warn on inconsistencies
+- [ ] Suggest automatic fixes
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -930,7 +930,7 @@ tests/steering/validator.test.ts
 **Dependencies**: T-014
 
 **Description**: 
-失敗ステージのリカバリーガイダンス。根本原因分析、修正手順提案。
+Recovery guidance for failed stages. Root cause analysis and fix procedure suggestions.
 
 **Implementation Path**: 
 - `src/recovery/recovery-guide.ts`
@@ -951,11 +951,11 @@ tests/recovery/recovery-guide.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] 失敗時の自動分析
-- [ ] 根本原因特定
-- [ ] 修正手順提案
-- [ ] 失敗履歴記録
-- [ ] Auto-recovery試行（Lint）
+- [ ] Automatic analysis on failure
+- [ ] Identify root cause
+- [ ] Suggest fix procedures
+- [ ] Record failure history
+- [ ] Attempt auto-recovery (Lint)
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -970,7 +970,7 @@ tests/recovery/recovery-guide.test.ts
 **Dependencies**: T-023
 
 **Description**: 
-ワークフローステージのロールバック機能（4粒度レベル）。
+Rollback functionality for workflow stages (4 granularity levels).
 
 **Implementation Path**: 
 - `src/recovery/rollback-manager.ts`
@@ -978,10 +978,10 @@ tests/recovery/recovery-guide.test.ts
 **Rollback Granularity**:
 | Level | Target | Description |
 |-------|--------|-------------|
-| File | 個別ファイル | 特定ファイルを前バージョンに |
-| Commit | Git コミット | 指定コミットまでリバート |
-| Stage | ワークフローステージ | Req/Design/Task/Impl単位 |
-| Sprint | スプリント全体 | スプリント開始時点に戻す |
+| File | Individual file | Revert a specific file to the previous version |
+| Commit | Git commit | Revert up to the specified commit |
+| Stage | Workflow stage | Per Req/Design/Task/Impl unit |
+| Sprint | Entire sprint | Return to the start of the sprint |
 
 **Test First (Article III)**:
 ```bash
@@ -989,11 +989,11 @@ tests/recovery/rollback-manager.test.ts
 ```
 
 **Acceptance Criteria**:
-- [ ] 4粒度レベルのロールバック
-- [ ] ドライラン（プレビュー）モード
-- [ ] 確認プロンプト
-- [ ] 部分変更のクリーンアップ
-- [ ] ロールバック履歴記録
+- [ ] Rollback at 4 granularity levels
+- [ ] Dry-run (preview) mode
+- [ ] Confirmation prompt
+- [ ] Clean up partial changes
+- [ ] Record rollback history
 - [ ] Unit tests passing with 85% coverage
 
 ---
@@ -1008,7 +1008,7 @@ tests/recovery/rollback-manager.test.ts
 **Dependencies**: T-001 through T-024
 
 **Description**: 
-フルレビューサイクルのE2E統合テスト。
+E2E integration tests for the full review cycle.
 
 **Implementation Path**: 
 - `tests/integration/full-review-cycle.test.ts`
@@ -1022,11 +1022,11 @@ tests/recovery/rollback-manager.test.ts
 5. Rollback scenarios
 
 **Acceptance Criteria**:
-- [ ] 完全レビューサイクルのE2Eテスト
-- [ ] Phase -1 Gate統合テスト
-- [ ] トレーサビリティ統合テスト
-- [ ] ダッシュボード統合テスト
-- [ ] ロールバック統合テスト
+- [ ] E2E test of the complete review cycle
+- [ ] Phase -1 Gate integration test
+- [ ] Traceability integration test
+- [ ] Dashboard integration test
+- [ ] Rollback integration test
 - [ ] Integration tests passing
 
 ---
@@ -1041,7 +1041,7 @@ tests/recovery/rollback-manager.test.ts
 **Dependencies**: T-005, T-025
 
 **Description**: 
-AGENTS.mdにレビュープロンプトを追加。
+Add review prompts to AGENTS.md.
 
 **Implementation Path**: 
 - `AGENTS.md`
@@ -1056,9 +1056,9 @@ AGENTS.mdにレビュープロンプトを追加。
 ```
 
 **Acceptance Criteria**:
-- [ ] 4つのレビュープロンプトがAGENTS.mdに追加
-- [ ] 各プロンプトの説明と使用例
-- [ ] 既存プロンプトとの整合性
+- [ ] Add 4 review prompts to AGENTS.md
+- [ ] Description and usage example for each prompt
+- [ ] Consistency with existing prompts
 
 ---
 

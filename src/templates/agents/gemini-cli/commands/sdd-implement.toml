@@ -18,7 +18,7 @@ Implement the feature by executing tasks in the task breakdown document, followi
 
 # Step 1: Read All Context
 
-**IMPORTANT: Read these files FIRST (English versions only):**
+**IMPORTANT: Read these files FIRST:**
 
 1. **Steering Context**:
    - `steering/structure.md` - Architecture patterns
@@ -33,8 +33,6 @@ Implement the feature by executing tasks in the task breakdown document, followi
 
 4. **Tasks**:
    - `storage/tasks/{{feature-name}}-tasks.md`
-
-**Note**: Always read English versions (.md), not Japanese translations (.ja.md)
 
 # Step 2: Task Execution Strategy
 

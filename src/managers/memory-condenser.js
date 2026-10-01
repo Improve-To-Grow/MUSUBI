@@ -1,7 +1,7 @@
 /**
  * MUSUBI Memory Condenser
  *
- * 長いセッション履歴を圧縮してコンテキストウィンドウ内に収める
+ * Compresses long session histories so they fit within the context window
  *
  * @module src/managers/memory-condenser
  * @see REQ-P0-B004
@@ -9,17 +9,17 @@
  */
 
 /**
- * コンデンサータイプ
+ * Condenser types
  */
 const CondenserType = {
-  LLM: 'llm', // LLMで要約
-  RECENT: 'recent', // 最新N件を保持
-  AMORTIZED: 'amortized', // 分割統治方式
-  NOOP: 'noop', // 圧縮なし
+  LLM: 'llm', // Summarize with an LLM
+  RECENT: 'recent', // Keep the most recent N events
+  AMORTIZED: 'amortized', // Divide-and-conquer approach
+  NOOP: 'noop', // No compression
 };
 
 /**
- * イベントタイプ
+ * Event types
  */
 const MemoryEventType = {
   USER_MESSAGE: 'user_message',
@@ -31,14 +31,14 @@ const MemoryEventType = {
 };
 
 /**
- * メモリイベント
+ * Memory event
  */
 class MemoryEvent {
   /**
    * @param {Object} options
-   * @param {string} options.type - イベントタイプ
-   * @param {string} options.content - 内容
-   * @param {Object} options.metadata - メタデータ
+   * @param {string} options.type - Event type
+   * @param {string} options.content - Content
+   * @param {Object} options.metadata - Metadata
    */
   constructor(options = {}) {
     this.id = options.id || `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -50,16 +50,16 @@ class MemoryEvent {
   }
 
   /**
-   * トークン数を推定（簡易版）
+   * Estimate the token count (simplified)
    * @returns {number}
    */
   _estimateTokens() {
-    // 簡易推定: 4文字 ≈ 1トークン
+    // Rough estimate: 4 characters ≈ 1 token
     return Math.ceil(this.content.length / 4);
   }
 
   /**
-   * 要約イベントを作成
+   * Create a summary event
    * @param {string} summary
    * @param {MemoryEvent[]} originalEvents
    * @returns {MemoryEvent}
@@ -89,12 +89,12 @@ class MemoryEvent {
 }
 
 /**
- * 圧縮結果
+ * Condensation result
  */
 class CondensedView {
   /**
-   * @param {MemoryEvent[]} events - 圧縮後のイベント
-   * @param {Object} stats - 統計情報
+   * @param {MemoryEvent[]} events - Events after condensation
+   * @param {Object} stats - Statistics
    */
   constructor(events, stats = {}) {
     this.events = events;
@@ -108,7 +108,7 @@ class CondensedView {
   }
 
   /**
-   * プロンプト用にフォーマット
+   * Format for use in a prompt
    * @returns {string}
    */
   toPrompt() {
@@ -124,7 +124,7 @@ class CondensedView {
 }
 
 /**
- * 基底コンデンサー
+ * Base condenser
  */
 class BaseCondenser {
   /**
@@ -141,7 +141,7 @@ class BaseCondenser {
   }
 
   /**
-   * イベントを圧縮
+   * Condense events
    * @param {MemoryEvent[]} events
    * @returns {Promise<CondensedView>}
    */
@@ -150,23 +150,23 @@ class BaseCondenser {
   }
 
   /**
-   * 保持すべきイベントかチェック
+   * Check whether an event should be kept
    * @param {MemoryEvent} event
    * @returns {boolean}
    */
   shouldPreserve(event) {
-    // 要約イベントは常に保持
+    // Always keep summary events
     if (event.type === MemoryEventType.SUMMARY) {
       return true;
     }
 
-    // パターンマッチング
+    // Pattern matching
     return this.preservePatterns.some(pattern => event.content.includes(pattern));
   }
 }
 
 /**
- * Noopコンデンサー（圧縮なし）
+ * Noop condenser (no compression)
  */
 class NoopCondenser extends BaseCondenser {
   async condense(events) {
@@ -177,13 +177,13 @@ class NoopCondenser extends BaseCondenser {
 }
 
 /**
- * 最新N件コンデンサー
+ * Recent-N condenser
  */
 class RecentEventsCondenser extends BaseCondenser {
   /**
    * @param {Object} options
-   * @param {number} options.keepFirst - 最初のN件を保持
-   * @param {number} options.keepRecent - 最新のN件を保持
+   * @param {number} options.keepFirst - Keep the first N events
+   * @param {number} options.keepRecent - Keep the most recent N events
    */
   constructor(options = {}) {
     super(options);
@@ -201,11 +201,11 @@ class RecentEventsCondenser extends BaseCondenser {
     const firstEvents = events.slice(0, this.keepFirst);
     const recentEvents = events.slice(-this.keepRecent);
 
-    // 中間イベントから保持すべきものを抽出
+    // Extract the middle events that must be kept
     const middleEvents = events.slice(this.keepFirst, -this.keepRecent);
     const preservedMiddle = middleEvents.filter(e => this.shouldPreserve(e));
 
-    // 省略された数を示すサマリー
+    // Summary indicating how many events were omitted
     const omittedCount = middleEvents.length - preservedMiddle.length;
     const summaryEvent = MemoryEvent.createSummary(
       `[${omittedCount} messages omitted for brevity]`,
@@ -221,14 +221,14 @@ class RecentEventsCondenser extends BaseCondenser {
 }
 
 /**
- * LLMコンデンサー
+ * LLM condenser
  */
 class LLMCondenser extends BaseCondenser {
   /**
    * @param {Object} options
-   * @param {number} options.maxTokens - 最大トークン数
-   * @param {number} options.keepFirst - 最初のN件を保持
-   * @param {Function} options.summarizer - 要約関数 (events) => Promise<string>
+   * @param {number} options.maxTokens - Maximum number of tokens
+   * @param {number} options.keepFirst - Keep the first N events
+   * @param {Function} options.summarizer - Summarizer function (events) => Promise<string>
    */
   constructor(options = {}) {
     super(options);
@@ -247,15 +247,15 @@ class LLMCondenser extends BaseCondenser {
       });
     }
 
-    // 最初のイベントは保持
+    // Keep the first events
     const preserved = events.slice(0, this.keepFirst);
     let remaining = events.slice(this.keepFirst);
 
-    // 重要なイベントを抽出
+    // Extract important events
     const importantEvents = remaining.filter(e => this.shouldPreserve(e));
     const regularEvents = remaining.filter(e => !this.shouldPreserve(e));
 
-    // 通常イベントをチャンク化して要約
+    // Chunk and summarize regular events
     const chunks = this._chunkEvents(regularEvents);
     const summaries = [];
 
@@ -274,7 +274,7 @@ class LLMCondenser extends BaseCondenser {
   }
 
   /**
-   * イベントをチャンク化
+   * Split events into chunks
    * @param {MemoryEvent[]} events
    * @returns {MemoryEvent[][]}
    */
@@ -287,7 +287,7 @@ class LLMCondenser extends BaseCondenser {
   }
 
   /**
-   * デフォルト要約関数（LLM未使用、簡易版）
+   * Default summarizer (simplified, no LLM)
    * @param {MemoryEvent[]} events
    * @returns {Promise<string>}
    */
@@ -306,14 +306,14 @@ class LLMCondenser extends BaseCondenser {
 }
 
 /**
- * 分割統治コンデンサー（Amortized）
+ * Divide-and-conquer condenser (Amortized)
  */
 class AmortizedCondenser extends BaseCondenser {
   /**
    * @param {Object} options
-   * @param {number} options.maxSize - 最大イベント数
-   * @param {number} options.targetSize - 目標イベント数
-   * @param {Function} options.summarizer - 要約関数
+   * @param {number} options.maxSize - Maximum number of events
+   * @param {number} options.targetSize - Target number of events
+   * @param {Function} options.summarizer - Summarizer function
    */
   constructor(options = {}) {
     super(options);
@@ -329,19 +329,19 @@ class AmortizedCondenser extends BaseCondenser {
       });
     }
 
-    // ユーザーメッセージの位置を特定（境界として使用）
+    // Locate user messages (used as boundaries)
     const userMessageIndices = events
       .map((e, i) => (e.type === MemoryEventType.USER_MESSAGE ? i : -1))
       .filter(i => i !== -1);
 
-    // 最初と最新のユーザーメッセージ周辺は保持
+    // Keep the events around the first and the latest user messages
     const preserveStart = userMessageIndices[0] !== undefined ? userMessageIndices[0] : 0;
     const preserveEnd =
       userMessageIndices.length > 1
         ? userMessageIndices[userMessageIndices.length - 1]
         : events.length;
 
-    // 圧縮対象を特定
+    // Determine which events to condense
     const toCondense = events.slice(preserveStart + 1, preserveEnd);
     const condensedCount = events.length - this.targetSize;
 
@@ -351,7 +351,7 @@ class AmortizedCondenser extends BaseCondenser {
       });
     }
 
-    // 要約を作成
+    // Create the summary
     const summaryText = await this.summarizer(toCondense.slice(0, condensedCount));
     const summaryEvent = MemoryEvent.createSummary(
       summaryText,
@@ -376,13 +376,13 @@ class AmortizedCondenser extends BaseCondenser {
 }
 
 /**
- * メモリコンデンサーファクトリー
+ * Memory condenser factory
  */
 class MemoryCondenser {
   /**
-   * コンデンサーを作成
+   * Create a condenser
    * @param {Object} options
-   * @param {string} options.type - コンデンサータイプ
+   * @param {string} options.type - Condenser type
    * @returns {BaseCondenser}
    */
   static create(options = {}) {
@@ -403,8 +403,8 @@ class MemoryCondenser {
   }
 
   /**
-   * 設定ファイルからコンデンサーを作成
-   * @param {Object} config - project.yml の condenser セクション
+   * Create a condenser from a configuration file
+   * @param {Object} config - The condenser section of project.yml
    * @returns {BaseCondenser}
    */
   static fromConfig(config = {}) {

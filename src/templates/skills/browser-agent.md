@@ -1,119 +1,119 @@
 ---
 name: browser-agent
-description: ブラウザ自動化エージェント - 自然言語でブラウザを操作し、スクリーンショットを取得・比較、E2Eテストを生成
+description: Browser automation agent - operate the browser in natural language, capture and compare screenshots, and generate E2E tests
 version: 1.0.0
 category: testing
 platform: claude-code
 ---
 
-# Browser Agent スキル
+# Browser Agent Skill
 
-自然言語コマンドでブラウザを操作し、スクリーンショット取得・比較、E2E テストコード生成を行うエージェントです。
+An agent that operates the browser with natural language commands, captures and compares screenshots, and generates E2E test code.
 
-## 機能
+## Features
 
-1. **ブラウザ操作**: 日本語/英語の自然言語でブラウザを操作
-2. **スクリーンショット**: 画面を自動キャプチャ・保存
-3. **AI比較**: 期待画面と実際の画面を Vision AI で比較
-4. **テスト生成**: 操作履歴から Playwright テストコードを自動生成
-5. **MUSUBI連携**: EARS 仕様からブラウザテストを生成
+1. **Browser operation**: Operate the browser with natural-language commands in English
+2. **Screenshots**: Automatically capture and save screens
+3. **AI comparison**: Compare the expected screen with the actual screen using Vision AI
+4. **Test generation**: Auto-generate Playwright test code from the action history
+5. **MUSUBI integration**: Generate browser tests from EARS specifications
 
-## 使用方法
+## Usage
 
-### インタラクティブモード
+### Interactive Mode
 
 ```bash
 npx musubi browser
 ```
 
-ブラウザを起動し、自然言語コマンドを受け付けます。
+Launches the browser and accepts natural language commands.
 
-### 単一コマンド実行
+### Single Command Execution
 
 ```bash
-npx musubi browser run "https://example.com を開いてログインボタンをクリック"
+npx musubi browser run "Open https://example.com and click the login button"
 ```
 
-### スクリプト実行
+### Script Execution
 
 ```bash
 npx musubi browser script ./test-script.txt
 ```
 
-### スクリーンショット比較
+### Screenshot Comparison
 
 ```bash
 npx musubi browser compare expected.png actual.png --threshold 0.95
 ```
 
-### テスト生成
+### Test Generation
 
 ```bash
 npx musubi browser generate-test --history actions.json --output tests/e2e/login.spec.ts
 ```
 
-## サポートするコマンド
+## Supported Commands
 
-### ナビゲーション
+### Navigation
 
-- `https://example.com を開く`
+- `Open https://example.com`
 - `go to https://example.com`
-- `ログインページにアクセス`
+- `Go to the login page`
 
-### クリック
+### Click
 
-- `ログインボタンをクリック`
+- `Click the login button`
 - `click login button`
-- `送信ボタンを押す`
+- `Press the submit button`
 
-### 入力
+### Input
 
-- `メール欄に「test@example.com」と入力`
+- `Enter "test@example.com" in the email field`
 - `type "hello" in email field`
-- `パスワードに "secret" を入力`
+- `Enter "secret" in the password field`
 
-### 待機
+### Wait
 
-- `3秒待つ`
+- `Wait 3 seconds`
 - `wait 5 seconds`
-- `ローディングが消えるまで待つ`
+- `Wait until loading disappears`
 
-### スクリーンショット
+### Screenshot
 
-- `スクリーンショットを取る`
-- `画面を「login-page」として保存`
+- `Take a screenshot`
+- `Save the screen as "login-page"`
 - `take screenshot`
 
-### 検証
+### Verification
 
-- `「ログイン成功」が表示される`
+- `"Login successful" is displayed`
 - `verify "Welcome" is visible`
-- `ダッシュボードが表示されること`
+- `The dashboard should be displayed`
 
-## セッションコマンド（インタラクティブモード）
+## Session Commands (Interactive Mode)
 
-| コマンド              | 説明                             |
+| Command              | Description                             |
 | --------------------- | -------------------------------- |
-| `history`             | アクション履歴を表示             |
-| `clear`               | 履歴をクリア                     |
-| `save-test <file>`    | 履歴から Playwright テストを保存 |
-| `exit` / `quit` / `q` | ブラウザを閉じて終了             |
-| `help` / `?`          | ヘルプを表示                     |
+| `history`             | Show action history             |
+| `clear`               | Clear history                     |
+| `save-test <file>`    | Save a Playwright test from history |
+| `exit` / `quit` / `q` | Close the browser and exit             |
+| `help` / `?`          | Show help                     |
 
-## オプション
+## Options
 
-| オプション      | 説明                     | デフォルト      |
+| Option      | Description                     | Default      |
 | --------------- | ------------------------ | --------------- |
-| `--headless`    | ヘッドレスモードで実行   | `true`          |
-| `--no-headless` | ブラウザを表示           | -               |
-| `-b, --browser` | ブラウザ種類             | `chromium`      |
-| `-o, --output`  | スクリーンショット保存先 | `./screenshots` |
-| `-t, --timeout` | タイムアウト（ms）       | `30000`         |
-| `--threshold`   | 類似度閾値               | `0.95`          |
+| `--headless`    | Run in headless mode   | `true`          |
+| `--no-headless` | Show the browser           | -               |
+| `-b, --browser` | Browser type             | `chromium`      |
+| `-o, --output`  | Screenshot output location | `./screenshots` |
+| `-t, --timeout` | Timeout (ms)       | `30000`         |
+| `--threshold`   | Similarity threshold               | `0.95`          |
 
-## MUSUBI 仕様連携
+## MUSUBI Specification Integration
 
-EARS 形式の仕様からブラウザテストを生成できます：
+Browser tests can be generated from specifications in EARS format:
 
 ```markdown
 ## Requirements
@@ -124,7 +124,7 @@ WHEN the user clicks the login button with valid credentials,
 the system SHALL display the dashboard page.
 ```
 
-↓ 生成されるテスト
+↓ Generated test
 
 ```javascript
 test('REQ-001: User Login', async ({ page }) => {
@@ -147,8 +147,8 @@ const agent = new BrowserAgent({
 });
 
 await agent.launch();
-await agent.execute('https://example.com を開く');
-await agent.execute('ログインボタンをクリック');
+await agent.execute('Open https://example.com');
+await agent.execute('Click the login button');
 
 const testCode = await agent.generateTest({
   name: 'Login Test',
@@ -158,12 +158,12 @@ const testCode = await agent.generateTest({
 await agent.close();
 ```
 
-## 要件
+## Requirements
 
 - Node.js 18+
-- Playwright（自動インストール）
+- Playwright (auto-install)
 
-## 関連
+## Related
 
 - [Playwright Documentation](https://playwright.dev/)
 - [MUSUBI SDD](https://github.com/nahisaho/MUSUBI)

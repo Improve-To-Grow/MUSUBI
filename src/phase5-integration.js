@@ -1,6 +1,6 @@
 /**
  * Phase 5 Integration Module
- * Advanced Features統合エンジン
+ * Advanced features integration engine
  *
  * @module phase5-integration
  */

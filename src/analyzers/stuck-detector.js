@@ -1,7 +1,7 @@
 /**
  * MUSUBI Stuck Detector
  *
- * AIエージェントのスタック状態（無限ループ、繰り返しエラー）を検出
+ * Detects stuck states of AI agents (infinite loops, repeated errors)
  *
  * @module src/analyzers/stuck-detector
  * @see REQ-P0-B001
@@ -11,7 +11,7 @@
 const crypto = require('crypto');
 
 /**
- * スタックイベントの種類
+ * Stuck event types
  */
 const EventType = {
   ACTION: 'action',
@@ -21,7 +21,7 @@ const EventType = {
 };
 
 /**
- * SDDステージ
+ * SDD stages
  */
 const Stage = {
   REQUIREMENTS: 'requirements',
@@ -32,7 +32,7 @@ const Stage = {
 };
 
 /**
- * スタックの種類
+ * Stuck (loop) types
  */
 const LoopType = {
   REPEATING_ACTION: 'repeating_action',
@@ -43,7 +43,7 @@ const LoopType = {
 };
 
 /**
- * 深刻度
+ * Severity levels
  */
 const Severity = {
   WARNING: 'warning',
@@ -51,7 +51,7 @@ const Severity = {
 };
 
 /**
- * イベントのハッシュを生成
+ * Generate a hash for an event
  * @param {Object} event
  * @returns {string}
  */
@@ -65,16 +65,16 @@ function hashEvent(event) {
 }
 
 /**
- * スタック分析結果
+ * Stuck analysis result
  */
 class StuckAnalysis {
   /**
    * @param {Object} options
-   * @param {string} options.loopType - スタックの種類
-   * @param {number} options.loopRepeatTimes - 繰り返し回数
-   * @param {number} options.loopStartIndex - ループ開始インデックス
-   * @param {string[]} options.suggestedActions - 推奨アクション
-   * @param {string} options.severity - 深刻度
+   * @param {string} options.loopType - Stuck (loop) type
+   * @param {number} options.loopRepeatTimes - Number of repetitions
+   * @param {number} options.loopStartIndex - Index where the loop starts
+   * @param {string[]} options.suggestedActions - Suggested actions
+   * @param {string} options.severity - Severity
    */
   constructor(options = {}) {
     this.loopType = options.loopType;
@@ -86,18 +86,18 @@ class StuckAnalysis {
   }
 
   /**
-   * 人間が読める形式のメッセージを生成
+   * Generate a human-readable message
    * @returns {string}
    */
   getMessage() {
     const typeMessages = {
-      [LoopType.REPEATING_ACTION]: `同じアクションが${this.loopRepeatTimes}回繰り返されています`,
-      [LoopType.ERROR_LOOP]: `同じエラーが${this.loopRepeatTimes}回繰り返されています`,
-      [LoopType.MONOLOGUE]: `出力なしの思考が${this.loopRepeatTimes}ステップ続いています`,
-      [LoopType.CONTEXT_OVERFLOW]: `コンテキスト超過エラーが${this.loopRepeatTimes}回発生しています`,
-      [LoopType.STAGE_OSCILLATION]: `同一ステージ間を${this.loopRepeatTimes}回往復しています`,
+      [LoopType.REPEATING_ACTION]: `The same action has been repeated ${this.loopRepeatTimes} times`,
+      [LoopType.ERROR_LOOP]: `The same error has been repeated ${this.loopRepeatTimes} times`,
+      [LoopType.MONOLOGUE]: `Reasoning without output has continued for ${this.loopRepeatTimes} steps`,
+      [LoopType.CONTEXT_OVERFLOW]: `Context overflow errors have occurred ${this.loopRepeatTimes} times`,
+      [LoopType.STAGE_OSCILLATION]: `Oscillated between the same stages ${this.loopRepeatTimes} times`,
     };
-    return typeMessages[this.loopType] || 'スタック状態が検出されました';
+    return typeMessages[this.loopType] || 'A stuck state was detected';
   }
 
   toJSON() {
@@ -114,16 +114,16 @@ class StuckAnalysis {
 }
 
 /**
- * スタック検出システム
+ * Stuck detection system
  */
 class StuckDetector {
   /**
    * @param {Object} options
-   * @param {number} options.maxRepeatActions - アクション繰り返し検出閾値（デフォルト: 4）
-   * @param {number} options.maxRepeatErrors - エラー繰り返し検出閾値（デフォルト: 3）
-   * @param {number} options.maxMonologueSteps - モノローグ検出閾値（デフォルト: 10）
-   * @param {number} options.maxContextErrors - コンテキスト超過検出閾値（デフォルト: 3）
-   * @param {number} options.maxStageOscillations - ステージ往復検出閾値（デフォルト: 3）
+   * @param {number} options.maxRepeatActions - Threshold for repeated actions (default: 4)
+   * @param {number} options.maxRepeatErrors - Threshold for repeated errors (default: 3)
+   * @param {number} options.maxMonologueSteps - Threshold for monologue detection (default: 10)
+   * @param {number} options.maxContextErrors - Threshold for context overflow errors (default: 3)
+   * @param {number} options.maxStageOscillations - Threshold for stage oscillations (default: 3)
    */
   constructor(options = {}) {
     this.maxRepeatActions = options.maxRepeatActions || 4;
@@ -137,11 +137,11 @@ class StuckDetector {
   }
 
   /**
-   * イベントを履歴に追加
+   * Add an event to the history
    * @param {Object} event
-   * @param {string} event.type - イベント種類
-   * @param {string} event.stage - SDDステージ
-   * @param {string} event.content - 内容
+   * @param {string} event.type - Event type
+   * @param {string} event.stage - SDD stage
+   * @param {string} event.content - Content
    */
   addEvent(event) {
     const eventWithMeta = {
@@ -157,7 +157,7 @@ class StuckDetector {
   }
 
   /**
-   * 履歴をクリア
+   * Clear the history
    */
   clearHistory() {
     this.history = [];
@@ -165,44 +165,44 @@ class StuckDetector {
   }
 
   /**
-   * スタック状態を検出
+   * Detect a stuck state
    * @returns {StuckAnalysis|null}
    */
   detect() {
-    // 最低3イベント必要
+    // At least 3 events are required
     if (this.history.length < 3) {
       return null;
     }
 
-    // シナリオ1: 同じアクション・同じ結果の繰り返し
+    // Scenario 1: same action with the same result, repeated
     const repeatingAction = this._detectRepeatingAction();
     if (repeatingAction) {
       this.stuckAnalysis = repeatingAction;
       return repeatingAction;
     }
 
-    // シナリオ2: エラーループ
+    // Scenario 2: error loop
     const errorLoop = this._detectErrorLoop();
     if (errorLoop) {
       this.stuckAnalysis = errorLoop;
       return errorLoop;
     }
 
-    // シナリオ3: モノローグ
+    // Scenario 3: monologue
     const monologue = this._detectMonologue();
     if (monologue) {
       this.stuckAnalysis = monologue;
       return monologue;
     }
 
-    // シナリオ4: コンテキスト超過ループ
+    // Scenario 4: context overflow loop
     const contextOverflow = this._detectContextOverflow();
     if (contextOverflow) {
       this.stuckAnalysis = contextOverflow;
       return contextOverflow;
     }
 
-    // シナリオ5: ステージ往復
+    // Scenario 5: stage oscillation
     const stageOscillation = this._detectStageOscillation();
     if (stageOscillation) {
       this.stuckAnalysis = stageOscillation;
@@ -214,7 +214,7 @@ class StuckDetector {
   }
 
   /**
-   * シナリオ1: 同じアクション・同じ結果の繰り返しを検出
+   * Scenario 1: detect the same action with the same result, repeated
    * @private
    * @returns {StuckAnalysis|null}
    */
@@ -241,7 +241,7 @@ class StuckDetector {
   }
 
   /**
-   * シナリオ2: エラーループを検出
+   * Scenario 2: detect an error loop
    * @private
    * @returns {StuckAnalysis|null}
    */
@@ -272,7 +272,7 @@ class StuckDetector {
   }
 
   /**
-   * シナリオ3: モノローグ（出力なしの思考継続）を検出
+   * Scenario 3: detect a monologue (continued reasoning without output)
    * @private
    * @returns {StuckAnalysis|null}
    */
@@ -285,8 +285,8 @@ class StuckDetector {
     const allMessages = lastN.every(
       e =>
         e.type === EventType.MESSAGE &&
-        !e.content.includes('```') && // コードブロックなし
-        e.content.length < 500 // 短いメッセージ
+        !e.content.includes('```') && // no code block
+        e.content.length < 500 // short message
     );
 
     if (allMessages) {
@@ -303,7 +303,7 @@ class StuckDetector {
   }
 
   /**
-   * シナリオ4: コンテキスト超過ループを検出
+   * Scenario 4: detect a context overflow loop
    * @private
    * @returns {StuckAnalysis|null}
    */
@@ -343,7 +343,7 @@ class StuckDetector {
   }
 
   /**
-   * シナリオ5: ステージ往復を検出
+   * Scenario 5: detect stage oscillation
    * @private
    * @returns {StuckAnalysis|null}
    */
@@ -356,13 +356,13 @@ class StuckDetector {
     const lastN = this.history.slice(-minEvents);
     const stages = lastN.map(e => e.stage);
 
-    // 2つのステージ間を往復しているかチェック
+    // Check whether it oscillates between two stages
     const uniqueStages = [...new Set(stages)];
     if (uniqueStages.length !== 2) {
       return null;
     }
 
-    // 交互パターンのチェック
+    // Check for an alternating pattern
     let oscillations = 0;
     for (let i = 1; i < stages.length; i++) {
       if (stages[i] !== stages[i - 1]) {
@@ -384,49 +384,49 @@ class StuckDetector {
   }
 
   /**
-   * 代替アプローチを提案
+   * Suggest alternative approaches
    * @param {string} loopType
    * @returns {string[]}
    */
   _suggestAlternatives(loopType) {
     const suggestions = {
       [LoopType.REPEATING_ACTION]: [
-        '別のアプローチを試してください',
-        '要件を再確認してください',
-        '問題を小さなステップに分解してください',
-        '一時的に別のタスクに取り組んでください',
+        'Try a different approach',
+        'Re-check the requirements',
+        'Break the problem down into smaller steps',
+        'Temporarily work on a different task',
       ],
       [LoopType.ERROR_LOOP]: [
-        'エラーメッセージを詳しく確認してください',
-        '依存関係を確認してください',
-        '環境設定を見直してください',
-        'デバッグ情報を追加してください',
+        'Examine the error message in detail',
+        'Check the dependencies',
+        'Review the environment configuration',
+        'Add debugging information',
       ],
       [LoopType.MONOLOGUE]: [
-        '具体的なアクションを実行してください',
-        'コードを書いてください',
-        'テストを実行してください',
-        'ユーザーに質問してください',
+        'Take a concrete action',
+        'Write code',
+        'Run the tests',
+        'Ask the user a question',
       ],
       [LoopType.CONTEXT_OVERFLOW]: [
-        'メモリコンデンサーを有効にしてください',
-        '不要なコンテキストを削除してください',
-        'セッションを分割してください',
-        '要約を生成してください',
+        'Enable the memory condenser',
+        'Remove unnecessary context',
+        'Split the session',
+        'Generate a summary',
       ],
       [LoopType.STAGE_OSCILLATION]: [
-        '現在のステージを完了させてください',
-        '受入基準を明確にしてください',
-        'ステージの完了条件を確認してください',
-        'ブロッカーを特定してください',
+        'Complete the current stage',
+        'Clarify the acceptance criteria',
+        'Check the stage completion criteria',
+        'Identify the blockers',
       ],
     };
 
-    return suggestions[loopType] || ['状態を確認してください'];
+    return suggestions[loopType] || ['Check the current state'];
   }
 
   /**
-   * 現在の分析結果を取得
+   * Get the current analysis result
    * @returns {StuckAnalysis|null}
    */
   getAnalysis() {
@@ -434,7 +434,7 @@ class StuckDetector {
   }
 
   /**
-   * 履歴を取得
+   * Get the history
    * @returns {Object[]}
    */
   getHistory() {
@@ -442,7 +442,7 @@ class StuckDetector {
   }
 
   /**
-   * 履歴をMarkdown形式でエクスポート
+   * Export the history as Markdown
    * @returns {string}
    */
   exportHistory() {

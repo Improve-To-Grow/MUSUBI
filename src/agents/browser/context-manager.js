@@ -38,8 +38,8 @@ class ContextManager {
     const context = await this.browser.newContext({
       viewport: options.viewport || { width: 1280, height: 720 },
       userAgent: options.userAgent,
-      locale: options.locale || 'ja-JP',
-      timezoneId: options.timezoneId || 'Asia/Tokyo',
+      locale: options.locale || 'en-US',
+      timezoneId: options.timezoneId || 'UTC',
       ...options,
     });
 
