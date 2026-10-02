@@ -1,6 +1,6 @@
-# MUSUBI - musubi
+# MUSUBI - MUSUBI
 
-A software project using MUSUBI SDD
+MUSUBI self-maintanance project
 
 ## Initialized with MUSUBI SDD for Claude Code
 
@@ -36,5 +36,5 @@ Check `.claude/skills/` directory for all installed skills.
 ---
 
 **Agent**: Claude Code
-**Initialized**: 2025-12-08
+**Initialized**: 2026-10-02
 **MUSUBI Version**: 0.1.0

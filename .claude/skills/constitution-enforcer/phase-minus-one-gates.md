@@ -39,6 +39,7 @@ Implementation Begins
 **Purpose**: Ensure project memory is consulted before work begins.
 
 **Validation**:
+
 ```bash
 # Check if steering files exist
 required_files=(
@@ -58,6 +59,7 @@ PASS "Steering files exist and will be consulted"
 ```
 
 **Pass Criteria**:
+
 - [ ] `steering/structure.md` exists (VI-1)
 - [ ] `steering/tech.md` exists (VI-2)
 - [ ] `steering/product.md` exists (VI-3)
@@ -73,6 +75,7 @@ PASS "Steering files exist and will be consulted"
 **Purpose**: Ensure requirements use EARS format.
 
 **Validation**:
+
 ```python
 def validate_ears_format(requirements_file):
     """
@@ -85,20 +88,21 @@ def validate_ears_format(requirements_file):
         r"IF .+ THEN .+ (SHALL|MUST)",     # Conditional
         r"The system (SHALL|MUST)",        # Ubiquitous
     ]
-    
+
     invalid_keywords = ["should", "may", "could", "might"]
-    
+
     for line in requirements_file:
         if any(kw in line.lower() for kw in invalid_keywords):
             FAIL(f"IV-2: Ambiguous keyword found: {line}")
-        
+
         if "REQ-" in line and not any(re.match(p, line) for p in valid_patterns):
             WARN(f"IV-1: Requirement may not follow EARS: {line}")
-    
+
     PASS("All requirements follow EARS format")
 ```
 
 **Pass Criteria**:
+
 - [ ] All requirements use SHALL/MUST (not should/may), with a single interpretation (IV-2)
 - [ ] Requirements follow one of the 5 EARS patterns (IV-1)
 - [ ] Each requirement has acceptance criteria (IV-3)
@@ -114,6 +118,7 @@ def validate_ears_format(requirements_file):
 **Purpose**: Ensure feature logic lives in core modules that are tested without the UI, server or CLI. The project profile decides what a core module is.
 
 **Validation**:
+
 ```bash
 # Read the profile and core paths from steering/project.yml
 # (default profile: library, P-2; default core paths for library/cli: lib/ packages/, P-3)
@@ -149,6 +154,7 @@ PASS "Testable-Core principle satisfied"
 ```
 
 **Pass Criteria**:
+
 - [ ] Feature logic targets a core path (I-1)
 - [ ] Core module will have tests that run without the app, a browser or a CLI (I-2)
 - [ ] Core module does not import from delivery paths (I-3)
@@ -167,6 +173,7 @@ PASS "Testable-Core principle satisfied"
 **Purpose**: Confirm tests will be written before implementation.
 
 **Validation**:
+
 ```bash
 # This is a confirmation gate - agent must commit to test-first
 echo "TEST-FIRST CONFIRMATION REQUIRED"
@@ -186,6 +193,7 @@ PASS "Test-First commitment confirmed"
 ```
 
 **Pass Criteria**:
+
 - [ ] Agent confirms test-first commitment (III-1)
 - [ ] Test file paths identified
 - [ ] A test planned for every EARS requirement (III-5)
@@ -201,28 +209,30 @@ PASS "Test-First commitment confirmed"
 **Purpose**: Ensure traceability chain is established.
 
 **Validation**:
+
 ```python
 def validate_traceability_setup(feature_name):
     """
     Verify traceability chain is ready.
     """
     required_artifacts = {
-        "requirements": f"storage/specs/{feature_name}-requirements.md",
-        "design": f"storage/design/{feature_name}-design.md",
-        "tasks": f"storage/tasks/{feature_name}-tasks.md",
+        "requirements": f"storage/specs/{feature_name}/requirements.md",
+        "design": f"storage/specs/{feature_name}/design.md",
+        "tasks": f"storage/specs/{feature_name}/tasks.md",
     }
-    
+
     for artifact, path in required_artifacts.items():
         if artifact == "requirements":
             # Requirements MUST exist before design
             if not os.path.exists(path):
                 FAIL(f"Requirements must exist before implementation: {path}")
-    
+
     # Confirm traceability matrix will be maintained
     PASS("Traceability setup confirmed")
 ```
 
 **Pass Criteria**:
+
 - [ ] Requirements file exists or will be created first
 - [ ] Design will reference requirements and include a coverage matrix (V-1, V-5)
 - [ ] Tasks will map to requirements (V-6)
@@ -241,6 +251,7 @@ def validate_traceability_setup(feature_name):
 **Not gated**: The code-size limits of Article VII (VII-4–VII-6: lines of code per file and per function, imports per file) do not decide this gate. They are checked at the article's level (CONST-007), not gated.
 
 **Validation**:
+
 ```markdown
 ## Simplicity Checklist
 
@@ -258,6 +269,7 @@ For the proposed design, verify:
 ```
 
 **Pass Criteria**:
+
 - [ ] At most 3 projects (VII-1), or Phase -1 Gate approval for the additional projects (VII-2)
 - [ ] Each additional project justified in design.md (VII-3)
 
@@ -271,6 +283,7 @@ For the proposed design, verify:
 **Purpose**: Use framework features directly; a custom abstraction layer over a framework needs Phase -1 Gate approval.
 
 **Validation**:
+
 ```markdown
 ## Anti-Abstraction Checklist
 
@@ -291,6 +304,7 @@ For the proposed solution, verify:
 ```
 
 **Pass Criteria**:
+
 - [ ] Framework APIs used directly (VIII-1)
 - [ ] Any abstraction over a framework has Phase -1 Gate approval (VIII-2) with the analysis VIII-3 requires
 - [ ] A project-owned client that exists because the vendor SDK cannot run on the target runtime (VIII-4) has that constraint documented in design.md (VIII-5)
@@ -344,14 +358,14 @@ ALL GATES PASSED → Proceed to implementation
 
 ## Gate Results
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| 1. Steering Check | ✅ PASS | All files exist |
-| 2. EARS Validation | ✅ PASS | 5/5 requirements valid |
-| 3. Testable Core | ✅ PASS | Target: lib/auth/ |
-| 4. Test-First | ✅ PASS | Commitment confirmed |
-| 5. Traceability | ✅ PASS | Requirements exist |
-| 6. Simplicity | ✅ PASS | 2 projects (≤ 3) |
+| Gate                | Status  | Notes                   |
+| ------------------- | ------- | ----------------------- |
+| 1. Steering Check   | ✅ PASS | All files exist         |
+| 2. EARS Validation  | ✅ PASS | 5/5 requirements valid  |
+| 3. Testable Core    | ✅ PASS | Target: lib/auth/       |
+| 4. Test-First       | ✅ PASS | Commitment confirmed    |
+| 5. Traceability     | ✅ PASS | Requirements exist      |
+| 6. Simplicity       | ✅ PASS | 2 projects (≤ 3)        |
 | 7. Anti-Abstraction | ✅ PASS | Framework used directly |
 
 ## Overall Result: ✅ PASS
@@ -359,6 +373,7 @@ ALL GATES PASSED → Proceed to implementation
 Implementation may proceed.
 
 ## Next Steps
+
 1. Write tests (test-engineer)
 2. Implement code (software-developer)
 3. Review (code-reviewer)
@@ -369,23 +384,28 @@ Implementation may proceed.
 ## Gate Failure Escalation
 
 ### Automatic Remediation
+
 - Gate 1: Auto-run steering skill
 - Gate 2: Auto-run requirements-analyst
 - Gate 5: Auto-create requirements template
 
 ### Manual Intervention Required
+
 - Gate 3: Requires architectural decision
 - Gate 4: Requires developer commitment
 - Gate 6: Requires fewer projects or a Phase -1 Gate request
 - Gate 7: Requires removing the wrapper or a Phase -1 Gate request
 
 ### Blocking Gates
+
 - Gate 4 (Test-First): MUST pass - no exceptions
 - Gate 2 (EARS): Blocks when EARS is required for the workflow mode (`ears_required`, medium and large by default); Article IV itself is advisory (CONST-004)
 
 ### Waivable Gates (with justification)
+
 - Gate 6 (Simplicity): Waivable with Phase -1 Gate approval and a justification in design.md (VII-2, VII-3)
 - Gate 7 (Anti-Abstraction): Waivable with Phase -1 Gate approval (VIII-2, VIII-3), or by a runtime constraint documented in design.md (VIII-4, VIII-5)
 
 ### Profile-Dependent Gates
+
 - Gate 3 (Testable Core): Blocks when Article I is critical for the project profile (`library` and `cli` by default); warns for `application` unless `constitution.levels` sets CONST-001 to critical (P-5, P-6)

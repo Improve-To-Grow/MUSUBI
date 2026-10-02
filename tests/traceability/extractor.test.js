@@ -195,10 +195,12 @@ This section describes REQ-001-001 implementation.
 
   describe('scanDirectory()', () => {
     it('should scan all files in a directory', async () => {
+      // Keys use the platform separator: scanDirectory builds paths with path.join
+      const path = require('path');
       const fileStructure = {
         src: ['auth.js', 'user.js'],
-        'src/auth.js': '// REQ-001-001\nfunction auth() {}',
-        'src/user.js': '// IMP-6.2-001\nclass User {}',
+        [path.join('src', 'auth.js')]: '// REQ-001-001\nfunction auth() {}',
+        [path.join('src', 'user.js')]: '// IMP-6.2-001\nclass User {}',
       };
 
       mockFs.readdir.mockImplementation(async dir => {

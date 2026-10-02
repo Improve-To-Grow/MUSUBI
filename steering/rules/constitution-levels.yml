@@ -1,7 +1,7 @@
 # Constitution Levels Configuration
 #
 # Defines enforcement levels for Constitutional Articles
-# See: docs/plans/musubi-improvement-plan-v0.8.md
+# Copied by `musubi init`; see "Project Profiles" in steering/rules/constitution.md
 
 schema_version: "1.0"
 

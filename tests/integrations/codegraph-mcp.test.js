@@ -197,7 +197,7 @@ describe('CodeGraphIntegration', () => {
       const integration = new CodeGraphIntegration('/test/repo');
 
       expect(integration.repoPath).toBe('/test/repo');
-      expect(integration.dbPath).toBe('/test/repo/.codegraph/graph.db');
+      expect(integration.dbPath).toBe(require('path').join('/test/repo', '.codegraph', 'graph.db'));
       expect(integration.options.fullIndex).toBe(false);
       expect(integration.options.noCommunity).toBe(false);
       expect(integration.options.debounce).toBe(1.0);

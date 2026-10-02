@@ -31,6 +31,7 @@ fi
 > **The project SHALL keep feature logic in core modules that have an explicit public interface and can be tested without the delivery mechanism (UI, HTTP server, terminal).**
 
 ### Rationale
+
 - Libraries are reusable across projects (`library`, `cli`)
 - Encourages modular design
 - Enables testing in isolation
@@ -38,6 +39,7 @@ fi
 - Allowing direct SDK use (I-4) removes the conflict with Article VIII
 
 ### Compliance Criteria
+
 ```
 ✅ COMPLIANT (all profiles):
 - Feature logic under a core path (I-1)
@@ -70,6 +72,7 @@ fi
 ```
 
 ### Enforcement
+
 ```bash
 # All profiles (I-3): no imports from delivery paths into core paths
 for core in $core_paths; do
@@ -122,6 +125,7 @@ esac
 The project profile determines the form of that interface: a CLI for `library` and `cli`, an HTTP API for `application`.
 
 ### Rationale
+
 - Enables testing without UI
 - Supports automation and scripting
 - Provides consistent interface across platforms
@@ -129,6 +133,7 @@ The project profile determines the form of that interface: a CLI for `library` a
 - Machines talk to applications over HTTP, so that is the interface to keep stable and documented
 
 ### Compliance Criteria
+
 ```
 ✅ COMPLIANT (all profiles):
 - Primary operations callable without the UI (II-1)
@@ -159,6 +164,7 @@ The project profile determines the form of that interface: a CLI for `library` a
 ```
 
 ### Enforcement
+
 ```bash
 case "$profile" in
 library|cli)
@@ -204,6 +210,7 @@ esac
 > **The developer SHALL write tests before the implementation that satisfies them (Red-Green-Blue cycle).**
 
 ### Requirements
+
 - **III-1** The developer SHALL write each test before the production code that makes it pass.
 - **III-2** WHEN the developer starts a new behavior, the developer SHALL first write a test that fails (**Red**).
 - **III-3** WHEN a failing test exists, the developer SHALL write the minimal code that makes it pass (**Green**).
@@ -213,12 +220,14 @@ esac
 - **III-7** Integration tests SHALL use real services, as Article IX defines.
 
 ### Rationale
+
 - Tests define expected behavior
 - Prevents untested code from entering codebase
 - Enforces Red-Green-Refactor discipline
 - Creates living documentation
 
 ### Compliance Criteria
+
 ```
 ✅ COMPLIANT:
 - Test file committed before source file (III-1)
@@ -236,11 +245,12 @@ esac
 ```
 
 ### Enforcement
+
 ```bash
 # III-1: check git history for test-first
 for commit in $(git log --oneline feature-branch..HEAD); do
     files=$(git show --name-only $commit)
-    
+
     # Check if source files added before tests
     if echo "$files" | grep -q "src/" && ! echo "$files" | grep -q "test"; then
         # Check previous commits for tests
@@ -265,27 +275,31 @@ fi
 > **Every requirement SHALL use EARS (Easy Approach to Requirements Syntax) format.**
 
 ### Requirements
+
 - **IV-1** Each requirement SHALL use one of the 5 EARS patterns (see EARS Patterns below).
 - **IV-2** Each requirement SHALL have a single interpretation.
 - **IV-3** Each requirement SHALL include acceptance criteria.
 - **IV-4** Each requirement SHALL be traceable to design and tests (see Article V).
 
 ### Rationale
+
 - Unambiguous requirement language
 - Testable specifications
 - Industry-standard format
 - Reduces misinterpretation
 
 ### EARS Patterns
-| Pattern | Template | Use Case |
-|---------|----------|----------|
-| Ubiquitous | The system SHALL [action] | Always applicable |
-| Event-driven | WHEN [event] the system SHALL [action] | Triggered by event |
-| State-driven | WHILE [state] the system SHALL [action] | During condition |
-| Optional | WHERE [feature] the system SHALL [action] | Optional features |
-| Unwanted | IF [condition] THEN the system SHALL [action] | Error handling |
+
+| Pattern      | Template                                      | Use Case           |
+| ------------ | --------------------------------------------- | ------------------ |
+| Ubiquitous   | The system SHALL [action]                     | Always applicable  |
+| Event-driven | WHEN [event] the system SHALL [action]        | Triggered by event |
+| State-driven | WHILE [state] the system SHALL [action]       | During condition   |
+| Optional     | WHERE [feature] the system SHALL [action]     | Optional features  |
+| Unwanted     | IF [condition] THEN the system SHALL [action] | Error handling     |
 
 ### Compliance Criteria
+
 ```
 ✅ COMPLIANT:
 "WHEN user clicks login, the system SHALL validate credentials" (IV-1)
@@ -300,6 +314,7 @@ Requirement without acceptance criteria (IV-3)
 ```
 
 ### Enforcement
+
 ```python
 invalid_keywords = ["should", "may", "could", "might", "would"]
 required_keywords = ["SHALL", "MUST"]
@@ -307,7 +322,7 @@ required_keywords = ["SHALL", "MUST"]
 for line in requirements:
     if any(kw in line.lower() for kw in invalid_keywords):
         VIOLATION(f"Article IV (IV-2): Ambiguous keyword in '{line}'")
-    
+
     if "REQ-" in line and not any(kw in line for kw in required_keywords):
         WARNING(f"Article IV (IV-1): Missing SHALL/MUST in '{line}'")
 
@@ -323,6 +338,7 @@ for req in parse_requirements():
 > **The project SHALL maintain 100% traceability between Requirements ↔ Design ↔ Code ↔ Tests.**
 
 ### Requirements
+
 - **V-1** Each requirement SHALL map to at least one design decision (architecture, API, database).
 - **V-2** Each requirement SHALL map to its implementation (source files, functions).
 - **V-3** Each requirement SHALL map to at least one test (test case, scenario).
@@ -331,12 +347,14 @@ for req in parse_requirements():
 - **V-6** Each task breakdown SHALL map its tasks to requirements.
 
 ### Rationale
+
 - Ensures every requirement is implemented
 - Prevents orphaned code
 - Enables impact analysis
 - Supports audit and compliance
 
 ### Traceability Chain
+
 ```
 REQ-001 (Requirement)
     ↓ (referenced in)
@@ -350,6 +368,7 @@ T-001 (Test)
 ```
 
 ### Compliance Criteria
+
 ```
 ✅ COMPLIANT:
 - 100% requirements have design mappings (V-1)
@@ -367,13 +386,14 @@ T-001 (Test)
 ```
 
 ### Enforcement
+
 ```python
 def check_traceability():
     requirements = parse_requirements()
     design = parse_design()
     tasks = parse_tasks()
     tests = parse_tests()
-    
+
     for req in requirements:
         if req.id not in design.references:
             VIOLATION(f"Article V (V-1): {req.id} not in design")
@@ -381,10 +401,10 @@ def check_traceability():
             VIOLATION(f"Article V (V-6): {req.id} not in tasks")
         if req.id not in tests.references:
             VIOLATION(f"Article V (V-3): {req.id} not tested")
-    
+
     if not design.coverage_matrix:
         VIOLATION("Article V (V-5): design.md has no requirements coverage matrix")
-    
+
     coverage = len(traced_requirements) / len(requirements) * 100
     if coverage < 100:
         VIOLATION(f"Article V: Traceability {coverage}% < 100%")
@@ -397,6 +417,7 @@ def check_traceability():
 > **Each skill SHALL consult project memory (steering files) before making decisions.**
 
 ### Requirements
+
 - **VI-1** `steering/structure.md` SHALL define the architecture patterns.
 - **VI-2** `steering/tech.md` SHALL define the technology stack.
 - **VI-3** `steering/product.md` SHALL define the business context.
@@ -405,12 +426,14 @@ def check_traceability():
 - **VI-6** WHEN a change to a steering file is proposed, the project SHALL obtain stakeholder approval before applying it.
 
 ### Rationale
+
 - Consistent architectural decisions
 - Technology stack awareness
 - Business context understanding
 - Prevents conflicting approaches
 
 ### Required Steering Files
+
 ```
 steering/
 ├── structure.md   # Architecture patterns
@@ -421,6 +444,7 @@ steering/
 ```
 
 ### Compliance Criteria
+
 ```
 ✅ COMPLIANT:
 - structure.md, tech.md and product.md define architecture, stack and business context (VI-1–VI-3)
@@ -437,6 +461,7 @@ steering/
 ```
 
 ### Enforcement
+
 ```python
 def check_steering_compliance():
     if not exists("steering/structure.md"):
@@ -454,6 +479,7 @@ def check_steering_compliance():
 > **The initial architecture SHALL contain at most 3 projects, and the source code SHALL stay within the size limits of VII-4 to VII-6.**
 
 **Terms**:
+
 - A _project_ is an independently deployable unit.
 - A _source file_ is a JavaScript or TypeScript file (`.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.cjs`, `.mts`, `.cts`) in a core or delivery path. Tests (`*.test.*`, `*.spec.*`), type declarations (`*.d.ts`) and generated, vendored or template files are not source files.
 - A _line of code_ is a line that contains something other than whitespace and comments.
@@ -461,11 +487,13 @@ def check_steering_compliance():
 - An _import_ is a distinct module that a file loads with `import`, `export … from`, `require()` or `import()`.
 
 ### Requirements
+
 - **VII-1** The initial architecture SHALL NOT exceed 3 projects.
 - **VII-2** IF a design needs more than 3 projects, THEN implementation of the additional projects SHALL NOT begin before Phase -1 Gate approval.
 - **VII-3** IF a design needs more than 3 projects, THEN design.md SHALL justify each additional project with business requirements, technical constraints and a team capacity analysis.
 
 ### Code-Size Limits
+
 - **VII-4** Each source file SHALL contain at most the configured maximum of lines of code (`code_limits.max_file_lines` in `steering/rules/constitution-levels.yml`, default 500).
 - **VII-5** Each function SHALL contain at most the configured maximum of lines of code (`code_limits.max_function_lines`, default 50).
 - **VII-6** Each source file other than an `index` file SHALL import at most the configured maximum of distinct modules (`code_limits.max_imports`, default 10).
@@ -475,6 +503,7 @@ An `index` file collects a module's public API, so VII-6 does not apply to it. A
 The code-size limits are not Phase -1 Gate items. Only VII-2 needs a gate. Code-size findings are reported at Article VII's level (CONST-007, flexible): they warn and do not block unless the project promotes CONST-007.
 
 ### Rationale
+
 - Prevents premature complexity
 - Reduces coordination overhead
 - Enables faster iteration
@@ -482,12 +511,14 @@ The code-size limits are not Phase -1 Gate items. Only VII-2 needs a gate. Code-
 - The default limits follow established tools: 50 lines per function is ESLint's `max-lines-per-function` default, 10 imports is the `max-dependencies` default of eslint-plugin-import, and 500 lines per file is the upper limit Robert C. Martin reports for the files of significant systems in _Clean Code_
 
 ### Counting Projects
+
 ```
 Count each independently deployable unit, e.g. a web app, an API service, a background worker.
 Folders inside one deployable unit, such as core modules under src/lib/, are not separate projects.
 ```
 
 ### Compliance Criteria
+
 ```
 ✅ COMPLIANT:
 - Initial architecture has at most 3 projects (VII-1)
@@ -509,16 +540,17 @@ Folders inside one deployable unit, such as core modules under src/lib/, are not
 ```
 
 ### Enforcement
+
 ```python
 def simplicity_check(design):
     # A project is an independently deployable unit
     projects = find_deployable_units(design)
     if len(projects) <= 3:
         return
-    
+
     if not design.phase_minus_one_gate_approved:
         VIOLATION("Article VII (VII-2): More than 3 projects without Phase -1 Gate approval")
-    
+
     for topic in ["business requirements", "technical constraints", "team capacity"]:
         if not design.justifies_additional_projects(topic):
             VIOLATION(f"Article VII (VII-3): design.md does not justify additional projects ({topic})")
@@ -547,6 +579,7 @@ def code_size_check(project):
 > **The project SHALL use framework features directly, without custom abstraction layers.**
 
 ### Requirements
+
 - **VIII-1** The project SHALL call framework APIs directly.
 - **VIII-2** The project SHALL NOT build a custom abstraction layer or wrapper library over a framework without Phase -1 Gate approval, except for a runtime-constraint client (VIII-4).
 - **VIII-3** IF a design proposes an abstraction over a framework, THEN its Phase -1 Gate request SHALL include a multi-framework support justification, a team expertise analysis and a migration path.
@@ -554,12 +587,14 @@ def code_size_check(project):
 - **VIII-5** WHERE a project-owned client exists because of a runtime constraint, design.md SHALL document that constraint.
 
 ### Rationale
+
 - Prevents over-engineering
 - Reduces maintenance burden
 - Leverages framework best practices
 - Enables framework updates
 
 ### Valid Abstractions
+
 ```
 - Multi-framework support (e.g. database library supporting Prisma AND TypeORM), with Phase -1 Gate approval (VIII-2, VIII-3)
 - Domain-specific abstractions (e.g. PaymentGateway interface with multiple providers)
@@ -567,6 +602,7 @@ def code_size_check(project):
 ```
 
 ### Compliance Criteria
+
 ```
 ✅ COMPLIANT:
 - Framework APIs called directly, e.g. Prisma client used as is (VIII-1)
@@ -584,6 +620,7 @@ def code_size_check(project):
 ```
 
 ### Enforcement
+
 ```python
 def anti_abstraction_check(design):
     for wrapper in find_framework_wrappers():  # e.g. DatabaseWrapper, HttpClientWrapper
@@ -604,6 +641,7 @@ def anti_abstraction_check(design):
 > **Integration tests SHALL use real services instead of mocks.**
 
 ### Requirements
+
 - **IX-1** Integration tests SHALL use real databases, APIs and services.
 - **IX-2** Each test database SHALL be isolated (container or test schema).
 - **IX-3** Integration tests SHALL call external APIs through their sandbox or test environments.
@@ -611,12 +649,14 @@ def anti_abstraction_check(design):
 - **IX-5** WHERE a test uses a mock, the test documentation SHALL justify that mock.
 
 ### Rationale
+
 - Tests real system behavior
 - Catches integration issues early
 - Validates actual service interactions
 - Builds confidence in deployment
 
 ### When a Mock Is Allowed
+
 ```
 Integration tests mock a service only when the service (IX-4):
 - is unavailable in the test environment
@@ -628,6 +668,7 @@ Tools for real services: Docker Compose, Testcontainers, test database schemas.
 ```
 
 ### Compliance Criteria
+
 ```
 ✅ COMPLIANT:
 - Integration tests use a real database, e.g. PostgreSQL via Testcontainers (IX-1)
@@ -644,6 +685,7 @@ Tools for real services: Docker Compose, Testcontainers, test database schemas.
 ```
 
 ### Enforcement
+
 ```python
 def real_services_check(feature):
     for test in find_tests(feature, type="integration"):
@@ -658,7 +700,7 @@ def real_services_check(feature):
                 VIOLATION(f"Article IX (IX-4): {test} mocks {service}, which is available for tests")
             elif not mock.justified_in_test_docs:
                 VIOLATION(f"Article IX (IX-5): {test} mocks {service} without a documented justification")
-        
+
         if test.database and not test.database.isolated:  # container or test schema
             VIOLATION(f"Article IX (IX-2): {test} uses a shared test database")
 ```
@@ -668,17 +710,18 @@ def real_services_check(feature):
 ## Constitutional Compliance Summary
 
 ### Quick Reference
-| Article | Title | Key Rule |
-|---------|-------|----------|
-| I | Testable Core | Feature logic in tested core modules |
-| II | Automation Interface | Reachable without the UI (CLI or HTTP API) |
-| III | Test-First | Tests before code, Red-Green-Blue (III-1–III-4) |
-| IV | EARS Format | Every requirement in an EARS pattern (IV-1) |
-| V | Traceability | 100% coverage (V-1–V-3) |
-| VI | Project Memory | Read steering first (VI-4) |
-| VII | Simplicity | At most 3 projects initially (VII-1); files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10 (VII-4–VII-6) |
-| VIII | Anti-Abstraction | Framework APIs directly; wrappers need gate approval (VIII-2) |
-| IX | Integration-First | Real services instead of mocks (IX-1, IX-4) |
+
+| Article | Title                | Key Rule                                                                                                    |
+| ------- | -------------------- | ----------------------------------------------------------------------------------------------------------- |
+| I       | Testable Core        | Feature logic in tested core modules                                                                        |
+| II      | Automation Interface | Reachable without the UI (CLI or HTTP API)                                                                  |
+| III     | Test-First           | Tests before code, Red-Green-Blue (III-1–III-4)                                                             |
+| IV      | EARS Format          | Every requirement in an EARS pattern (IV-1)                                                                 |
+| V       | Traceability         | 100% coverage (V-1–V-3)                                                                                     |
+| VI      | Project Memory       | Read steering first (VI-4)                                                                                  |
+| VII     | Simplicity           | At most 3 projects initially (VII-1); files ≤ 500 lines of code, functions ≤ 50, imports ≤ 10 (VII-4–VII-6) |
+| VIII    | Anti-Abstraction     | Framework APIs directly; wrappers need gate approval (VIII-2)                                               |
+| IX      | Integration-First    | Real services instead of mocks (IX-1, IX-4)                                                                 |
 
 ### Enforcement Priority
 

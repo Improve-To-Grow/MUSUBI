@@ -77,7 +77,7 @@ describe('LocaleManager', () => {
 
     test('should set templatesPath based on projectPath', () => {
       const manager = new LocaleManager('/project/root');
-      expect(manager.templatesPath).toBe('/project/root/steering/templates');
+      expect(manager.templatesPath).toBe(path.join('/project/root', 'steering', 'templates'));
     });
   });
 

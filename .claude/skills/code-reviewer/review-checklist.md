@@ -9,6 +9,7 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 ## Pre-Review Checks
 
 ### Before Starting Review
+
 - [ ] PR/MR description clearly explains the change
 - [ ] Linked requirements/issues are referenced
 - [ ] CI/CD pipeline passes
@@ -20,6 +21,7 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 ## Code Quality Checklist
 
 ### 1. Functionality
+
 - [ ] Code implements the requirements correctly
 - [ ] Edge cases are handled
 - [ ] Error handling is appropriate
@@ -27,6 +29,7 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 - [ ] Code works as intended (manually verified if needed)
 
 ### 2. Design & Architecture
+
 - [ ] Follows existing architecture patterns (check `steering/structure.md`)
 - [ ] SOLID principles are applied appropriately
 - [ ] No unnecessary complexity
@@ -35,6 +38,7 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 - [ ] Testable-core principle followed for the project profile (Article I)
 
 ### 3. Code Style
+
 - [ ] Consistent naming conventions
 - [ ] Proper indentation and formatting
 - [ ] Comments explain "why", not "what"
@@ -42,6 +46,7 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 - [ ] No debug/console statements left behind
 
 ### 4. Testing
+
 - [ ] Tests written before implementation (Article III, III-1)
 - [ ] Unit tests cover core logic
 - [ ] Integration tests verify component interaction
@@ -49,6 +54,7 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 - [ ] Edge cases and error paths are tested
 
 ### 5. Security
+
 - [ ] No hardcoded secrets or credentials
 - [ ] Input validation present
 - [ ] Output encoding for user-facing data
@@ -56,6 +62,7 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 - [ ] Authentication/authorization checked
 
 ### 6. Performance
+
 - [ ] No obvious performance issues
 - [ ] Database queries are optimized
 - [ ] No N+1 query problems
@@ -63,6 +70,7 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 - [ ] Large operations are async/background
 
 ### 7. Maintainability
+
 - [ ] Code is readable and self-documenting
 - [ ] Functions/methods have at most 50 lines of code and source files at most 500 lines of code and 10 imports, or the configured limits (Article VII, VII-4–VII-6)
 - [ ] No code duplication
@@ -73,21 +81,22 @@ A comprehensive checklist for conducting effective code reviews in MUSUBI SDD pr
 
 ## Review Severity Levels
 
-| Level | Description | Action |
-|-------|-------------|--------|
-| 🔴 **Blocker** | Critical issue, must fix | Request changes |
-| 🟠 **Major** | Significant issue, should fix | Request changes |
-| 🟡 **Minor** | Small issue, nice to fix | Approve with comments |
-| 🔵 **Suggestion** | Optional improvement | Approve with comments |
-| 💬 **Question** | Need clarification | Comment |
-| 👍 **Praise** | Good implementation | Comment |
+| Level             | Description                   | Action                |
+| ----------------- | ----------------------------- | --------------------- |
+| 🔴 **Blocker**    | Critical issue, must fix      | Request changes       |
+| 🟠 **Major**      | Significant issue, should fix | Request changes       |
+| 🟡 **Minor**      | Small issue, nice to fix      | Approve with comments |
+| 🔵 **Suggestion** | Optional improvement          | Approve with comments |
+| 💬 **Question**   | Need clarification            | Comment               |
+| 👍 **Praise**     | Good implementation           | Comment               |
 
 ---
 
 ## Review Comment Templates
 
 ### Blocker
-```
+
+````
 🔴 **Blocker**: [Description]
 
 This needs to be fixed before merge because [reason].
@@ -95,33 +104,42 @@ This needs to be fixed before merge because [reason].
 **Suggested fix:**
 ```code
 // Example fix
-```
+````
+
 ```
 
 ### Major Issue
 ```
+
 🟠 **Major**: [Description]
 
 This could cause [problem]. Consider [alternative approach].
+
 ```
 
 ### Minor Issue
 ```
+
 🟡 **Minor**: [Description]
 
 Not critical, but would improve [aspect].
+
 ```
 
 ### Suggestion
 ```
+
 🔵 **Suggestion**: [Description]
 
 Optional: This could be improved by [suggestion].
+
 ```
 
 ### Praise
 ```
+
 👍 Nice implementation of [feature]. Clean and readable!
+
 ```
 
 ---
@@ -187,3 +205,4 @@ During review, verify (read `constitution.profile` from `steering/project.yml` f
 - Need more information
 - Questions about approach
 - Discussion needed before decision
+```

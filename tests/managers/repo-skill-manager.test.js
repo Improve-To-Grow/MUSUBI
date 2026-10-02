@@ -27,7 +27,7 @@ describe('RepoSkillManager', () => {
     it('should initialize with default values', () => {
       const defaultManager = new RepoSkillManager();
       expect(defaultManager.projectRoot).toBe(process.cwd());
-      expect(defaultManager.skillsDir).toContain('.musubi/skills');
+      expect(defaultManager.skillsDir).toContain(path.join('.musubi', 'skills'));
     });
 
     it('should accept custom project root', () => {

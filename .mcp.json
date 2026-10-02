@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "type": "stdio",
+      "command": "codegraph-mcp",
+      "args": [
+        "serve",
+        "--repo",
+        "D:\\Code\\MUSUBI"
+      ],
+      "env": {}
+    }
+  }
+}
