@@ -7,6 +7,10 @@ const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
 
+// chokidar 4 uses fs.watch on macOS (no fsevents), which can miss writes made
+// within milliseconds of 'ready'; give the OS watcher a moment before writing
+const settle = () => new Promise(resolve => setTimeout(resolve, 100));
+
 describe('FileWatcher', () => {
   let tempDir;
   let watcher;
@@ -95,6 +99,7 @@ describe('FileWatcher', () => {
       const testFile = path.join(tempDir, 'steering', 'test.md');
 
       watcher.on('ready', async () => {
+        await settle();
         await fs.writeFile(testFile, 'initial content');
       });
 
@@ -116,6 +121,7 @@ describe('FileWatcher', () => {
       const testFile = path.join(tempDir, 'steering', 'new-file.md');
 
       watcher.on('ready', async () => {
+        await settle();
         await fs.writeFile(testFile, 'new content');
       });
 
@@ -132,6 +138,7 @@ describe('FileWatcher', () => {
       const testFile = path.join(tempDir, 'steering', 'delete-me.md');
 
       watcher.on('ready', async () => {
+        await settle();
         await fs.writeFile(testFile, 'content');
       });
 

@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- GUI server: a failed project scan when a WebSocket client connected was an unhandled promise rejection, which crashed the server process. It is now logged, and the initial state is only sent to clients that are still connected.
 - `musubi-upgrade` compared versions with a pre-release suffix (e.g. `6.3.1-itg.1`) as `NaN`, so upgrades and `musubi-upgrade check` gave wrong results.
 
 ## [6.3.0] - 2026-01-02

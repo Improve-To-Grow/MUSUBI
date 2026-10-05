@@ -425,10 +425,17 @@ ${description}
         this.clients.delete(ws);
       });
 
-      // Send initial project state
-      this.projectScanner.scan().then(project => {
-        ws.send(JSON.stringify({ type: 'project:init', data: project }));
-      });
+      // Send initial project state; a failed scan must not crash the server
+      this.projectScanner
+        .scan()
+        .then(project => {
+          if (ws.readyState === ws.OPEN) {
+            ws.send(JSON.stringify({ type: 'project:init', data: project }));
+          }
+        })
+        .catch(error => {
+          console.error('Error scanning project:', error);
+        });
     });
   }
 
