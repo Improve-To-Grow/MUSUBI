@@ -340,11 +340,30 @@ If codegraph-mcp is not installed, **after confirming with the user, run the fol
 # Use --force to update an existing installation to the latest version
 pipx install --force codegraph-mcp-server
 
+# Required: pin the MCP SDK to 1.x (see the note below)
+pipx runpip codegraph-mcp-server install "mcp<2"
+
 # Verify it works
 codegraph-mcp --version
 ```
 
 > **Note**: If pipx is not installed, first run `pip install pipx && pipx ensurepath`.
+
+> **Important - pin `mcp<2`**: `codegraph-mcp-server` (0.8.0, the current
+> release) declares a bare `mcp` dependency, so pip resolves the 2.x SDK. The
+> 2.x line removed the low-level `Server.list_tools` decorator API that 0.8.0
+> is built on, and the server then dies at startup with no tools exposed:
+> `Error: 'Server' object has no attribute 'list_tools'`.
+>
+> Re-run the pin after **any** `pipx install --force`, `pipx upgrade`,
+> `pipx upgrade-all`, or `pipx reinstall` of this package - each re-resolves
+> `mcp` and silently reintroduces the crash. Verify with
+> `pipx runpip codegraph-mcp-server show mcp`, which must report 1.x.
+>
+> Use `runpip`, not `pipx inject` - `inject` refuses with "Not modifying
+> existing installation" because `mcp` is already present. Keep `"mcp<2"`
+> quoted; in PowerShell an unquoted `<` is a reserved redirection character.
+> Restart Claude Code afterwards, since MCP servers only connect at startup.
 
 #### Step 3: Create the Project Index
 
@@ -398,9 +417,10 @@ claude mcp add codegraph -- codegraph-mcp serve --repo ${workspaceFolder}
 1. ✅ Check pipx (`which pipx`)
 2. ✅ Check for an existing installation (`which codegraph-mcp`)
 3. ✅ If not installed, run pipx install
-4. ✅ Index the current project (`codegraph-mcp index --full`)
-5. ✅ Show statistics (`codegraph-mcp stats`)
-6. ✅ Ask about the environment and create the configuration file
+4. ✅ Pin the MCP SDK (`pipx runpip codegraph-mcp-server install "mcp<2"`)
+5. ✅ Index the current project (`codegraph-mcp index --full`)
+6. ✅ Show statistics (`codegraph-mcp stats`)
+7. ✅ Ask about the environment and create the configuration file
 
 **Dialogue example**:
 
