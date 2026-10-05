@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Generated example projects no longer list `musubi-sdd` as a project dependency.
 - The release workflow creates a GitHub release instead of publishing to npm; the npm publish workflow was removed.
 
+### Security
+
+- Upgraded `chokidar` to v4 (drops the vulnerable `braces` dependency) and refreshed the lockfile with `npm audit fix` (ws, qs/express, path-to-regexp, minimatch, picomatch, js-yaml, yaml). `npm audit --omit=dev` reports 0 vulnerabilities.
+
 ### Fixed
 
 - `musubi-upgrade` compared versions with a pre-release suffix (e.g. `6.3.1-itg.1`) as `NaN`, so upgrades and `musubi-upgrade check` gave wrong results.
