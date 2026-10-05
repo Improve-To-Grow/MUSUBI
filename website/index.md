@@ -63,7 +63,7 @@ features:
 
 ```bash
 # Install and initialize
-npx musubi-sdd init
+musubi-sdd init
 
 # Use SDD commands with your AI agent
 # Claude Code:     /sdd-requirements, /sdd-design, /sdd-implement

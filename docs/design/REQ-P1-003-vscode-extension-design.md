@@ -250,7 +250,7 @@ export async function initProject(state: WorkspaceState): Promise<void> {
       cancellable: false,
     },
     async () => {
-      await cli.execute(`npx musubi-sdd init ${platform.value}`);
+      await cli.execute(`musubi-sdd init ${platform.value}`);
     }
   );
 
@@ -270,7 +270,7 @@ export async function validateConstitution(state: WorkspaceState): Promise<void>
       title: 'Validating constitutional compliance...',
     },
     async () => {
-      return await cli.execute('npx musubi-sdd validate');
+      return await cli.execute('musubi-sdd validate');
     }
   );
 
@@ -453,7 +453,7 @@ export class StatusBarManager {
     const cli = new CliBridge();
     
     // Get compliance status
-    const validation = await cli.execute('npx musubi-sdd validate --json');
+    const validation = await cli.execute('musubi-sdd validate --json');
     if (validation.success) {
       const data = validation.data;
       this.complianceItem.text = `$(shield) ${data.passed}/${data.total}`;
@@ -464,7 +464,7 @@ export class StatusBarManager {
     }
 
     // Get traceability
-    const trace = await cli.execute('npx musubi-sdd trace --summary --json');
+    const trace = await cli.execute('musubi-sdd trace --summary --json');
     if (trace.success) {
       this.traceabilityItem.text = `$(git-branch) ${trace.data.coverage}%`;
     }
@@ -529,7 +529,7 @@ export class CliBridge {
 
   async checkMusubiInstalled(): Promise<boolean> {
     try {
-      await execAsync('npx musubi-sdd --version');
+      await execAsync('musubi-sdd --version');
       return true;
     } catch {
       return false;

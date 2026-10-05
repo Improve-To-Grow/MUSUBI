@@ -286,9 +286,10 @@ class GUIServer {
       }
       try {
         const { spawn } = require('child_process');
-        const _child = spawn('npx', ['musubi-requirements', 'create'], {
+        // Run this installation's own bin so the wizard never resolves to another MUSUBI copy
+        const requirementsBin = path.join(__dirname, '..', '..', 'bin', 'musubi-requirements.js');
+        const _child = spawn(process.execPath, [requirementsBin, 'create'], {
           cwd: this.projectPath,
-          shell: true,
         });
         res.json({ success: true, message: 'Requirements wizard started' });
       } catch (error) {

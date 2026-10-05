@@ -110,7 +110,7 @@ Rollback is possible at 4 levels of granularity:
 ### Step 1: Install MUSUBI
 
 ```bash
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 ```
 
 ### Step 2: Start Developing by Just Talking to the AI
@@ -180,13 +180,13 @@ Reviews all phases in order.
 
 | Platform | Setup |
 |-----------------|-------------|
-| **Claude Code** | `npx musubi-sdd init --claude` |
-| **GitHub Copilot** | `npx musubi-sdd init --copilot` |
-| **Cursor IDE** | `npx musubi-sdd init --cursor` |
-| **Gemini CLI** | `npx musubi-sdd init --gemini` |
-| **Codex CLI** | `npx musubi-sdd init --codex` |
-| **Qwen Code** | `npx musubi-sdd init --qwen` |
-| **Windsurf** | `npx musubi-sdd init --windsurf` |
+| **Claude Code** | `musubi-sdd init --claude` |
+| **GitHub Copilot** | `musubi-sdd init --copilot` |
+| **Cursor IDE** | `musubi-sdd init --cursor` |
+| **Gemini CLI** | `musubi-sdd init --gemini` |
+| **Codex CLI** | `musubi-sdd init --codex` |
+| **Qwen Code** | `musubi-sdd init --qwen` |
+| **Windsurf** | `musubi-sdd init --windsurf` |
 
 ---
 
@@ -394,20 +394,20 @@ Upgrade an existing project to v6.2.0:
 
 ```bash
 # Upgrade with the latest version (recommended)
-npx musubi-sdd@latest upgrade
+musubi-sdd upgrade
 
 # Specify a particular version
-npx musubi-sdd@latest upgrade --to 6.2.0
+musubi-sdd upgrade --to 6.2.0
 
 # Preview changes (without applying)
-npx musubi-sdd upgrade --dry-run
+musubi-sdd upgrade --dry-run
 ```
 
 For a local installation:
 
 ```bash
-npm install musubi-sdd@latest
-npx musubi-sdd upgrade
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
+musubi-sdd upgrade
 ```
 
 ---

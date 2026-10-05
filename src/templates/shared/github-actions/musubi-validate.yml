@@ -30,13 +30,13 @@ jobs:
         run: npm ci
 
       - name: Install MUSUBI
-        run: npm install -g musubi-sdd
+        run: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
       - name: Run MUSUBI Validation
         id: validate
         run: |
           # Run constitutional validation with scoring
-          npx musubi-validate score > validation-report.json 2>&1 || true
+          musubi-validate score > validation-report.json 2>&1 || true
 
           if [ -f validation-report.json ]; then
             SCORE=$(jq '.score // 0' validation-report.json 2>/dev/null || echo "0")
@@ -52,7 +52,7 @@ jobs:
       - name: Traceability Check
         id: trace
         run: |
-          npx musubi-trace --verify > trace-report.json 2>&1 || true
+          musubi-trace --verify > trace-report.json 2>&1 || true
 
           if [ -f trace-report.json ]; then
             COVERAGE=$(jq '.coverage // 100' trace-report.json 2>/dev/null || echo "100")

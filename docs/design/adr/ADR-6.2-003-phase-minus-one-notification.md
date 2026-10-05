@@ -246,7 +246,7 @@ jobs:
       - name: Run Constitution Checker
         id: constitution
         run: |
-          npx musubi validate constitution --json > result.json
+          musubi validate constitution --json > result.json
           echo "violations=$(cat result.json | jq '.violations | length')" >> $GITHUB_OUTPUT
       
       - name: Trigger Phase -1 Gate

@@ -280,7 +280,7 @@ if project_count > 3:
         FAIL: "VII-3: Additional projects not justified in design.md"
 
 # Code-size limits (VII-4–VII-6), reported at CONST-007's level, not gated
-# Implemented by `npx musubi-validate project` (project-wide) and the CI constitutional check (changed files)
+# Implemented by `musubi-validate project` (project-wide) and the CI constitutional check (changed files)
 for file in source files under core and delivery paths:
     if lines_of_code(file) > max_file_lines (default 500):
         WARN: "VII-4: File over the lines-of-code limit"
@@ -740,11 +740,11 @@ Use these commands to enforce constitutional compliance programmatically:
 
 | Command                                                                           | Purpose                                                     | Example                                                                                                   |
 | --------------------------------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `musubi-validate project`                                                         | Full project validation (profile, levels, code-size limits) | `npx musubi-validate project`                                                                             |
-| `musubi-validate guardrails --type safety`                                        | Validate content against safety rules                       | `npx musubi-validate guardrails "content" --type safety`                                                  |
-| `musubi-validate guardrails --type safety --constitutional --content-type <type>` | Check one artifact against the articles                     | `npx musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js` |
-| `musubi-validate guardrails --type input`                                         | Validate input against injection attacks                    | `npx musubi-validate guardrails "input" --type input`                                                     |
-| `musubi-validate guardrails-chain`                                                | Run full guardrail chain                                    | `npx musubi-validate guardrails-chain "content" --parallel`                                               |
+| `musubi-validate project`                                                         | Full project validation (profile, levels, code-size limits) | `musubi-validate project`                                                                             |
+| `musubi-validate guardrails --type safety`                                        | Validate content against safety rules                       | `musubi-validate guardrails "content" --type safety`                                                  |
+| `musubi-validate guardrails --type safety --constitutional --content-type <type>` | Check one artifact against the articles                     | `musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js` |
+| `musubi-validate guardrails --type input`                                         | Validate input against injection attacks                    | `musubi-validate guardrails "input" --type input`                                                     |
+| `musubi-validate guardrails-chain`                                                | Run full guardrail chain                                    | `musubi-validate guardrails-chain "content" --parallel`                                               |
 
 `--constitutional` needs `--content-type` (`code`, `test`, `requirements`, `design`): the constitution applies per artifact type, so untyped content fails as unclassified. Articles that do not apply to the content are scored not applicable.
 
@@ -761,11 +761,11 @@ Injection checks are skipped for typed artifacts, which legitimately contain bra
 
 ```bash
 # Check a source file against the constitutional articles
-npx musubi-validate guardrails --type safety --level strict --constitutional --content-type code --file src/feature.js
+musubi-validate guardrails --type safety --level strict --constitutional --content-type code --file src/feature.js
 
 # Check several files
 for file in src/*.js; do
-  npx musubi-validate guardrails --type safety --constitutional --content-type code --file "$file"
+  musubi-validate guardrails --type safety --constitutional --content-type code --file "$file"
 done
 ```
 

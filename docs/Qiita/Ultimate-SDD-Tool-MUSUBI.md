@@ -369,9 +369,9 @@ MUSUBI provides a **complete SDD workflow** in both scenarios. In brownfield pro
 
 ```bash
 # 1. Initialize (for any agent)
-npx musubi-sdd init --claude      # Claude Code (Skills API)
-npx musubi-sdd init --copilot     # GitHub Copilot (AGENTS.md)
-npx musubi-sdd init --cursor      # Cursor (AGENTS.md)
+musubi-sdd init --claude      # Claude Code (Skills API)
+musubi-sdd init --copilot     # GitHub Copilot (AGENTS.md)
+musubi-sdd init --cursor      # Cursor (AGENTS.md)
 # Others: --gemini, --windsurf, --codex, --qwen
 
 # 2. Generate project memory
@@ -393,7 +393,7 @@ npx musubi-sdd init --cursor      # Cursor (AGENTS.md)
 
 ```bash
 # 1. Initialize in an existing codebase
-npx musubi-sdd init --claude
+musubi-sdd init --claude
 
 # 2. Generate steering from the existing code
 /sdd-steering
@@ -527,11 +527,8 @@ For details, see the [MUSUBI × CodeGraph MCP Server Integration Guide](https://
 ### Installation
 
 ```bash
-# Via npx (recommended)
-npx musubi-sdd init
-
-# Or install globally
-npm install -g musubi-sdd
+# Install globally from the ITG fork
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 musubi init
 ```
 
@@ -539,25 +536,25 @@ musubi init
 
 ```bash
 # Claude Code - 25 Skills API
-npx musubi-sdd init --claude
+musubi-sdd init --claude
 
 # GitHub Copilot - 25 agents (AGENTS.md, official support)
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 
 # Cursor IDE - 25 agents (AGENTS.md, official support)
-npx musubi-sdd init --cursor
+musubi-sdd init --cursor
 
 # Gemini CLI - 25 agents (GEMINI.md integration) + TOML format
-npx musubi-sdd init --gemini
+musubi-sdd init --gemini
 
 # Windsurf IDE - 25 agents (AGENTS.md)
-npx musubi-sdd init --windsurf
+musubi-sdd init --windsurf
 
 # Codex CLI - 25 agents (AGENTS.md)
-npx musubi-sdd init --codex
+musubi-sdd init --codex
 
 # Qwen Code - 25 agents (AGENTS.md)
-npx musubi-sdd init --qwen
+musubi-sdd init --qwen
 ```
 
 ### CLI Commands
@@ -599,9 +596,9 @@ musubi info
 
 ```bash
 # Choose your AI agent
-npx musubi-sdd init --claude     # Claude Code (Skills API)
-npx musubi-sdd init --copilot    # GitHub Copilot (AGENTS.md)
-npx musubi-sdd init --cursor     # Cursor (AGENTS.md)
+musubi-sdd init --claude     # Claude Code (Skills API)
+musubi-sdd init --copilot    # GitHub Copilot (AGENTS.md)
+musubi-sdd init --cursor     # Cursor (AGENTS.md)
 # Others: --gemini, --windsurf, --codex, --qwen
 
 # All 25 specialized agents are available with any agent!
@@ -610,7 +607,7 @@ npx musubi-sdd init --cursor     # Cursor (AGENTS.md)
 
 ## Resources
 
-- 📦 **npm**: [musubi-sdd](https://www.npmjs.com/package/musubi-sdd) (v2.1.1)
+- 📦 **Source**: [ITG fork](https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments) (v2.1.1)
 - 📚 **GitHub**: [nahisaho/musubi](https://github.com/nahisaho/MUSUBI)
 - 🎯 **Blueprint**: [Ultimate-SDD-Tool-Blueprint-v3-25-Skills.md](https://github.com/nahisaho/MUSUBI/blob/main/Ultimate-SDD-Tool-Blueprint-v3-25-Skills.md)
 - 📊 **Framework comparison**: See the comparison table in this article

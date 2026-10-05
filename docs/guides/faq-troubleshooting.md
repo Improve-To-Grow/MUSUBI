@@ -32,7 +32,7 @@ FAQ and Troubleshooting Guide
 ```bash
 # Adopting in an existing project
 cd existing-project
-npx musubi-sdd init --mode brownfield
+musubi-sdd init --mode brownfield
 ```
 
 #### Q: Which AI coding assistants are compatible?
@@ -109,14 +109,11 @@ npm ERR! syscall mkdir
 
 **Solution:**
 ```bash
-# Option 1: Use npx
-npx musubi-sdd init
+# Option 1: Install in the user directory
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments' --prefix ~/.npm-global
 
-# Option 2: Install in the user directory
-npm install -g musubi-sdd --prefix ~/.npm-global
-
-# Option 3: Use sudo (not recommended)
-sudo npm install -g musubi-sdd
+# Option 2: Use sudo (not recommended)
+sudo npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ### Issue: Node.js version error
@@ -152,8 +149,8 @@ echo $PATH
 # Add the npm global bin directory
 export PATH="$PATH:$(npm config get prefix)/bin"
 
-# Or use npx
-npx musubi-sdd --help
+# If it is still missing, install it
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ---
@@ -223,7 +220,7 @@ Traceability Gap: 5 requirements without implementation
 **Solution:**
 ```bash
 # Check details
-npx musubi-gaps --verbose
+musubi-gaps --verbose
 
 # Example output:
 # REQ-AUTH-003: Not implemented
@@ -231,7 +228,7 @@ npx musubi-gaps --verbose
 #   Action: Implement MFA functionality
 
 # Re-validate after implementation
-npx musubi-trace
+musubi-trace
 ```
 
 ### Issue: Delta spec validation failed
@@ -407,7 +404,7 @@ Check constitution compliance before code changes.
 **Solution:**
 ```bash
 # Regenerate Windsurf settings
-npx musubi-sdd init --platform windsurf --force
+musubi-sdd init --platform windsurf --force
 ```
 
 ---
@@ -446,7 +443,7 @@ jobs:
 **Solution:**
 ```yaml
 - name: Generate Traceability
-  run: npx musubi-trace --output reports/traceability.md
+  run: musubi-trace --output reports/traceability.md
   
 - name: Upload Report
   uses: actions/upload-artifact@v4
@@ -484,13 +481,13 @@ Validation took 45s (expected < 10s)
 **Solution:**
 ```bash
 # Validate specific files only
-npx musubi-validate ears --file storage/specs/auth.md
+musubi-validate ears --file storage/specs/auth.md
 
 # Enable parallel validation
-npx musubi-validate all --parallel
+musubi-validate all --parallel
 
 # Use cache
-npx musubi-validate all --cache
+musubi-validate all --cache
 ```
 
 ### Issue: Large project performance
@@ -532,18 +529,18 @@ module.exports = {
 **Migration Script:**
 ```bash
 # Automatic migration
-npx musubi-sdd migrate --from 2 --to 3
+musubi-sdd migrate --from 2 --to 3
 
 # Manual check
-npx musubi-validate all --verbose
+musubi-validate all --verbose
 ```
 
 ### From other SDD tools
 
 ```bash
 # Import existing specifications
-npx musubi-convert import --format openapi --file api-spec.yaml
-npx musubi-convert import --format gherkin --dir features/
+musubi-convert import --format openapi --file api-spec.yaml
+musubi-convert import --format gherkin --dir features/
 ```
 
 ---
@@ -560,17 +557,17 @@ npx musubi-convert import --format gherkin --dir features/
 
 ```bash
 # Enable verbose logging
-DEBUG=musubi:* npx musubi-validate all
+DEBUG=musubi:* musubi-validate all
 
 # Specific modules only
-DEBUG=musubi:validator npx musubi-validate ears
+DEBUG=musubi:validator musubi-validate ears
 ```
 
 ### Bug Reports
 
 ```bash
 # Collect diagnostic information
-npx musubi-sdd diagnose > musubi-diagnostic.txt
+musubi-sdd diagnose > musubi-diagnostic.txt
 
 # Create a GitHub Issue
 # https://github.com/nahisaho/MUSUBI/issues/new
@@ -581,4 +578,4 @@ npx musubi-sdd diagnose > musubi-diagnostic.txt
 
 **MUSUBI v3.12.0** - Specification Driven Development
 
-[Documentation](../USER-GUIDE.md) | [GitHub](https://github.com/nahisaho/MUSUBI) | [npm](https://www.npmjs.com/package/musubi-sdd)
+[Documentation](../USER-GUIDE.md) | [GitHub](https://github.com/nahisaho/MUSUBI) | [ITG fork](https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments)

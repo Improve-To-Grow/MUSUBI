@@ -33,7 +33,7 @@ P-labels are priority markers that enable intelligent parallel task execution in
 
 ```bash
 # Run tasks with P-labels
-npx musubi-orchestrate swarm \
+musubi-orchestrate swarm \
   --tasks "P0:security-audit,P1:code-review,P1:unit-tests,P2:integration-tests,P3:documentation" \
   --strategy all \
   --max-concurrent 4
@@ -134,7 +134,7 @@ const featureTasks = {
 
 ```bash
 # Security-first code review
-npx musubi-orchestrate swarm \
+musubi-orchestrate swarm \
   --tasks \
     "P0:security-auditor:src/auth/**/*.js" \
     "P1:code-reviewer:src/auth/**/*.js" \
@@ -364,25 +364,25 @@ replanningEngine.on('replan', (event) => {
 
 ```bash
 # Basic swarm execution
-npx musubi-orchestrate swarm --tasks "skill1,skill2,skill3"
+musubi-orchestrate swarm --tasks "skill1,skill2,skill3"
 
 # With P-labels
-npx musubi-orchestrate swarm --tasks "P0:critical,P1:important,P2:nice-to-have"
+musubi-orchestrate swarm --tasks "P0:critical,P1:important,P2:nice-to-have"
 
 # With strategy
-npx musubi-orchestrate swarm --tasks "..." --strategy all|first|majority|quorum
+musubi-orchestrate swarm --tasks "..." --strategy all|first|majority|quorum
 
 # With concurrency limit
-npx musubi-orchestrate swarm --tasks "..." --max-concurrent 4
+musubi-orchestrate swarm --tasks "..." --max-concurrent 4
 
 # With timeout
-npx musubi-orchestrate swarm --tasks "..." --timeout 60000
+musubi-orchestrate swarm --tasks "..." --timeout 60000
 
 # Verbose output
-npx musubi-orchestrate swarm --tasks "..." --verbose
+musubi-orchestrate swarm --tasks "..." --verbose
 
 # Help
-npx musubi-orchestrate swarm --help
+musubi-orchestrate swarm --help
 ```
 
 ---

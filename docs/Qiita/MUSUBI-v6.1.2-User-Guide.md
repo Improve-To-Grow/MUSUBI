@@ -26,7 +26,7 @@ There is no need to memorize commands. Just tell the AI what you want to do, and
 ### Step 1: Install MUSUBI
 
 ```bash
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 ```
 
 Select your AI platform and the setup is done automatically.
@@ -110,13 +110,13 @@ The AI performs change impact analysis and creates a delta specification (Delta 
 
 | Platform | Setup | Usage |
 |-----------------|-------------|--------|
-| **Claude Code** | `npx musubi-sdd init --claude` | Converse in natural language |
-| **GitHub Copilot** | `npx musubi-sdd init --copilot` | Converse in natural language |
-| **Cursor IDE** | `npx musubi-sdd init --cursor` | Converse in natural language |
-| **Gemini CLI** | `npx musubi-sdd init --gemini` | Converse in natural language |
-| **Codex CLI** | `npx musubi-sdd init --codex` | Converse in natural language |
-| **Qwen Code** | `npx musubi-sdd init --qwen` | Converse in natural language |
-| **Windsurf** | `npx musubi-sdd init --windsurf` | Converse in natural language |
+| **Claude Code** | `musubi-sdd init --claude` | Converse in natural language |
+| **GitHub Copilot** | `musubi-sdd init --copilot` | Converse in natural language |
+| **Cursor IDE** | `musubi-sdd init --cursor` | Converse in natural language |
+| **Gemini CLI** | `musubi-sdd init --gemini` | Converse in natural language |
+| **Codex CLI** | `musubi-sdd init --codex` | Converse in natural language |
+| **Qwen Code** | `musubi-sdd init --qwen` | Converse in natural language |
+| **Windsurf** | `musubi-sdd init --windsurf` | Converse in natural language |
 
 On all platforms, you can work through **conversation in natural language**.
 
@@ -649,7 +649,7 @@ docker compose up -d
 
 ```bash
 # Initialize with Japanese templates
-npx musubi-sdd init --locale ja
+musubi-sdd init --locale ja
 ```
 
 Supported languages: English, Japanese, Chinese, Korean, German, French, Spanish, Indonesian
@@ -663,21 +663,21 @@ Supported languages: English, Japanese, Chinese, Korean, German, French, Spanish
 This has been fixed in v6.1.1 and later. Please use the latest version:
 
 ```bash
-npx musubi-sdd@latest init
+musubi-sdd init
 ```
 
-### Q: npx musubi-sdd is not found
+### Q: musubi-sdd is not found
 
 ```bash
-npx clear-npx-cache
-npx musubi-sdd@latest --version
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
+musubi-sdd --version
 ```
 
 ### Q: I want to upgrade an existing project
 
 ```bash
 # Automatic analysis and setup of an existing project
-npx musubi-sdd onboard
+musubi-sdd onboard
 ```
 
 ---
@@ -685,7 +685,7 @@ npx musubi-sdd onboard
 ## 📚 Related Resources
 
 - **GitHub**: [nahisaho/musubi](https://github.com/nahisaho/MUSUBI)
-- **npm**: [musubi-sdd](https://www.npmjs.com/package/musubi-sdd)
+- **Source**: [ITG fork](https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments)
 - **Documentation**: [docs/USER-GUIDE.ja.md](https://github.com/nahisaho/MUSUBI/blob/main/docs/USER-GUIDE.ja.md)
 
 ---
@@ -722,7 +722,7 @@ If you cannot express something in natural language, or want to run it directly 
 ### Initialization Commands
 
 ```bash
-npx musubi-sdd init [options]
+musubi-sdd init [options]
   --claude      For Claude Code
   --copilot     For GitHub Copilot
   --cursor      For Cursor IDE
@@ -736,31 +736,31 @@ npx musubi-sdd init [options]
 ### Specification Driven Development Commands
 
 ```bash
-npx musubi-requirements "<feature description>"  # Requirements definition
-npx musubi-design <feature-name>       # Design
-npx musubi-tasks <feature-name>        # Task breakdown
-npx musubi-validate [all|requirements|design|traceability]  # Validation
-npx musubi-trace <feature-name>        # Traceability
-npx musubi-gaps <feature-name>         # Gap analysis
+musubi-requirements "<feature description>"  # Requirements definition
+musubi-design <feature-name>       # Design
+musubi-tasks <feature-name>        # Task breakdown
+musubi-validate [all|requirements|design|traceability]  # Validation
+musubi-trace <feature-name>        # Traceability
+musubi-gaps <feature-name>         # Gap analysis
 ```
 
 ### Change Management Commands
 
 ```bash
-npx musubi-change init <change-name>      # Create change proposal
-npx musubi-change apply <change-name>     # Apply change
-npx musubi-change archive <change-name>   # Archive
+musubi-change init <change-name>      # Create change proposal
+musubi-change apply <change-name>     # Apply change
+musubi-change archive <change-name>   # Archive
 ```
 
 ### Other Commands
 
 ```bash
-npx musubi-orchestrate <pattern> <feature>  # Orchestration
-npx musubi-costs                            # Cost tracking
-npx musubi-release [--dry-run]              # Release
-npx musubi-analyze <path>                   # Analysis
-npx musubi-sync                             # Sync
-npx musubi-onboard                          # Analyze existing project
+musubi-orchestrate <pattern> <feature>  # Orchestration
+musubi-costs                            # Cost tracking
+musubi-release [--dry-run]              # Release
+musubi-analyze <path>                   # Analysis
+musubi-sync                             # Sync
+musubi-onboard                          # Analyze existing project
 ```
 
 ---

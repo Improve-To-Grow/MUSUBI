@@ -90,7 +90,7 @@ describe('CI/CD Integration', () => {
 
       it('should include validate job', () => {
         const yaml = generator.generate();
-        expect(yaml).toContain('npx musubi validate');
+        expect(yaml).toContain('musubi validate');
       });
 
       it('should include test job', () => {
@@ -273,7 +273,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
-      - run: npx musubi validate
+      - run: musubi validate
 `;
       const result = validator.validate(content, CIProvider.GITHUB_ACTIONS);
       expect(result.valid).toBe(true);
@@ -305,7 +305,7 @@ jobs:
 
     it('should warn about missing caching', () => {
       const content =
-        'jobs:\n  test:\n    runs-on: ubuntu\n    steps:\n      - npm ci\n      - npx musubi validate';
+        'jobs:\n  test:\n    runs-on: ubuntu\n    steps:\n      - npm ci\n      - musubi validate';
       const result = validator.validate(content, CIProvider.GITHUB_ACTIONS);
       expect(result.warnings.some(w => w.includes('caching'))).toBe(true);
     });
@@ -318,7 +318,7 @@ stages:
 test:
   script:
     - npm ci
-    - npx musubi validate
+    - musubi validate
 `;
       const result = validator.validate(content, CIProvider.GITLAB_CI);
       expect(result.valid).toBe(true);
@@ -406,7 +406,7 @@ test:
 
     it('should validate pipeline', () => {
       const content =
-        'jobs:\n  test:\n    runs-on: ubuntu\n    steps:\n      - npm ci\n      - npx musubi validate';
+        'jobs:\n  test:\n    runs-on: ubuntu\n    steps:\n      - npm ci\n      - musubi validate';
       const result = manager.validate(content, CIProvider.GITHUB_ACTIONS);
       expect(result).toBeDefined();
     });

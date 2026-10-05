@@ -278,14 +278,13 @@ Now, let's actually move a project forward with MUSUBI.
 ### Step 1: Install MUSUBI
 
 ```bash
-# Via npx (recommended)
-npx musubi-sdd init --claude      # If using Claude Code
-npx musubi-sdd init --copilot     # If using GitHub Copilot
-npx musubi-sdd init --cursor      # If using Cursor
+# Install globally from the ITG fork
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
-# Or install globally
-npm install -g musubi-sdd
-musubi init --claude
+# Initialize for your agent
+musubi-sdd init --claude      # If using Claude Code
+musubi-sdd init --copilot     # If using GitHub Copilot
+musubi-sdd init --cursor      # If using Cursor
 ```
 
 Running this creates the following files and directories.
@@ -1244,7 +1243,7 @@ jobs:
         run: npm run test:coverage -- --threshold=80
       
       - name: Constitutional validation
-        run: npx musubi validate
+        run: musubi validate
 
   deploy:
     needs: test
@@ -1304,7 +1303,7 @@ When introducing MUSUBI to an existing project, use Delta Specs (differential sp
 
 ```bash
 cd existing-project
-npx musubi-sdd init --claude
+musubi-sdd init --claude
 ```
 
 ### Step 2: Analyze Existing Code
@@ -1542,7 +1541,7 @@ For details, see the [MUSUBI × CodeGraph MCP Server Integration Guide](https://
 
 1. **Install MUSUBI**
    ```bash
-   npx musubi-sdd init --claude  # Choose your agent
+   musubi-sdd init --claude  # Choose your agent
    ```
 
 2. **First, remember only @orchestrator**
@@ -1578,7 +1577,7 @@ For details, see the [MUSUBI × CodeGraph MCP Server Integration Guide](https://
 
 ## Resources
 
-- **MUSUBI npm**: https://www.npmjs.com/package/musubi-sdd
+- **Source (ITG fork)**: https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments
 - **GitHub Repository**: https://github.com/nahisaho/MUSUBI
 - **Current Version**: v2.1.1 (as of June 2025)
 

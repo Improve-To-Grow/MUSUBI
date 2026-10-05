@@ -31,7 +31,7 @@ This guide provides a practical path to adopt MUSUBI gradually, allowing teams t
 
 #### 1. Install MUSUBI
 ```bash
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 #### 2. Initialize in a Test Project

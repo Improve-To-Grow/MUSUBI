@@ -217,7 +217,7 @@ jobs:
         with:
           node-version: '20'
           
-      - run: npm install -g musubi-sdd
+      - run: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
       
       - name: Validate Constitution
         run: musubi-validate

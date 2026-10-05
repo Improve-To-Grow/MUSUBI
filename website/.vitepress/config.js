@@ -169,8 +169,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/nahisaho/MUSUBI' },
-      { icon: 'npm', link: 'https://www.npmjs.com/package/musubi-sdd' }
+      { icon: 'github', link: 'https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments' }
     ],
 
     footer: {

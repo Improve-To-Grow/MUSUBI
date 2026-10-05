@@ -369,18 +369,18 @@ MUSUBI has a `musubi-analyze` command, which provides analysis features separate
 | **Main purpose** | Project statistics, complexity analysis, giant function detection | Code graph construction, dependency tracking, impact analysis |
 | **Output destination** | Console / report | `steering/memories/codegraph.md` |
 | **Integration with AI** | Provides analysis results to the AI | Real-time integration via the MCP protocol |
-| **Installation** | `npm install -g musubi-sdd` | `uvx codegraph-mcp` |
+| **Installation** | `npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'` | `uvx codegraph-mcp` |
 
 **Guidelines for choosing:**
 
 | What you want to do | Command to use |
 |-------------|-------------|
-| View project statistics | `npx musubi-analyze` |
-| Find high-complexity functions | `npx musubi-analyze --complexity` |
-| Detect giant functions | `npx musubi-analyze --giant-functions` |
+| View project statistics | `musubi-analyze` |
+| Find high-complexity functions | `musubi-analyze --complexity` |
+| Detect giant functions | `musubi-analyze --giant-functions` |
 | Trace callers of a function | CodeGraph (`find_callers`) |
 | Know the impact scope of a change | CodeGraph (`find_dependencies`) |
-| Let the AI grasp the whole picture | `npx musubi-analyze --codegraph-full` |
+| Let the AI grasp the whole picture | `musubi-analyze --codegraph-full` |
 
 :::note info
 **Best Practices**
@@ -432,7 +432,7 @@ sudo apt-get install -y git
 **Connect to WSL from VSCode:**
 1. In VSCode, `Ctrl+Shift+P` → `WSL: Connect to WSL`
 2. Open the project on WSL
-3. Run `npx musubi-sdd init --copilot` in the terminal on WSL
+3. Run `musubi-sdd init --copilot` in the terminal on WSL
 
 **Why is WSL needed?**
 - The CodeGraph MCP Server requires a Python environment
@@ -444,12 +444,12 @@ sudo apt-get install -y git
 
 **CLI:**
 ```bash
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 ```
 
 #### Options During Initialization
 
-Running `npx musubi-sdd init --copilot` starts an interactive project configuration.
+Running `musubi-sdd init --copilot` starts an interactive project configuration.
 
 ```
 🎯 MUSUBI - Ultimate Specification Driven Development
@@ -591,7 +591,7 @@ This generates the following.
 
 | Scenario | How Steering Is Initialized | Characteristics |
 |----------|---------------------|------|
-| **Zero start** | `npx musubi-sdd init --copilot` | Generated from templates at installation. Edit to fit your project |
+| **Zero start** | `musubi-sdd init --copilot` | Generated from templates at installation. Edit to fit your project |
 | **Existing project** | `Generate Steering` | Analyzes existing code and automatically infers structure and technology stack |
 
 **For a zero start:**
@@ -639,7 +639,7 @@ Update Steering
 That's all it takes to bring project memory up to date.
 
 ```bash
-npx musubi-sync  # Manual sync via CLI
+musubi-sync  # Manual sync via CLI
 ```
 :::
 
@@ -667,7 +667,7 @@ EOF
 **CLI:**
 ```bash
 # Use MUSUBI's CodeGraph integration
-npx musubi-analyze --codegraph-full
+musubi-analyze --codegraph-full
 ```
 
 **Natural language (talk to GitHub Copilot):**
@@ -901,7 +901,7 @@ P3 (Low)       → Background, if time permits
 **CLI:**
 ```bash
 # P0 runs immediately, P1-P3 run in parallel in priority order
-npx musubi-orchestrate parallel \
+musubi-orchestrate parallel \
   --skills "frontend-developer,backend-developer,test-engineer" \
   --strategy "priority"
 ```
@@ -941,7 +941,7 @@ Visualize quality with A-F grades:
 
 **CLI:**
 ```bash
-npx -p musubi-gui start --port 3000
+musubi-gui start --port 3000
 ```
 
 **Natural language (talk to GitHub Copilot):**
@@ -988,7 +988,7 @@ Developer → MUSUBI → [Swarm of 25 skills] → Guardrails → Quality-assured
 ## Links
 
 - **GitHub**: https://github.com/nahisaho/MUSUBI
-- **npm**: https://www.npmjs.com/package/musubi-sdd
+- **Source (ITG fork)**: https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments
 - **CodeGraph MCP Server**: https://github.com/alohays/codegraph-mcp
 - **Documentation**: https://nahisaho.github.io/musubi
 
@@ -997,7 +997,7 @@ Developer → MUSUBI → [Swarm of 25 skills] → Guardrails → Quality-assured
 **Get started right now:**
 
 ```bash
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 ```
 
 **Natural language (after installation, talk to GitHub Copilot):**
@@ -1015,34 +1015,27 @@ Experience Swarm Coding with **MUSUBI v5.7.0**.
 
 ## Appendix A: CLI Command List
 
-MUSUBI provides 21 CLI commands. All can be run with `npx`.
+MUSUBI provides 21 CLI commands, all available after a global installation.
 
 :::note info
 **How to Run Commands**
 
-MUSUBI commands are included in the `musubi-sdd` package.
+Install the ITG fork globally once, then run the commands directly (never via `npx`).
 
 ```bash
-# Method 1: Specify the package with the -p option (recommended)
-npx -p musubi-sdd musubi-gui start --port 3000
-npx -p musubi-sdd musubi-analyze --codegraph-full
-
-# Method 2: Run directly after global installation
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 musubi-gui start --port 3000
+musubi-analyze --codegraph-full
 ```
-
-In the command examples below, `npx musubi-xxx` is used for brevity,
-but in practice, run them with `npx -p musubi-sdd musubi-xxx` or with `musubi-xxx` after global installation.
 :::
 
 ### Initialization and Setup
 
 | Command | Description |
 |---------|------|
-| `npx musubi-sdd init` | Initialize project |
-| `npx musubi-onboard` | Analyze existing project and generate Steering |
-| `npx musubi-sync` | Synchronize Steering documents |
+| `musubi-sdd init` | Initialize project |
+| `musubi-onboard` | Analyze existing project and generate Steering |
+| `musubi-sync` | Synchronize Steering documents |
 
 **musubi-sdd init options:**
 - `--copilot` / `--github-copilot` - For GitHub Copilot
@@ -1057,10 +1050,10 @@ but in practice, run them with `npx -p musubi-sdd musubi-xxx` or with `musubi-xx
 
 | Command | Description |
 |---------|------|
-| `npx musubi-requirements` | Requirements definition in EARS format |
-| `npx musubi-design` | C4 model + ADR design |
-| `npx musubi-tasks` | Task breakdown (P0-P3 priorities) |
-| `npx musubi-workflow` | Workflow management |
+| `musubi-requirements` | Requirements definition in EARS format |
+| `musubi-design` | C4 model + ADR design |
+| `musubi-tasks` | Task breakdown (P0-P3 priorities) |
+| `musubi-workflow` | Workflow management |
 
 **musubi-requirements subcommands:**
 - `init <feature>` - Initialize the requirements document for a feature
@@ -1098,10 +1091,10 @@ but in practice, run them with `npx -p musubi-sdd musubi-xxx` or with `musubi-xx
 
 | Command | Description |
 |---------|------|
-| `npx musubi-analyze` | Code quality analysis |
-| `npx musubi-validate` | Validate compliance with the 9 Constitutional Articles |
-| `npx musubi-trace` | Requirements→code→test traceability |
-| `npx musubi-gaps` | Detect gaps between specification and implementation |
+| `musubi-analyze` | Code quality analysis |
+| `musubi-validate` | Validate compliance with the 9 Constitutional Articles |
+| `musubi-trace` | Requirements→code→test traceability |
+| `musubi-gaps` | Detect gaps between specification and implementation |
 
 **musubi-analyze options:**
 - `-t, --type <type>` - Analysis type (quality/dependencies/security/stuck/codegraph/all)
@@ -1141,7 +1134,7 @@ but in practice, run them with `npx -p musubi-sdd musubi-xxx` or with `musubi-xx
 
 | Command | Description |
 |---------|------|
-| `npx musubi-orchestrate` | Multi-skill orchestration |
+| `musubi-orchestrate` | Multi-skill orchestration |
 
 **musubi-orchestrate subcommands:**
 - `run <pattern>` - Run an orchestration pattern
@@ -1162,8 +1155,8 @@ but in practice, run them with `npx -p musubi-sdd musubi-xxx` or with `musubi-xx
 
 | Command | Description |
 |---------|------|
-| `npx musubi-change` | Manage change proposals (Delta specifications) |
-| `npx musubi-checkpoint` | Manage development state checkpoints |
+| `musubi-change` | Manage change proposals (Delta specifications) |
+| `musubi-checkpoint` | Manage development state checkpoints |
 
 **musubi-change subcommands:**
 - `init <change-id>` - Create a new change proposal (with Delta specification)
@@ -1194,8 +1187,8 @@ but in practice, run them with `npx -p musubi-sdd musubi-xxx` or with `musubi-xx
 
 | Command | Description |
 |---------|------|
-| `npx musubi-remember` | Agent memory management |
-| `npx musubi-share` | Memory sharing between teams |
+| `musubi-remember` | Agent memory management |
+| `musubi-share` | Memory sharing between teams |
 
 **musubi-remember subcommands:**
 - `add <memory>` - Add a new memory entry
@@ -1214,11 +1207,11 @@ but in practice, run them with `npx -p musubi-sdd musubi-xxx` or with `musubi-xx
 
 | Command | Description |
 |---------|------|
-| `npx musubi-gui` | Web dashboard |
-| `npx musubi-browser` | Browser automation (natural language) |
-| `npx musubi-resolve` | Automatic GitHub Issue resolution |
-| `npx musubi-convert` | Conversion to and from Spec Kit format |
-| `npx musubi-costs` | LLM API cost tracking |
+| `musubi-gui` | Web dashboard |
+| `musubi-browser` | Browser automation (natural language) |
+| `musubi-resolve` | Automatic GitHub Issue resolution |
+| `musubi-convert` | Conversion to and from Spec Kit format |
+| `musubi-costs` | LLM API cost tracking |
 
 **musubi-gui subcommands:**
 - `start` - Start the web server (specify the port with `--port <port>`)
@@ -1268,7 +1261,7 @@ With MUSUBI, you don't need to memorize CLI commands; you can operate it just by
 
 | What you want to do | Natural-language command | Corresponding CLI command |
 |-------------|-----------------|----------------|
-| Initialize project | `Initialize MUSUBI` | `npx musubi-sdd init --copilot` |
+| Initialize project | `Initialize MUSUBI` | `musubi-sdd init --copilot` |
 | | `Set up the project` | |
 | | `Start SDD` | |
 
@@ -1276,7 +1269,7 @@ With MUSUBI, you don't need to memorize CLI commands; you can operate it just by
 
 | What you want to do | Natural-language command | Corresponding CLI command |
 |-------------|-----------------|----------------|
-| Create index | `Create the CodeGraph MCP Index` | `npx musubi-analyze --codegraph-full` |
+| Create index | `Create the CodeGraph MCP Index` | `musubi-analyze --codegraph-full` |
 | | `Build the code graph` | |
 | | `Analyze the project` | |
 | Update index | `Update the CodeGraph MCP Index` | - |
@@ -1286,7 +1279,7 @@ With MUSUBI, you don't need to memorize CLI commands; you can operate it just by
 
 | What you want to do | Natural-language command | Corresponding CLI command |
 |-------------|-----------------|----------------|
-| Sync memory | `Update Steering` | `npx musubi-sync` |
+| Sync memory | `Update Steering` | `musubi-sync` |
 | | `Sync the project memory` | |
 | Check memory | `Check Steering` | - |
 | | `Show me the project settings` | |
@@ -1295,27 +1288,27 @@ With MUSUBI, you don't need to memorize CLI commands; you can operate it just by
 
 | What you want to do | Natural-language command | Corresponding CLI command |
 |-------------|-----------------|----------------|
-| Define requirements | `Define the requirements for the authentication feature` | `npx musubi-requirements auth` |
+| Define requirements | `Define the requirements for the authentication feature` | `musubi-requirements auth` |
 | | `#sdd-requirements auth` | |
-| Create design | `Design the authentication feature` | `npx musubi-design auth` |
+| Create design | `Design the authentication feature` | `musubi-design auth` |
 | | `#sdd-design auth` | |
-| Task breakdown | `List out the tasks for the authentication feature` | `npx musubi-tasks auth` |
+| Task breakdown | `List out the tasks for the authentication feature` | `musubi-tasks auth` |
 | | `#sdd-tasks auth` | |
 
 ### Implementation and Development
 
 | What you want to do | Natural-language command | Corresponding CLI command |
 |-------------|-----------------|----------------|
-| Implement feature | `Implement the authentication feature` | `npx musubi-workflow implement auth` |
+| Implement feature | `Implement the authentication feature` | `musubi-workflow implement auth` |
 | | `#sdd-implement auth` | |
-| Parallel execution | `Develop the frontend and backend at the same time` | `npx musubi-orchestrate parallel` |
+| Parallel execution | `Develop the frontend and backend at the same time` | `musubi-orchestrate parallel` |
 | | `Implement in parallel` | |
 
 ### Analysis and Validation
 
 | What you want to do | Natural-language command | Corresponding CLI command |
 |-------------|-----------------|----------------|
-| Code analysis | `Analyze the whole project` | `npx musubi-analyze` |
+| Code analysis | `Analyze the whole project` | `musubi-analyze` |
 | | `Show codebase statistics` | |
 | Complexity analysis | `Analyze code complexity` | - |
 | | `Find functions that need refactoring` | |
@@ -1326,11 +1319,11 @@ With MUSUBI, you don't need to memorize CLI commands; you can operate it just by
 
 | What you want to do | Natural-language command | Corresponding CLI command |
 |-------------|-----------------|----------------|
-| Quality check | `Show the quality dashboard` | `npx musubi-gui start --port 3000` |
+| Quality check | `Show the quality dashboard` | `musubi-gui start --port 3000` |
 | | `Check the project quality` | |
-| Constitution validation | `Validate Constitution compliance` | `npx musubi-validate` |
+| Constitution validation | `Validate Constitution compliance` | `musubi-validate` |
 | | `Check whether there are any rule violations` | |
-| Trace check | `Check traceability` | `npx musubi-trace` |
+| Trace check | `Check traceability` | `musubi-trace` |
 | | `Show the trace from requirements to implementation` | |
 
 ### Security
@@ -1346,9 +1339,9 @@ With MUSUBI, you don't need to memorize CLI commands; you can operate it just by
 
 | What you want to do | Natural-language command | Corresponding CLI command |
 |-------------|-----------------|----------------|
-| Gap analysis | `Find gaps between the spec and the implementation` | `npx musubi-gaps` |
-| Change management | `Show the change history` | `npx musubi-change` |
-| Onboarding | `Tell me about the project overview` | `npx musubi-onboard` |
+| Gap analysis | `Find gaps between the spec and the implementation` | `musubi-gaps` |
+| Change management | `Show the change history` | `musubi-change` |
+| Onboarding | `Tell me about the project overview` | `musubi-onboard` |
 
 ---
 

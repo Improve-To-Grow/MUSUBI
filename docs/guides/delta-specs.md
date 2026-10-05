@@ -235,10 +235,10 @@ Add traceability checks to your pipeline:
 ```yaml
 # .github/workflows/traceability-check.yml
 - name: Validate Delta Specs
-  run: npx musubi-change validate-all
+  run: musubi-change validate-all
 
 - name: Check Traceability
-  run: npx musubi-trace ci-check --strictness standard
+  run: musubi-trace ci-check --strictness standard
 ```
 
 ## Next Steps

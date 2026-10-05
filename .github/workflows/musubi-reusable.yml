@@ -65,7 +65,7 @@ jobs:
         run: npm ci || npm install
 
       - name: Install MUSUBI
-        run: npm install -g musubi-sdd
+        run: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
       - name: Constitutional Check
         id: constitution
@@ -73,7 +73,7 @@ jobs:
         run: |
           echo "🏛️ Constitutional Governance Check"
           if [ -f "steering/rules/constitution.md" ]; then
-            npx musubi validate --constitution && echo "result=passed" >> $GITHUB_OUTPUT || echo "result=failed" >> $GITHUB_OUTPUT
+            musubi validate --constitution && echo "result=passed" >> $GITHUB_OUTPUT || echo "result=failed" >> $GITHUB_OUTPUT
           else
             echo "⚠️ No constitution.md found"
             echo "result=skipped" >> $GITHUB_OUTPUT
@@ -84,7 +84,7 @@ jobs:
         if: contains(fromJson('["validate", "all"]'), inputs.command)
         run: |
           echo "✅ Running Validation"
-          if npx musubi validate ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }}; then
+          if musubi validate ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }}; then
             echo "result=passed" >> $GITHUB_OUTPUT
           else
             echo "result=failed" >> $GITHUB_OUTPUT
@@ -96,7 +96,7 @@ jobs:
         if: contains(fromJson('["analyze", "all"]'), inputs.command)
         run: |
           echo "📊 Running Analysis"
-          RESULT=$(npx musubi analyze --format json ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }} 2>/dev/null || echo '{"coverage":0}')
+          RESULT=$(musubi analyze --format json ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }} 2>/dev/null || echo '{"coverage":0}')
           COVERAGE=$(echo "$RESULT" | jq -r '.coverage // 0')
           echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
           echo "Coverage: $COVERAGE%"
@@ -106,14 +106,14 @@ jobs:
         if: contains(fromJson('["gaps", "trace", "all"]'), inputs.command)
         run: |
           echo "🔗 Checking Traceability Gaps"
-          RESULT=$(npx musubi gaps --format json ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }} 2>/dev/null || echo '{"gaps":[]}')
+          RESULT=$(musubi gaps --format json ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }} 2>/dev/null || echo '{"gaps":[]}')
           COUNT=$(echo "$RESULT" | jq '.gaps | length // 0')
           echo "count=$COUNT" >> $GITHUB_OUTPUT
           echo "Gaps: $COUNT"
           
           if [ "$COUNT" -gt 0 ] && [ "${{ inputs.fail-on-gaps }}" = "true" ]; then
             echo "❌ Gaps found, failing"
-            npx musubi gaps ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }}
+            musubi gaps ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }}
             exit 1
           fi
 

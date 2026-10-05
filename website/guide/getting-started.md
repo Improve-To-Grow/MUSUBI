@@ -14,7 +14,7 @@ This guide will help you get MUSUBI up and running in your project.
 
 ```bash
 # Initialize MUSUBI in your project
-npx musubi-sdd init
+musubi-sdd init
 ```
 
 This will:
@@ -26,7 +26,7 @@ This will:
 ### Global Installation
 
 ```bash
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 # Initialize for specific agent
 musubi init --copilot   # GitHub Copilot

@@ -613,7 +613,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: npm install -g musubi-sdd
+      - run: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
       - name: Generate traceability matrix
         run: musubi-trace matrix --format markdown > trace-report.md
       - name: Validate coverage
@@ -632,7 +632,7 @@ jobs:
 traceability:
   stage: test
   script:
-    - npm install -g musubi-sdd
+    - npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
     - musubi-trace matrix --format json > trace-report.json
     - musubi-trace coverage --min-coverage 80
   artifacts:

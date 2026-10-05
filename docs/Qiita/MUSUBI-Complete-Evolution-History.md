@@ -2256,19 +2256,19 @@ const cicdWorkflow = WorkflowExamples.getCICDPipelineWorkflow();
 
 ```bash
 # Always use the latest version (recommended)
-npx musubi-sdd@latest init
+musubi-sdd init
 
 # Specify platform
-npx musubi-sdd@latest init --claude-code  # Claude Code
-npx musubi-sdd@latest init --copilot      # GitHub Copilot
-npx musubi-sdd@latest init --cursor       # Cursor IDE
+musubi-sdd init --claude-code  # Claude Code
+musubi-sdd init --copilot      # GitHub Copilot
+musubi-sdd init --cursor       # Cursor IDE
 ```
 
 ## 16.2 Upgrading an Existing Project
 
 ```bash
 # Update to the latest version with the same command
-npx musubi-sdd@latest init
+musubi-sdd init
 
 # Skills, agents, and CLI commands are updated automatically
 ```
@@ -2403,7 +2403,7 @@ In v5.2.0, we completed ESLint and Prettier compliance across the entire codebas
 ### Technology Stack Approach Selection
 
 ```bash
-$ npx musubi-sdd init --copilot
+$ musubi-sdd init --copilot
 
 ? Technology stack approach:
   ❯ Single language        # Select one language

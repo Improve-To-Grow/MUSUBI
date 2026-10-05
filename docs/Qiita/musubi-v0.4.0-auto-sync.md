@@ -25,7 +25,7 @@ In this article, we answer the question "Why wasn't project memory alone enough?
 
 ```bash
 # Install
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 # Analyze an existing project and generate documentation (v0.3.0)
 musubi-onboard
@@ -332,7 +332,7 @@ Automatic synchronization triggered by codebase changes.
 ### 1. Installation
 
 ```bash
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ### 2. Onboarding an Existing Project (v0.3.0 Feature)
@@ -480,7 +480,7 @@ jobs:
           node-version: '20'
       
       - name: Install MUSUBI
-        run: npm install -g musubi-sdd
+        run: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
       
       - name: Sync steering docs
         run: musubi-sync --auto-approve
@@ -630,7 +630,7 @@ Repeat...
 
 ```bash
 # Install
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 # Analyze an existing project (first time)
 musubi-onboard
@@ -653,7 +653,7 @@ With v0.4.0, Phases 1-4 of the roadmap are complete. Future possibilities:
 ## References
 
 - [MUSUBI GitHub Repository](https://github.com/nahisaho/MUSUBI)
-- [npm Package](https://www.npmjs.com/package/musubi-sdd)
+- [ITG fork](https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments)
 - [Phase 1-4 Roadmap Analysis](https://github.com/nahisaho/MUSUBI/blob/main/docs/analysis/SERENA-STEERING-COMPARISON.md)
 
 ---

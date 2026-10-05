@@ -225,13 +225,13 @@ program
 ### 4. Installation Flow
 
 ```
-npx musubi-sdd init --claude       # Claude Code (default)
-npx musubi-sdd init --copilot      # GitHub Copilot
-npx musubi-sdd init --cursor       # Cursor IDE
-npx musubi-sdd init --gemini       # Gemini CLI
-npx musubi-sdd init --codex        # Codex CLI
-npx musubi-sdd init --qwen         # Qwen Code
-npx musubi-sdd init --windsurf     # Windsurf IDE
+musubi-sdd init --claude       # Claude Code (default)
+musubi-sdd init --copilot      # GitHub Copilot
+musubi-sdd init --cursor       # Cursor IDE
+musubi-sdd init --gemini       # Gemini CLI
+musubi-sdd init --codex        # Codex CLI
+musubi-sdd init --qwen         # Qwen Code
+musubi-sdd init --windsurf     # Windsurf IDE
 ```
 
 ## Key Differences from cc-sdd

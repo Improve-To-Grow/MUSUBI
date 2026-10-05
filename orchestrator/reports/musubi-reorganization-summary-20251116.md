@@ -147,7 +147,7 @@ musubi/
 - `package.json` with dependencies and bin configuration
 - `bin/musubi.js` and `bin/musubi-init.js`
 - `src/templates/` for template distribution
-- CLI commands: `npx musubi-sdd init`, `musubi init`, etc.
+- CLI commands: `musubi-sdd init`, `musubi init`, etc.
 - npm registry publishing configuration
 
 **Before**: Generic "Basic CLI"
@@ -222,7 +222,7 @@ musubi/  (npm package repository)
 
 ### User Project Structure (After `musubi init`)
 
-When users run `npx musubi-sdd init`, templates are copied:
+When users run `musubi-sdd init`, templates are copied:
 
 user-project/
 ├── .claude/
@@ -239,7 +239,7 @@ user-project/
 1. **Added Section: Distribution Platform**
    - npm package details (`musubi-sdd`)
    - Node.js >=18.0.0 requirement
-   - Installation methods (npx, global, local)
+   - Installation method (global install from the ITG fork)
    - npm dependencies (commander, inquirer, chalk, fs-extra)
    - Distribution rationale
 
@@ -271,7 +271,7 @@ user-project/
 
 1. **Added Section: Distribution and Access**
    - Package distribution via npm registry
-   - Three installation methods (npx, global, local)
+   - Installation method (global install from the ITG fork)
    - Requirements (Node.js >=18.0.0, Git, Claude Code)
    - First-time setup example
    - What gets installed (skills, commands, steering, templates, etc.)
@@ -288,14 +288,11 @@ user-project/
 
 MUSUBI is distributed as an npm package (`musubi-sdd`)...
 
-**Installation Methods**:
-1. npx (Zero Installation): `npx musubi-sdd init`
-2. Global Installation: `npm install -g musubi-sdd`
-3. Local Project Dependency: `npm install --save-dev musubi-sdd`
+**Installation**: `npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'`
 
 **First-Time Setup**:
 ```bash
-npx musubi-sdd init my-project
+musubi-sdd init my-project
 cd my-project
 code .
 ```

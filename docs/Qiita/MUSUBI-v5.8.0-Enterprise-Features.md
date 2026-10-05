@@ -386,9 +386,9 @@ Time:        23.27s
 ## 🚀 How to Upgrade
 
 ```bash
-npm update musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 # or
-npm install musubi-sdd@5.8.0
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ## 📊 Performance Improvements (Continued from v5.7.x)
@@ -427,4 +427,4 @@ Please upgrade and accelerate SDD adoption across your whole team!
 - [The Evolution of MUSUBI](https://qiita.com/nahisaho/items/musubi-evolution)
 
 **Repository**: https://github.com/nahisaho/MUSUBI  
-**npm**: https://www.npmjs.com/package/musubi-sdd
+**Source (ITG fork)**: https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments

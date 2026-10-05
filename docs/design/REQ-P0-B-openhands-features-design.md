@@ -576,7 +576,7 @@ jobs:
           node-version: '20'
       
       - name: Install MUSUBI
-        run: npm install -g musubi-sdd
+        run: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
       
       - name: Resolve Issue
         env:

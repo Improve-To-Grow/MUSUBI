@@ -604,7 +604,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: npm install -g musubi-sdd
+      - run: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
       - run: |
           for file in changes/*.md; do
             musubi-change validate "$file"
@@ -623,7 +623,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: npm install -g musubi-sdd
+      - run: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
       - run: musubi-gaps coverage --min-coverage 80
       - run: musubi-trace validate --min-coverage 100
 ```

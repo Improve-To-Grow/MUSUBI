@@ -5,6 +5,9 @@
 
 const { EventEmitter } = require('events');
 
+// MUSUBI is distributed from the ITG fork on GitHub, never from the npm registry
+const MUSUBI_INSTALL_COMMAND = 'npm install -g github:Improve-To-Grow/MUSUBI#ITG-adjustments';
+
 // ============================================================================
 // CI/CD Providers
 // ============================================================================
@@ -95,19 +98,19 @@ const JobConfig = {
   [JobType.VALIDATE]: {
     name: 'Validate Steering',
     description: 'Validate steering files and constitution compliance',
-    command: 'npx musubi validate',
+    command: 'musubi validate',
     required: true,
   },
   [JobType.ANALYZE]: {
     name: 'Analyze Codebase',
     description: 'Analyze codebase structure and patterns',
-    command: 'npx musubi analyze',
+    command: 'musubi analyze',
     required: false,
   },
   [JobType.SYNC]: {
     name: 'Sync Steering',
     description: 'Synchronize steering files across platforms',
-    command: 'npx musubi sync',
+    command: 'musubi sync',
     required: false,
   },
   [JobType.TEST]: {
@@ -119,13 +122,13 @@ const JobConfig = {
   [JobType.REPORT]: {
     name: 'Generate Report',
     description: 'Generate quality metrics report',
-    command: 'npx musubi gaps --format json',
+    command: 'musubi gaps --format json',
     required: false,
   },
   [JobType.DEPLOY]: {
     name: 'Deploy Documentation',
     description: 'Deploy generated documentation',
-    command: 'npx musubi share --deploy',
+    command: 'musubi share --deploy',
     required: false,
   },
 };
@@ -211,6 +214,7 @@ class WorkflowGenerator {
 
     steps.push(
       { name: 'Install dependencies', run: 'npm ci' },
+      { name: 'Install MUSUBI', run: MUSUBI_INSTALL_COMMAND },
       { name: jobConfig.name, run: jobConfig.command }
     );
 
@@ -242,7 +246,7 @@ class WorkflowGenerator {
       lines.push('', 'cache:', '  paths:', '    - node_modules/');
     }
 
-    lines.push('', 'before_script:', '  - npm ci', '');
+    lines.push('', 'before_script:', '  - npm ci', `  - ${MUSUBI_INSTALL_COMMAND}`, '');
 
     for (const jobType of this.options.jobs) {
       const jobConfig = JobConfig[jobType];
@@ -270,6 +274,7 @@ class WorkflowGenerator {
             steps: [
               { task: 'NodeTool@0', inputs: { versionSpec: this.options.nodeVersion } },
               { script: 'npm ci', displayName: 'Install dependencies' },
+              { script: MUSUBI_INSTALL_COMMAND, displayName: 'Install MUSUBI' },
               { script: jobConfig.command, displayName: jobConfig.name },
             ],
           },
@@ -309,6 +314,7 @@ class WorkflowGenerator {
         stage('Install') {
             steps {
                 sh 'npm ci'
+                sh '${MUSUBI_INSTALL_COMMAND}'
             }
         }
 ${stages}
@@ -333,6 +339,7 @@ ${stages}
           'checkout',
           { restore_cache: { keys: ['v1-deps-{{ checksum "package-lock.json" }}'] } },
           { run: 'npm ci' },
+          { run: MUSUBI_INSTALL_COMMAND },
           {
             save_cache: {
               paths: ['node_modules'],
@@ -366,6 +373,9 @@ ${stages}
       'cache:',
       '  npm: true',
       '',
+      'before_script:',
+      `  - ${MUSUBI_INSTALL_COMMAND}`,
+      '',
       'script:',
     ];
 
@@ -384,7 +394,7 @@ ${stages}
         step: {
           name: jobConfig.name,
           caches: ['node'],
-          script: ['npm ci', jobConfig.command],
+          script: ['npm ci', MUSUBI_INSTALL_COMMAND, jobConfig.command],
         },
       };
     });
@@ -456,7 +466,7 @@ class PreCommitGenerator {
     const commands = [];
 
     if (this.options.hooks.includes('validate')) {
-      commands.push('npx musubi validate');
+      commands.push('musubi validate');
     }
 
     if (this.options.hooks.includes('lint')) {
@@ -468,7 +478,7 @@ class PreCommitGenerator {
     }
 
     if (this.options.hooks.includes('sync')) {
-      commands.push('npx musubi sync');
+      commands.push('musubi sync');
     }
 
     return `#!/bin/sh
@@ -486,7 +496,7 @@ echo "✅ Pre-commit checks passed!"
   generateHuskyConfig() {
     return {
       hooks: {
-        'pre-commit': 'npx lint-staged && npx musubi validate',
+        'pre-commit': 'npx lint-staged && musubi validate',
       },
     };
   }
@@ -499,7 +509,7 @@ echo "✅ Pre-commit checks passed!"
     }
 
     if (this.options.hooks.includes('validate')) {
-      config['steering/**/*.md'] = ['npx musubi validate'];
+      config['steering/**/*.md'] = ['musubi validate'];
     }
 
     return config;
@@ -510,8 +520,8 @@ echo "✅ Pre-commit checks passed!"
       prepare: 'husky install',
       lint: 'eslint src tests',
       'lint:fix': 'eslint src tests --fix',
-      validate: 'npx musubi validate',
-      'validate:all': 'npx musubi validate --all',
+      validate: 'musubi validate',
+      'validate:all': 'musubi validate --all',
     };
   }
 }
@@ -752,6 +762,7 @@ function createCICDManager(options = {}) {
 
 module.exports = {
   // Constants
+  MUSUBI_INSTALL_COMMAND,
   CIProvider,
   ProviderConfig,
   JobType,

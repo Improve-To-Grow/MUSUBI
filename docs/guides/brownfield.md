@@ -23,7 +23,7 @@ Navigate to your project root and initialize:
 
 ```bash
 cd your-project
-npx musubi-init
+musubi-init
 ```
 
 This creates the MUSUBI directory structure:
@@ -52,7 +52,7 @@ your-project/
 Run the analysis command to understand your codebase:
 
 ```bash
-npx musubi-analyze
+musubi-analyze
 ```
 
 MUSUBI will scan your project and generate a report:
@@ -88,7 +88,7 @@ Coverage Estimate:
 Based on the analysis, generate initial EARS requirements:
 
 ```bash
-npx musubi-requirements generate --from-analysis
+musubi-requirements generate --from-analysis
 ```
 
 This creates requirements documents in `docs/requirements/`:
@@ -124,7 +124,7 @@ Manually review the generated requirements:
 Extract design patterns from your code:
 
 ```bash
-npx musubi-design generate --from-code
+musubi-design generate --from-code
 ```
 
 Example output in `docs/design/`:
@@ -193,7 +193,7 @@ describe('AuthService', () => {
 MUSUBI can suggest links automatically:
 
 ```bash
-npx musubi-trace auto-link --suggest
+musubi-trace auto-link --suggest
 ```
 
 ```
@@ -212,7 +212,7 @@ Apply suggestions? (y/n)
 Check your traceability coverage:
 
 ```bash
-npx musubi-trace coverage
+musubi-trace coverage
 ```
 
 ```
@@ -241,16 +241,16 @@ For future changes, use delta specifications:
 
 ```bash
 # Create a change proposal
-npx musubi-change init --title "Add Password Reset" --type feature
+musubi-change init --title "Add Password Reset" --type feature
 
 # Edit the delta spec
 code storage/changes/CHG-xxx/delta-spec.md
 
 # Validate the change
-npx musubi-change validate CHG-xxx
+musubi-change validate CHG-xxx
 
 # Analyze impact
-npx musubi-change impact CHG-xxx
+musubi-change impact CHG-xxx
 ```
 
 ## Step 8: Configure CI Integration
@@ -275,10 +275,10 @@ jobs:
       - run: npm ci
       
       - name: Validate Traceability
-        run: npx musubi-trace ci-check --threshold 80
+        run: musubi-trace ci-check --threshold 80
       
       - name: Generate Report
-        run: npx musubi-trace html-report -o report.html
+        run: musubi-trace html-report -o report.html
       
       - name: Upload Report
         uses: actions/upload-artifact@v4
@@ -295,10 +295,10 @@ For large projects, start with critical paths:
 
 ```bash
 # Analyze specific modules
-npx musubi-analyze --include "src/auth/**" --include "src/payments/**"
+musubi-analyze --include "src/auth/**" --include "src/payments/**"
 
 # Focus on high-priority areas
-npx musubi-requirements generate --priority high
+musubi-requirements generate --priority high
 ```
 
 ### Legacy Code
@@ -322,7 +322,7 @@ For code with multiple teams:
 Track your brownfield conversion progress:
 
 ```bash
-npx musubi-trace report --format markdown
+musubi-trace report --format markdown
 ```
 
 Example metrics dashboard:

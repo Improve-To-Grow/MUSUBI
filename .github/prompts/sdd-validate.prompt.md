@@ -550,7 +550,7 @@ AND the system SHALL create a session.
    - [ ] Each function has at most 50 lines of code, nested functions included (VII-5)
    - [ ] Each source file other than an `index` file imports at most 10 distinct modules (VII-6)
    - The numbers are the defaults. Use the configured limits when set: `code_limits` in `steering/rules/constitution-levels.yml`, overridden per project by `constitution.overrides.code_limits` in `steering/project.yml` (e.g. `max_function_lines: 80`)
-   - Measure with `npx musubi-validate project`, which reports the source files, functions and import lists over the configured limits
+   - Measure with `musubi-validate project`, which reports the source files, functions and import lists over the configured limits
 
 **Example Output**:
 

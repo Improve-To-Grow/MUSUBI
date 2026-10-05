@@ -14,10 +14,10 @@ This guide explains how to run your first specification-driven development workf
 
 ```bash
 # Global installation (for the CLI)
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 # Or install locally in your project
-npm install musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ## Step 2: Initialize the Project

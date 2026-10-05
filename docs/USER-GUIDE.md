@@ -49,30 +49,30 @@ Specification → Design → Implementation → Validation → Monitoring
 ### Installation
 
 ```bash
-# Global installation
-npm install -g musubi-sdd
+# Global installation from the ITG fork (rerun to update)
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
-# Or use npx
-npx musubi-sdd init
+# Initialize
+musubi-sdd init
 ```
 
 ### Quick Start (5 Minutes)
 
 ```bash
 # 1. Initialize project
-npx musubi-sdd init
+musubi-sdd init
 
 # 2. Generate requirements
-npx musubi-requirements "User authentication feature"
+musubi-requirements "User authentication feature"
 
 # 3. Generate design
-npx musubi-design auth-feature
+musubi-design auth-feature
 
 # 4. Generate tasks
-npx musubi-tasks auth-feature
+musubi-tasks auth-feature
 
 # 5. Validate everything
-npx musubi-validate all
+musubi-validate all
 ```
 
 ### Project Structure
@@ -262,16 +262,16 @@ musubi orchestrate workflow \
 
 ```bash
 # Claude Code (primary)
-npx musubi-sdd init --platform claude-code
+musubi-sdd init --platform claude-code
 
 # GitHub Copilot
-npx musubi-sdd init --platform github-copilot
+musubi-sdd init --platform github-copilot
 
 # Cursor
-npx musubi-sdd init --platform cursor
+musubi-sdd init --platform cursor
 
 # Universal (all platforms)
-npx musubi-sdd init --platform all
+musubi-sdd init --platform all
 ```
 
 ---
@@ -292,8 +292,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
       - run: npm ci
-      - run: npx musubi-validate all
-      - run: npx musubi-trace --output reports/traceability.md
+      - run: musubi-validate all
+      - run: musubi-trace --output reports/traceability.md
 ```
 
 ### GitLab CI
@@ -303,7 +303,7 @@ jobs:
 validate:
   script:
     - npm ci
-    - npx musubi-validate all
+    - musubi-validate all
 ```
 
 ### Jenkins
@@ -312,7 +312,7 @@ validate:
 // Jenkinsfile
 stage('Validate') {
   steps {
-    sh 'npx musubi-validate all'
+    sh 'musubi-validate all'
   }
 }
 ```
@@ -334,7 +334,7 @@ AGENTS.md + steering/structure.md → Full SDD
 Run validation in pre-commit hooks:
 
 ```bash
-npx husky add .husky/pre-commit "npx musubi-validate ears"
+npx husky add .husky/pre-commit "musubi-validate ears"
 ```
 
 ### 3. Use P-Labels
@@ -360,7 +360,7 @@ function login(username, password) { ... }
 Before applying changes, review impact:
 
 ```bash
-npx musubi-change analyze --delta storage/changes/auth-v2.md
+musubi-change analyze --delta storage/changes/auth-v2.md
 ```
 
 ---
@@ -373,7 +373,7 @@ npx musubi-change analyze --delta storage/changes/auth-v2.md
 
 ```bash
 # Check specific file
-npx musubi-validate ears --file storage/specs/feature.md
+musubi-validate ears --file storage/specs/feature.md
 
 # Fix: Ensure requirements start with "The system shall", "When...", etc.
 ```
@@ -382,7 +382,7 @@ npx musubi-validate ears --file storage/specs/feature.md
 
 ```bash
 # Check which article
-npx musubi-validate constitution --verbose
+musubi-validate constitution --verbose
 
 # Common fix: Add missing tests or documentation
 ```
@@ -391,7 +391,7 @@ npx musubi-validate constitution --verbose
 
 ```bash
 # Find gaps
-npx musubi-gaps --verbose
+musubi-gaps --verbose
 
 # Fix: Add REQ-XXX comments to implementation
 ```
@@ -400,13 +400,13 @@ npx musubi-gaps --verbose
 
 ```bash
 # Show help
-npx musubi-sdd --help
+musubi-sdd --help
 
 # Show version
-npx musubi-sdd --version
+musubi-sdd --version
 
 # Verbose output
-npx musubi-validate all --verbose
+musubi-validate all --verbose
 ```
 
 ---
@@ -575,4 +575,4 @@ const report = reporter.generateReport(analysis);
 
 **MUSUBI v6.0.0** - Specification Driven Development for the AI Age
 
-[GitHub](https://github.com/nahisaho/MUSUBI) | [npm](https://www.npmjs.com/package/musubi-sdd) | [Documentation](https://nahisaho.github.io/musubi)
+[GitHub](https://github.com/nahisaho/MUSUBI) | [ITG fork](https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments) | [Documentation](https://nahisaho.github.io/musubi)

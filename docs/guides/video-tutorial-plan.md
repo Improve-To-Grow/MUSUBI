@@ -65,7 +65,7 @@ Let's get started."
 **Commands to Demo**:
 ```bash
 # Terminal 1: Install MUSUBI
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 # Verify installation
 musubi --version
@@ -660,7 +660,7 @@ Timeline:
 18:00 Archive & Summary
 
 Resources:
-📦 Install: npm install -g musubi-sdd
+📦 Install: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 📖 Documentation: https://github.com/nahisaho/MUSUBI
 📝 Brownfield Tutorial: https://github.com/nahisaho/MUSUBI/blob/main/docs/guides/brownfield-tutorial.md
 📊 Traceability Guide: https://github.com/nahisaho/MUSUBI/blob/main/docs/guides/traceability-matrix-guide.md

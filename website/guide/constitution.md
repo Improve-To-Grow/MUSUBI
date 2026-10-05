@@ -98,7 +98,7 @@ A _core path_ holds feature logic. A _delivery path_ holds the code that deliver
 musubi-validate article 1
 ```
 
-`musubi-validate article 1` reports the profile and the core modules in the core paths. The full validator (`npx musubi-validate project`) also checks I-2, I-3 and I-5 (advisory), and for `application` I-A4 and I-A5 (advisory).
+`musubi-validate article 1` reports the profile and the core modules in the core paths. The full validator (`musubi-validate project`) also checks I-2, I-3 and I-5 (advisory), and for `application` I-A4 and I-A5 (advisory).
 
 ---
 
@@ -271,7 +271,7 @@ musubi-validate article 7
 musubi-validate gates
 ```
 
-`musubi-validate article 7` counts the projects and reports the code-size findings. The full validator (`npx musubi-validate project`) and the CI constitutional check also check VII-4 to VII-6 on the source files in core and delivery paths.
+`musubi-validate article 7` counts the projects and reports the code-size findings. The full validator (`musubi-validate project`) and the CI constitutional check also check VII-4 to VII-6 on the source files in core and delivery paths.
 
 ---
 

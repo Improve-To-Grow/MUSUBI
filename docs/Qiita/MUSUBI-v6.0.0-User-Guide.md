@@ -51,22 +51,22 @@ for f in *.md; do [ "$f" != "AGENTS.md" ] && mv "$f" "${f%.md}.prompt.md"; done
 # New installation
 
 ```bash
-# Global install via npm (sudo required on Linux/Mac)
-sudo npm install -g musubi-sdd
+# Global install from the ITG fork (sudo may be required on Linux/Mac)
+sudo npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
-# Or run directly with npx (no install needed, recommended)
-npx musubi-sdd@latest --version
+# Verify
+musubi-sdd --version
 # Output: 6.1.0
 ```
 
 # Upgrade
 
 ```bash
-# If installed globally (sudo required on Linux/Mac)
-sudo npm install -g musubi-sdd@latest
+# Rerun the global install (sudo may be required on Linux/Mac)
+sudo npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
-# npx always uses the latest version (recommended)
-npx musubi-sdd@latest --version
+# Verify
+musubi-sdd --version
 ```
 
 ---
@@ -79,26 +79,26 @@ Initialize to match your AI coding platform:
 
 ```bash
 # Claude Code (recommended)
-npx musubi-sdd init --claude
+musubi-sdd init --claude
 
 # GitHub Copilot (VS Code)
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 
 # Cursor IDE
-npx musubi-sdd init --cursor
+musubi-sdd init --cursor
 
 # Gemini CLI
-npx musubi-sdd init --gemini
+musubi-sdd init --gemini
 
 # Multiple platforms at once
-npx musubi-sdd init --claude --copilot
+musubi-sdd init --claude --copilot
 ```
 
 # Step 2: Define Requirements
 
 ```bash
 # Generate requirements in EARS format (interactive)
-npx musubi-requirements "User authentication feature"
+musubi-requirements "User authentication feature"
 ```
 
 **Note**: Requirements definition proceeds interactively. After the AI probes for the "true purpose" one question at a time, it defines the requirements comprehensively using MECE.
@@ -109,7 +109,7 @@ Generated file: `storage/specs/user-auth-requirements.md`
 
 ```bash
 # Generate the design with the C4 model
-npx musubi-design user-auth
+musubi-design user-auth
 ```
 
 Generated file: `storage/design/user-auth-design.md`
@@ -118,7 +118,7 @@ Generated file: `storage/design/user-auth-design.md`
 
 ```bash
 # Generate implementation tasks
-npx musubi-tasks user-auth
+musubi-tasks user-auth
 ```
 
 Generated file: `storage/tasks/user-auth-tasks.md`
@@ -127,7 +127,7 @@ Generated file: `storage/tasks/user-auth-tasks.md`
 
 ```bash
 # Validate everything
-npx musubi-validate all
+musubi-validate all
 ```
 
 ---
@@ -154,7 +154,7 @@ MUSUBI v6.1.0 supports the following 7 AI coding platforms:
 - MCP (Model Context Protocol) integration
 
 ```bash
-npx musubi-sdd init --claude
+musubi-sdd init --claude
 ```
 
 # GitHub Copilot (Improved in v6.0.0)
@@ -163,7 +163,7 @@ npx musubi-sdd init --claude
 - Full VS Code integration
 
 ```bash
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 ```
 
 Generated file structure:
@@ -289,67 +289,67 @@ your-project/
 
 ```bash
 # Show help
-npx musubi-sdd --help
+musubi-sdd --help
 
 # Check version
-npx musubi-sdd --version
+musubi-sdd --version
 
 # Initialize
-npx musubi-sdd init [--claude|--copilot|--cursor|--gemini]
+musubi-sdd init [--claude|--copilot|--cursor|--gemini]
 ```
 
 # Specification-Driven Development Commands
 
 ```bash
 # Requirements definition
-npx musubi-requirements "<feature description>"
+musubi-requirements "<feature description>"
 
 # Design
-npx musubi-design <feature-name>
+musubi-design <feature-name>
 
 # Task breakdown
-npx musubi-tasks <feature-name>
+musubi-tasks <feature-name>
 
 # Validation
-npx musubi-validate [all|requirements|design|traceability]
+musubi-validate [all|requirements|design|traceability]
 
 # Traceability
-npx musubi-trace <feature-name>
+musubi-trace <feature-name>
 
 # Gap analysis
-npx musubi-gaps <feature-name>
+musubi-gaps <feature-name>
 ```
 
 # Change Management Commands
 
 ```bash
 # Create a change proposal
-npx musubi-change init <change-name>
+musubi-change init <change-name>
 
 # Apply changes
-npx musubi-change apply <change-name>
+musubi-change apply <change-name>
 
 # Archive changes
-npx musubi-change archive <change-name>
+musubi-change archive <change-name>
 ```
 
 # Advanced Commands
 
 ```bash
 # Orchestration
-npx musubi-orchestrate <pattern> <feature-name>
+musubi-orchestrate <pattern> <feature-name>
 
 # Cost tracking
-npx musubi-costs
+musubi-costs
 
 # Release
-npx musubi-release [--dry-run]
+musubi-release [--dry-run]
 
 # Analysis
-npx musubi-analyze <path>
+musubi-analyze <path>
 
 # Sync
-npx musubi-sync
+musubi-sync
 ```
 
 ---
@@ -371,7 +371,7 @@ MUSUBI can generate templates in 8 languages:
 
 ```bash
 # Initialize with Japanese templates
-npx musubi-sdd init --claude --locale ja
+musubi-sdd init --claude --locale ja
 ```
 
 ---
@@ -382,15 +382,15 @@ Patterns for coordinating multiple agents:
 
 | Pattern | Use | Command |
 |----------|------|---------|
-| Sequential | Sequential execution | `npx musubi-orchestrate sequential` |
-| Triage | Task routing | `npx musubi-orchestrate triage` |
-| Handoff | Handoff between agents | `npx musubi-orchestrate handoff` |
-| Swarm | Cooperative processing | `npx musubi-orchestrate swarm` |
-| Group Chat | Discussion-style | `npx musubi-orchestrate group-chat` |
-| Nested | Hierarchical | `npx musubi-orchestrate nested` |
-| Human-in-Loop | Human approval | `npx musubi-orchestrate human-in-loop` |
-| Auto | Automatic selection | `npx musubi-orchestrate auto` |
-| Parallel | Parallel execution | `npx musubi-orchestrate parallel` |
+| Sequential | Sequential execution | `musubi-orchestrate sequential` |
+| Triage | Task routing | `musubi-orchestrate triage` |
+| Handoff | Handoff between agents | `musubi-orchestrate handoff` |
+| Swarm | Cooperative processing | `musubi-orchestrate swarm` |
+| Group Chat | Discussion-style | `musubi-orchestrate group-chat` |
+| Nested | Hierarchical | `musubi-orchestrate nested` |
+| Human-in-Loop | Human approval | `musubi-orchestrate human-in-loop` |
+| Auto | Automatic selection | `musubi-orchestrate auto` |
+| Parallel | Parallel execution | `musubi-orchestrate parallel` |
 
 ---
 
@@ -406,7 +406,7 @@ Patterns for coordinating multiple agents:
 
 ```bash
 # Initialize in large-project mode
-npx musubi-sdd init --mode large
+musubi-sdd init --mode large
 ```
 
 # Monorepo Support
@@ -433,14 +433,14 @@ const graph = pm.generateDependencyGraph('mermaid');
 
 # Common Issues
 
-# Q: `npx musubi-sdd` is not found
+# Q: `musubi-sdd` is not found
 
 ```bash
-# Clear the cache
-npx clear-npx-cache
+# Reinstall globally
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 # Re-run
-npx musubi-sdd@latest --version
+musubi-sdd --version
 ```
 
 # Q: GitHub Copilot does not recognize `.prompt.md`
@@ -462,7 +462,7 @@ for f in *.md; do [ "$f" != "AGENTS.md" ] && mv "$f" "${f%.md}.prompt.md"; done
 # 📚 Related Resources
 
 - **GitHub repository**: [nahisaho/musubi](https://github.com/nahisaho/MUSUBI)
-- **npm package**: [musubi-sdd](https://www.npmjs.com/package/musubi-sdd)
+- **Source**: [ITG fork](https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments)
 - **VS Code Copilot documentation**: [Reusable prompt files](https://code.visualstudio.com/docs/copilot/copilot-customization#_reusable-prompt-files)
 
 ---

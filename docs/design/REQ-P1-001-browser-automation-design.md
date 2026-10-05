@@ -270,7 +270,7 @@ browser-agent: Generate Playwright test code from the action history so far
 ## Execution
 
 ```bash
-npx musubi browser-agent "Open https://example.com and test the login"
+musubi browser-agent "Open https://example.com and test the login"
 ```
 ```
 
@@ -280,19 +280,19 @@ npx musubi browser-agent "Open https://example.com and test the login"
 
 ```bash
 # Interactive mode
-npx musubi browser
+musubi browser
 
 # Run a single command
-npx musubi browser --command "Open https://example.com"
+musubi browser --command "Open https://example.com"
 
 # Run a script
-npx musubi browser --script ./browser-script.txt
+musubi browser --script ./browser-script.txt
 
 # Screenshot comparison
-npx musubi browser --compare expected.png actual.png --threshold 0.95
+musubi browser --compare expected.png actual.png --threshold 0.95
 
 # Test generation
-npx musubi browser --generate-test --output tests/e2e/login.spec.ts
+musubi browser --generate-test --output tests/e2e/login.spec.ts
 ```
 
 ### Options

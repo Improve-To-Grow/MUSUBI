@@ -84,7 +84,7 @@ todo-app/
 mkdir todo-app && cd todo-app
 
 # Initialize MUSUBI (for GitHub Copilot)
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 ```
 
 ### 2.2 Tech Stack Decisions
@@ -154,7 +154,7 @@ A simple and easy-to-use task management application
 ### 3.2 Generate Requirements with the CLI
 
 ```bash
-npx musubi-sdd requirements --feature todo-management --output storage/specs/
+musubi-sdd requirements --feature todo-management --output storage/specs/
 ```
 
 ### 3.3 Generated Requirements Document
@@ -269,7 +269,7 @@ While a filter is active, the system shall display only tasks matching the filte
 ### 4.1 Generate the Design
 
 ```bash
-npx musubi-sdd design --feature todo-management --output storage/specs/
+musubi-sdd design --feature todo-management --output storage/specs/
 ```
 
 ### 4.2 C4 Component Diagram
@@ -350,7 +350,7 @@ Adopt local state management using React useState.
 ### 5.1 Generate Tasks
 
 ```bash
-npx musubi-sdd tasks --feature todo-management
+musubi-sdd tasks --feature todo-management
 ```
 
 ### 5.2 Task List
@@ -651,13 +651,13 @@ npm test
 ### 7.2 Traceability Validation
 
 ```bash
-npx musubi-sdd trace --feature todo-management
+musubi-sdd trace --feature todo-management
 ```
 
 ### 7.3 Check Requirements Coverage
 
 ```bash
-npx musubi-sdd validate --feature todo-management
+musubi-sdd validate --feature todo-management
 ```
 
 **Example output:**

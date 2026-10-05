@@ -204,9 +204,10 @@ function getCurrentVersion(projectDir) {
   return null;
 }
 
+// Compares the numeric core only, so fork pre-release tags (e.g. 6.3.1-itg.1) match their base
 function compareVersions(v1, v2) {
-  const parts1 = v1.split('.').map(Number);
-  const parts2 = v2.split('.').map(Number);
+  const parts1 = v1.split('-')[0].split('.').map(Number);
+  const parts2 = v2.split('-')[0].split('.').map(Number);
 
   for (let i = 0; i < 3; i++) {
     if (parts1[i] > parts2[i]) return 1;
@@ -248,7 +249,7 @@ program
     const currentVersion = getCurrentVersion(projectDir);
     if (!currentVersion) {
       console.log(chalk.red('❌ MUSUBI is not initialized in this directory.'));
-      console.log(chalk.gray('\nRun: npx musubi-sdd init\n'));
+      console.log(chalk.gray('\nRun: musubi-sdd init\n'));
       process.exit(1);
     }
 
@@ -386,7 +387,7 @@ program
       console.log(
         chalk.yellow(`\n⚠️  Upgrade available: ${currentVersion} → ${packageJson.version}`)
       );
-      console.log(chalk.gray('\nRun: npx musubi-sdd upgrade\n'));
+      console.log(chalk.gray('\nRun: musubi-sdd upgrade\n'));
     } else {
       console.log(chalk.green('\n✅ Project is up to date.\n'));
     }

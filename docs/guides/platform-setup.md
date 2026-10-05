@@ -34,7 +34,7 @@
 
 ```bash
 # Initialize
-npx musubi-sdd init --claude-code
+musubi-sdd init --claude-code
 ```
 
 ### Generated File Structure
@@ -104,7 +104,7 @@ project/
 
 ```bash
 # Initialize
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 ```
 
 ### Generated File Structure
@@ -166,7 +166,7 @@ project/
 
 ```bash
 # Initialize
-npx musubi-sdd init --cursor
+musubi-sdd init --cursor
 ```
 
 ### Generated File Structure
@@ -219,7 +219,7 @@ rules:
 npm install -g @anthropic-ai/gemini-cli
 
 # Initialize MUSUBI
-npx musubi-sdd init --gemini
+musubi-sdd init --gemini
 ```
 
 ### Generated File Structure
@@ -267,7 +267,7 @@ export GEMINI_CONTEXT="$(cat GEMINI.md steering/product.md)"
 npm install -g @openai/codex-cli
 
 # Initialize MUSUBI
-npx musubi-sdd init --codex
+musubi-sdd init --codex
 ```
 
 ### Generated File Structure
@@ -306,7 +306,7 @@ codex -i
 
 ```bash
 # Initialize MUSUBI
-npx musubi-sdd init --qwen
+musubi-sdd init --qwen
 ```
 
 ### Generated File Structure
@@ -349,7 +349,7 @@ Write the requirements following .qwen/commands/sdd-requirements.md
 
 ```bash
 # Initialize MUSUBI
-npx musubi-sdd init --windsurf
+musubi-sdd init --windsurf
 ```
 
 ### Generated File Structure
@@ -418,31 +418,31 @@ The following CLI commands are available on all platforms:
 
 ```bash
 # Initialize
-npx musubi-sdd init
+musubi-sdd init
 
 # SDD workflow
-npx musubi-sdd requirements --feature <name>
-npx musubi-sdd design --feature <name>
-npx musubi-sdd tasks --feature <name>
-npx musubi-sdd validate
+musubi-sdd requirements --feature <name>
+musubi-sdd design --feature <name>
+musubi-sdd tasks --feature <name>
+musubi-sdd validate
 
 # Analysis
-npx musubi-sdd analyze
-npx musubi-sdd gaps
-npx musubi-sdd trace
+musubi-sdd analyze
+musubi-sdd gaps
+musubi-sdd trace
 
 # Memory management
-npx musubi-sdd remember
-npx musubi-sdd sync
+musubi-sdd remember
+musubi-sdd sync
 
 # Automation
-npx musubi-sdd orchestrate
-npx musubi-sdd resolve --issue <number>
+musubi-sdd orchestrate
+musubi-sdd resolve --issue <number>
 
 # Utilities
-npx musubi-sdd browser
-npx musubi-sdd gui start
-npx musubi-sdd convert
+musubi-sdd browser
+musubi-sdd gui start
+musubi-sdd convert
 ```
 
 ---

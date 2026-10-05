@@ -7,7 +7,7 @@ MUSUBI SDD is a comprehensive toolkit for specification-driven development. This
 ## Installation
 
 ```bash
-npm install musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ## Module Index

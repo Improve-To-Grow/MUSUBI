@@ -5,7 +5,7 @@ MUSUBI SDD programmatic API for Node.js integration.
 ## Installation
 
 ```bash
-npm install musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ## Quick Start

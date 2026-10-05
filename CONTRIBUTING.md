@@ -12,6 +12,7 @@ Thank you for your interest in contributing to MUSUBI! This document provides gu
 - [Project Structure](#project-structure)
 - [Development Workflow](#development-workflow)
 - [Pull Request Process](#pull-request-process)
+- [Versioning and Distribution (ITG fork)](#versioning-and-distribution-itg-fork)
 - [Coding Standards](#coding-standards)
 - [Testing Guidelines](#testing-guidelines)
 - [Documentation](#documentation)
@@ -241,6 +242,29 @@ git push origin feature/your-feature-name
 
 # Go to GitHub and create Pull Request
 ```
+
+---
+
+## Versioning and Distribution (ITG fork)
+
+This fork is distributed from GitHub as `@improve-to-grow/musubi-sdd`. It is never published to the npm registry (`"private": true` blocks it), and the `musubi-sdd` package on npm is the upstream version without our changes.
+
+**Install and update** (the same command does both):
+
+```bash
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
+```
+
+Never use `npx` for MUSUBI commands, and never `npm update -g`: neither can resolve this fork, so both fall back to the upstream registry package.
+
+**Version scheme**: `<upstream base>-itg.<N>`, e.g. `6.3.1-itg.1`.
+
+- Bump `N` in every change merged to `ITG-adjustments` that affects installed users, so `musubi-sdd --version` shows whether someone is up to date:
+  ```bash
+  npm version prerelease --preid itg --no-git-tag-version
+  ```
+- When merging a new upstream release, reset to the new base: `<new upstream version>-itg.1`.
+- Add a `CHANGELOG.md` entry for each bump. Tagging `v<version>` creates a GitHub release whose notes contain the pinned install command.
 
 ---
 

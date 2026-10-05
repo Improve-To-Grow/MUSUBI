@@ -162,66 +162,66 @@ const result = await critic.evaluate('requirements', context);
 MUSUBI provides powerful CLI tools that can be used from any terminal. Install with:
 
 ```bash
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 # or use directly
-npx musubi-sdd <command>
+musubi-sdd <command>
 ```
 
 ### Core Workflow Commands
 
 | Command               | Purpose                        | Example                                  |
 | --------------------- | ------------------------------ | ---------------------------------------- |
-| `musubi-workflow`     | Workflow state & metrics       | `npx musubi-workflow status`             |
-| `musubi-requirements` | EARS requirements management   | `npx musubi-requirements init <feature>` |
-| `musubi-design`       | C4 + ADR design documents      | `npx musubi-design init <feature>`       |
-| `musubi-tasks`        | Task breakdown management      | `npx musubi-tasks init <feature>`        |
-| `musubi-trace`        | Traceability analysis          | `npx musubi-trace matrix`                |
-| `musubi-change`       | Change management (brownfield) | `npx musubi-change init <change-id>`     |
-| `musubi-gaps`         | Gap detection & coverage       | `npx musubi-gaps detect`                 |
-| `musubi-validate`     | Constitutional validation      | `npx musubi-validate all`                |
+| `musubi-workflow`     | Workflow state & metrics       | `musubi-workflow status`             |
+| `musubi-requirements` | EARS requirements management   | `musubi-requirements init <feature>` |
+| `musubi-design`       | C4 + ADR design documents      | `musubi-design init <feature>`       |
+| `musubi-tasks`        | Task breakdown management      | `musubi-tasks init <feature>`        |
+| `musubi-trace`        | Traceability analysis          | `musubi-trace matrix`                |
+| `musubi-change`       | Change management (brownfield) | `musubi-change init <change-id>`     |
+| `musubi-gaps`         | Gap detection & coverage       | `musubi-gaps detect`                 |
+| `musubi-validate`     | Constitutional validation      | `musubi-validate all`                |
 
 ### Supporting Commands
 
 | Command          | Purpose                        | Example                         |
 | ---------------- | ------------------------------ | ------------------------------- |
-| `musubi-init`    | Initialize MUSUBI in project   | `npx musubi-init --copilot`     |
-| `musubi-share`   | Memory sharing across projects | `npx musubi-share export`       |
-| `musubi-sync`    | Sync steering files            | `npx musubi-sync`               |
-| `musubi-analyze` | Project analysis               | `npx musubi-analyze complexity` |
-| `musubi-onboard` | AI platform onboarding         | `npx musubi-onboard copilot`    |
+| `musubi-init`    | Initialize MUSUBI in project   | `musubi-init --copilot`     |
+| `musubi-share`   | Memory sharing across projects | `musubi-share export`       |
+| `musubi-sync`    | Sync steering files            | `musubi-sync`               |
+| `musubi-analyze` | Project analysis               | `musubi-analyze complexity` |
+| `musubi-onboard` | AI platform onboarding         | `musubi-onboard copilot`    |
 
 ### Advanced Commands (v3.5.0 NEW)
 
 | Command              | Purpose                            | Example                                |
 | -------------------- | ---------------------------------- | -------------------------------------- |
-| `musubi-orchestrate` | Multi-skill workflow orchestration | `npx musubi-orchestrate auto <task>`   |
-| `musubi-browser`     | Browser automation & E2E testing   | `npx musubi-browser run "click login"` |
-| `musubi-gui`         | Web GUI dashboard                  | `npx musubi-gui start`                 |
-| `musubi-remember`    | Agent memory management            | `npx musubi-remember extract`          |
-| `musubi-resolve`     | GitHub Issue auto-resolution       | `npx musubi-resolve <issue-number>`    |
-| `musubi-convert`     | Format conversion (Spec Kit)       | `npx musubi-convert to-speckit`        |
+| `musubi-orchestrate` | Multi-skill workflow orchestration | `musubi-orchestrate auto <task>`   |
+| `musubi-browser`     | Browser automation & E2E testing   | `musubi-browser run "click login"` |
+| `musubi-gui`         | Web GUI dashboard                  | `musubi-gui start`                 |
+| `musubi-remember`    | Agent memory management            | `musubi-remember extract`          |
+| `musubi-resolve`     | GitHub Issue auto-resolution       | `musubi-resolve <issue-number>`    |
+| `musubi-convert`     | Format conversion (Spec Kit)       | `musubi-convert to-speckit`        |
 
 ### Replanning Commands (v3.6.0 NEW)
 
 | Command                               | Purpose                      | Example                                                      |
 | ------------------------------------- | ---------------------------- | ------------------------------------------------------------ |
-| `musubi-orchestrate replan`           | Execute dynamic replanning   | `npx musubi-orchestrate replan <context-id>`                 |
-| `musubi-orchestrate goal register`    | Register a new goal          | `npx musubi-orchestrate goal register --name "Deploy API"`   |
-| `musubi-orchestrate goal update`      | Update goal progress         | `npx musubi-orchestrate goal update <goal-id> --progress 50` |
-| `musubi-orchestrate goal status`      | View goal status             | `npx musubi-orchestrate goal status [goal-id]`               |
-| `musubi-orchestrate optimize run`     | Run path optimization        | `npx musubi-orchestrate optimize run <path-id>`              |
-| `musubi-orchestrate optimize suggest` | Get optimization suggestions | `npx musubi-orchestrate optimize suggest <path-id>`          |
-| `musubi-orchestrate path analyze`     | Analyze execution path       | `npx musubi-orchestrate path analyze <path-id>`              |
-| `musubi-orchestrate path optimize`    | Optimize execution path      | `npx musubi-orchestrate path optimize <path-id>`             |
+| `musubi-orchestrate replan`           | Execute dynamic replanning   | `musubi-orchestrate replan <context-id>`                 |
+| `musubi-orchestrate goal register`    | Register a new goal          | `musubi-orchestrate goal register --name "Deploy API"`   |
+| `musubi-orchestrate goal update`      | Update goal progress         | `musubi-orchestrate goal update <goal-id> --progress 50` |
+| `musubi-orchestrate goal status`      | View goal status             | `musubi-orchestrate goal status [goal-id]`               |
+| `musubi-orchestrate optimize run`     | Run path optimization        | `musubi-orchestrate optimize run <path-id>`              |
+| `musubi-orchestrate optimize suggest` | Get optimization suggestions | `musubi-orchestrate optimize suggest <path-id>`          |
+| `musubi-orchestrate path analyze`     | Analyze execution path       | `musubi-orchestrate path analyze <path-id>`              |
+| `musubi-orchestrate path optimize`    | Optimize execution path      | `musubi-orchestrate path optimize <path-id>`             |
 
 ### Guardrails Commands (v3.9.0 NEW)
 
 | Command                                    | Purpose                           | Example                                                                                                   |
 | ------------------------------------------ | --------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `musubi-validate guardrails`               | Input/Output guardrail validation | `npx musubi-validate guardrails --type input`                                                             |
-| `musubi-validate guardrails --type output` | Output content validation         | `echo "content" \| npx musubi-validate guardrails --type output`                                          |
-| `musubi-validate guardrails --type safety` | Safety check with constitutional  | `npx musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js` |
-| `musubi-validate guardrails-chain`         | Chain multiple guardrails         | `npx musubi-validate guardrails-chain --parallel`                                                         |
+| `musubi-validate guardrails`               | Input/Output guardrail validation | `musubi-validate guardrails --type input`                                                             |
+| `musubi-validate guardrails --type output` | Output content validation         | `echo "content" \| musubi-validate guardrails --type output`                                          |
+| `musubi-validate guardrails --type safety` | Safety check with constitutional  | `musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js` |
+| `musubi-validate guardrails-chain`         | Chain multiple guardrails         | `musubi-validate guardrails-chain --parallel`                                                         |
 
 ## Enterprise Scale Modules (v5.5.0 NEW)
 
@@ -261,15 +261,15 @@ Combine CLI commands with GitHub Copilot prompts for maximum efficiency:
 
 ```bash
 # Initialize workflow, then use prompt
-npx musubi-workflow init user-auth
+musubi-workflow init user-auth
 #sdd-requirements user-auth
 
 # Analyze issues, then resolve
-npx musubi-resolve analyze 42
+musubi-resolve analyze 42
 #sdd-implement issue-42-fix
 
 # Start GUI dashboard for visual tracking
-npx musubi-gui start
+musubi-gui start
 ```
 
 ## Learn More
@@ -279,7 +279,7 @@ npx musubi-gui start
 - [Constitutional Governance](steering/rules/constitution.md)
 - [8-Stage SDD Workflow](steering/rules/workflow.md)
 
-**Tip**: Run `npx musubi-sdd --help` for complete CLI documentation.
+**Tip**: Run `musubi-sdd --help` for complete CLI documentation.
 
 ---
 

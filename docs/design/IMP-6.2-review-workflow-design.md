@@ -1619,20 +1619,20 @@ jobs:
     if: contains(github.event.head_commit.modified, 'docs/requirements/')
     steps:
       - uses: actions/checkout@v4
-      - run: npx musubi review requirements --ci
+      - run: musubi review requirements --ci
 
   design-review:
     runs-on: ubuntu-latest
     if: contains(github.event.head_commit.modified, 'docs/design/')
     steps:
       - uses: actions/checkout@v4
-      - run: npx musubi review design --ci
+      - run: musubi review design --ci
 
   constitution-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npx musubi validate constitution --strict
+      - run: musubi validate constitution --strict
 ```
 
 ### 13.2 VS Code Extension Integration

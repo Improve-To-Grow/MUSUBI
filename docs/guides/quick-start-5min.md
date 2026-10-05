@@ -39,25 +39,14 @@
 
 ## 2. Installation
 
-### Option A: npx (Recommended, No Installation Required)
+MUSUBI is installed globally from the ITG fork. Do not use `npx` or the `musubi-sdd` package on npm: that is the upstream version without our changes.
 
 ```bash
-npx musubi-sdd init
-```
-
-### Option B: Global Installation
-
-```bash
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 musubi init
 ```
 
-### Option C: Project-Local
-
-```bash
-npm install --save-dev musubi-sdd
-npx musubi init
-```
+To update later, run the same install command again.
 
 ---
 
@@ -70,7 +59,7 @@ npx musubi init
 mkdir my-project && cd my-project
 
 # Initialize MUSUBI (for GitHub Copilot)
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 ```
 
 **Generated file structure:**
@@ -98,7 +87,7 @@ my-project/
 cd existing-project
 
 # Automatically analyze and generate steering docs
-npx musubi-sdd onboard
+musubi-sdd onboard
 ```
 
 **Automatically detected items:**
@@ -121,7 +110,7 @@ npx musubi-sdd onboard
 ### 4.2 Generate Requirements with the CLI
 
 ```bash
-npx musubi-sdd requirements --feature login --output storage/specs/
+musubi-sdd requirements --feature login --output storage/specs/
 ```
 
 ### 4.3 Generated Requirements Document (EARS Format)
@@ -190,7 +179,7 @@ graph LR
 When the codebase changes, update the steering docs:
 
 ```bash
-npx musubi-sdd remember --auto
+musubi-sdd remember --auto
 ```
 
 ### Tip 2: Gap Analysis
@@ -198,7 +187,7 @@ npx musubi-sdd remember --auto
 Check the differences between requirements and implementation:
 
 ```bash
-npx musubi-sdd gaps
+musubi-sdd gaps
 ```
 
 ### Tip 3: Change Impact Analysis
@@ -206,7 +195,7 @@ npx musubi-sdd gaps
 Visualize the scope of a change's impact:
 
 ```bash
-npx musubi-sdd analyze --changes
+musubi-sdd analyze --changes
 ```
 
 ---

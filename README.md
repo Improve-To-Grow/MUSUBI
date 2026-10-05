@@ -4,16 +4,25 @@
 
 **Ultimate Specification Driven Development Tool**
 
-[![CI](https://github.com/nahisaho/MUSUBI/actions/workflows/ci.yml/badge.svg)](https://github.com/nahisaho/MUSUBI/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/musubi-sdd.svg)](https://www.npmjs.com/package/musubi-sdd)
-[![npm downloads](https://img.shields.io/npm/dm/musubi-sdd.svg)](https://www.npmjs.com/package/musubi-sdd)
+[![CI](https://github.com/Improve-To-Grow/MUSUBI/actions/workflows/ci.yml/badge.svg?branch=ITG-adjustments)](https://github.com/Improve-To-Grow/MUSUBI/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-[Documentation](docs/) | [npm](https://www.npmjs.com/package/musubi-sdd)
+[Documentation](docs/) | [Upstream project](https://github.com/nahisaho/MUSUBI)
 
 </div>
+
+> [!IMPORTANT]
+> **This is the Improve To Grow (ITG) fork of MUSUBI.** It is installed globally from this repository, never from the npm registry: the `musubi-sdd` package on npm is the upstream version without our changes.
+>
+> ```bash
+> npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
+> ```
+>
+> - Always run the installed commands directly (`musubi-sdd init`, `musubi-validate …`). Never use `npx`: it downloads the upstream package when MUSUBI is not installed.
+> - To update, run the same install command again. Do not run `npm update -g`; it cannot update a GitHub install.
+> - Check what you have with `npm ls -g @improve-to-grow/musubi-sdd` and `musubi-sdd --version` (fork versions end in `-itg.N`).
 
 ---
 
@@ -40,11 +49,12 @@ MUSUBI (musubi - "connection/binding") is a comprehensive **Specification Driven
 ## 🚀 Quick Start
 
 ```bash
-# Install and initialize in 30 seconds
-npx musubi-sdd init
+# Install (once per machine) and initialize in 30 seconds
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
+musubi-sdd init
 
 # For existing projects - auto-analyze and generate steering docs
-npx musubi-sdd onboard
+musubi-sdd onboard
 
 # That's it! Now use your AI agent with SDD commands:
 # Claude Code: /sdd-requirements, /sdd-design, /sdd-implement
@@ -55,9 +65,6 @@ npx musubi-sdd onboard
 <summary>📦 More installation options</summary>
 
 ```bash
-# Global installation
-npm install -g musubi-sdd
-
 # Initialize for specific AI agent
 musubi init --copilot   # GitHub Copilot
 musubi init --cursor    # Cursor IDE
@@ -528,35 +535,37 @@ musubi-validate complexity
 
 ## Quick Start
 
-### Installation via npx
+### Installation
 
 ```bash
+# Install globally from the ITG fork (once per machine; rerun to update)
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
+
 # Initialize MUSUBI for your preferred agent
 
 # Claude Code (default) - 27 Skills (25 + 5 built-in)
-npx musubi-sdd init
-npx musubi-sdd init --claude
+musubi-sdd init
+musubi-sdd init --claude
 
 # GitHub Copilot - 27 skills (AGENTS.md, official support)
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 
 # Cursor IDE - 27 skills (AGENTS.md, official support)
-npx musubi-sdd init --cursor
+musubi-sdd init --cursor
 
 # Gemini CLI - 27 skills (GEMINI.md integration)
-npx musubi-sdd init --gemini
+musubi-sdd init --gemini
 
 # Codex CLI - 27 skills (AGENTS.md)
-npx musubi-sdd init --codex
+musubi-sdd init --codex
 
 # Qwen Code - 27 skills (AGENTS.md)
-npx musubi-sdd init --qwen
+musubi-sdd init --qwen
 
 # Windsurf IDE - 27 skills (AGENTS.md)
-npx musubi-sdd init --windsurf
+musubi-sdd init --windsurf
 
-# Or install globally
-npm install -g musubi-sdd
+# Short alias
 musubi init --claude    # or --copilot, --cursor, etc.
 
 # Onboard existing project (automatic analysis)
@@ -1025,7 +1034,7 @@ Performs quick constitutional compliance checks:
 - **Article IV**: EARS Requirements Format (validates EARS patterns)
 - **Article VI**: Project Memory (checks steering files)
 
-For comprehensive validation, use your agent's `/sdd-validate` (or equivalent) command, or run `npx musubi-validate project`. For an `application` project the validator also checks core → delivery imports (I-3), UI code in core paths (I-A4), request-context APIs outside adapter paths (I-A5), schema validation on machine-facing endpoints (II-A4) and `package.json` scripts that point to missing files (II-A10). For every profile it also checks the code-size limits of the source files in core and delivery paths (VII-4–VII-6: at most 500 lines of code per file, 50 per function and 10 imports per file; warnings, configurable through `constitution.overrides.code_limits` in `steering/project.yml`) and doc comments on the exported functions and classes of core modules (I-5, advisory).
+For comprehensive validation, use your agent's `/sdd-validate` (or equivalent) command, or run `musubi-validate project`. For an `application` project the validator also checks core → delivery imports (I-3), UI code in core paths (I-A4), request-context APIs outside adapter paths (I-A5), schema validation on machine-facing endpoints (II-A4) and `package.json` scripts that point to missing files (II-A10). For every profile it also checks the code-size limits of the source files in core and delivery paths (VII-4–VII-6: at most 500 lines of code per file, 50 per function and 10 imports per file; warnings, configurable through `constitution.overrides.code_limits` in `steering/project.yml`) and doc comments on the exported functions and classes of core modules (I-5, advisory).
 
 ### Agent-Specific Commands
 
@@ -1257,7 +1266,7 @@ for which files to edit to enable it.
 
 ```bash
 # 1. Initialize
-npx musubi-sdd init
+musubi-sdd init
 
 # 2. Generate steering
 /sdd-steering
@@ -1279,7 +1288,7 @@ npx musubi-sdd init
 
 ```bash
 # 1. Initialize with existing codebase
-npx musubi-sdd init
+musubi-sdd init
 
 # 2. Generate steering from existing code
 /sdd-steering

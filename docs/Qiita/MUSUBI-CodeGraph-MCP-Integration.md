@@ -438,7 +438,7 @@ With the integration of MUSUBI v2.0 × CodeGraph MCP Server, AI agents have evol
 
 ```bash
 # Install MUSUBI
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 # Initialize in your project
 musubi init --claude-code

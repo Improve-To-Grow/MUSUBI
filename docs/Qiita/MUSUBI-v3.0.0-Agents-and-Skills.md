@@ -15,25 +15,25 @@ MUSUBI (Specification Driven Development) v3.0.0 is a specification-driven devel
 
 ```bash
 # For Claude Code (default)
-npx musubi-sdd@latest init
+musubi-sdd init
 
 # For GitHub Copilot
-npx musubi-sdd@latest init --copilot
+musubi-sdd init --copilot
 
 # For Cursor IDE
-npx musubi-sdd@latest init --cursor
+musubi-sdd init --cursor
 ```
 
 ## 2.2 Upgrading an Existing Project
 
 ```bash
 # Upgrade to v3.0.0
-npx musubi-sdd@latest init
+musubi-sdd init
 
 # Skills and commands are updated automatically
 ```
 
-**Note:** Using `npx` always runs the latest version. A global install is not required.
+**Note:** To get the latest version, rerun `npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'` before upgrading a project.
 
 # Chapter 3 Agent (Skill) Overview
 
@@ -540,10 +540,10 @@ In MUSUBI, each specialized AI is defined as a **Skill**. Each Skill is speciali
 **Usage examples:**
 ```bash
 # Generate E2E tests
-npx musubi-workflow --agent browser --task "Create an E2E test for the login flow"
+musubi-workflow --agent browser --task "Create an E2E test for the login flow"
 
 # Visual regression test
-npx musubi-workflow --agent browser --task "Screenshot test for the dashboard"
+musubi-workflow --agent browser --task "Screenshot test for the dashboard"
 ```
 
 ---
@@ -568,16 +568,16 @@ npx musubi-workflow --agent browser --task "Screenshot test for the dashboard"
 **Usage examples:**
 ```bash
 # Start the dashboard
-npx musubi-gui start
+musubi-gui start
 
 # Development mode (hot reload)
-npx musubi-gui dev
+musubi-gui dev
 
 # Show only the traceability matrix
-npx musubi-gui matrix
+musubi-gui matrix
 
 # Specify a custom port
-npx musubi-gui start --port 4000
+musubi-gui start --port 4000
 ```
 
 **API endpoints:**

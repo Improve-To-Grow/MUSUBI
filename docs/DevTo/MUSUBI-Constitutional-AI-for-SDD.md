@@ -2,7 +2,7 @@
 
 > **Stop Vibe Coding. Start Building Software That Actually Works.**
 
-![MUSUBI Banner](https://img.shields.io/badge/MUSUBI-v2.1.1-blue?style=for-the-badge) ![npm](https://img.shields.io/npm/v/musubi-sdd?style=for-the-badge) ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+![MUSUBI Banner](https://img.shields.io/badge/MUSUBI-v2.1.1-blue?style=for-the-badge) ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
 
 ## The Problem: AI Coding Without Direction
 
@@ -64,7 +64,7 @@ Here's the magic: **you only need to remember one command**.
 
 ```bash
 # Install MUSUBI
-npx musubi-sdd init --copilot  # or --claude, --cursor, etc.
+musubi-sdd init --copilot  # or --claude, --cursor, etc.
 ```
 
 Then, just talk to `@orchestrator`:
@@ -206,13 +206,13 @@ Traceability: 100%
 
 ```bash
 # Initialize with your AI platform
-npx musubi-sdd init --claude     # Claude Code
-npx musubi-sdd init --copilot    # GitHub Copilot
-npx musubi-sdd init --cursor     # Cursor IDE
-npx musubi-sdd init --gemini     # Gemini CLI
-npx musubi-sdd init --windsurf   # Windsurf
-npx musubi-sdd init --codex      # Codex CLI
-npx musubi-sdd init --qwen       # Qwen Code
+musubi-sdd init --claude     # Claude Code
+musubi-sdd init --copilot    # GitHub Copilot
+musubi-sdd init --cursor     # Cursor IDE
+musubi-sdd init --gemini     # Gemini CLI
+musubi-sdd init --windsurf   # Windsurf
+musubi-sdd init --codex      # Codex CLI
+musubi-sdd init --qwen       # Qwen Code
 ```
 
 ### Your First Feature
@@ -257,7 +257,7 @@ The AI will:
 
 ## Resources
 
-- 📦 **npm**: [musubi-sdd](https://www.npmjs.com/package/musubi-sdd)
+- 📦 **Source**: [ITG fork](https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments)
 - 🐙 **GitHub**: [nahisaho/musubi](https://github.com/nahisaho/MUSUBI)
 - 📚 **Documentation**: [README](https://github.com/nahisaho/MUSUBI#readme)
 - 🆕 **CodeGraph MCP**: [nahisaho/codegraph-mcp-server](https://github.com/nahisaho/codegraph-mcp-server)
@@ -276,7 +276,7 @@ AI coding assistants are here to stay. But without proper guidance, they produce
 Stop vibe coding. Start building software that actually works.
 
 ```bash
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 ```
 
 ---
