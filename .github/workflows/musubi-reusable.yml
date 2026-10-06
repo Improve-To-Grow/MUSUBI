@@ -39,10 +39,6 @@ on:
         description: 'Number of gaps'
         value: ${{ jobs.musubi.outputs.gaps-count }}
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   musubi:
     name: MUSUBI Validation
