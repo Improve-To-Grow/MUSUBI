@@ -417,7 +417,7 @@ npx musubi-sdd upgrade
 - [MUSUBI SDD 公式ドキュメント](https://github.com/nahisaho/MUSUBI)
 - [Constitutional Governance](steering/rules/constitution.md)
 - [Review Gate Engine API Reference](docs/API-REFERENCE.md)
-- [CHANGELOG v6.2.0](CHANGELOG.md)
+- [CHANGELOG v6.2.0](https://github.com/nahisaho/MUSUBI/blob/main/CHANGELOG.md#620---2026-01-01)
 
 ---
 

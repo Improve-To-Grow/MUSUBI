@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Changelog is kept only in `CHANGELOG.md`**: `README.md` replaces its per-release "What's New" sections with links to this file; steering files and the shared steering templates link to it instead of carrying a changelog section; the `/sdd-change-archive` command templates for all platforms direct changelog entries to `CHANGELOG.md`; the documentation site navigation links to this file
 - **Multilingual support is limited to technical-article publication** (CHANGE-001):
   - All SDD artifacts (steering, requirements, design, tasks, change proposals, skill deliverables) and agent chat are English only
   - `TechArticleGenerator` (`src/enterprise/tech-article.js`) is the single language boundary: `language` per call, then `config.defaultLanguage`, then `en`; Qiita and Zenn keep Japanese (`ja`) output

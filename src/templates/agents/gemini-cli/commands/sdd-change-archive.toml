@@ -72,7 +72,7 @@ If REMOVED requirements exist:
 # Step 6: Update Documentation
 
 Update main documentation:
-- README.md changelog
+- `CHANGELOG.md` entry (README.md and other docs link to it instead of repeating it)
 - API documentation (if applicable)
 - User guides
 

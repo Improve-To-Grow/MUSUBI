@@ -265,31 +265,31 @@ git checkout archive/{{deprecated-feature}} -- lib/{{deprecated-feature}}/
 
 ### 6. Update Documentation
 
-**Update Main Documentation**:
+**Update the Changelog** (`CHANGELOG.md` is the only changelog; README.md and other documents link to it instead of repeating its entries):
 
 ```markdown
-<!-- README.md -->
+<!-- CHANGELOG.md -->
 
-## Changelog
+## [{{VERSION}}] - {{DATE}}
 
-### [{{VERSION}}] - {{DATE}}
-
-#### Added
+### Added
 
 - {{FEATURE}}: {{DESCRIPTION}} (CHG-{{NUMBER}})
 
-#### Changed
+### Changed
 
 - {{MODIFIED_FEATURE}}: {{DESCRIPTION}}
 
-#### Deprecated
+### Deprecated
 
 - {{DEPRECATED_FEATURE}}: Use {{ALTERNATIVE}} instead
 
-#### Removed
+### Removed
 
 - {{REMOVED_FEATURE}}: Removed after {{DAYS}}-day deprecation period
 ```
+
+**Update Main Documentation** (README.md, user guides): link to the `CHANGELOG.md` entry instead of copying it.
 
 **Update API Documentation** (if applicable):
 
