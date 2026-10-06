@@ -485,9 +485,10 @@ gh auth login
 
 ---
 
-### ❌ Problem: Non-English text (e.g. translated documents) is garbled
+### ❌ Problem: Non-ASCII text (e.g. Japanese technical-article sources) is garbled
 
-This applies when bilingual output is enabled (see [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md)).
+MUSUBI writes SDD documents in English, but article sources under `docs/Qiita/`, generated Qiita/Zenn
+articles, and your own content may contain non-ASCII characters.
 
 **Solution:**
 

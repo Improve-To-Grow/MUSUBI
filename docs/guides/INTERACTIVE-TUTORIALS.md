@@ -60,15 +60,10 @@ musubi init
   Python
   Go
   Rust
-  
-? Documentation language: (Use arrow keys)
-❯ English
-  Japanese
   ...
 ```
 
-> Keep **English** as the documentation language. Bilingual output (an extra translated copy of
-> every document) is enabled separately — see [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md).
+> MUSUBI has no documentation-language prompt: all generated documents and agent chat are in English.
 
 ### Step 3: Check Generated Files
 

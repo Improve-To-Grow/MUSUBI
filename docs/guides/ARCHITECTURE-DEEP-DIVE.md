@@ -394,8 +394,6 @@ src/
 │   └── template-constraints.js # Template constraints
 │
 ├── templates/                  # Templates
-│   ├── index.js               # Template exports
-│   ├── locale-manager.js      # Multi-language management
 │   ├── template-constraints.js # Constraint definitions
 │   ├── agents/                # Agent templates
 │   │   ├── claude-code/       # Claude Code

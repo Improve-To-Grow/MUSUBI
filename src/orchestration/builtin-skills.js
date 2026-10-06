@@ -432,7 +432,6 @@ const requirementsReviewerSkill = {
 
         const result = await reviewer.applyCorrections(input.documentPath, input.corrections, {
           createBackup: input.createBackup !== false,
-          updateJapanese: input.updateJapanese !== false,
           reviewOptions: {
             method: input.method || ReviewMethod.COMBINED,
           },
@@ -661,7 +660,6 @@ const designReviewerSkill = {
 
         const result = await reviewer.applyCorrections(input.documentPath, input.corrections, {
           createBackup: input.createBackup !== false,
-          updateJapanese: input.updateJapanese !== false,
           generateADRs: input.generateADRs !== false,
           adrPath: input.adrPath,
           reviewOptions: {

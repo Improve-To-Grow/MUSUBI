@@ -126,10 +126,6 @@ steering:
 
 ```yaml
 agents:
-  default_language: "en"
-  bilingual_output:
-    enabled: false
-    languages: ["en"]
   
   output:
     gradual_generation: true
@@ -142,12 +138,11 @@ agents:
 
 **Purpose**: Defines how all agents should behave.
 
-**Bilingual output**: disabled by default (English only). `default_language` is the language agents use
-to chat with the user; `bilingual_output` adds a translated copy of every document. Enabling them also
-requires template changes — see [BILINGUAL-IMPLEMENTATION.md](../BILINGUAL-IMPLEMENTATION.md).
+**Language**: all agents write documents in English and chat in English. There is no language
+setting: `locale`, `agents.default_language` and `agents.bilingual_output` were removed in CHANGE-001
+and now fail validation. Multilingual output exists only in the technical-article generator.
 
 **When to update**:
-- Change default language
 - Adjust output thresholds
 - Enable/disable features
 - Modify dialogue patterns
@@ -370,7 +365,6 @@ Reads configuration to:
 ### All Document-Generating Agents
 
 Read configuration to:
-- Check bilingual output requirement
 - Apply gradual generation settings
 - Use correct file splitting threshold
 - Follow naming conventions
@@ -560,14 +554,14 @@ project_name: "musubi-sdd"  # The project name
 ### Reading Configuration in Agent
 
 ```javascript
-// Example: Agent reads bilingual setting
+// Example: Agent reads output settings
 const config = readYAML('steering/project.yml');
-const { enabled, languages } = config.agents.bilingual_output;
+const { gradual_generation, progress_indicators } = config.agents.output;
 
-generateEnglishVersion();
-if (enabled) {
-  // e.g. languages = ["en", "ja"] -> also write <name>.ja.md
-  generateTranslation(languages.find(lang => lang !== 'en'));
+if (gradual_generation) {
+  generateInChunks({ showProgress: progress_indicators });
+} else {
+  generateAtOnce();
 }
 ```
 

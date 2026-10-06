@@ -459,7 +459,6 @@ const result = await validator.validateAll(projectPath);
 - 🤝 **Team Collaboration** - `musubi-share` enables memory sharing, import/export, and multi-platform sync (v0.6.0)
 - ✅ **Constitutional Validation** - `musubi-validate` enforces 9 immutable governance articles with Phase -1 Gates (v0.7.0)
 - ✅ **Complete Traceability** - Requirements → Design → Code → Tests mapping
-- 🌐 **Optional Bilingual Output** - English by default; agents can add a translated copy of every document and chat in a second language ([how to enable](BILINGUAL-IMPLEMENTATION.md))
 
 ## Supported AI Coding Agents
 
@@ -1221,11 +1220,9 @@ AND the system SHALL create a session.
 ## Documentation Language
 
 All agent-generated documents are written in English, and agents communicate with users in English.
-
-Bilingual output is optional: when enabled, every document also gets a translated copy
-(e.g. `requirements.ja.md` next to `requirements.md`, with English as the reference), and agents can
-chat with users in the second language. See [BILINGUAL-IMPLEMENTATION.md](BILINGUAL-IMPLEMENTATION.md)
-for which files to edit to enable it.
+There is no documentation-language setting. The one multilingual feature is technical-article
+generation: `TechArticleGenerator` (`src/enterprise/tech-article.js`) can emit Japanese articles for
+Qiita and Zenn through its `language` option.
 
 ## Delta Specifications (Brownfield)
 

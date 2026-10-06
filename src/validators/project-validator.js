@@ -27,8 +27,6 @@ const DEFAULT_PROJECT_CONFIG = {
     level_config: 'steering/rules/constitution-levels.yml',
   },
   agents: {
-    default_language: 'en',
-    bilingual_output: { enabled: false, languages: ['en'] },
     output: {
       gradual_generation: true,
       progress_indicators: true,
@@ -37,6 +35,30 @@ const DEFAULT_PROJECT_CONFIG = {
     },
   },
 };
+
+/**
+ * Configuration keys removed by CHANGE-001 (REQ-LANG-007).
+ *
+ * MUSUBI writes all SDD documents and chats in English only; multilingual output exists
+ * solely in the technical-article generator. Any of these keys fails validation.
+ */
+const REMOVED_PROJECT_KEYS = [
+  {
+    path: '/locale',
+    key: 'locale',
+    present: config => config.locale !== undefined,
+  },
+  {
+    path: '/agents/default_language',
+    key: 'agents.default_language',
+    present: config => config.agents?.default_language !== undefined,
+  },
+  {
+    path: '/agents/bilingual_output',
+    key: 'agents.bilingual_output',
+    present: config => config.agents?.bilingual_output !== undefined,
+  },
+];
 
 class ProjectValidator {
   /**
@@ -95,6 +117,21 @@ class ProjectValidator {
       }));
     }
 
+    // Removed keys (REQ-LANG-007): fail with an error that names the key
+    for (const removed of REMOVED_PROJECT_KEYS) {
+      if (removed.present(config)) {
+        result.valid = false;
+        result.errors.push({
+          path: removed.path,
+          message:
+            `'${removed.key}' is no longer supported (CHANGE-001): MUSUBI writes all documents ` +
+            'and chat in English only. Remove it from steering/project.yml.',
+          keyword: 'removed',
+          params: { key: removed.key },
+        });
+      }
+    }
+
     // Check for recommended fields
     if (!config.package_type) {
       result.warnings.push({
@@ -148,10 +185,6 @@ class ProjectValidator {
       agents: {
         ...DEFAULT_PROJECT_CONFIG.agents,
         ...config.agents,
-        bilingual_output: {
-          ...DEFAULT_PROJECT_CONFIG.agents.bilingual_output,
-          ...config.agents?.bilingual_output,
-        },
         output: {
           ...DEFAULT_PROJECT_CONFIG.agents.output,
           ...config.agents?.output,
@@ -319,4 +352,4 @@ class ProjectValidator {
   }
 }
 
-module.exports = { ProjectValidator, DEFAULT_PROJECT_CONFIG };
+module.exports = { ProjectValidator, DEFAULT_PROJECT_CONFIG, REMOVED_PROJECT_KEYS };

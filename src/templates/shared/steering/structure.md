@@ -474,7 +474,7 @@ environments/
 ### Language Policy
 
 - **Primary Language**: English
-- **Documentation**: English (`.md`); optional translations (`<name>.<lang>.md`) when bilingual output is enabled
+- **Documentation**: English (`.md`) only
 - **Code Comments**: English
 - **UI Strings**: i18n framework
 

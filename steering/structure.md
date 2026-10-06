@@ -474,7 +474,8 @@ environments/
 ### Language Policy
 
 - **Primary Language**: English
-- **Documentation**: English (`.md`); optional translations (`<name>.<lang>.md`) when bilingual output is enabled
+- **Documentation**: English (`.md`) only; no translated copies (CHANGE-001)
+- **Language boundary**: `src/enterprise/tech-article.js` (`TechArticleGenerator`) is the only multilingual component; it emits Qiita/Zenn articles in Japanese through its `language` option
 - **Code Comments**: English
 - **UI Strings**: i18n framework
 

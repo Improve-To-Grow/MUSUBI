@@ -152,22 +152,6 @@ async function main(agent, agentKey, options = {}) {
     },
     {
       type: 'list',
-      name: 'locale',
-      message: 'Documentation language:',
-      choices: [
-        { name: 'English', value: 'en' },
-        { name: 'Japanese', value: 'ja' },
-        { name: 'Chinese', value: 'zh' },
-        { name: 'Korean', value: 'ko' },
-        { name: 'Indonesian', value: 'id' },
-        { name: 'Spanish', value: 'es' },
-        { name: 'German', value: 'de' },
-        { name: 'French', value: 'fr' },
-      ],
-      default: 'en',
-    },
-    {
-      type: 'list',
       name: 'projectStructure',
       message: 'Project structure:',
       choices: [
@@ -628,21 +612,12 @@ async function copyAgentsFile(agent) {
 
 async function generateSteering(answers, externalSpec = null) {
   const steeringTemplates = path.join(SHARED_TEMPLATE_DIR, 'steering');
-  const locale = answers.locale || 'en';
   const languages = answers.languages || ['undecided'];
 
-  // Copy and customize steering files
+  // Copy and customize steering files (English only, REQ-LANG-001)
   const files = ['structure.md', 'product.md'];
   for (const file of files) {
-    // Try locale-specific file first (e.g., structure.ja.md)
-    let templatePath = path.join(steeringTemplates, file.replace('.md', `.${locale}.md`));
-    if (locale === 'en' || !fs.existsSync(templatePath)) {
-      // Fall back to default (English)
-      templatePath = path.join(steeringTemplates, file);
-    }
-
-    // Determine output filename (locale suffix for non-English)
-    const outputFile = locale !== 'en' ? file.replace('.md', `.${locale}.md`) : file;
+    const templatePath = path.join(steeringTemplates, file);
 
     if (!fs.existsSync(templatePath)) {
       // If template doesn't exist, skip (don't fail)
@@ -655,15 +630,13 @@ async function generateSteering(answers, externalSpec = null) {
     content = content.replace(/\{\{PROJECT_NAME\}\}/g, answers.projectName);
     content = content.replace(/\{\{DESCRIPTION\}\}/g, answers.description);
     content = content.replace(/\{\{DATE\}\}/g, new Date().toISOString().split('T')[0]);
-    content = content.replace(/\{\{LOCALE\}\}/g, locale);
 
-    await fs.writeFile(path.join('steering', outputFile), content);
+    await fs.writeFile(path.join('steering', file), content);
   }
 
   // Generate tech.md based on selected languages
-  const techContent = generateTechMd(languages, answers, locale);
-  const techFile = locale !== 'en' ? `tech.${locale}.md` : 'tech.md';
-  await fs.writeFile(path.join('steering', techFile), techContent);
+  const techContent = generateTechMd(languages, answers);
+  await fs.writeFile(path.join('steering', 'tech.md'), techContent);
 
   // Build external specification section for project.yml
   let externalSpecYml = '';
@@ -679,11 +652,10 @@ external_specs:
 `;
   }
 
-  // Create project.yml with locale, language settings, and external spec
+  // Create project.yml with language settings and external spec
   const projectYml = `# MUSUBI Project Configuration
 name: ${answers.projectName}
 description: ${answers.description}
-locale: ${locale}
 version: "0.1.0"
 created: ${new Date().toISOString().split('T')[0]}
 

@@ -158,7 +158,6 @@ Skills are more capable than plain prompts:
 | **ADR generation** | ✅ | ✅ |
 | **Test-first** | ✅ | ✅ |
 | **Traceability** | ✅ | ✅ |
-| **Bilingual documentation** (optional, [BILINGUAL-IMPLEMENTATION.md](BILINGUAL-IMPLEMENTATION.md)) | ✅ | ✅ |
 | **Multi-agent coordination** | ✅ @orchestrator | ❌ Manual |
 | **Change impact analysis** | ✅ @change-impact-analyzer | ⚠️ Commands only |
 | **Automatic Constitution enforcement** | ✅ @constitution-enforcer | ⚠️ CLI only |

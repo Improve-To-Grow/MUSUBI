@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **Multilingual support is limited to technical-article publication** (CHANGE-001):
+  - All SDD artifacts (steering, requirements, design, tasks, change proposals, skill deliverables) and agent chat are English only
+  - `TechArticleGenerator` (`src/enterprise/tech-article.js`) is the single language boundary: `language` per call, then `config.defaultLanguage`, then `en`; Qiita and Zenn keep Japanese (`ja`) output
+  - `musubi init` no longer asks for a documentation language and always writes `structure.md`, `tech.md` and `product.md`
+  - `RequirementsReviewer.applyCorrections` / `DesignReviewer.applyCorrections` no longer accept `updateJapanese` and never touch `<doc>.ja.md` siblings; the `updateJapanese` input of the built-in reviewer skills is gone
+  - Platform instruction templates (Claude Code, Codex, Cursor, GitHub Copilot, Windsurf, Gemini CLI, Qwen Code): "Documentation Language" is a single English-only statement
+  - `ProjectValidator` fails validation with an error naming the key when `steering/project.yml` still contains `locale`, `agents.default_language` or `agents.bilingual_output` (REQ-LANG-007)
+
+### Removed
+
+- `BILINGUAL-IMPLEMENTATION.md` (opt-in bilingual output guide)
+- `LocaleManager` and the `src/templates` module exports (`LocaleManager`, `SUPPORTED_LOCALES`, `LOCALE_NAMES`, `TEMPLATE_CATEGORIES`)
+- `locale`, `agents.default_language` and `agents.bilingual_output` from the project schema, `musubi config`, `musubi onboard` and `steering/project.yml`
+
 ## [6.3.0] - 2026-01-02
 
 ### Added

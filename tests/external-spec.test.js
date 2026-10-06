@@ -175,7 +175,6 @@ describe('External Specification Reference', () => {
       const projectYml = `# MUSUBI Project Configuration
 name: test-project
 description: Test description
-locale: en
 version: "0.1.0"
 created: 2025-12-10
 

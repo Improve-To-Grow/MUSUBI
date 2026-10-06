@@ -783,8 +783,8 @@ class RequirementsReviewer {
   /**
    * Apply corrections to a document based on review results
    *
-   * When `options.updateJapanese` is not false and a sibling `<doc>.ja.md` exists, the same
-   * text replacements are applied to it (language-neutral; no translation is performed).
+   * Only the named document is modified. Translated siblings such as `<doc>.ja.md` are
+   * neither read nor updated (SDD documents are English only, CHANGE-001).
    * @param {string} documentPath - Path of the document to correct
    * @param {Array} corrections - List of correction instructions
    * @param {Object} options - Options
@@ -866,21 +866,6 @@ class RequirementsReviewer {
     // Save the file
     fs.writeFileSync(fullPath, content, 'utf-8');
 
-    // Apply the same replacements to an existing <doc>.ja.md translation, if any
-    if (options.updateJapanese !== false) {
-      const jaPath = fullPath.replace(/\.md$/, '.ja.md');
-      if (fs.existsSync(jaPath)) {
-        // Simple text replacement only; corrected text is not translated
-        let jaContent = fs.readFileSync(jaPath, 'utf-8');
-        for (const change of appliedChanges) {
-          if (jaContent.includes(change.original)) {
-            jaContent = jaContent.replace(change.original, change.corrected);
-          }
-        }
-        fs.writeFileSync(jaPath, jaContent, 'utf-8');
-      }
-    }
-
     // Re-review to update the quality gate
     const updatedResult = await this.review(documentPath, options.reviewOptions || {});
 
@@ -893,9 +878,6 @@ class RequirementsReviewer {
       filesModified: [
         fullPath,
         options.createBackup !== false ? `${fullPath}.backup` : null,
-        options.updateJapanese !== false && fs.existsSync(fullPath.replace(/\.md$/, '.ja.md'))
-          ? fullPath.replace(/\.md$/, '.ja.md')
-          : null,
       ].filter(Boolean),
     };
   }

@@ -92,6 +92,48 @@ describe('ProjectValidator', () => {
       expect(result.warnings.length).toBeGreaterThan(0);
       expect(result.warnings.some(w => w.path.includes('package_type'))).toBe(true);
     });
+
+    // REQ-LANG-007: removed language keys fail validation with an error naming the key
+    describe('removed language keys (REQ-LANG-007)', () => {
+      const baseConfig = {
+        schema_version: '2.0',
+        project_name: 'test-project',
+        version: '1.0.0',
+        package_type: 'application',
+      };
+
+      it.each([
+        ['locale', { locale: 'en' }],
+        ['agents.default_language', { agents: { default_language: 'ja' } }],
+        [
+          'agents.bilingual_output',
+          { agents: { bilingual_output: { enabled: true, languages: ['en', 'ja'] } } },
+        ],
+      ])('should reject %s', async (key, extra) => {
+        await fs.writeFile(
+          path.join(testDir, 'steering/project.yml'),
+          yaml.dump({ ...baseConfig, ...extra })
+        );
+
+        const result = await validator.validateConfig();
+        expect(result.valid).toBe(false);
+        const error = result.errors.find(e => e.keyword === 'removed');
+        expect(error).toBeDefined();
+        expect(error.message).toContain(`'${key}'`);
+        expect(error.params.key).toBe(key);
+      });
+
+      it('should still accept agents.output without language keys', async () => {
+        await fs.writeFile(
+          path.join(testDir, 'steering/project.yml'),
+          yaml.dump({ ...baseConfig, agents: { output: { gradual_generation: false } } })
+        );
+
+        const result = await validator.validateConfig();
+        expect(result.valid).toBe(true);
+        expect(result.errors).toHaveLength(0);
+      });
+    });
   });
 
   describe('getEffectiveConfig', () => {
@@ -105,7 +147,9 @@ describe('ProjectValidator', () => {
       const effective = await validator.getEffectiveConfig();
       expect(effective.package_type).toBe('application');
       expect(effective.workflow.mode).toBe('medium');
-      expect(effective.agents.default_language).toBe('en');
+      expect(effective.agents.output.gradual_generation).toBe(true);
+      expect(effective.agents).not.toHaveProperty('default_language');
+      expect(effective.agents).not.toHaveProperty('bilingual_output');
     });
 
     it('should preserve user overrides', async () => {
@@ -249,6 +293,12 @@ describe('DEFAULT_PROJECT_CONFIG', () => {
     expect(DEFAULT_PROJECT_CONFIG.schema_version).toBe('2.0');
     expect(DEFAULT_PROJECT_CONFIG.package_type).toBe('application');
     expect(DEFAULT_PROJECT_CONFIG.workflow.mode).toBe('medium');
-    expect(DEFAULT_PROJECT_CONFIG.agents.default_language).toBe('en');
+    expect(DEFAULT_PROJECT_CONFIG.agents.output.gradual_generation).toBe(true);
+  });
+
+  it('should not carry language defaults (REQ-LANG-006)', () => {
+    expect(DEFAULT_PROJECT_CONFIG).not.toHaveProperty('locale');
+    expect(DEFAULT_PROJECT_CONFIG.agents).not.toHaveProperty('default_language');
+    expect(DEFAULT_PROJECT_CONFIG.agents).not.toHaveProperty('bilingual_output');
   });
 });

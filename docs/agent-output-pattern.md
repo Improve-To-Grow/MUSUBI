@@ -1,9 +1,5 @@
 # Agent Output Pattern - Gradual File Generation
 
-> Bilingual output (an additional translated copy of each deliverable) is optional. For the
-> template that adds translation steps, see
-> [BILINGUAL-IMPLEMENTATION.md](../BILINGUAL-IMPLEMENTATION.md) (Step 4.3).
-
 ## Purpose
 
 Prevent context length overflow errors by breaking agent output into small chunks with file saves.
@@ -107,10 +103,8 @@ After user approval, **generate each file in order**:
 - User can resume from file 6
 - No need to regenerate completed files
 
-### 4. Optional Bilingual Output
-- English only by default
-- When bilingual output is enabled, generate each translation right after its English file
-  (see [BILINGUAL-IMPLEMENTATION.md](../BILINGUAL-IMPLEMENTATION.md))
+### 4. English Only
+- All deliverables are written in English; no translated copies are generated
 
 ## Agent-Specific Adaptations
 
