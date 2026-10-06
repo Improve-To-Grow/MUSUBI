@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Change ID**: CHANGE-001
-- **Proposal**: `storage/changes/CHANGE-001.md` (Status: Approved)
+- **Proposal**: [CHANGE-001.md](CHANGE-001.md) (archived together with this report; see [CHANGE-001-archive.md](CHANGE-001-archive.md))
 - **Status**: Implemented
 - **Implemented**: 2026-10-06
 - **Implemented By**: Yaroslav (with Claude Code)

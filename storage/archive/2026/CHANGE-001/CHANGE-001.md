@@ -2,7 +2,9 @@
 
 **Change ID**: CHANGE-001  
 **Date**: 2026-10-06  
-**Status**: Approved  
+**Status**: ~~Proposed~~ → ~~Approved~~ → ~~Implemented~~ → **Archived**  
+**Implemented**: 2026-10-06 (commit 3987026 on `ITG-adjustments`)  
+**Archived**: 2026-10-06 (`storage/archive/2026/CHANGE-001/`)  
 **Type**: Refactor / Scope reduction  
 **Priority**: P2
 
@@ -208,3 +210,7 @@ Not modified (historical records, left as-is): `docs/analysis/*`, `docs/plans/*`
 - [ ] Product review complete
 - [ ] Security review complete (not needed: no security surface)
 - [ ] Ready to apply
+
+Approval was recorded through the Status field (Approved, 2026-10-06); the checklist above is
+left as submitted. Implementation and archive records: `CHANGE-001-implementation.md`,
+`CHANGE-001-archive.md` in the same directory.
