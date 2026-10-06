@@ -34,6 +34,7 @@ const {
   createTechArticleGenerator,
   PLATFORM,
   ARTICLE_TYPE,
+  LANGUAGE,
 } = require('./tech-article');
 
 const {
@@ -77,6 +78,7 @@ module.exports = {
   createTechArticleGenerator,
   PLATFORM,
   ARTICLE_TYPE,
+  LANGUAGE,
 
   // Error Recovery (IMP-6.2-008-01)
   ErrorRecoveryHandler,

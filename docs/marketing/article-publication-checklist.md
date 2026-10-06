@@ -18,12 +18,12 @@
 
 **Suggested Qiita Title:**
 ```
-Getting Started with Specification Driven Development using MUSUBI - From Vibe Coding to SDD (Specification Driven Development)
+MUSUBI ではじめる仕様駆動開発入門 - Vibe CodingからSDD（Specification Driven Development）へ
 ```
 
 **Suggested Tags:**
 ```
-GitHub-Copilot, Claude, SDD, AI, Development Efficiency
+GitHub-Copilot, Claude, SDD, AI, 開発効率化
 ```
 
 ---
@@ -44,12 +44,12 @@ GitHub-Copilot, Claude, SDD, AI, Development Efficiency
 
 **Suggested Qiita Title:**
 ```
-Ultimate SDD Tool "MUSUBI" - The Ultimate Specification Driven Development Tool with 7 AI Agent Support and 25 Skills
+Ultimate SDD Tool "MUSUBI" - 7つのAIエージェント対応、25スキル搭載の究極仕様駆動開発ツール
 ```
 
 **Suggested Tags:**
 ```
-SDD, Multi-Agent, Requirements Definition, Design, AI
+SDD, マルチエージェント, 要件定義, 設計, AI
 ```
 
 ---
@@ -59,7 +59,7 @@ SDD, Multi-Agent, Requirements Definition, Design, AI
 | Title | URL | Status |
 |-------|-----|--------|
 | MUSUBI v2.0 × CodeGraph MCP Server | https://qiita.com/hisaho/items/719210ccc20fe2514054 | ✅ Published |
-| MUSUBI - 25-Skill Ultimate SDD | https://qiita.com/hisaho/items/a245c2ad5adf2ab5a409 | ✅ Published |
+| MUSUBI - 25スキル究極SDD | https://qiita.com/hisaho/items/a245c2ad5adf2ab5a409 | ✅ Published |
 | CodeGraph MCP Server | https://qiita.com/hisaho/items/b99ac51d78119ef60b6b | ✅ Published |
 
 ---

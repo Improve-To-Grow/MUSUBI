@@ -9,6 +9,7 @@ const {
   createTechArticleGenerator,
   PLATFORM,
   ARTICLE_TYPE,
+  LANGUAGE,
 } = require('../../src/enterprise/tech-article');
 const fs = require('fs').promises;
 
@@ -210,6 +211,19 @@ describe('TechArticleGenerator', () => {
       const longTitle = 'A'.repeat(100);
       expect(generator.slugify(longTitle).length).toBeLessThanOrEqual(50);
     });
+
+    it('should preserve CJK characters instead of emptying the slug', () => {
+      expect(generator.slugify('仕様駆動開発')).toBe('仕様駆動開発');
+      expect(generator.slugify('【MUSUBI v6.2.0】完全ガイド')).toBe('musubi-v620完全ガイド');
+    });
+
+    it('should not collide for different Japanese titles', () => {
+      expect(generator.slugify('はじめに')).not.toBe(generator.slugify('まとめ'));
+    });
+
+    it('should fall back when no slug-safe characters remain', () => {
+      expect(generator.slugify('【】！？')).toBe('article');
+    });
   });
 
   describe('countWords', () => {
@@ -230,6 +244,17 @@ describe('TechArticleGenerator', () => {
       expect(generator.estimateReadingTime(shortText)).toBe('1 min read');
       expect(generator.estimateReadingTime(longText)).toBe('5 min read');
     });
+
+    it('should label the estimate in Japanese', () => {
+      expect(generator.estimateReadingTime('テスト', LANGUAGE.JA)).toBe('約1分で読めます');
+    });
+
+    it('should weight CJK by its own reading speed', () => {
+      // 2000 CJK chars at 500/min reads in 4 minutes, not 10 as a flat
+      // 200-per-minute rate over the same character count would imply.
+      const japanese = 'あ'.repeat(2000);
+      expect(generator.estimateReadingTime(japanese, LANGUAGE.JA)).toBe('約4分で読めます');
+    });
   });
 
   describe('registerTemplate', () => {
@@ -249,6 +274,126 @@ describe('TechArticleGenerator', () => {
     it('should create instance', () => {
       const g = createTechArticleGenerator();
       expect(g).toBeInstanceOf(TechArticleGenerator);
+    });
+  });
+
+  describe('LANGUAGE', () => {
+    it('should define supported languages', () => {
+      expect(LANGUAGE.EN).toBe('en');
+      expect(LANGUAGE.JA).toBe('ja');
+    });
+  });
+
+  describe('resolveLanguage', () => {
+    it('should default to English', () => {
+      expect(generator.resolveLanguage()).toBe(LANGUAGE.EN);
+    });
+
+    it('should honour the per-call option over the config default', () => {
+      const g = new TechArticleGenerator({ outputDir: testDir, defaultLanguage: LANGUAGE.JA });
+      expect(g.resolveLanguage()).toBe(LANGUAGE.JA);
+      expect(g.resolveLanguage({ language: LANGUAGE.EN })).toBe(LANGUAGE.EN);
+    });
+
+    it('should fall back to English for an unknown language', () => {
+      expect(generator.resolveLanguage({ language: 'xx' })).toBe(LANGUAGE.EN);
+    });
+  });
+
+  describe('Japanese output', () => {
+    it('should emit Japanese section headings', async () => {
+      const content = {
+        title: 'MUSUBI v6.2.0 完全ガイド',
+        tags: ['SDD', 'AI'],
+        introduction: 'この記事では MUSUBI を紹介します。',
+        sections: [{ title: 'はじめに', content: '仕様駆動開発について' }],
+        benchmarks: { 実行時間: '100ms' },
+        conclusion: 'MUSUBI をぜひお試しください。',
+        references: [{ title: 'MUSUBI', url: 'https://github.com/nahisaho/MUSUBI' }],
+      };
+
+      const result = await generator.generate(content, {
+        platform: PLATFORM.QIITA,
+        language: LANGUAGE.JA,
+      });
+
+      expect(result.language).toBe(LANGUAGE.JA);
+      expect(result.article).toContain('## 目次');
+      expect(result.article).toContain('## ベンチマーク結果');
+      expect(result.article).toContain('## まとめ');
+      expect(result.article).toContain('## 参考リンク');
+      expect(result.article).not.toContain('## Table of Contents');
+      expect(result.article).not.toContain('## Conclusion');
+    });
+
+    it('should keep caller-supplied content untranslated', async () => {
+      const result = await generator.generate(
+        { title: 'タイトル', sections: [{ title: 'Section 1', content: 'English body' }] },
+        { language: LANGUAGE.JA }
+      );
+
+      expect(result.article).toContain('## Section 1');
+      expect(result.article).toContain('English body');
+    });
+
+    it('should emit a Japanese Qiita front matter title', async () => {
+      const result = await generator.generate(
+        { title: '【MUSUBI v6.2.0】完全ガイド', tags: ['SDD'] },
+        { platform: PLATFORM.QIITA, language: LANGUAGE.JA }
+      );
+
+      expect(result.article).toContain('title: "【MUSUBI v6.2.0】完全ガイド"');
+      expect(result.article).toContain('private: false');
+    });
+
+    it('should use a Japanese default title when none is given', async () => {
+      const result = await generator.generate({}, { language: LANGUAGE.JA });
+      expect(result.metadata.title).toBe('無題の記事');
+    });
+
+    it('should generate a Japanese experiment report', async () => {
+      const experimentReport = {
+        metadata: { title: 'MUSUBI テストスイート' },
+        summary: { total: 10, passed: 10, failed: 0, passRate: '100%', duration: 1200 },
+        metrics: { performance: { avgDuration: '50ms' }, coverage: { line: '85%' } },
+        observations: ['すべてのテストが成功した'],
+      };
+
+      const result = await generator.generateFromExperiment(experimentReport, {
+        language: LANGUAGE.JA,
+      });
+
+      expect(result.article).toContain('実験レポート: MUSUBI テストスイート');
+      expect(result.article).toContain('## 実験サマリー');
+      expect(result.article).toContain('| テスト総数 | 10 |');
+      expect(result.article).toContain('### パフォーマンス');
+      expect(result.article).toContain('### カバレッジ');
+      expect(result.article).toContain('## 考察');
+      expect(result.article).toContain('合計実行時間');
+      expect(result.article).toContain('実験は非常に順調に完了しました');
+      expect(result.article).not.toContain('Experiment Summary');
+    });
+
+    it('should work via the config default language', async () => {
+      const g = new TechArticleGenerator({ outputDir: testDir, defaultLanguage: LANGUAGE.JA });
+      const result = await g.generate({ title: 'テスト', sections: [{ title: '章' }] });
+
+      expect(result.language).toBe(LANGUAGE.JA);
+      expect(result.article).toContain('## 目次');
+    });
+  });
+
+  describe('registerLanguage', () => {
+    it('should register a custom language merged over English defaults', async () => {
+      generator.registerLanguage('fr', { tableOfContents: 'Sommaire' });
+      const result = await generator.generate(
+        { title: 'Article', sections: [{ title: 'Un' }], conclusion: 'Fin' },
+        { language: 'fr' }
+      );
+
+      expect(result.article).toContain('## Sommaire');
+      // Unspecified keys fall back to English rather than going missing
+      expect(result.article).toContain('## Conclusion');
     });
   });
 });

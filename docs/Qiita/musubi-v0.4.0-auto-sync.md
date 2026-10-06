@@ -1,211 +1,211 @@
-# MUSUBI v0.4.0 - Why Project Memory Alone Wasn't Enough, and the Implementation of Automatic Sync
+# MUSUBI v0.4.0 - プロジェクトメモリだけでは足りなかった理由と自動同期の実装
 
-**Tags**: `AI` `ChatGPT` `GitHub` `npm` `Documentation`
+**タグ**: `AI` `ChatGPT` `GitHub` `npm` `ドキュメント`
 
-## Introduction
+## はじめに
 
-We have released MUSUBI (Ultimate Specification Driven Development Tool) v0.4.0. This version adds an **automatic sync feature for steering documents** (`musubi-sync`).
+MUSUBI (Ultimate Specification Driven Development Tool) v0.4.0 をリリースしました。このバージョンでは、**ステアリングドキュメントの自動同期機能** (`musubi-sync`) を追加しました。
 
-In this article, we answer the question "Why wasn't project memory alone enough?" while explaining the new features and usage of v0.4.0.
+本記事では、「なぜプロジェクトメモリだけでは足りなかったのか？」という疑問に答えつつ、v0.4.0 の新機能と使い方を解説します。
 
-## TL;DR (Summary)
+## TL;DR（要約）
 
-**What was the problem?**
-- The project memory for AI agents (v0.2.0) can record "why that technology was chosen," but "which technologies are currently in use" is not updated automatically
-- Even when the code changes, the documentation stays outdated → the AI operates on incorrect assumptions
+**何が問題だったか？**
+- AIエージェント用のプロジェクトメモリ（v0.2.0）は「なぜその技術を選んだか」は記録できるが、「今どの技術を使っているか」は自動更新されない
+- コードを変更しても、ドキュメントが古いまま → AIが誤った前提で動く
 
-**How did we solve it?**
-- The `musubi-sync` command automatically detects codebase changes (versions, dependencies, directories)
-- Detected changes are automatically reflected in the steering documents (both English and Japanese)
+**どう解決したか？**
+- `musubi-sync` コマンドで、コードベースの変更（バージョン、依存関係、ディレクトリ）を自動検出
+- 検出した変更をステアリングドキュメントに自動反映（英語・日本語の両方）
 
-**What are the benefits?**
-- Zero effort for manual updates (10 minutes → 3 seconds, a 95% reduction)
-- Prevents drift between documentation and code (always up to date)
-- Can also be built into CI/CD pipelines (`--auto-approve` option)
+**何が嬉しいか？**
+- 手動更新の手間ゼロ（10分 → 3秒、95%削減）
+- ドキュメントとコードの乖離を防止（常に最新状態）
+- CI/CDパイプラインにも組み込み可能（`--auto-approve`オプション）
 
 ```bash
-# Install
+# インストール
 npm install -g musubi-sdd
 
-# Analyze an existing project and generate documentation (v0.3.0)
+# 既存プロジェクトを分析してドキュメント生成 (v0.3.0)
 musubi-onboard
 
-# Detect codebase changes and update documentation (v0.4.0)
+# コードベースの変更を検出してドキュメント更新 (v0.4.0)
 musubi-sync
 ```
 
-## Why Wasn't Project Memory Alone Enough?
+## なぜプロジェクトメモリだけでは足りなかったのか？
 
-### Challenges Through v0.2.0
+### v0.2.0 までの課題
 
-In MUSUBI v0.2.0, we implemented a **project memory system** inspired by the Serena project.
+MUSUBI v0.2.0 では、Serena プロジェクトから着想を得て **プロジェクトメモリシステム** を実装しました。
 
 ```
 steering/
 ├── memories/
-│   ├── architecture_decisions.md  # Design decisions
-│   ├── development_workflow.md    # Development workflow
-│   ├── domain_knowledge.md        # Domain knowledge
-│   ├── lessons_learned.md         # Lessons learned
-│   ├── suggested_commands.md      # Recommended commands
-│   └── technical_debt.md          # Technical debt
-├── structure.md                   # Architecture patterns
-├── tech.md                        # Technology stack
-└── product.md                     # Product context
+│   ├── architecture_decisions.md  # 設計決定
+│   ├── development_workflow.md    # 開発フロー
+│   ├── domain_knowledge.md        # ドメイン知識
+│   ├── lessons_learned.md         # 学習内容
+│   ├── suggested_commands.md      # 推奨コマンド
+│   └── technical_debt.md          # 技術的負債
+├── structure.md                   # アーキテクチャパターン
+├── tech.md                        # 技術スタック
+└── product.md                     # プロダクトコンテキスト
 ```
 
-This allows AI agents to persist knowledge across conversations.
+これにより、AI エージェントが会話間で知識を永続化できるようになりました。
 
-#### The Role of the Memory System
+#### メモリシステムの役割
 
-The 6 memory files added in v0.2.0 each record a different kind of knowledge.
+v0.2.0 で追加された 6 つのメモリファイルは、それぞれ異なる種類の知識を記録します。
 
-1. **architecture_decisions.md** (Design decisions)
-   - Records important design decisions in ADR (Architecture Decision Record) format
-   - Examples: "Why we chose JWT authentication", "Why we moved to microservices"
-   - **AI agents read this to understand the reasons behind past decisions**
+1. **architecture_decisions.md** (設計決定)
+   - ADR (Architecture Decision Record) 形式で重要な設計判断を記録
+   - 例: 「なぜ JWT 認証を選んだか」「なぜマイクロサービス化したか」
+   - **AI エージェントはこれを読んで、過去の決定理由を理解**
 
-2. **development_workflow.md** (Development workflow)
-   - Records project-specific development processes
-   - Examples: "PR approval rules", "Deployment procedure", "Branching strategy"
-   - **AI agents follow this when proposing work**
+2. **development_workflow.md** (開発フロー)
+   - プロジェクト固有の開発プロセスを記録
+   - 例: 「PR の承認ルール」「デプロイ手順」「ブランチ戦略」
+   - **AI エージェントはこれに従って作業を提案**
 
-3. **domain_knowledge.md** (Domain knowledge)
-   - Records business logic and industry-specific knowledge
-   - Examples: "Point calculation logic", "Definition of the fiscal year", "Industry terminology"
-   - **AI agents refer to this when generating code**
+3. **domain_knowledge.md** (ドメイン知識)
+   - ビジネスロジックや業界特有の知識を記録
+   - 例: 「ポイント計算ロジック」「会計年度の定義」「業界用語」
+   - **AI エージェントはこれを参照してコードを生成**
 
-4. **lessons_learned.md** (Lessons learned)
-   - Records past troubles and improvements
-   - Examples: "Performance problems and their solutions", "Failed refactorings"
-   - **AI agents avoid repeating the same mistakes**
+4. **lessons_learned.md** (学習内容)
+   - 過去のトラブルや改善点を記録
+   - 例: 「パフォーマンス問題とその解決策」「失敗したリファクタリング」
+   - **AI エージェントは同じ過ちを避ける**
 
-5. **suggested_commands.md** (Recommended commands)
-   - Records commands and scripts commonly used in the project
-   - Examples: "How to run tests", "Setting up the local environment", "Debugging procedure"
-   - **AI agents suggest appropriate commands**
+5. **suggested_commands.md** (推奨コマンド)
+   - プロジェクトでよく使うコマンドやスクリプトを記録
+   - 例: 「テスト実行方法」「ローカル環境構築」「デバッグ手順」
+   - **AI エージェントは適切なコマンドを提案**
 
-6. **technical_debt.md** (Technical debt)
-   - Records problems to be addressed in the future
-   - Examples: "Outdated dependencies", "Refactoring candidates", "TODO comments"
-   - **AI agents propose work taking priorities into account**
+6. **technical_debt.md** (技術的負債)
+   - 将来対処すべき問題を記録
+   - 例: 「古い依存関係」「リファクタリング候補」「TODO コメント」
+   - **AI エージェントは優先順位を考慮して作業提案**
 
-#### What Project Memory Alone Could Record
+#### プロジェクトメモリだけでは何が記録できたか
 
-The project memory in v0.2.0 was a **mechanism for recording "human judgment and experience."**
+v0.2.0 のプロジェクトメモリは、**「人間の判断や経験」を記録する仕組み**でした。
 
-- ✅ **What could be recorded**: Why a technology was chosen (Why)
-- ✅ **What could be recorded**: What problems occurred in the past (History)
-- ✅ **What could be recorded**: What rules govern development (How)
-- ❌ **What could not be recorded**: Which technologies are currently in use (What)
-- ❌ **What could not be recorded**: What the current version is (Current State)
-- ❌ **What could not be recorded**: What directories exist (Structure)
+- ✅ **記録できたこと**: なぜその技術を選んだか (Why)
+- ✅ **記録できたこと**: 過去にどんな問題があったか (History)
+- ✅ **記録できたこと**: どんなルールで開発するか (How)
+- ❌ **記録できなかったこと**: 今どの技術を使っているか (What)
+- ❌ **記録できなかったこと**: 現在のバージョンは何か (Current State)
+- ❌ **記録できなかったこと**: どんなディレクトリがあるか (Structure)
 
-**In other words, while qualitative knowledge (Why/How) could be recorded, quantitative information (What) had to rely on manual updates.**
+**つまり、質的な知識 (Why/How) は記録できても、量的な情報 (What) は手動更新に頼るしかありませんでした。**
 
-However, **we found a major problem in operation**.
+しかし、**運用してみると大きな問題が見つかりました**。
 
-### Problem 1: Drift from the Codebase
+### 問題1: コードベースとの乖離
 
-Project memory is "knowledge recorded manually." However, in actual development:
+プロジェクトメモリは「手動で記録する知識」です。しかし、実際の開発では:
 
 ```typescript
-// Update package.json
+// package.json を更新
 {
   "version": "0.3.0" -> "0.4.0",
   "dependencies": {
     "chalk": "^5.0.0",
-    "js-yaml": "^4.1.0"  // Newly added
+    "js-yaml": "^4.1.0"  // 新規追加
   }
 }
 
-// Create a new directory
+// 新しいディレクトリを作成
 bin/
-├── musubi-sync.js  // Newly added
+├── musubi-sync.js  // 新規追加
 ```
 
-These changes are not automatically reflected in `steering/tech.md` or `steering/structure.md`.
+これらの変更は自動的には `steering/tech.md` や `steering/structure.md` に反映されません。
 
-**Result**: The documentation becomes outdated, and AI agents may operate on incorrect assumptions.
+**結果**: ドキュメントが古くなり、AI エージェントが誤った前提で動作する可能性があります。
 
-### Problem 2: The Effort and Timing of Updates
+### 問題2: 更新の手間とタイミング
 
-Manual updates have the following challenges.
+手動更新には以下の課題があります。
 
-1. **Forgetting to update**: When focused on development, it is easy to forget to update the documentation
-2. **Unclear update timing**: It is hard to decide when to update
-3. **Missed content in updates**: It is hard to tell what has changed
-4. **Burden of bilingual support**: Both English and Japanese must be updated
+1. **更新を忘れる**: 開発に集中すると、ドキュメント更新を忘れがち
+2. **更新タイミングが不明**: いつ更新すべきか判断が難しい
+3. **更新内容の抜け漏れ**: 何が変わったか把握しづらい
+4. **バイリンガル対応の負担**: 英語・日本語の両方を更新する必要がある
 
-### Problem 3: Synchronization in Team Development
+### 問題3: チーム開発での同期
 
-When there are multiple developers:
+複数の開発者がいる場合:
 
-- Developer A adds a new framework
-- Developer B works from the outdated documentation
-- **Result**: A mismatch in understanding occurs
+- 開発者 A が新しいフレームワークを追加
+- 開発者 B は古いドキュメントを参照して作業
+- **結果**: 認識の齟齬が発生
 
-**In other words, project memory can hold "recorded knowledge," but it had no mechanism to automatically reflect "the current state of the codebase."**
+**つまり、プロジェクトメモリは「記録された知識」を保持できますが、「現在のコードベースの状態」を自動的に反映する仕組みがありませんでした。**
 
-## v0.4.0 Solution: The Automatic Sync System
+## v0.4.0 の解決策: 自動同期システム
 
-### Architecture
+### アーキテクチャ
 
-In v0.4.0, we achieved automatic synchronization in the following 5 steps.
+v0.4.0 では、以下の 5 ステップで自動同期を実現しました。
 
 ```
 1. Load Config
-   └─> Read steering/project.yml
+   └─> steering/project.yml を読み込み
    
 2. Analyze Codebase
-   └─> Scan package.json and the directory structure
+   └─> package.json, ディレクトリ構造を走査
    
 3. Detect Changes
-   └─> Compare the configuration with the actual state
+   └─> 設定と実際の状態を比較
    
 4. Display & Confirm
-   └─> Show the changes and ask the user for confirmation
+   └─> 変更内容を表示、ユーザー確認
    
 5. Apply Updates
-   └─> Update the YAML + Markdown files (English and Japanese)
+   └─> YAML + Markdown ファイルを更新 (英語・日本語)
 ```
 
-### How Change Detection Works
+### 変更検出の仕組み
 
-`musubi-sync` detects changes in the following categories.
+`musubi-sync` は以下のカテゴリで変更を検出します。
 
-| Category | What Is Detected | Updated Target |
+| カテゴリ | 検出内容 | 更新先 |
 |---------|---------|--------|
-| **Version** | Version change in `package.json` | `project.yml` |
-| **Languages** | Added/removed languages | `project.yml` |
-| **Frameworks** | Added/removed dependencies | `project.yml`, `tech.md` (en/ja) |
-| **Directories** | Newly created directories | `project.yml`, `structure.md` (en/ja) |
+| **Version** | `package.json` のバージョン変更 | `project.yml` |
+| **Languages** | 新規/削除された言語 | `project.yml` |
+| **Frameworks** | 新規/削除された依存関係 | `project.yml`, `tech.md` (en/ja) |
+| **Directories** | 新規作成されたディレクトリ | `project.yml`, `structure.md` (en/ja) |
 
-### Implementation Details
+### 実装の工夫
 
-#### 1. YAML Parsing: Avoid Manual Implementation
+#### 1. YAML パーシング: 手動実装を避ける
 
-At first, we considered manipulating YAML as strings by hand, but judged it to be error-prone. We adopted the **js-yaml library**.
+当初、YAML を手動で文字列操作することを検討しましたが、エラーが起きやすいと判断。**js-yaml ライブラリ**を採用しました。
 
 ```javascript
 const yaml = require('js-yaml');
 
-// Read
+// 読み込み
 const config = yaml.load(fs.readFileSync('steering/project.yml', 'utf8'));
 
-// Update
+// 更新
 config.version = newVersion;
 
-// Write (preserving the structure)
+// 書き込み (構造を保持)
 fs.writeFileSync('steering/project.yml', yaml.dump(config, {
   indent: 2,
   lineWidth: 100
 }));
 ```
 
-#### 2. Change Detection: Exclude Noise
+#### 2. 変更検出: ノイズを除外
 
-Detecting every change would include noise such as `node_modules` and `dist/`. We implemented **focused detection logic**:
+すべての変更を検出すると `node_modules` や `dist/` などのノイズが含まれます。**フォーカスした検出ロジック**を実装:
 
 ```javascript
 function detectChanges(config, actual) {
@@ -223,7 +223,7 @@ function detectChanges(config, actual) {
     changes.version = { old: config.version, new: actual.version };
   }
 
-  // Frameworks (exclude node_modules)
+  // Frameworks (node_modules を除外)
   const configFrameworks = new Set(config.frameworks || []);
   actual.frameworks
     .filter(fw => !fw.startsWith('node_modules'))
@@ -233,7 +233,7 @@ function detectChanges(config, actual) {
       }
     });
 
-  // Directories (apply exclusion patterns)
+  // Directories (除外パターン適用)
   const excludePatterns = ['node_modules', 'dist', '.git'];
   actual.directories
     .filter(dir => !excludePatterns.some(pattern => dir.includes(pattern)))
@@ -247,24 +247,24 @@ function detectChanges(config, actual) {
 }
 ```
 
-#### 3. User Confirmation: Balancing Automation and Control
+#### 3. ユーザー確認: 自動化と制御のバランス
 
-Full automation is risky. We provide **3 execution modes**:
+完全自動化はリスクがあります。**3 つの実行モード**を用意:
 
 ```bash
-# Interactive (default): Show changes and ask for confirmation
+# Interactive (デフォルト): 変更を表示して確認
 musubi-sync
 
-# Dry-run: Preview only (do not apply)
+# Dry-run: プレビューのみ (適用しない)
 musubi-sync --dry-run
 
-# Auto-approve: Apply automatically (for CI/CD)
+# Auto-approve: 自動適用 (CI/CD 向け)
 musubi-sync --auto-approve
 ```
 
-#### 4. Bilingual Updates: Maintaining Consistency
+#### 4. バイリンガル更新: 一貫性の維持
 
-Update both English and Japanese at the same time:
+英語・日本語の両方を同時に更新:
 
 ```javascript
 function updateTechMd(changes, actualState) {
@@ -276,11 +276,11 @@ function updateTechMd(changes, actualState) {
   files.forEach(file => {
     let content = fs.readFileSync(file, 'utf8');
     
-    // Add a new framework
+    // 新しいフレームワークを追加
     changes.newFrameworks.forEach(framework => {
       const isJapanese = file.endsWith('.ja.md');
       const addition = isJapanese
-        ? `- **${framework}** - [Add a description]`
+        ? `- **${framework}** - [説明を記載してください]`
         : `- **${framework}** - [Add description]`;
       
       content = appendToSection(content, '## Frameworks', addition);
@@ -291,9 +291,9 @@ function updateTechMd(changes, actualState) {
 }
 ```
 
-#### 5. Audit Trail: Record Every Sync
+#### 5. 監査証跡: すべての同期を記録
 
-Record sync events in `architecture_decisions.md`:
+同期イベントを `architecture_decisions.md` に記録:
 
 ```javascript
 function recordChangeInMemory(changes) {
@@ -317,7 +317,7 @@ Automatic synchronization triggered by codebase changes.
   const filePath = 'steering/memories/architecture_decisions.md';
   const content = fs.readFileSync(filePath, 'utf8');
   
-  // Add the latest change at the top
+  // 最新の変更を先頭に追加
   const updated = content.replace(
     /^(# Architecture Decisions\n\n)/,
     `$1${entry}`
@@ -327,24 +327,24 @@ Automatic synchronization triggered by codebase changes.
 }
 ```
 
-## How to Use v0.4.0
+## v0.4.0 の使い方
 
-### 1. Installation
+### 1. インストール
 
 ```bash
 npm install -g musubi-sdd
 ```
 
-### 2. Onboarding an Existing Project (v0.3.0 Feature)
+### 2. 既存プロジェクトのオンボーディング (v0.3.0 機能)
 
-First, analyze the existing project and generate steering documents:
+まず、既存プロジェクトを分析してステアリングドキュメントを生成:
 
 ```bash
 cd your-project
 musubi-onboard
 ```
 
-**Result**:
+**実行結果**:
 
 ```
 🚀 MUSUBI Onboarding Wizard
@@ -370,30 +370,30 @@ Analyzing your project...
    - Create requirements: /sdd-requirements [feature]
 ```
 
-### 3. Development: Change the Codebase
+### 3. 開発: コードベースを変更
 
-Proceed with development as usual.
+通常通り開発を進めます。
 
 ```bash
-# Add a new dependency
+# 新しい依存関係を追加
 npm install axios
 
-# Create a new directory
+# 新しいディレクトリを作成
 mkdir -p src/api
 
-# Update the version
+# バージョンを更新
 npm version patch  # 0.3.0 → 0.3.1
 ```
 
-### 4. Sync: Detect Changes and Update
+### 4. 同期: 変更を検出して更新
 
-#### Interactive Mode (Default)
+#### Interactive モード (デフォルト)
 
 ```bash
 musubi-sync
 ```
 
-**Result**:
+**実行結果**:
 
 ```
 🔄 MUSUBI Steering Sync
@@ -421,15 +421,15 @@ Updating steering documents...
    - Commit changes: git add steering/ && git commit
 ```
 
-#### Dry-run Mode (Preview Only)
+#### Dry-run モード (プレビューのみ)
 
-When you want to review the changes but do not want to apply them yet:
+変更内容を確認したいが、まだ適用したくない場合:
 
 ```bash
 musubi-sync --dry-run
 ```
 
-**Result**:
+**実行結果**:
 
 ```
 🔄 MUSUBI Steering Sync (Dry Run)
@@ -448,15 +448,15 @@ Would update:
   - steering/memories/architecture_decisions.md
 ```
 
-#### Auto-approve Mode (for CI/CD)
+#### Auto-approve モード (CI/CD 向け)
 
-When running automatically in a CI/CD pipeline:
+CI/CD パイプラインで自動実行する場合:
 
 ```bash
 musubi-sync --auto-approve
 ```
 
-**GitHub Actions example**:
+**GitHub Actions の例**:
 
 ```yaml
 name: Sync Steering Docs
@@ -494,31 +494,31 @@ jobs:
           git push
 ```
 
-### 5. Continuous Operation
+### 5. 継続的な運用
 
-Build it into your development cycle.
+開発サイクルに組み込みます。
 
 ```
-Develop → musubi-sync → Review → Commit
+開発 → musubi-sync → レビュー → コミット
   ↑                                   ↓
   └───────────────────────────────────┘
 ```
 
-**Recommended frequency**:
+**推奨頻度**:
 
-- **Weekly**: Run `musubi-sync` regularly
-- **Before a release**: Always sync and confirm the latest state
-- **After large changes**: When adding new dependencies or directories
+- **週次**: 定期的に `musubi-sync` を実行
+- **リリース前**: 必ず同期して最新状態を確認
+- **大きな変更後**: 新しい依存関係やディレクトリ追加時
 
-## Actual Results
+## 実際の効果
 
-Results of dogfooding on the MUSUBI project itself:
+MUSUBI プロジェクト自身で dogfooding した結果:
 
-### Before (Through v0.3.0)
+### Before (v0.3.0 まで)
 
-- **Manual updates**: Forgot to update `tech.md` after Phase 3 was complete
-- **Bilingual burden**: Manually edited both English and Japanese
-- **Missed updates**: New dependencies (`glob`, `inquirer`) were not documented
+- **手動更新**: Phase 3 完了後、`tech.md` の更新を忘れる
+- **バイリンガル負担**: 英語・日本語の両方を手動で編集
+- **更新漏れ**: 新しい依存関係 (`glob`, `inquirer`) の記載漏れ
 
 ### After (v0.4.0)
 
@@ -535,129 +535,129 @@ Detected changes:
 ✅ All steering docs updated in 3 seconds
 ```
 
-**Effects**:
+**効果**:
 
-- ⏱️ **Time savings**: Manual update 10 minutes → automatic sync 3 seconds (95% reduction)
-- 🎯 **Improved accuracy**: Zero missed detections
-- 🌐 **Bilingual support**: English and Japanese are synced automatically
-- 📝 **Audit trail**: All changes are recorded in `architecture_decisions.md`
+- ⏱️ **時間削減**: 手動更新 10 分 → 自動同期 3 秒 (95% 削減)
+- 🎯 **精度向上**: 検出漏れゼロ
+- 🌐 **バイリンガル対応**: 英語・日本語が自動で同期
+- 📝 **監査証跡**: すべての変更が `architecture_decisions.md` に記録
 
-## Project Memory vs Automatic Sync: When to Use Which
+## プロジェクトメモリ vs 自動同期: 使い分け
 
-| Item | Project Memory (v0.2.0) | Automatic Sync (v0.4.0) |
+| 項目 | プロジェクトメモリ (v0.2.0) | 自動同期 (v0.4.0) |
 |------|---------------------------|------------------|
-| **Purpose** | Design decisions, lessons learned, domain knowledge | Codebase state (version, tech stack, structure) |
-| **Updates** | Manual (AI agent or developer) | Automatic detection + confirmation |
-| **Content** | Qualitative knowledge (Why, How) | Quantitative information (What) |
-| **Change frequency** | Low (only for important decisions) | High (anytime during development) |
-| **Examples** | "Reason for adopting JWT authentication", "Insights from performance improvements" | "Current version: 0.4.0", "Frameworks in use: React, Jest" |
+| **用途** | 設計決定、学習内容、ドメイン知識 | コードベースの状態 (バージョン、技術スタック、構造) |
+| **更新** | 手動 (AI エージェントまたは開発者) | 自動検出 + 確認 |
+| **内容** | 質的な知識 (Why, How) | 量的な情報 (What) |
+| **変更頻度** | 低 (重要な決定時のみ) | 高 (開発中随時) |
+| **例** | "JWT 認証を採用した理由", "パフォーマンス改善の知見" | "現在のバージョン: 0.4.0", "使用フレームワーク: React, Jest" |
 
-**The two are complementary**:
+**両者は補完関係**:
 
-- **Project memory**: Why a technology was chosen (Why)
-- **Automatic sync**: Which technologies are currently in use (What)
+- **プロジェクトメモリ**: なぜその技術を選んだか (Why)
+- **自動同期**: 今どの技術を使っているか (What)
 
-## Evolution from v0.1.7 to v0.4.0
+## v0.1.7 → v0.4.0 の進化
 
-Let's look back at MUSUBI's evolution.
+MUSUBI の進化を振り返ります。
 
-### v0.1.7 (Initial Release)
+### v0.1.7 (初期リリース)
 
-- 25 agents + constitutional governance
-- 7 platforms supported
-- **Challenge**: Steering documents were created and updated manually
+- 25 エージェント + 憲法ガバナンス
+- 7 プラットフォーム対応
+- **課題**: 手動でステアリングドキュメントを作成・更新
 
-### v0.2.0 (Phase 1: Memory System)
+### v0.2.0 (Phase 1: メモリシステム)
 
-- Added project memory (`steering/memories/`)
-- Persists design decisions and lessons learned
-- **Challenge**: Could not keep up with codebase changes
+- プロジェクトメモリ追加 (`steering/memories/`)
+- 設計決定・学習内容を永続化
+- **課題**: コードベースの変化に追従できない
 
-### v0.2.1 (Phase 2: Project Configuration)
+### v0.2.1 (Phase 2: プロジェクト設定)
 
-- Added `steering/project.yml`
-- Standardized project configuration
-- **Challenge**: Applying it to existing projects was laborious
+- `steering/project.yml` 追加
+- プロジェクト設定の標準化
+- **課題**: 既存プロジェクトへの適用が手間
 
-### v0.3.0 (Phase 3: Onboarding Automation)
+### v0.3.0 (Phase 3: オンボーディング自動化)
 
-- Added the `musubi-onboard` command
-- Automatically analyzes existing projects and generates documentation
-- **Effect**: 96% reduction in setup time (2-4 hours → 2-5 minutes)
-- **Challenge**: One-time only, with no continuous updates
+- `musubi-onboard` コマンド追加
+- 既存プロジェクトを自動分析してドキュメント生成
+- **効果**: セットアップ時間 96% 削減 (2-4 時間 → 2-5 分)
+- **課題**: 初回だけで、継続的な更新なし
 
-### v0.4.0 (Phase 4: Automatic Sync) ← **This Release**
+### v0.4.0 (Phase 4: 自動同期) ← **今回のリリース**
 
-- Added the `musubi-sync` command
-- Change detection + automatic updates
-- 3 execution modes (Interactive / Dry-run / Auto-approve)
-- **Effect**: Prevents drift between documentation and code
+- `musubi-sync` コマンド追加
+- 変更検出 + 自動更新
+- 3 つの実行モード (Interactive / Dry-run / Auto-approve)
+- **効果**: ドキュメントとコードの乖離を防止
 
-### The Complete Lifecycle
+### 完全なライフサイクル
 
 ```
 musubi-onboard (v0.3.0)
   ↓
-Generate initial steering documents
+初期ステアリングドキュメント生成
   ↓
-Development and code changes
+開発・コード変更
   ↓
 musubi-sync (v0.4.0)
   ↓
-Update steering documents
+ステアリングドキュメント更新
   ↓
-Repeat...
+繰り返し...
 ```
 
-**Phases 1-4 deliver a complete steering lifecycle.**
+**Phase 1-4 で完全なステアリングライフサイクルを実現しました。**
 
-## Summary
+## まとめ
 
-### Why Project Memory Alone Wasn't Enough
+### プロジェクトメモリだけでは足りなかった理由
 
-1. **Drift from the codebase**: Manual recording cannot keep up with code changes
-2. **Effort of updates**: Bilingual support and deciding when to update are burdens
-3. **Synchronization in team development**: Mismatched understanding among multiple developers
+1. **コードベースとの乖離**: 手動記録ではコード変更に追従できない
+2. **更新の手間**: バイリンガル対応、更新タイミング判断が負担
+3. **チーム開発での同期**: 複数開発者間での認識齟齬
 
-### The v0.4.0 Solution
+### v0.4.0 の解決策
 
-- **Automatic detection**: Detects changes in versions, languages, frameworks, and directories
-- **3 modes**: Flexible operation with Interactive / Dry-run / Auto-approve
-- **Bilingual support**: Updates English and Japanese at the same time
-- **Audit trail**: Records every sync event
+- **自動検出**: バージョン、言語、フレームワーク、ディレクトリの変更を検出
+- **3 つのモード**: Interactive / Dry-run / Auto-approve で柔軟な運用
+- **バイリンガル対応**: 英語・日本語を同時更新
+- **監査証跡**: すべての同期イベントを記録
 
-### How to Use
+### 使い方
 
 ```bash
-# Install
+# インストール
 npm install -g musubi-sdd
 
-# Analyze an existing project (first time)
+# 既存プロジェクトを分析 (初回)
 musubi-onboard
 
-# Detect changes and update (ongoing)
+# 変更を検出して更新 (継続的)
 musubi-sync
-musubi-sync --dry-run        # Preview
+musubi-sync --dry-run        # プレビュー
 musubi-sync --auto-approve   # CI/CD
 ```
 
-### Future Plans
+### 今後の展開
 
-With v0.4.0, Phases 1-4 of the roadmap are complete. Future possibilities:
+v0.4.0 でロードマップ Phase 1-4 が完了しました。今後の可能性:
 
-- Git hook integration (automatic checks in pre-commit)
-- CI/CD validation (verify sync state in PRs)
-- Extended detection (architecture patterns, DB schema changes)
-- LSP integration (symbol-level analysis, in the future)
+- Git フック統合 (pre-commit で自動チェック)
+- CI/CD バリデーション (PR で同期状態を検証)
+- 拡張検出 (アーキテクチャパターン、DB スキーマ変更)
+- LSP 統合 (シンボルレベル分析、将来)
 
-## References
+## 参考リンク
 
-- [MUSUBI GitHub Repository](https://github.com/nahisaho/MUSUBI)
-- [npm Package](https://www.npmjs.com/package/musubi-sdd)
-- [Phase 1-4 Roadmap Analysis](https://github.com/nahisaho/MUSUBI/blob/main/docs/analysis/SERENA-STEERING-COMPARISON.md)
+- [MUSUBI GitHub リポジトリ](https://github.com/nahisaho/MUSUBI)
+- [npm パッケージ](https://www.npmjs.com/package/musubi-sdd)
+- [Phase 1-4 ロードマップ分析](https://github.com/nahisaho/MUSUBI/blob/main/docs/analysis/SERENA-STEERING-COMPARISON.md)
 
 ---
 
-With MUSUBI v0.4.0, a complete steering system built on **project memory (knowledge) + automatic sync (state)** is now in place. Please give it a try!
+MUSUBI v0.4.0 で、**プロジェクトメモリ (知識) + 自動同期 (状態)** による完全なステアリングシステムが完成しました。ぜひお試しください！
 
 **Happy Specification Driven Development! 🎉**

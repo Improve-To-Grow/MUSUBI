@@ -1,213 +1,213 @@
-title: MUSUBI v3.0.0 Complete Guide: 27 Specialized AI Agents and Skills
+title: MUSUBI v3.0.0完全ガイド: 27の専門AIエージェントとスキル
 
-# Chapter 1 Introduction
+# 第1章 はじめに
 
-MUSUBI (Specification Driven Development) v3.0.0 is a specification-driven development framework built on Claude Code. This article explains in detail the role, available tools, and area of expertise of each of the **27 specialized AI agents (Skills)** included in MUSUBI.
+MUSUBI (Specification Driven Development) v3.0.0は、Claude Codeを活用した仕様駆動開発フレームワークです。本記事では、MUSUBIに搭載された **27の専門AIエージェント（Skill）** について、それぞれの役割、使用可能なツール、専門領域を詳しく解説します。
 
-**v3.0.0 New Features:**
-- 🌐 **Browser Agent**: Automate the browser with natural language
-- 📊 **Web GUI Dashboard**: Real-time project dashboard
-- 🔄 **Spec Kit compatible**: Two-way conversion with GitHub Copilot Spec Kit
+**v3.0.0 新機能:**
+- 🌐 **Browser Agent**: 自然言語でブラウザを自動操作
+- 📊 **Web GUI Dashboard**: リアルタイムプロジェクトダッシュボード
+- 🔄 **Spec Kit互換**: GitHub Copilot Spec Kitとの相互変換
 
-# Chapter 2 Installation and Upgrade
+# 第2章 インストール・アップグレード
 
-## 2.1 New Installation
+## 2.1 新規インストール
 
 ```bash
-# For Claude Code (default)
+# Claude Code用（デフォルト）
 npx musubi-sdd@latest init
 
-# For GitHub Copilot
+# GitHub Copilot用
 npx musubi-sdd@latest init --copilot
 
-# For Cursor IDE
+# Cursor IDE用
 npx musubi-sdd@latest init --cursor
 ```
 
-## 2.2 Upgrading an Existing Project
+## 2.2 既存プロジェクトのアップグレード
 
 ```bash
-# Upgrade to v3.0.0
+# v3.0.0にアップグレード
 npx musubi-sdd@latest init
 
-# Skills and commands are updated automatically
+# Skillsとコマンドが自動的に更新されます
 ```
 
-**Note:** Using `npx` always runs the latest version. A global install is not required.
+**注意:** `npx`を使用すると常に最新版が実行されます。グローバルインストールは不要です。
 
-# Chapter 3 Agent (Skill) Overview
+# 第3章 エージェント（Skill）の概要
 
-In MUSUBI, each specialized AI is defined as a **Skill**. Each Skill is specialized for specific tasks and is invoked automatically in response to trigger words.
+MUSUBIでは、各専門AIを**Skill**として定義しています。各Skillは特定のタスクに特化しており、トリガーワードに応じて自動的に呼び出されます。
 
-## 3.1 Orchestration
+## 3.1 オーケストレーション（Orchestration）
 
 ### 3.1.1 Orchestrator
 
-**Master coordinator that oversees multiple agents**
+**複数エージェントを統括するマスターコーディネーター**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Oversees the 27 specialized AI agents and decomposes and coordinates complex tasks |
-| **Tools used** | Read, Write, Edit, Bash, Glob, Grep, TodoWrite |
-| **Trigger words** | orchestrate, coordinate, multi-agent, workflow, execution plan, task breakdown, agent selection, project planning, complex task, full lifecycle, end-to-end development |
+| **説明** | 27の専門AIエージェントを統括し、複雑なタスクを分解・調整 |
+| **使用ツール** | Read, Write, Edit, Bash, Glob, Grep, TodoWrite |
+| **トリガーワード** | orchestrate, coordinate, multi-agent, workflow, execution plan, task breakdown, agent selection, project planning, complex task, full lifecycle, end-to-end development |
 
-**Key features:**
-- Agent selection: Select the best agent for the user's request
-- Workflow coordination: Manage dependencies and execution order between agents
-- Task breakdown: Split complex requirements into executable subtasks
-- Result integration: Integrate and organize the outputs of multiple agents
-- Progress management: Track and report overall progress
+**主な機能:**
+- エージェント選択: ユーザーリクエストに最適なエージェントを選定
+- ワークフロー調整: エージェント間の依存関係と実行順序を管理
+- タスク分解: 複雑な要件を実行可能なサブタスクに分割
+- 結果統合: 複数エージェントの出力を統合・整理
+- 進捗管理: 全体の進捗を追跡・報告
 
 ---
 
 ### 3.1.2 Steering
 
-**Project memory manager**
+**プロジェクトメモリマネージャー**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Analyzes the codebase and generates and maintains project memory (steering context) |
-| **Tools used** | Read, Write, Bash, Glob, Grep |
-| **Trigger words** | steering, project memory, codebase analysis, auto-update context, generate steering, architecture patterns, tech stack analysis, project structure |
+| **説明** | コードベースを分析し、プロジェクトメモリ（steeringコンテキスト）を生成・維持 |
+| **使用ツール** | Read, Write, Bash, Glob, Grep |
+| **トリガーワード** | steering, project memory, codebase analysis, auto-update context, generate steering, architecture patterns, tech stack analysis, project structure |
 
-**Generated documents:**
-- `steering/structure.md` - Architecture patterns, directory structure, naming conventions
-- `steering/tech.md` - Technology stack, frameworks, development tools
-- `steering/product.md` - Business context, product purpose, users
-- `steering/project.yml` - Project settings (machine-readable format)
+**生成するドキュメント:**
+- `steering/structure.md` - アーキテクチャパターン、ディレクトリ構造、命名規則
+- `steering/tech.md` - 技術スタック、フレームワーク、開発ツール
+- `steering/product.md` - ビジネスコンテキスト、製品目的、ユーザー
+- `steering/project.yml` - プロジェクト設定（機械可読形式）
 
 ---
 
-## 3.2 Requirements and Planning
+## 3.2 要件定義・計画（Requirements & Planning）
 
 ### 3.2.1 Requirements Analyst
 
-**Expert in requirements analysis and user story creation**
+**要件分析・ユーザーストーリー作成の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Analyzes stakeholder needs and defines clear functional and non-functional requirements |
-| **Tools used** | Read, Write, Edit, Bash |
-| **Trigger words** | requirements, EARS format, user stories, functional requirements, non-functional requirements, SRS, requirement analysis, specification, acceptance criteria |
+| **説明** | ステークホルダーのニーズを分析し、明確な機能/非機能要件を定義 |
+| **使用ツール** | Read, Write, Edit, Bash |
+| **トリガーワード** | requirements, EARS format, user stories, functional requirements, non-functional requirements, SRS, requirement analysis, specification, acceptance criteria |
 
-**Areas of expertise:**
-- Requirements definition (functional requirements, non-functional requirements, constraints)
-- Stakeholder analysis
-- Requirements elicitation (interviews, workshops, prototyping)
-- Documenting requirements in EARS format
-- Prioritization (MoSCoW method, Kano analysis)
+**専門領域:**
+- 要件定義（機能要件、非機能要件、制約条件）
+- ステークホルダー分析
+- 要件の引き出し（インタビュー、ワークショップ、プロトタイピング）
+- EARS形式での要件文書化
+- 優先順位付け（MoSCoW法、カノ分析）
 
 ---
 
 ### 3.2.2 Project Manager
 
-**Expert in project planning and risk management**
+**プロジェクト計画・リスク管理の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Responsible for project planning, schedule management, risk management, and progress tracking |
-| **Tools used** | Read, Write, Edit, TodoWrite |
-| **Trigger words** | project management, project plan, WBS, Gantt chart, risk management, sprint planning, milestone tracking, project timeline, resource allocation |
+| **説明** | プロジェクト計画、スケジュール管理、リスク管理、進捗追跡を担当 |
+| **使用ツール** | Read, Write, Edit, TodoWrite |
+| **トリガーワード** | project management, project plan, WBS, Gantt chart, risk management, sprint planning, milestone tracking, project timeline, resource allocation |
 
-**Areas of expertise:**
-- Project planning (WBS, Gantt charts, milestones)
-- Risk management (risk identification, analysis, countermeasures)
-- Agile/Scrum management (sprint planning, backlog management)
-- Stakeholder management
+**専門領域:**
+- プロジェクト計画（WBS、ガントチャート、マイルストーン）
+- リスク管理（リスク識別、分析、対応策）
+- アジャイル/スクラム管理（スプリント計画、バックログ管理）
+- ステークホルダー管理
 
 ---
 
-## 3.3 Architecture and Design
+## 3.3 アーキテクチャ・設計（Architecture & Design）
 
 ### 3.3.1 System Architect
 
-**Expert in system architecture design**
+**システムアーキテクチャ設計の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | System architecture design, C4 model diagrams, ADR (Architecture Decision Record) creation |
-| **Tools used** | Read, Write, Edit, Bash, Glob, Grep |
-| **Trigger words** | architecture, system design, C4 model, ADR, architecture decision, component diagram, sequence diagram, system architecture |
+| **説明** | システムアーキテクチャ設計、C4モデル図、ADR（アーキテクチャ決定記録）作成 |
+| **使用ツール** | Read, Write, Edit, Bash, Glob, Grep |
+| **トリガーワード** | architecture, system design, C4 model, ADR, architecture decision, component diagram, sequence diagram, system architecture |
 
-**Areas of expertise:**
-- C4 model (Context, Container, Component, Code)
-- Architecture patterns (microservices, monolith, event-driven)
-- Distributed system design
-- Security architecture
+**専門領域:**
+- C4モデル（Context、Container、Component、Code）
+- アーキテクチャパターン（マイクロサービス、モノリス、イベント駆動）
+- 分散システム設計
+- セキュリティアーキテクチャ
 
 ---
 
 ### 3.3.2 API Designer
 
-**Expert in API design**
+**API設計の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Design of REST/GraphQL/gRPC APIs and creation of OpenAPI specifications |
-| **Tools used** | Read, Write, Edit, Bash |
-| **Trigger words** | API design, REST API, GraphQL, OpenAPI, Swagger, gRPC, API specification, endpoint design, API contract |
+| **説明** | REST/GraphQL/gRPC APIの設計、OpenAPI仕様書の作成 |
+| **使用ツール** | Read, Write, Edit, Bash |
+| **トリガーワード** | API design, REST API, GraphQL, OpenAPI, Swagger, gRPC, API specification, endpoint design, API contract |
 
-**Areas of expertise:**
-- RESTful API design (resource design, HTTP methods, status codes)
-- GraphQL API design (schemas, resolvers)
-- gRPC design (Protocol Buffers, service definitions)
-- Creating OpenAPI specifications
-- API security (OAuth2, JWT, rate limiting)
+**専門領域:**
+- RESTful API設計（リソース設計、HTTPメソッド、ステータスコード）
+- GraphQL API設計（スキーマ、リゾルバー）
+- gRPC設計（Protocol Buffers、サービス定義）
+- OpenAPI仕様書の作成
+- APIセキュリティ（OAuth2、JWT、レート制限）
 
 ---
 
 ### 3.3.3 Database Schema Designer
 
-**Expert in database schema design**
+**データベーススキーマ設計の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Database design, ER diagrams, DDL generation |
-| **Tools used** | Read, Write, Edit, Bash |
-| **Trigger words** | database design, schema design, ER diagram, data model, DDL, database architecture, entity relationship |
+| **説明** | データベース設計、ER図、DDL生成 |
+| **使用ツール** | Read, Write, Edit, Bash |
+| **トリガーワード** | database design, schema design, ER diagram, data model, DDL, database architecture, entity relationship |
 
-**Areas of expertise:**
-- Data modeling (conceptual, logical, and physical design)
-- Normalization (1NF to BCNF)
-- RDBMS (PostgreSQL, MySQL, SQL Server)
-- NoSQL (MongoDB, DynamoDB, Redis)
+**専門領域:**
+- データモデリング（概念設計、論理設計、物理設計）
+- 正規化（1NF〜BCNF）
+- RDBMS（PostgreSQL、MySQL、SQL Server）
+- NoSQL（MongoDB、DynamoDB、Redis）
 
 ---
 
 ### 3.3.4 UI/UX Designer
 
-**Expert in UI/UX design**
+**UI/UXデザインの専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | User interface design, wireframes, prototype creation |
-| **Tools used** | Read, Write, Edit |
-| **Trigger words** | UI design, UX design, wireframe, mockup, prototype, user interface, user experience, design system, component library, accessibility |
+| **説明** | ユーザーインターフェース設計、ワイヤーフレーム、プロトタイプ作成 |
+| **使用ツール** | Read, Write, Edit |
+| **トリガーワード** | UI design, UX design, wireframe, mockup, prototype, user interface, user experience, design system, component library, accessibility |
 
-**Areas of expertise:**
-- UX design (personas, user journey maps)
-- UI design (wireframes, mockups)
-- Design systems (component libraries, design tokens)
-- Accessibility (WCAG 2.1 compliance)
+**専門領域:**
+- UXデザイン（ペルソナ、ユーザージャーニーマップ）
+- UIデザイン（ワイヤーフレーム、モックアップ）
+- デザインシステム（コンポーネントライブラリ、デザイントークン）
+- アクセシビリティ（WCAG 2.1準拠）
 
 ---
 
-## 3.4 Development and Implementation
+## 3.4 開発・実装（Development & Implementation）
 
 ### 3.4.1 Software Developer
 
-**Expert in multi-language code implementation**
+**マルチ言語コード実装の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Code implementation in multiple languages, following SOLID principles and design patterns |
-| **Tools used** | Read, Write, Edit, Bash, Glob, Grep |
-| **Trigger words** | implement, code, development, programming, coding, write code, create function, build feature |
+| **説明** | 複数言語でのコード実装、SOLID原則、デザインパターンに準拠 |
+| **使用ツール** | Read, Write, Edit, Bash, Glob, Grep |
+| **トリガーワード** | implement, code, development, programming, coding, write code, create function, build feature |
 
-**Supported languages:**
+**対応言語:**
 - TypeScript, JavaScript, Python, Java, C#, Go, Swift, Kotlin, Rust, PHP, Ruby
 
-**Supported frameworks:**
+**対応フレームワーク:**
 - Frontend: React, Vue, Angular, Svelte, Next.js, Nuxt.js
 - Backend: Express, NestJS, FastAPI, Django, Spring Boot, ASP.NET
 
@@ -215,165 +215,165 @@ In MUSUBI, each specialized AI is defined as a **Skill**. Each Skill is speciali
 
 ### 3.4.2 Test Engineer
 
-**Expert in test strategy and implementation**
+**テスト戦略・実装の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Design and implementation of unit/integration/E2E tests, mapping to EARS requirements |
-| **Tools used** | Read, Write, Edit, Bash, Glob, Grep |
-| **Trigger words** | testing, unit tests, integration tests, E2E tests, test automation, test cases, TDD, BDD |
+| **説明** | ユニット/統合/E2Eテストの設計・実装、EARS要件とのマッピング |
+| **使用ツール** | Read, Write, Edit, Bash, Glob, Grep |
+| **トリガーワード** | testing, unit tests, integration tests, E2E tests, test automation, test cases, TDD, BDD |
 
-**Areas of expertise:**
-- Unit tests (Vitest, Jest, pytest, JUnit)
-- Integration tests
-- E2E tests (Playwright, Cypress)
-- TDD/BDD methods
+**専門領域:**
+- ユニットテスト（Vitest、Jest、pytest、JUnit）
+- 統合テスト
+- E2Eテスト（Playwright、Cypress）
+- TDD/BDD手法
 
 ---
 
-## 3.5 Quality and Review
+## 3.5 品質・レビュー（Quality & Review）
 
 ### 3.5.1 Code Reviewer
 
-**Expert in code review**
+**コードレビューの専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Code review, SOLID principles, best practice verification |
-| **Tools used** | Read, Grep, Glob, Bash (read-only) |
-| **Trigger words** | code review, code quality, SOLID principles, best practices, review code, PR review |
+| **説明** | コードレビュー、SOLID原則、ベストプラクティスの確認 |
+| **使用ツール** | Read, Grep, Glob, Bash（読み取り専用） |
+| **トリガーワード** | code review, code quality, SOLID principles, best practices, review code, PR review |
 
-**Review perspectives:**
-- Code quality (readability, maintainability)
-- Compliance with SOLID principles
-- Security vulnerabilities
-- Performance issues
-- Test coverage
+**レビュー観点:**
+- コード品質（可読性、保守性）
+- SOLID原則への準拠
+- セキュリティ脆弱性
+- パフォーマンス問題
+- テストカバレッジ
 
 ---
 
 ### 3.5.2 Quality Assurance
 
-**Expert in QA strategy and test planning**
+**QA戦略・テスト計画の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Develops a comprehensive QA strategy and test plan to ensure quality |
-| **Tools used** | Read, Write, Edit, Bash |
-| **Trigger words** | QA, quality assurance, test strategy, QA plan, quality metrics, test planning, quality gates, acceptance testing |
+| **説明** | 包括的なQA戦略とテスト計画を策定し、品質を確保 |
+| **使用ツール** | Read, Write, Edit, Bash |
+| **トリガーワード** | QA, quality assurance, test strategy, QA plan, quality metrics, test planning, quality gates, acceptance testing |
 
-**Areas of expertise:**
-- QA strategy development (quality goals, KPIs, acceptance criteria)
-- Test planning (test scope, schedule)
-- Quality metrics (coverage, defect density)
-- Requirements traceability
+**専門領域:**
+- QA戦略策定（品質目標、KPI、受入基準）
+- テスト計画（テストスコープ、スケジュール）
+- 品質メトリクス（カバレッジ、欠陥密度）
+- 要件トレーサビリティ
 
 ---
 
 ### 3.5.3 Bug Hunter
 
-**Expert in bug investigation and root cause analysis**
+**バグ調査・根本原因分析の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Bug investigation, identifying reproduction steps, root cause analysis, fix proposals |
-| **Tools used** | Read, Write, Edit, Bash, Glob, Grep |
-| **Trigger words** | bug fix, debug, troubleshoot, root cause analysis, error investigation, fix bug, resolve issue |
+| **説明** | バグ調査、再現手順の特定、根本原因分析、修正提案 |
+| **使用ツール** | Read, Write, Edit, Bash, Glob, Grep |
+| **トリガーワード** | bug fix, debug, troubleshoot, root cause analysis, error investigation, fix bug, resolve issue |
 
-**Areas of expertise:**
-- Bug investigation methods (reproduction steps, log analysis)
-- Root cause analysis (5 Whys, fishbone diagrams)
-- Bug types (logic errors, memory leaks, race conditions)
-- Debugging strategies
+**専門領域:**
+- バグ調査手法（再現手順、ログ分析）
+- 根本原因分析（5 Whys、フィッシュボーン図）
+- バグタイプ（ロジックエラー、メモリリーク、レースコンディション）
+- デバッグ戦略
 
 ---
 
-## 3.6 Security and Performance
+## 3.6 セキュリティ・パフォーマンス（Security & Performance）
 
 ### 3.6.1 Security Auditor
 
-**Expert in security auditing**
+**セキュリティ監査の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Vulnerability detection and security auditing based on the OWASP Top 10 |
-| **Tools used** | Read, Grep, Glob, Bash (read-only) |
-| **Trigger words** | security audit, vulnerability scan, OWASP, security review, penetration testing, security assessment |
+| **説明** | OWASP Top 10に基づく脆弱性検出、セキュリティ監査 |
+| **使用ツール** | Read, Grep, Glob, Bash（読み取り専用） |
+| **トリガーワード** | security audit, vulnerability scan, OWASP, security review, penetration testing, security assessment |
 
-**Areas of expertise:**
-- OWASP Top 10 (2021)
-- Web security (XSS, CSRF, SQL injection)
-- API security (authentication, authorization)
-- Infrastructure security
+**専門領域:**
+- OWASP Top 10（2021）
+- Webセキュリティ（XSS、CSRF、SQLインジェクション）
+- APIセキュリティ（認証、認可）
+- インフラストラクチャセキュリティ
 
 ---
 
 ### 3.6.2 Performance Optimizer
 
-**Expert in performance analysis and optimization**
+**パフォーマンス分析・最適化の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Performance analysis, bottleneck detection, and optimization strategy proposals |
-| **Tools used** | Read, Write, Edit, Bash, Glob, Grep |
-| **Trigger words** | performance optimization, performance tuning, profiling, benchmark, bottleneck analysis, scalability, latency optimization |
+| **説明** | パフォーマンス分析、ボトルネック検出、最適化戦略の提案 |
+| **使用ツール** | Read, Write, Edit, Bash, Glob, Grep |
+| **トリガーワード** | performance optimization, performance tuning, profiling, benchmark, bottleneck analysis, scalability, latency optimization |
 
-**Areas of expertise:**
-- Frontend optimization (Core Web Vitals, bundle optimization)
-- Backend optimization (query optimization, caching)
-- Infrastructure optimization (scaling, CDN)
+**専門領域:**
+- フロントエンド最適化（Core Web Vitals、バンドル最適化）
+- バックエンド最適化（クエリ最適化、キャッシング）
+- インフラ最適化（スケーリング、CDN）
 
 ---
 
-## 3.7 Infrastructure and Operations
+## 3.7 インフラ・運用（Infrastructure & Operations）
 
 ### 3.7.1 DevOps Engineer
 
-**Expert in CI/CD and infrastructure automation**
+**CI/CD・インフラ自動化の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | CI/CD pipeline construction, Docker/Kubernetes, infrastructure automation |
-| **Tools used** | Read, Write, Edit, Bash, Glob |
-| **Trigger words** | CI/CD, DevOps, Docker, Kubernetes, pipeline, deployment, container, infrastructure automation |
+| **説明** | CI/CDパイプライン構築、Docker/Kubernetes、インフラ自動化 |
+| **使用ツール** | Read, Write, Edit, Bash, Glob |
+| **トリガーワード** | CI/CD, DevOps, Docker, Kubernetes, pipeline, deployment, container, infrastructure automation |
 
-**Areas of expertise:**
-- CI/CD pipelines (GitHub Actions, GitLab CI)
-- Containerization (Docker, Docker Compose)
-- Orchestration (Kubernetes)
-- IaC (Terraform, Ansible)
+**専門領域:**
+- CI/CDパイプライン（GitHub Actions、GitLab CI）
+- コンテナ化（Docker、Docker Compose）
+- オーケストレーション（Kubernetes）
+- IaC（Terraform、Ansible）
 
 ---
 
 ### 3.7.2 Cloud Architect
 
-**Expert in cloud architecture**
+**クラウドアーキテクチャの専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | AWS/Azure/GCP design, IaC (Terraform/Bicep) code generation, cost optimization |
-| **Tools used** | Read, Write, Edit, Bash |
-| **Trigger words** | cloud architecture, AWS, Azure, GCP, Terraform, cloud design, infrastructure as code, cloud migration |
+| **説明** | AWS/Azure/GCP設計、IaC（Terraform/Bicep）コード生成、コスト最適化 |
+| **使用ツール** | Read, Write, Edit, Bash |
+| **トリガーワード** | cloud architecture, AWS, Azure, GCP, Terraform, cloud design, infrastructure as code, cloud migration |
 
-**Areas of expertise:**
-- AWS (EC2, Lambda, RDS, S3, EKS)
-- Azure (VMs, Functions, SQL, Storage, AKS)
-- GCP (Compute, Cloud Run, Cloud SQL)
-- IaC (Terraform, Bicep, CloudFormation)
+**専門領域:**
+- AWS（EC2、Lambda、RDS、S3、EKS）
+- Azure（VMs、Functions、SQL、Storage、AKS）
+- GCP（Compute、Cloud Run、Cloud SQL）
+- IaC（Terraform、Bicep、CloudFormation）
 
 ---
 
 ### 3.7.3 Database Administrator
 
-**Expert in database operations and tuning**
+**データベース運用・チューニングの専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Database operations, performance tuning, backup/recovery |
-| **Tools used** | Read, Write, Edit, Bash, Grep |
-| **Trigger words** | database administration, DBA, database tuning, performance tuning, backup recovery, high availability |
+| **説明** | データベース運用、パフォーマンスチューニング、バックアップ/リカバリ |
+| **使用ツール** | Read, Write, Edit, Bash, Grep |
+| **トリガーワード** | database administration, DBA, database tuning, performance tuning, backup recovery, high availability |
 
-**Supported databases:**
+**対応データベース:**
 - RDBMS: PostgreSQL, MySQL/MariaDB, Oracle, SQL Server
 - NoSQL: MongoDB, Redis, Cassandra, DynamoDB
 - NewSQL: CockroachDB, TiDB
@@ -382,329 +382,329 @@ In MUSUBI, each specialized AI is defined as a **Skill**. Each Skill is speciali
 
 ### 3.7.4 Site Reliability Engineer
 
-**Expert in SRE, monitoring, and incident response**
+**SRE・監視・インシデント対応の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Production monitoring, observability, SLO/SLI management, incident response |
-| **Tools used** | Read, Write, Bash, Glob |
-| **Trigger words** | monitoring, observability, SRE, site reliability, alerting, incident response, SLO, SLI, error budget, Prometheus, Grafana |
+| **説明** | 本番監視、可観測性、SLO/SLI管理、インシデント対応 |
+| **使用ツール** | Read, Write, Bash, Glob |
+| **トリガーワード** | monitoring, observability, SRE, site reliability, alerting, incident response, SLO, SLI, error budget, Prometheus, Grafana |
 
-**Areas of expertise:**
-- SLI/SLO definition and tracking
-- Monitoring platforms (Prometheus, Grafana, Datadog)
-- Alert configuration
-- Incident response workflow
-- Post-mortems
+**専門領域:**
+- SLI/SLO定義・追跡
+- 監視プラットフォーム（Prometheus、Grafana、Datadog）
+- アラート設定
+- インシデント対応ワークフロー
+- ポストモーテム
 
 ---
 
 ### 3.7.5 Release Coordinator
 
-**Expert in release coordination and deployment strategy**
+**リリース調整・デプロイ戦略の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Multi-component release coordination, feature flags, rollback strategy |
-| **Tools used** | Read, Write, Bash, Glob, TodoWrite |
-| **Trigger words** | release management, release planning, feature flags, canary deployment, progressive rollout, release notes, rollback strategy |
+| **説明** | マルチコンポーネントリリース調整、フィーチャーフラグ、ロールバック戦略 |
+| **使用ツール** | Read, Write, Bash, Glob, TodoWrite |
+| **トリガーワード** | release management, release planning, feature flags, canary deployment, progressive rollout, release notes, rollback strategy |
 
-**Areas of expertise:**
-- Release planning and coordination
-- Feature flag management
-- Canary/blue-green deployments
-- Rollback procedures
+**専門領域:**
+- リリース計画・調整
+- フィーチャーフラグ管理
+- カナリア/ブルーグリーンデプロイメント
+- ロールバック手順
 
 ---
 
-## 3.8 Documentation
+## 3.8 ドキュメンテーション（Documentation）
 
 ### 3.8.1 Technical Writer
 
-**Expert in technical writing**
+**技術文書作成の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Creation of technical documents, API documentation, user guides, and READMEs |
-| **Tools used** | Read, Write, Edit, Glob |
-| **Trigger words** | documentation, technical writing, API documentation, README, user guide, developer guide, tutorial |
+| **説明** | 技術文書、APIドキュメント、ユーザーガイド、READMEの作成 |
+| **使用ツール** | Read, Write, Edit, Glob |
+| **トリガーワード** | documentation, technical writing, API documentation, README, user guide, developer guide, tutorial |
 
-**Supported documents:**
-- README (project overview, setup instructions)
-- API documentation (OpenAPI, Swagger)
-- User guides/developer guides
-- Tutorials
+**対応ドキュメント:**
+- README（プロジェクト概要、セットアップ手順）
+- APIドキュメント（OpenAPI、Swagger）
+- ユーザーガイド/開発者ガイド
+- チュートリアル
 
 ---
 
-## 3.9 Specialized
+## 3.9 特殊機能（Specialized）
 
 ### 3.9.1 AI/ML Engineer
 
-**Expert in machine learning and MLOps**
+**機械学習・MLOpsの専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Machine learning model development, training, evaluation, deployment, MLOps |
-| **Tools used** | Read, Write, Edit, Bash, Glob, Grep |
-| **Trigger words** | machine learning, ML, AI, model training, MLOps, model deployment, feature engineering, neural network, deep learning |
+| **説明** | 機械学習モデル開発、トレーニング、評価、デプロイ、MLOps |
+| **使用ツール** | Read, Write, Edit, Bash, Glob, Grep |
+| **トリガーワード** | machine learning, ML, AI, model training, MLOps, model deployment, feature engineering, neural network, deep learning |
 
-**Areas of expertise:**
-- Machine learning model development (supervised/unsupervised learning, deep learning)
-- NLP (text classification, NER, text generation)
-- Computer vision (image classification, object detection)
-- MLOps (model versioning, deployment, monitoring)
-- LLM/generative AI (fine-tuning, RAG, agents)
+**専門領域:**
+- 機械学習モデル開発（教師あり/なし学習、深層学習）
+- NLP（テキスト分類、NER、文章生成）
+- コンピュータビジョン（画像分類、物体検出）
+- MLOps（モデルバージョニング、デプロイ、監視）
+- LLM/生成AI（ファインチューニング、RAG、エージェント）
 
 ---
 
 ### 3.9.2 Change Impact Analyzer
 
-**Expert in change impact analysis**
+**変更影響分析の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Impact analysis of changes to existing systems, breaking change detection, migration planning |
-| **Tools used** | Read, Write, Bash, Glob, Grep |
-| **Trigger words** | change impact, impact analysis, brownfield, delta spec, change proposal, breaking changes, dependency analysis |
+| **説明** | 既存システムへの変更影響分析、破壊的変更検出、マイグレーション計画 |
+| **使用ツール** | Read, Write, Bash, Glob, Grep |
+| **トリガーワード** | change impact, impact analysis, brownfield, delta spec, change proposal, breaking changes, dependency analysis |
 
-**Areas of expertise:**
-- Identifying affected components
-- Detecting breaking changes
-- Updating dependency graphs
-- Risk assessment and migration planning
+**専門領域:**
+- 影響を受けるコンポーネントの特定
+- 破壊的変更の検出
+- 依存関係グラフの更新
+- リスク評価とマイグレーション計画
 
 ---
 
 ### 3.9.3 Constitution Enforcer
 
-**Watchdog for Constitution (governance) compliance**
+**憲法（ガバナンス）遵守の監視役**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Verifies compliance with the 9 Constitutional Articles and Phase -1 Gates |
-| **Tools used** | Read, Glob, Grep (read-only) |
-| **Trigger words** | constitution, governance, compliance, validation, Phase -1 Gates, simplicity gate, anti-abstraction gate, test-first |
+| **説明** | 9つの憲法条項とPhase -1ゲートの遵守を検証 |
+| **使用ツール** | Read, Glob, Grep（読み取り専用） |
+| **トリガーワード** | constitution, governance, compliance, validation, Phase -1 Gates, simplicity gate, anti-abstraction gate, test-first |
 
-**The 9 Constitutional Articles:**
-1. Library-First Principle
-2. CLI Interface Mandate
-3. Test-First Imperative
-4. EARS Requirements Format
-5. Traceability Mandate
-6. Project Memory
-7. Simplicity Gate
-8. Anti-Abstraction Gate
-9. Integration-First Testing
+**9つの憲法条項:**
+1. ライブラリファースト原則
+2. CLIインターフェース義務
+3. テストファースト命令
+4. EARS要件形式
+5. トレーサビリティ義務
+6. プロジェクトメモリ
+7. シンプリシティゲート
+8. 反抽象化ゲート
+9. 統合ファーストテスト
 
 ---
 
 ### 3.9.4 Traceability Auditor
 
-**Expert in requirements traceability auditing**
+**要件トレーサビリティ監査の専門家**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Verifies complete traceability from EARS requirements to design to tasks to code to tests |
-| **Tools used** | Read, Glob, Grep (read-only) |
-| **Trigger words** | traceability, requirements coverage, coverage matrix, traceability matrix, requirement mapping, EARS coverage |
+| **説明** | EARS要件→設計→タスク→コード→テストの完全なトレーサビリティを検証 |
+| **使用ツール** | Read, Glob, Grep（読み取り専用） |
+| **トリガーワード** | traceability, requirements coverage, coverage matrix, traceability matrix, requirement mapping, EARS coverage |
 
-**Verification contents:**
-- Requirements-to-design mapping (100% coverage)
-- Design-to-task mapping
-- Task-to-code mapping
-- Code-to-test mapping
-- Gap detection (orphaned requirements, untested code)
+**検証内容:**
+- 要件→設計のマッピング（100%カバレッジ）
+- 設計→タスクのマッピング
+- タスク→コードのマッピング
+- コード→テストのマッピング
+- ギャップ検出（孤立要件、未テストコード）
 
 ---
 
-# Chapter 4 New Features in v3.0.0
+# 第4章 v3.0.0新機能
 
 ## 4.1 Browser Automation Agent
 
-**Expert in browser automation testing** 🆕
+**ブラウザ自動化テストの専門家** 🆕
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Browser automation with Playwright, E2E testing, Web UI testing |
-| **Tools used** | Read, Write, Edit, Bash, Glob, Grep |
-| **Trigger words** | browser automation, e2e test, playwright, end-to-end, web testing, UI testing, browser test, screenshot, web scraping |
+| **説明** | Playwrightを使用したブラウザ自動化、E2Eテスト、Web UIテスト |
+| **使用ツール** | Read, Write, Edit, Bash, Glob, Grep |
+| **トリガーワード** | browser automation, e2e test, playwright, end-to-end, web testing, UI testing, browser test, screenshot, web scraping |
 
-**Areas of expertise:**
-- Design and implementation of E2E test scenarios
-- Cross-browser testing (Chromium, Firefox, WebKit)
-- Visual regression testing (screenshot comparison)
-- Web accessibility auditing
-- Performance measurement (Core Web Vitals)
+**専門領域:**
+- E2Eテストシナリオの設計と実装
+- クロスブラウザテスト（Chromium, Firefox, WebKit）
+- 視覚的リグレッションテスト（スクリーンショット比較）
+- Webアクセシビリティ監査
+- パフォーマンス測定（Core Web Vitals）
 
-**Usage examples:**
+**使用例:**
 ```bash
-# Generate E2E tests
-npx musubi-workflow --agent browser --task "Create an E2E test for the login flow"
+# E2Eテストの生成
+npx musubi-workflow --agent browser --task "ログインフローのE2Eテスト作成"
 
-# Visual regression test
-npx musubi-workflow --agent browser --task "Screenshot test for the dashboard"
+# 視覚的リグレッションテスト
+npx musubi-workflow --agent browser --task "ダッシュボードのスクリーンショットテスト"
 ```
 
 ---
 
 ## 4.2 Web GUI Dashboard
 
-**Web-based dashboard** 🆕
+**Webベースのダッシュボード** 🆕
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Web dashboard that visualizes the SDD workflow and traceability |
-| **Features** | Project overview, workflow status, specification list, traceability matrix, Constitution display |
-| **Technology** | Express.js, WebSocket, single-page application |
+| **説明** | SDDワークフローとトレーサビリティを視覚化するWebダッシュボード |
+| **機能** | プロジェクト概要、ワークフロー状態、仕様書一覧、トレーサビリティマトリクス、憲法表示 |
+| **技術** | Express.js, WebSocket, シングルページアプリケーション |
 
-**Key features:**
-- **Project overview**: File statistics, workflow progress
-- **Workflow visualization**: Display of the 8-stage SDD workflow status
-- **Specification browser**: Search and browse requirements, design, and tasks
-- **Traceability matrix**: Visualization of requirements coverage
-- **Real-time updates**: File change notifications via WebSocket
+**主要機能:**
+- **プロジェクト概要**: ファイル統計、ワークフロー進捗
+- **ワークフロー可視化**: 8段階SDDワークフローの状態表示
+- **仕様書ブラウザ**: 要件・設計・タスクの検索と閲覧
+- **トレーサビリティマトリクス**: 要件カバレッジの可視化
+- **リアルタイム更新**: WebSocketによるファイル変更通知
 
-**Usage examples:**
+**使用例:**
 ```bash
-# Start the dashboard
+# ダッシュボード起動
 npx musubi-gui start
 
-# Development mode (hot reload)
+# 開発モード（ホットリロード）
 npx musubi-gui dev
 
-# Show only the traceability matrix
+# トレーサビリティマトリクスのみ表示
 npx musubi-gui matrix
 
-# Specify a custom port
+# カスタムポート指定
 npx musubi-gui start --port 4000
 ```
 
-**API endpoints:**
-| Endpoint | Description |
+**APIエンドポイント:**
+| エンドポイント | 説明 |
 |----------------|------|
-| `GET /api/project` | Project overview |
-| `GET /api/specs` | Specification list (EARS format) |
-| `GET /api/traceability` | Traceability matrix |
-| `GET /api/workflow` | Workflow status |
-| `GET /api/steering` | Steering documents |
-| `GET /api/health` | Health check |
+| `GET /api/project` | プロジェクト概要 |
+| `GET /api/specs` | 仕様書一覧（EARS形式） |
+| `GET /api/traceability` | トレーサビリティマトリクス |
+| `GET /api/workflow` | ワークフロー状態 |
+| `GET /api/steering` | Steeringドキュメント |
+| `GET /api/health` | ヘルスチェック |
 
 ---
 
-# Chapter 5 OpenHands-Derived Modules (v2.2.0+)
+# 第5章 OpenHands由来モジュール（v2.2.0〜）
 
-MUSUBI v2.2.0 integrated eight advanced modules inspired by the **OpenHands project**. These modules significantly improve agent autonomy and quality.
+MUSUBI v2.2.0では、**OpenHandsプロジェクト**にインスパイアされた8つの高度なモジュールが統合されました。これらのモジュールにより、エージェントの自律性と品質が大幅に向上しています。
 
 ## 5.1 StuckDetector
 
-**Automatic detection of stuck agents**
+**エージェントの行き詰まり自動検出**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Automatically detects when an agent repeats the same operation or makes no progress |
-| **Detection patterns** | Repeated execution of the same command, error loops, long waits with no progress |
-| **Response** | Automatic recovery suggestions, presentation of alternative approaches |
+| **説明** | エージェントが同じ操作を繰り返したり、進捗がない状態を自動検出 |
+| **検出パターン** | 同じコマンドの繰り返し実行、エラーループ、進捗なしの長時間待機 |
+| **対応** | 自動リカバリー提案、代替アプローチの提示 |
 
 ## 5.2 SkillsLoader
 
-**Dynamic skill loading and management**
+**動的スキルのロードと管理**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Dynamically loads skills (agents) as needed |
-| **Features** | On-demand loading, memory efficiency, skill dependency management |
+| **説明** | 必要に応じてスキル（エージェント）を動的にロード |
+| **機能** | オンデマンドロード、メモリ効率化、スキル依存関係管理 |
 
 ```javascript
-// Dynamic skill loading
+// 動的スキルロード
 const skill = await skillsLoader.load('code-reviewer');
 ```
 
 ## 5.3 MemoryCondenser
 
-**Efficient compression of long-term memory**
+**長期記憶の効率的な圧縮**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Efficiently compresses long-term context while retaining important information |
-| **Features** | Context compression, prioritized retention of important information, token optimization |
+| **説明** | 長期コンテキストを効率的に圧縮し、重要な情報を保持 |
+| **機能** | コンテキスト圧縮、重要情報の優先保持、トークン最適化 |
 
 ## 5.4 CriticSystem
 
-**Quality evaluation of agent output**
+**エージェント出力の品質評価**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Evaluates agent output and calculates a quality score |
-| **Evaluation criteria** | Accuracy, completeness, consistency, best practice compliance |
+| **説明** | エージェントの出力を評価し、品質スコアを算出 |
+| **評価項目** | 正確性、完全性、一貫性、ベストプラクティス準拠 |
 
 ```javascript
-// Quality evaluation
+// 品質評価
 const critique = await criticSystem.evaluate(agentOutput);
 // { score: 0.85, feedback: [...], improvements: [...] }
 ```
 
 ## 5.5 IssueResolver
 
-**Automatic analysis and resolution proposals for GitHub Issues**
+**GitHub Issueの自動分析と解決提案**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Analyzes GitHub Issues and automatically generates the tasks needed to resolve them |
-| **Features** | Issue classification, root cause analysis, automatic task generation, PR proposals |
+| **説明** | GitHub Issueを分析し、解決に必要なタスクを自動生成 |
+| **機能** | Issue分類、根本原因分析、タスク自動生成、PR提案 |
 
 ## 5.6 SecurityAnalyzer
 
-**Automatic detection of security vulnerabilities**
+**セキュリティ脆弱性の自動検出**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Automatically detects security vulnerabilities in code |
-| **Detection items** | SQL injection, XSS, CSRF, authentication/authorization issues, dependency vulnerabilities |
+| **説明** | コードのセキュリティ脆弱性を自動検出 |
+| **検出項目** | SQLインジェクション、XSS、CSRF、認証・認可の問題、依存関係の脆弱性 |
 
 ```javascript
-// Security analysis
+// セキュリティ分析
 const vulnerabilities = await securityAnalyzer.scan(codebase);
 // [{ type: 'SQL Injection', severity: 'high', location: '...' }]
 ```
 
 ## 5.7 AgentMemoryManager
 
-**Memory sharing between agents**
+**エージェント間のメモリ共有**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Shares and synchronizes memory across multiple agents |
-| **Features** | Shared context management, inter-agent communication, state persistence |
+| **説明** | 複数エージェント間でメモリを共有・同期 |
+| **機能** | 共有コンテキスト管理、エージェント間通信、状態永続化 |
 
 ## 5.8 GitHubClient
 
-**GitHub API integration**
+**GitHub API統合**
 
-| Item | Content |
+| 項目 | 内容 |
 |------|------|
-| **Description** | Automates Issue/PR operations through integration with the GitHub API |
-| **Supported operations** | Create/update/close Issues, create/review/merge PRs, add comments |
+| **説明** | GitHub APIとの統合により、Issue/PR操作を自動化 |
+| **対応操作** | Issue作成・更新・クローズ、PR作成・レビュー・マージ、コメント追加 |
 
 ---
 
-# Chapter 6 List of Tools Used
+# 第6章 使用ツール一覧
 
-The tools each Skill can use are as follows:
+各Skillが使用できるツールは以下の通りです：
 
-| Tool | Description | Permission |
+| ツール | 説明 | 権限 |
 |--------|------|------|
-| **Read** | Read files | Read |
-| **Write** | Create files | Write |
-| **Edit** | Edit files | Write |
-| **Bash** | Execute shell commands | Execute |
-| **Glob** | File pattern search | Read |
-| **Grep** | Content search | Read |
-| **TodoWrite** | Task management | Write |
+| **Read** | ファイルの読み取り | 読み取り |
+| **Write** | ファイルの作成 | 書き込み |
+| **Edit** | ファイルの編集 | 書き込み |
+| **Bash** | シェルコマンド実行 | 実行 |
+| **Glob** | ファイルパターン検索 | 読み取り |
+| **Grep** | コンテンツ検索 | 読み取り |
+| **TodoWrite** | タスク管理 | 書き込み |
 
 ---
 
-# Chapter 7 Agent Permission Matrix
+# 第7章 エージェント権限マトリクス
 
 | Skill | Read | Write | Edit | Bash | Glob | Grep | TodoWrite |
 |-------|:----:|:-----:|:----:|:----:|:----:|:----:|:---------:|
@@ -737,64 +737,64 @@ The tools each Skill can use are as follows:
 
 ---
 
-# Chapter 8 Slash Command List
+# 第8章 スラッシュコマンド一覧
 
-MUSUBI provides nine slash commands that can be used in Claude Code. These commands support each stage of the SDD workflow.
+MUSUBIは、Claude Codeで使用できる9つのスラッシュコマンドを提供しています。これらのコマンドはSDDワークフローの各段階をサポートします。
 
-## 8.1 Core Commands
+## 8.1 コアコマンド
 
-| Command | Description | Usage example |
+| コマンド | 説明 | 使用例 |
 |----------|------|--------|
-| `/sdd-steering` | Generate and update project memory (steering context) | `/sdd-steering` |
-| `/sdd-requirements` | Create an EARS-format requirements specification | `/sdd-requirements authentication` |
-| `/sdd-design` | Generate a technical design document from requirements | `/sdd-design authentication` |
-| `/sdd-tasks` | Break the design down into actionable tasks | `/sdd-tasks authentication` |
-| `/sdd-implement` | Implement the feature based on tasks | `/sdd-implement authentication` |
-| `/sdd-validate` | Validate Constitution compliance and requirements coverage | `/sdd-validate authentication` |
+| `/sdd-steering` | プロジェクトメモリ（steeringコンテキスト）を生成・更新 | `/sdd-steering` |
+| `/sdd-requirements` | EARS形式の要件仕様書を作成 | `/sdd-requirements authentication` |
+| `/sdd-design` | 要件から技術設計書を生成 | `/sdd-design authentication` |
+| `/sdd-tasks` | 設計をアクション可能なタスクに分解 | `/sdd-tasks authentication` |
+| `/sdd-implement` | タスクに基づいて機能を実装 | `/sdd-implement authentication` |
+| `/sdd-validate` | 憲法遵守と要件カバレッジを検証 | `/sdd-validate authentication` |
 
-## 8.2 Change Management Commands (for Brownfield)
+## 8.2 変更管理コマンド（Brownfield向け）
 
-Commands for managing changes to existing systems:
+既存システムへの変更を管理するためのコマンドです：
 
-| Command | Description | Usage example |
+| コマンド | 説明 | 使用例 |
 |----------|------|--------|
-| `/sdd-change-init` | Initialize a change proposal | `/sdd-change-init add-2fa` |
-| `/sdd-change-apply` | Apply an approved change proposal | `/sdd-change-apply add-2fa` |
-| `/sdd-change-archive` | Archive a completed change proposal | `/sdd-change-archive add-2fa` |
+| `/sdd-change-init` | 変更提案を初期化 | `/sdd-change-init add-2fa` |
+| `/sdd-change-apply` | 承認された変更提案を適用 | `/sdd-change-apply add-2fa` |
+| `/sdd-change-archive` | 完了した変更提案をアーカイブ | `/sdd-change-archive add-2fa` |
 
-## 8.3 Command Details
+## 8.3 コマンド詳細
 
-### 8.3.1 `/sdd-steering` - Project Memory Generation
+### 8.3.1 `/sdd-steering` - プロジェクトメモリ生成
 
-Analyzes the project's codebase and generates the steering context.
+プロジェクトのコードベースを分析し、steeringコンテキストを生成します。
 
-**Modes:**
-- **Bootstrap Mode**: When no steering files exist, analyzes the entire codebase and generates the initial files
-- **Sync Mode**: When steering files exist, detects differences from the codebase and updates them
+**モード:**
+- **Bootstrap Mode**: steeringファイルが存在しない場合、コードベース全体を分析して初期ファイルを生成
+- **Sync Mode**: steeringファイルが存在する場合、コードベースとの差分を検出して更新
 
-**Generated files:**
+**生成ファイル:**
 ```
 steering/
-├── structure.md    # Architecture patterns
-├── tech.md         # Technology stack
-├── product.md      # Business context
-└── project.yml     # Project settings (machine-readable)
+├── structure.md    # アーキテクチャパターン
+├── tech.md         # 技術スタック
+├── product.md      # ビジネスコンテキスト
+└── project.yml     # プロジェクト設定（機械可読）
 ```
 
 ---
 
-### 8.3.2 `/sdd-requirements [feature-name]` - Requirements Definition
+### 8.3.2 `/sdd-requirements [feature-name]` - 要件定義
 
-Creates an EARS-format requirements specification for the specified feature.
+指定された機能のEARS形式要件仕様書を作成します。
 
-**Output:**
+**出力:**
 ```
 docs/requirements/[feature-name]/
-├── requirements.md       # English version
-└── requirements.ja.md    # Japanese version
+├── requirements.md       # 英語版
+└── requirements.ja.md    # 日本語版
 ```
 
-**EARS format patterns:**
+**EARS形式パターン:**
 - **Event-driven**: `WHEN [event], the [system] SHALL [response]`
 - **State-driven**: `WHILE [state], the [system] SHALL [response]`
 - **Unwanted behavior**: `IF [error], THEN the [system] SHALL [response]`
@@ -803,303 +803,303 @@ docs/requirements/[feature-name]/
 
 ---
 
-### 8.3.3 `/sdd-design [feature-name]` - Technical Design
+### 8.3.3 `/sdd-design [feature-name]` - 技術設計
 
-Generates a technical design document from the requirements specification.
+要件仕様書から技術設計書を生成します。
 
-**Output:**
+**出力:**
 ```
 docs/design/[feature-name]/
-├── design.md       # English version
-└── design.ja.md    # Japanese version
+├── design.md       # 英語版
+└── design.ja.md    # 日本語版
 ```
 
-**Contents included:**
-- C4 model diagrams (Context, Container, Component)
-- ADR (Architecture Decision Record)
-- Sequence diagrams
-- Data model
-- API design
+**含まれる内容:**
+- C4モデル図（Context、Container、Component）
+- ADR（アーキテクチャ決定記録）
+- シーケンス図
+- データモデル
+- API設計
 
 ---
 
-### 8.3.4 `/sdd-tasks [feature-name]` - Task Breakdown
+### 8.3.4 `/sdd-tasks [feature-name]` - タスク分解
 
-Breaks the design document down into actionable implementation tasks.
+設計書をアクション可能な実装タスクに分解します。
 
-**Output:**
+**出力:**
 ```
 docs/tasks/[feature-name]/
-├── tasks.md       # English version
-└── tasks.ja.md    # Japanese version
+├── tasks.md       # 英語版
+└── tasks.ja.md    # 日本語版
 ```
 
-**Contents included:**
-- Prioritized task list
-- Requirements coverage matrix
-- Dependency graph
-- Estimates (complexity)
+**含まれる内容:**
+- 優先度付きタスクリスト
+- 要件カバレッジマトリクス
+- 依存関係グラフ
+- 見積もり（複雑度）
 
 ---
 
-### 8.3.5 `/sdd-implement [feature-name]` - Implementation
+### 8.3.5 `/sdd-implement [feature-name]` - 実装
 
-Implements the feature based on the task breakdown.
+タスク分解に基づいて機能を実装します。
 
-**Process:**
-1. Read the task file
-2. Write tests first, following the Test-First principle
-3. Implement the code
-4. Run and verify the tests
-
----
-
-### 8.3.6 `/sdd-validate [feature-name]` - Validation
-
-Validates whether the implementation satisfies the Constitutional Articles and requirements coverage.
-
-**Validation items:**
-- Compliance with the 9 Constitutional Articles
-- 100% requirements traceability
-- Code quality standards
-- Security standards
-- Test coverage
+**プロセス:**
+1. タスクファイルの読み込み
+2. Test-First原則に従いテストを先に作成
+3. コード実装
+4. テスト実行・確認
 
 ---
 
-### 8.3.7 `/sdd-change-init [change-name]` - Change Proposal Initialization
+### 8.3.6 `/sdd-validate [feature-name]` - 検証
 
-Creates a change proposal for an existing system (for Brownfield projects).
+実装が憲法条項と要件カバレッジを満たしているか検証します。
 
-**Output:**
+**検証項目:**
+- 9つの憲法条項への準拠
+- 100%要件トレーサビリティ
+- コード品質基準
+- セキュリティ基準
+- テストカバレッジ
+
+---
+
+### 8.3.7 `/sdd-change-init [change-name]` - 変更提案初期化
+
+既存システムへの変更提案を作成します（Brownfieldプロジェクト向け）。
+
+**出力:**
 ```
 changes/[change-name]/
-├── proposal.md     # Change proposal
-└── specs/          # Delta specs (ADDED/MODIFIED/REMOVED/RENAMED)
+├── proposal.md     # 変更提案
+└── specs/          # Delta仕様（ADDED/MODIFIED/REMOVED/RENAMED）
 ```
 
 ---
 
-### 8.3.8 `/sdd-change-apply [change-name]` - Apply Change
+### 8.3.8 `/sdd-change-apply [change-name]` - 変更適用
 
-Applies an approved change proposal to the codebase.
-
----
-
-### 8.3.9 `/sdd-change-archive [change-name]` - Archive Change
-
-Archives a completed change proposal and updates the documentation.
+承認された変更提案をコードベースに適用します。
 
 ---
 
-# Chapter 9 Project Memory (Steering System)
+### 8.3.9 `/sdd-change-archive [change-name]` - 変更アーカイブ
 
-All Skills refer to the following steering files before starting a task:
+完了した変更提案をアーカイブし、ドキュメントを更新します。
+
+---
+
+# 第9章 プロジェクトメモリ（Steering System）
+
+すべてのSkillは、タスク開始前に以下のsteeringファイルを参照します：
 
 ```
 steering/
-├── structure.md  # Architecture patterns, directory structure
-├── tech.md       # Technology stack, frameworks
-└── product.md    # Business context, product purpose
+├── structure.md  # アーキテクチャパターン、ディレクトリ構造
+├── tech.md       # 技術スタック、フレームワーク
+└── product.md    # ビジネスコンテキスト、製品目的
 ```
 
-This allows all agents to share a consistent project context.
+これにより、すべてのエージェントが一貫したプロジェクトコンテキストを共有できます。
 
 ---
 
-# Chapter 10 SDD 8-Stage Workflow
+# 第10章 SDD 8段階ワークフロー
 
-MUSUBI follows the following 8-stage workflow:
+MUSUBIは以下の8段階ワークフローに従います：
 
 ```
 Research → Requirements → Design → Tasks → Implementation → Testing → Deployment → Monitoring
 ```
 
-1. **Research**: Technical research, options analysis
-2. **Requirements**: Requirements definition in EARS format
-3. **Design**: C4 model, ADR, technical design
-4. **Tasks**: Breakdown into implementation tasks
-5. **Implementation**: Code implementation
-6. **Testing**: Unit/integration/E2E tests
-7. **Deployment**: CI/CD, infrastructure deployment
-8. **Monitoring**: Production monitoring, SLO tracking
+1. **Research**: 技術調査、オプション分析
+2. **Requirements**: EARS形式での要件定義
+3. **Design**: C4モデル、ADR、技術設計
+4. **Tasks**: 実装タスクへの分解
+5. **Implementation**: コード実装
+6. **Testing**: ユニット/統合/E2Eテスト
+7. **Deployment**: CI/CD、インフラデプロイ
+8. **Monitoring**: 本番監視、SLO追跡
 
 ---
 
-# Chapter 11 CLI Command List
+# 第11章 CLIコマンド一覧
 
-MUSUBI also provides CLI commands that can be used directly from the terminal.
+MUSUBIは、ターミナルから直接使用できるCLIコマンドも提供しています。
 
-## 11.1 Main Commands
+## 11.1 メインコマンド
 
 ```bash
-# Initialize the project
-musubi init                    # Initialize for Claude Code (default)
-musubi init --cursor           # Initialize for Cursor IDE
-musubi init --copilot          # Initialize for GitHub Copilot
-musubi init --gemini           # Initialize for Gemini CLI
-musubi init --codex            # Initialize for Codex CLI
-musubi init --qwen             # Initialize for Qwen Code
-musubi init --windsurf         # Initialize for Windsurf IDE
+# プロジェクトの初期化
+musubi init                    # Claude Code用に初期化（デフォルト）
+musubi init --cursor           # Cursor IDE用に初期化
+musubi init --copilot          # GitHub Copilot用に初期化
+musubi init --gemini           # Gemini CLI用に初期化
+musubi init --codex            # Codex CLI用に初期化
+musubi init --qwen             # Qwen Code用に初期化
+musubi init --windsurf         # Windsurf IDE用に初期化
 
-# Project management
-musubi status                  # Show project status
-musubi validate                # Quick validation of Constitution compliance
-musubi validate --verbose      # Show detailed validation results
-musubi sync                    # Sync steering documents with the codebase
-musubi sync --dry-run          # Preview changes (not applied)
-musubi info                    # Show version and environment information
+# プロジェクト管理
+musubi status                  # プロジェクトステータスを表示
+musubi validate                # 憲法遵守のクイック検証
+musubi validate --verbose      # 詳細な検証結果を表示
+musubi sync                    # steeringドキュメントをコードベースと同期
+musubi sync --dry-run          # 変更をプレビュー（適用なし）
+musubi info                    # バージョンと環境情報を表示
 ```
 
-## 11.2 Standalone CLI Commands
+## 11.2 スタンドアロンCLIコマンド
 
-Dedicated CLI commands for more advanced operations:
+より高度な操作のための専用CLIコマンドです：
 
-| Command | Description |
+| コマンド | 説明 |
 |----------|------|
-| `musubi-requirements` | EARS-format requirements generator |
-| `musubi-design` | Technical design generator (C4, ADR) |
-| `musubi-tasks` | Task breakdown generator |
-| `musubi-trace` | Traceability matrix analysis |
-| `musubi-analyze` | Gap detection and analysis |
-| `musubi-onboard` | Team onboarding assistant |
-| `musubi-share` | Knowledge sharing tool |
-| `musubi-change` | Change impact analysis |
-| `musubi-gaps` | Requirements gap detection |
-| `musubi-remember` | Project memory management |
-| `musubi-resolve` | Problem resolution assistant |
-| `musubi-workflow` | Workflow management |
+| `musubi-requirements` | EARS形式要件ジェネレーター |
+| `musubi-design` | 技術設計ジェネレーター（C4、ADR） |
+| `musubi-tasks` | タスク分解ジェネレーター |
+| `musubi-trace` | トレーサビリティマトリクス分析 |
+| `musubi-analyze` | ギャップ検出と分析 |
+| `musubi-onboard` | チームオンボーディングアシスタント |
+| `musubi-share` | ナレッジ共有ツール |
+| `musubi-change` | 変更影響分析 |
+| `musubi-gaps` | 要件ギャップ検出 |
+| `musubi-remember` | プロジェクトメモリ管理 |
+| `musubi-resolve` | 問題解決アシスタント |
+| `musubi-workflow` | ワークフロー管理 |
 
-**Usage examples:**
+**使用例:**
 ```bash
-# Generate requirements
+# 要件生成
 musubi-requirements --feature authentication --output docs/specs/
 
-# Traceability analysis
+# トレーサビリティ分析
 musubi-trace --requirements docs/specs/requirements.md --tests tests/
 
-# Gap detection
+# ギャップ検出
 musubi-gaps --specs docs/specs/ --code src/
 ```
 
 ---
 
-# Chapter 12 Supported AI Platforms (7 Types)
+# 第12章 サポートAIプラットフォーム（7種類）
 
-MUSUBI supports the following 7 AI coding agents:
+MUSUBIは以下の7つのAIコーディングエージェントをサポートしています：
 
-| Platform | Flag | Description |
+| プラットフォーム | フラグ | 説明 |
 |------------------|--------|------|
-| **Claude Code** | `--claude`, `--claude-code` | Default. Full Skills API support |
-| **GitHub Copilot** | `--copilot`, `--github-copilot` | Command/prompt approach |
-| **Cursor IDE** | `--cursor` | Command/prompt approach |
-| **Gemini CLI** | `--gemini`, `--gemini-cli` | Command/prompt approach |
-| **Codex CLI** | `--codex`, `--codex-cli` | Command/prompt approach |
-| **Qwen Code** | `--qwen`, `--qwen-code` | Command/prompt approach |
-| **Windsurf IDE** | `--windsurf` | Command/prompt approach |
+| **Claude Code** | `--claude`, `--claude-code` | デフォルト。Skills API完全対応 |
+| **GitHub Copilot** | `--copilot`, `--github-copilot` | コマンド/プロンプト方式 |
+| **Cursor IDE** | `--cursor` | コマンド/プロンプト方式 |
+| **Gemini CLI** | `--gemini`, `--gemini-cli` | コマンド/プロンプト方式 |
+| **Codex CLI** | `--codex`, `--codex-cli` | コマンド/プロンプト方式 |
+| **Qwen Code** | `--qwen`, `--qwen-code` | コマンド/プロンプト方式 |
+| **Windsurf IDE** | `--windsurf` | コマンド/プロンプト方式 |
 
-**Note:** The Skills API (`@skill-name` format) is exclusive to Claude Code. Other platforms use the command/prompt approach.
+**注意:** Skills API（`@skill-name`形式）はClaude Code専用です。他のプラットフォームではコマンド/プロンプト方式を使用します。
 
 ---
 
-# Chapter 13 CodeGraph MCP Server Integration
+# 第13章 CodeGraph MCP Server連携
 
-By integrating with the **CodeGraph MCP Server**, MUSUBI enables AI agents to understand the entire codebase as a "graph".
+MUSUBIは**CodeGraph MCP Server**と統合することで、AIエージェントがコードベース全体を「グラフ」として理解できるようになります。
 
-## 13.1 What Is the CodeGraph MCP Server?
+## 13.1 CodeGraph MCP Serverとは？
 
-The CodeGraph MCP Server is a server that analyzes source code as a graph structure and provides it to AI agents via MCP (Model Context Protocol).
+CodeGraph MCP Serverは、ソースコードをグラフ構造として解析し、MCP（Model Context Protocol）経由でAIエージェントに提供するサーバーです。
 
-| Feature | Description |
+| 機能 | 説明 |
 |------|------|
-| **Code structure analysis** | Visualize dependencies among functions, classes, and modules |
-| **GraphRAG search** | Semantic code search (meaning-based) |
-| **Community detection** | Module boundary analysis using the Louvain algorithm |
-| **Impact analysis** | Automatically identify the ripple range of changes |
-| **14-language support** | Python, JavaScript, TypeScript, Java, C#, Go, Rust, Ruby, PHP, C++, HCL, and more |
+| **コード構造分析** | 関数、クラス、モジュールの依存関係を可視化 |
+| **GraphRAG検索** | セマンティックなコード検索（意味ベース） |
+| **コミュニティ検出** | Louvainアルゴリズムによるモジュール境界分析 |
+| **影響分析** | 変更の波及範囲を自動特定 |
+| **14言語対応** | Python, JavaScript, TypeScript, Java, C#, Go, Rust, Ruby, PHP, C++, HCLなど |
 
-## 13.2 Provided MCP Tools (14 Types)
+## 13.2 提供されるMCPツール（14種類）
 
 ```
-# Code graph operations
-init_graph          - Initialize graph
-get_code_snippet    - Retrieve source code
-find_callers        - Trace callers
-find_callees        - Trace callees
-find_dependencies   - Dependency analysis
+# コードグラフ操作
+init_graph          - グラフ初期化
+get_code_snippet    - ソースコード取得
+find_callers        - 呼び出し元追跡
+find_callees        - 呼び出し先追跡
+find_dependencies   - 依存関係分析
 
-# Search features
-local_search        - Local context search
-global_search       - Global search
-query_codebase      - Natural language query
+# 検索機能
+local_search        - ローカルコンテキスト検索
+global_search       - グローバル検索
+query_codebase      - 自然言語クエリ
 
-# Analysis features
-analyze_module_structure  - Module structure analysis
-suggest_refactoring       - Refactoring suggestions
-stats                     - Codebase statistics
-community                 - Community detection
+# 分析機能
+analyze_module_structure  - モジュール構造分析
+suggest_refactoring       - リファクタリング提案
+stats                     - コードベース統計
+community                 - コミュニティ検出
 ```
 
-## 13.3 Usage Examples by Agent
+## 13.3 エージェントごとの活用例
 
-| Agent | CodeGraph Usage | Effect |
+| エージェント | CodeGraph活用 | 効果 |
 |-------------|---------------|------|
-| **Orchestrator** | `global_search`, `stats` | Grasp the whole project, select the optimal agent |
-| **System Architect** | `analyze_module_structure`, `community` | Architecture visualization, refactoring planning |
-| **Software Developer** | `get_code_snippet`, `local_search` | Quickly find related code |
-| **Code Reviewer** | `find_callers`, `suggest_refactoring` | Check impact scope, suggest improvements |
-| **Test Engineer** | `find_dependencies` | Understand dependencies of test targets |
-| **Security Auditor** | `find_callers`, `query_codebase` | Identify usage locations of vulnerable functions |
-| **Change Impact Analyzer** | `find_dependencies`, `find_callers` | Complete analysis of change impact |
-| **Bug Hunter** | `local_search`, `get_code_snippet` | Trace the root cause of bugs |
+| **Orchestrator** | `global_search`, `stats` | プロジェクト全体把握、最適なエージェント選定 |
+| **System Architect** | `analyze_module_structure`, `community` | アーキテクチャ可視化、リファクタリング計画 |
+| **Software Developer** | `get_code_snippet`, `local_search` | 関連コードの迅速な発見 |
+| **Code Reviewer** | `find_callers`, `suggest_refactoring` | 影響範囲の確認、改善提案 |
+| **Test Engineer** | `find_dependencies` | テスト対象の依存関係把握 |
+| **Security Auditor** | `find_callers`, `query_codebase` | 脆弱な関数の利用箇所特定 |
+| **Change Impact Analyzer** | `find_dependencies`, `find_callers` | 変更影響の完全分析 |
+| **Bug Hunter** | `local_search`, `get_code_snippet` | バグの根本原因追跡 |
 
-## 13.4 Setup Methods
+## 13.4 セットアップ方法
 
-### 13.4.1 Method 1: Automatic Setup by the Orchestrator (Recommended)
+### 13.4.1 方法1: Orchestratorによる自動セットアップ（推奨）
 
 ```
-User: Set up CodeGraph MCP
+ユーザー: CodeGraph MCPを設定して
 ```
 
-The Orchestrator runs automatically:
-1. Check the Python environment
-2. Install codegraph-mcp-server
-3. Create the project index
-4. Generate configuration files appropriate to the environment in use
+Orchestratorが自動実行：
+1. Python環境確認
+2. codegraph-mcp-serverインストール
+3. プロジェクトのインデックス作成
+4. 使用環境に応じた設定ファイル生成
 
-### 13.4.2 Method 2: Manual Setup
+### 13.4.2 方法2: 手動セットアップ
 
 ```bash
-# Install
+# インストール
 pipx install --force codegraph-mcp-server
 
-# Create the project index (full index)
+# プロジェクトのインデックス作成（フルインデックス）
 codegraph-mcp index . --full
 
-# Example index output:
+# インデックス出力例:
 # Indexed 105 files
 # - Entities: 1006
 # - Relations: 5359
 # - Communities: 36
 
-# Add to Claude Code
+# Claude Codeに追加
 claude mcp add codegraph -- codegraph-mcp serve --repo /path/to/project
 ```
 
-## 13.5 Index Options
+## 13.5 インデックスオプション
 
-| Option | Description |
+| オプション | 説明 |
 |----------|------|
-| `--full` | Create a full index (recommended) |
-| `--incremental` | Update only changed files |
-| `--exclude <pattern>` | Specify exclusion patterns (e.g., `node_modules`) |
+| `--full` | 完全なインデックスを作成（推奨） |
+| `--incremental` | 変更ファイルのみ更新 |
+| `--exclude <pattern>` | 除外パターン指定（例: `node_modules`） |
 
-**Best practices:**
-- Always create the index with the `--full` option the first time
-- Run `--full` again when there are major changes to the codebase
-- Use `--incremental` for efficient day-to-day updates
+**ベストプラクティス:**
+- 初回は必ず`--full`オプションでインデックスを作成
+- コードベースに大きな変更があった場合は再度`--full`を実行
+- 日常的な更新は`--incremental`で効率的に更新
 
-**For VS Code (Claude Extension):**
+**VS Code (Claude Extension)の場合:**
 
 `.vscode/settings.json`:
 ```json
@@ -1113,26 +1113,26 @@ claude mcp add codegraph -- codegraph-mcp serve --repo /path/to/project
 }
 ```
 
-## 13.6 Benefits of Adoption
+## 13.6 導入効果
 
-| Metric | Before | After | Improvement |
+| 指標 | 導入前 | 導入後 | 改善率 |
 |------|--------|--------|--------|
-| Code search time | 5-10 min manually | Instant (<1 sec) | **99% reduction** |
-| Impact analysis accuracy | 60-70% | 95% or higher | **+35%** |
-| Refactoring planning time | 2-4 hours | 15-30 min | **85% reduction** |
-| Bug cause identification time | 30 min-2 hours | 5-15 min | **75% reduction** |
+| コード検索時間 | 手動5-10分 | 即時（<1秒） | **99%削減** |
+| 影響分析精度 | 60-70% | 95%以上 | **+35%** |
+| リファクタリング計画時間 | 2-4時間 | 15-30分 | **85%削減** |
+| バグ原因特定時間 | 30分-2時間 | 5-15分 | **75%削減** |
 
 ---
 
-# Chapter 14 Summary
+# 第14章 まとめ
 
-MUSUBI v3.0.0 is a powerful specification-driven development framework that integrates 27 specialized AI agents (Skills). v3.0.0 adds the Browser Automation Agent and the Web GUI Dashboard, greatly strengthening E2E testing and project visualization. Each Skill is specialized for specific tasks and is coordinated automatically by the Orchestrator.
+MUSUBI v3.0.0は、27の専門AIエージェント（Skill）を統合した強力な仕様駆動開発フレームワークです。v3.0.0では、Browser Automation AgentとWeb GUI Dashboardが追加され、E2Eテストとプロジェクト可視化が大幅に強化されました。各Skillは特定のタスクに特化しており、Orchestratorによって自動的に調整されます。
 
-The project memory (Steering System) lets all agents share a consistent context, ensuring traceability from EARS-format requirements through implementation, testing, and deployment.
+プロジェクトメモリ（Steering System）により、すべてのエージェントが一貫したコンテキストを共有し、EARS形式の要件から実装、テスト、デプロイまでのトレーサビリティを確保します。
 
 ---
 
-# Chapter 15 Reference Links
+# 第15章 参考リンク
 
 - [MUSUBI GitHub Repository](https://github.com/nahisaho/MUSUBI)
 - [Claude Code Documentation](https://docs.anthropic.com/claude-code)

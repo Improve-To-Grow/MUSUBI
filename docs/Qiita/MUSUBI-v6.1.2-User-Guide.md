@@ -1,798 +1,798 @@
-# [MUSUBI v6.1.2] Just Talk to Your AI in Natural Language! The Complete Guide to Specification Driven Development
+# 【MUSUBI v6.1.2】AIに自然言語で話しかけるだけ！仕様駆動開発の完全ガイド
 
-## Introduction
+## はじめに
 
-**MUSUBI SDD v6.1.2** is a framework that enables Specification Driven Development (SDD) by **simply talking to your AI coding assistant in natural language**.
+**MUSUBI SDD v6.1.2** は、AIコーディングアシスタントに**自然言語で話しかけるだけ**で、仕様駆動開発（SDD）を実現するフレームワークです。
 
-There is no need to memorize commands. Just tell the AI what you want to do, and you can proceed through a consistent workflow from requirements definition to design, implementation, and validation.
-
----
-
-## 🆕 What's New in v6.1.2
-
-### Improved Test Reliability
-
-- **WebSocket test fix**: Added creation of the `storage/archive` directory, improving CI stability
-
-### What's Changed in v6.1.2
-
-- **Unified directory structure**: Flattened to `storage/specs/`
-- **Interactive requirements definition**: One question at a time + MECE analysis
+コマンドを覚える必要はありません。AIに「やりたいこと」を伝えるだけで、要件定義から設計、実装、検証まで一貫したワークフローで開発を進められます。
 
 ---
 
-## 🚀 Getting Started with SDD in Natural Language (Start in 5 Minutes)
+## 🆕 v6.1.2 の変更点
 
-### Step 1: Install MUSUBI
+### テストの信頼性向上
+
+- **WebSocketテスト修正**: `storage/archive` ディレクトリ作成を追加し、CIの安定性を向上
+
+### v6.1.2 の変更点
+
+- **ディレクトリ構造の統一**: `storage/specs/` にフラット化
+- **対話型要件定義**: 1問1答 + MECE分析
+
+---
+
+## 🚀 自然言語で始めるSDD（5分で開始）
+
+### Step 1: MUSUBI のインストール
 
 ```bash
 npx musubi-sdd init --copilot
 ```
 
-Select your AI platform and the setup is done automatically.
+お使いのAIプラットフォームを選択すると、自動でセットアップされます。
 
-### Step 2: Start Developing by Just Talking to the AI
+### Step 2: AIに話しかけるだけで開発開始
 
-Once initialization is complete, Specification Driven Development begins when you **simply talk to the AI in natural language**.
+初期化が完了したら、**AIに自然言語で話しかけるだけ**で仕様駆動開発が始まります。
 
 ---
 
-## 💬 Examples of Working in Natural Language
+## 💬 自然言語での作業例
 
-### 🎯 Want to Create Requirements
+### 🎯 要件定義を作成したい
 
-Tell the AI the following.
+AIに次のように伝えます。
 
-> **"Create requirements for the user authentication feature"**
+> **「ユーザー認証機能の要件定義を作成して」**
 
-The AI starts a dialogue, asking one question at a time.
+AIが1問1答形式で対話を開始します。
 
 ```
-AI: What is the "real problem" you want this feature to solve?
+AI: この機能で解決したい『本当の課題』は何ですか？
 
-You: Many users forget their passwords, and support inquiries are increasing
+あなた: パスワードを忘れるユーザーが多くて、問い合わせが増えている
 
-AI: Who needs this feature the most?
+AI: この機能を最も必要としているのは誰ですか？
 
-You: The customer support team and users who log in frequently
+あなた: カスタマーサポートチームと、頻繁にログインするユーザー
 
-AI: If this feature worked perfectly, what would change?
+AI: もしこの機能が完璧に動作したら、何が変わりますか？
 
-You: Inquiries would drop by 80%, and users could log in smoothly
+あなた: 問い合わせが80%減って、ユーザーがスムーズにログインできる
 ...
 ```
 
-When the dialogue is complete, the AI defines comprehensive requirements using MECE analysis and saves them to `storage/specs/user-auth-requirements.md`.
+対話が完了すると、AIはMECE分析で網羅的な要件を定義し、`storage/specs/user-auth-requirements.md` に保存します。
 
 ---
 
-### 📐 Want to Create a Design
+### 📐 設計を作成したい
 
-> **"Create a design for the user authentication feature using the C4 model"**
+> **「ユーザー認証機能の設計をC4モデルで作成して」**
 
-The AI creates design diagrams using the C4 model (Context, Container, Component, Code).
-
----
-
-### 📋 Want to Break Down into Tasks
-
-> **"Break down the user authentication feature into implementation tasks"**
-
-The AI breaks down the implementation tasks with P-label priorities (P0-P3).
+AIがC4モデル（Context, Container, Component, Code）で設計図を作成します。
 
 ---
 
-### ⚙️ Want to Proceed with Implementation
+### 📋 タスクに分解したい
 
-> **"Start implementing from the P0 tasks"**
+> **「ユーザー認証機能を実装タスクに分解して」**
 
-The AI implements the tasks in priority order.
-
----
-
-### ✅ Want to Validate
-
-> **"Validate the consistency between requirements and implementation"**
-
-The AI runs traceability validation and reports gaps and inconsistencies.
+AIが実装タスクをP-ラベル優先度（P0〜P3）で分解します。
 
 ---
 
-### 🔄 Want to Change Existing Code
+### ⚙️ 実装を進めたい
 
-> **"Create a change proposal to add OAuth authentication to the login screen"**
+> **「P0タスクから順に実装を開始して」**
 
-The AI performs change impact analysis and creates a delta specification (Delta Spec).
+AIが優先度順にタスクを実装します。
 
 ---
 
-## 🤖 Supported AI Platforms (7 Types)
+### ✅ 検証したい
 
-| Platform | Setup | Usage |
+> **「要件と実装の整合性を検証して」**
+
+AIがトレーサビリティ検証を実行し、漏れや不整合を報告します。
+
+---
+
+### 🔄 既存コードを変更したい
+
+> **「ログイン画面にOAuth認証を追加する変更提案を作成して」**
+
+AIが変更影響分析を行い、差分仕様（Delta Spec）を作成します。
+
+---
+
+## 🤖 対応AIプラットフォーム（7種類）
+
+| プラットフォーム | セットアップ | 使い方 |
 |-----------------|-------------|--------|
-| **Claude Code** | `npx musubi-sdd init --claude` | Converse in natural language |
-| **GitHub Copilot** | `npx musubi-sdd init --copilot` | Converse in natural language |
-| **Cursor IDE** | `npx musubi-sdd init --cursor` | Converse in natural language |
-| **Gemini CLI** | `npx musubi-sdd init --gemini` | Converse in natural language |
-| **Codex CLI** | `npx musubi-sdd init --codex` | Converse in natural language |
-| **Qwen Code** | `npx musubi-sdd init --qwen` | Converse in natural language |
-| **Windsurf** | `npx musubi-sdd init --windsurf` | Converse in natural language |
+| **Claude Code** | `npx musubi-sdd init --claude` | 自然言語で会話 |
+| **GitHub Copilot** | `npx musubi-sdd init --copilot` | 自然言語で会話 |
+| **Cursor IDE** | `npx musubi-sdd init --cursor` | 自然言語で会話 |
+| **Gemini CLI** | `npx musubi-sdd init --gemini` | 自然言語で会話 |
+| **Codex CLI** | `npx musubi-sdd init --codex` | 自然言語で会話 |
+| **Qwen Code** | `npx musubi-sdd init --qwen` | 自然言語で会話 |
+| **Windsurf** | `npx musubi-sdd init --windsurf` | 自然言語で会話 |
 
-On all platforms, you can work through **conversation in natural language**.
-
----
-
-## 📋 27 Specialized AI Agents
-
-MUSUBI ships with 27 specialized agents. Just ask in natural language, and the appropriate agent responds automatically.
-
-### Core Workflow (9)
-
-| What You Can Do | Example Phrasing |
-|-----------|-----------|
-| Project setup | "Set up the project architecture" |
-| Requirements definition | "Define requirements for the XX feature" |
-| System design | "Create a design for the XX feature using the C4 model" |
-| Task breakdown | "Break down the XX feature into implementation tasks" |
-| Implementation | "Implement the P0 tasks" |
-| Validation | "Validate the consistency between requirements and implementation" |
-| Change analysis | "Analyze the impact of adding XX" |
-| Change application | "Apply the change proposal" |
-| Archive | "Archive the completed changes" |
-
-### Quality Assurance (6)
-
-| What You Can Do | Example Phrasing |
-|-----------|-----------|
-| Test design | "Design tests for the XX feature" |
-| Code review | "Review this code" |
-| Security audit | "Check for security vulnerabilities" |
-| Performance optimization | "Optimize this process" |
-| Quality management | "Check the quality metrics" |
-| Governance validation | "Check compliance with the Constitutional Articles" |
-
-### Specialized Areas (12)
-
-| What You Can Do | Example Phrasing |
-|-----------|-----------|
-| API design | "Design a REST API" |
-| Database design | "Design the schema for the users table" |
-| Database operations | "Optimize the query" |
-| UI/UX design | "Design the UI for the login screen" |
-| DevOps | "Build a CI/CD pipeline" |
-| Cloud design | "Design an AWS architecture" |
-| AI/ML implementation | "Implement a recommendation system" |
-| Documentation | "Create API documentation" |
-| Release management | "Create release notes" |
-| SRE | "Configure alert settings" |
-| Bug investigation | "Investigate the cause of this error" |
-| Issue resolution | "Resolve this Issue" |
+すべてのプラットフォームで、**自然言語での会話**で作業できます。
 
 ---
 
-## 🏛️ Nine Constitutional Articles That Protect Quality
+## 📋 27の専門AIエージェント
 
-MUSUBI guarantees quality through a "Constitution". The AI checks compliance automatically, so you do not need to think about it.
+MUSUBI には27の専門エージェントが搭載されています。自然言語で依頼すると、適切なエージェントが自動で対応します。
 
-| Article | Principle | Meaning |
+### コアワークフロー（9個）
+
+| できること | 伝え方の例 |
+|-----------|-----------|
+| プロジェクト設定 | 「プロジェクトのアーキテクチャを設定して」 |
+| 要件定義 | 「〇〇機能の要件を定義して」 |
+| システム設計 | 「〇〇機能の設計をC4モデルで作成して」 |
+| タスク分解 | 「〇〇機能を実装タスクに分解して」 |
+| 実装 | 「P0タスクを実装して」 |
+| 検証 | 「要件と実装の整合性を検証して」 |
+| 変更分析 | 「〇〇を追加する影響を分析して」 |
+| 変更適用 | 「変更提案を適用して」 |
+| アーカイブ | 「完了した変更をアーカイブして」 |
+
+### 品質保証（6個）
+
+| できること | 伝え方の例 |
+|-----------|-----------|
+| テスト設計 | 「〇〇機能のテストを設計して」 |
+| コードレビュー | 「このコードをレビューして」 |
+| セキュリティ監査 | 「セキュリティ脆弱性をチェックして」 |
+| パフォーマンス最適化 | 「この処理を最適化して」 |
+| 品質管理 | 「品質メトリクスを確認して」 |
+| ガバナンス検証 | 「憲法条項への準拠を確認して」 |
+
+### 専門領域（12個）
+
+| できること | 伝え方の例 |
+|-----------|-----------|
+| API設計 | 「REST APIを設計して」 |
+| データベース設計 | 「ユーザーテーブルのスキーマを設計して」 |
+| データベース運用 | 「クエリを最適化して」 |
+| UI/UX設計 | 「ログイン画面のUIを設計して」 |
+| DevOps | 「CI/CDパイプラインを構築して」 |
+| クラウド設計 | 「AWSアーキテクチャを設計して」 |
+| AI/ML実装 | 「推薦システムを実装して」 |
+| ドキュメント作成 | 「APIドキュメントを作成して」 |
+| リリース管理 | 「リリースノートを作成して」 |
+| SRE | 「アラート設定を構成して」 |
+| バグ調査 | 「このエラーの原因を調査して」 |
+| 課題解決 | 「このIssueを解決して」 |
+
+---
+
+## 🏛️ 品質を守る9つの憲法条項
+
+MUSUBI は「憲法」で品質を保証します。AIが自動で準拠を確認するので、意識する必要はありません。
+
+| 条項 | 原則 | 意味 |
 |------|------|------|
-| I | Library-First | Implement as a reusable library |
-| II | CLI Interface | Provide a CLI for every feature |
-| III | Test-First | Write tests first |
-| IV | EARS Format | Write requirements in a standard format |
-| V | Traceability | Track requirements <-> design <-> code <-> tests |
-| VI | Project Memory | Refer to project settings |
-| VII | Simplicity Gate | Prevent excessive complexity |
-| VIII | Anti-Abstraction | Avoid unnecessary abstractions |
-| IX | Integration-First | Integration tests in real environments |
+| I | Library-First | 再利用可能なライブラリとして実装 |
+| II | CLI Interface | すべての機能にCLIを提供 |
+| III | Test-First | テストを先に書く |
+| IV | EARS Format | 要件は標準形式で記述 |
+| V | Traceability | 要件↔設計↔コード↔テストを追跡 |
+| VI | Project Memory | プロジェクト設定を参照 |
+| VII | Simplicity Gate | 過度な複雑化を防止 |
+| VIII | Anti-Abstraction | 不要な抽象化を避ける |
+| IX | Integration-First | 実環境での統合テスト |
 
 ---
 
-## 📁 Project Structure
+## 📁 プロジェクト構造
 
-A project initialized with MUSUBI:
+MUSUBI で初期化されたプロジェクト：
 
 ```
 your-project/
-├── AGENTS.md                    # AI agent definitions
+├── AGENTS.md                    # AIエージェント定義
 ├── steering/
-│   ├── structure.md             # Architecture
-│   ├── tech.md                  # Technology stack
-│   ├── product.md               # Product information
+│   ├── structure.md             # アーキテクチャ
+│   ├── tech.md                  # 技術スタック
+│   ├── product.md               # プロダクト情報
 │   └── rules/
-│       ├── constitution.md      # Constitutional Articles
-│       ├── workflow.md          # Workflow
-│       └── ears-format.md       # EARS format
+│       ├── constitution.md      # 憲法条項
+│       ├── workflow.md          # ワークフロー
+│       └── ears-format.md       # EARS形式
 ├── storage/
-│   ├── specs/                   # Specifications
-│   ├── changes/                 # Change management
-│   └── archive/                 # Archive
-└── [platform-specific files]
+│   ├── specs/                   # 仕様書
+│   ├── changes/                 # 変更管理
+│   └── archive/                 # アーカイブ
+└── [プラットフォーム別ファイル]
 ```
 
 ---
 
-## 🔄 Typical Development Flow
+## 🔄 典型的な開発フロー
 
-### New Feature Development
-
-```
-1. "Define requirements for the XX feature"
-   → One-question-at-a-time dialogue → MECE analysis → Requirements complete
-
-2. "Create a design from these requirements"
-   → C4 model design → ADR (Architecture Decision Record)
-
-3. "Break it down into tasks"
-   → Create tasks with P-label priorities
-
-4. "Implement from P0"
-   → Sequential implementation → Test creation
-
-5. "Validate"
-   → Traceability check → Complete
-```
-
-### Changing Existing Features
+### 新機能開発
 
 ```
-1. "Analyze the impact of adding XX"
-   → Identify the scope of impact
+1. 「〇〇機能の要件を定義して」
+   → 1問1答の対話 → MECE分析 → 要件定義完成
 
-2. "Create a change proposal"
-   → Create Delta Spec
+2. 「この要件で設計を作成して」
+   → C4モデル設計 → ADR（設計決定）
 
-3. "Apply the change"
-   → Safe change execution
+3. 「タスクに分解して」
+   → P-ラベル優先度でタスク化
 
-4. "Archive the change"
-   → Save history
+4. 「P0から実装して」
+   → 順次実装 → テスト作成
+
+5. 「検証して」
+   → トレーサビリティ確認 → 完了
+```
+
+### 既存機能の変更
+
+```
+1. 「〇〇を追加する影響を分析して」
+   → 影響範囲の特定
+
+2. 「変更提案を作成して」
+   → Delta Spec作成
+
+3. 「変更を適用して」
+   → 安全な変更実行
+
+4. 「変更をアーカイブして」
+   → 履歴保存
 ```
 
 ---
 
-## 📖 Practical Example: OneRoster API Project
+## 📖 実践例: OneRoster API プロジェクト
 
-Here is the flow of requirements definition using MUSUBI in a real project.
+実際のプロジェクトでMUSUBIを使用した要件定義の流れを紹介します。
 
-### Project Overview
+### プロジェクト概要
 
-Building a system that provides roster data compliant with the **OneRoster CSV Japan Profile** via an API.
+**OneRoster CSV Japan プロファイル**に準拠した名簿データを API 経由で提供するシステムの構築。
 
-### Step 1: One-Question-at-a-Time Interview
+### Step 1: 1問1答形式のヒアリング
 
-When you tell the AI "Create requirements for a project that uploads OneRoster CSV via API and provides a Roster API", a dialogue like the following begins.
+AIに「OneRoster CSVをAPIでアップロードし、Roster APIを提供するプロジェクトの要件定義を作成して」と伝えると、以下のような対話が始まります。
 
-#### Q1: Identify the Problem
+#### Q1: 課題の特定
 ```
-AI: What is the "real problem" you want this feature to solve?
+AI: この機能で解決したい『本当の課題』は何ですか？
 
-Answer: CSVs are being copied manually, and automation has not been achieved
-```
-
-#### Q2: Identify Stakeholders
-```
-AI: Who needs this feature the most?
-
-Answer: Boards of education, operators of school administration support systems, operators of learning tools
-      The API is called by learning tools (LMS, etc.)
-      CSV uploads are done by board of education administrators or school administration support system operators
+回答: 手動でCSVをコピーしており、自動化ができていない
 ```
 
-#### Q3: Define Success Criteria
+#### Q2: ステークホルダーの特定
 ```
-AI: If this feature worked perfectly, what would change?
+AI: この機能を最も必要としているのは誰ですか？
 
-Answer: It can be automated without human intervention
-      Up-to-date roster synchronization is possible in real time
-      Learning tools (LMS, etc.) can retrieve rosters correctly
-```
-
-#### Q4: Confirm Constraints
-```
-AI: Are there any constraints or prerequisites?
-
-Answer: Built on Azure, using Python + FastAPI
-      OAuth 2.0 (OpenAPI compliant), compliance with the Act on the Protection of Personal Information
-      99.9% availability
-      Providing the OneRoster REST API is also required
+回答: 教育委員会、校務支援システム運用者、学習ツール運用者
+      APIを呼び出すのは学習ツール（LMS等）
+      CSVアップロードは教育委員会の管理者か校務支援システム運用者
 ```
 
-### Step 2: MECE Analysis and Requirements Organization
+#### Q3: 成功基準の定義
+```
+AI: もしこの機能が完璧に動作したら、何が変わりますか？
 
-After the interview is complete, the AI organizes the requirements into the following categories according to the MECE (Mutually Exclusive, Collectively Exhaustive) principle.
+回答: 人手を介さず自動化できる
+      リアルタイムで最新の名簿連携ができる
+      学習ツール（LMS等）が正しく名簿を取得できる
+```
 
-| Category | Example Requirements |
+#### Q4: 制約条件の確認
+```
+AI: 制約条件や前提条件はありますか？
+
+回答: Azure上に構築、Python + FastAPI使用
+      OAuth 2.0（OpenAPI準拠）、個人情報保護法準拠
+      稼働率99.9%
+      OneRoster REST APIの提供も必要
+```
+
+### Step 2: MECE分析と要件整理
+
+ヒアリング完了後、AIはMECE（Mutually Exclusive, Collectively Exhaustive）の原則に従い、要件を以下のカテゴリに整理します。
+
+| カテゴリ | 要件例 |
 |---------|--------|
-| **CSV upload feature** | File upload, validation, import, error handling |
+| **CSVアップロード機能** | ファイルアップロード、検証、インポート、エラーハンドリング |
 | **OneRoster REST API** | Orgs, Users, Classes, Enrollments, AcademicSessions, Courses |
-| **Authentication and authorization** | OAuth 2.0, scope-based authorization, API key authentication |
-| **Data management** | Data retention period, audit logs |
-| **Non-functional requirements** | Performance, availability (99.9%), security |
+| **認証・認可** | OAuth 2.0、スコープベース認可、APIキー認証 |
+| **データ管理** | データ保持期間、監査ログ |
+| **非機能要件** | 性能、可用性（99.9%）、セキュリティ |
 
-### Step 3: Writing Requirements in EARS Format
+### Step 3: EARS形式での要件記述
 
-Each requirement is written in EARS (Easy Approach to Requirements Syntax) format.
+各要件はEARS（Easy Approach to Requirements Syntax）形式で記述されます。
 
 ```markdown
-#### REQ-CSV-001: CSV File Upload
-**WHEN** an administrator uploads a ZIP file compliant with the OneRoster CSV Japan Profile,
-**the system SHALL** receive the file and start validation processing.
+#### REQ-CSV-001: CSVファイルアップロード
+**WHEN** 管理者がOneRoster CSV Japan プロファイル準拠のZIPファイルをアップロードする,
+**the system SHALL** ファイルを受信し、検証処理を開始する。
 
-**Acceptance Criteria**:
-- [ ] Can receive ZIP files (up to 100MB)
-- [ ] Verifies the existence of manifest.csv
-- [ ] Returns the processing status after the upload is complete
+**受入基準**:
+- [ ] ZIPファイル（最大100MB）を受信できる
+- [ ] manifest.csv の存在を確認する
+- [ ] アップロード完了後、処理ステータスを返却する
 ```
 
-### Step 4: Deliverables
+### Step 4: 成果物
 
-When requirements definition is complete, a specification containing the following is generated at `storage/specs/roster-api-requirements.md`.
+要件定義が完了すると、`storage/specs/roster-api-requirements.md` に以下の内容を含む仕様書が生成されます。
 
-- Overview (background, vision, stakeholders)
-- Functional requirements (EARS format, 24 items)
-- Non-functional requirements (performance, availability, security)
-- Technical constraints
-- Glossary
-- Traceability matrix
+- 概要（背景、ビジョン、ステークホルダー）
+- 機能要件（EARS形式、24項目）
+- 非機能要件（性能、可用性、セキュリティ）
+- 技術制約
+- 用語定義
+- トレーサビリティマトリクス
 
-### Key Points
+### ポイント
 
-1. **One question at a time**: Do not ask many questions at once; dig deeper in order
-2. **MECE analysis**: Organize requirements with no gaps and no overlaps
-3. **EARS format**: Unambiguous, testable requirement statements
-4. **Traceability**: Prepare to trace requirements -> design -> implementation -> tests
+1. **1問1答形式**: 一度に大量の質問をせず、順序立てて深掘りする
+2. **MECE分析**: 漏れなく、重複なく要件を整理する
+3. **EARS形式**: 曖昧さのない、テスト可能な要件記述
+4. **トレーサビリティ**: 要件→設計→実装→テストの追跡を準備
 
-### Step 5: Design with the C4 Model
+### Step 5: C4モデルによる設計
 
-After requirements definition is complete, tell the AI "Create a design for the OneRoster API using the C4 model", and it will create design diagrams at 4 levels.
+要件定義完了後、「OneRoster API の設計をC4モデルで作成して」と伝えると、AIが4レベルの設計図を作成します。
 
-#### Level 1: System Context
+#### Level 1: System Context（システムコンテキスト）
 
-Defines the relationships between the system and external actors (people and systems).
+システムと外部アクター（人・システム）の関係を定義します。
 
 ```mermaid
 graph TB
-    subgraph External Systems
-        SIS[School Administration<br>Support System]
+    subgraph 外部システム
+        SIS[校務支援<br>システム]
     end
     
-    subgraph Users
-        Admin[Board of Education<br>Administrator]
-        LMS[Learning Tools<br>LMS, etc.]
+    subgraph 利用者
+        Admin[教育委員会<br>管理者]
+        LMS[学習ツール<br>LMS等]
     end
     
     subgraph OneRoster API System
-        API[OneRoster API<br>CSV Japan Profile compliant]
+        API[OneRoster API<br>CSV Japan プロファイル準拠]
     end
     
-    subgraph Authentication Platform
+    subgraph 認証基盤
         AzureAD[Azure AD B2C]
     end
     
-    SIS -->|Roster CSV export| Admin
-    Admin -->|CSV upload| API
+    SIS -->|Roster CSV出力| Admin
+    Admin -->|CSVアップロード| API
     LMS -->|REST API| API
     API --> AzureAD
 ```
 
-#### Level 2: Container
+#### Level 2: Container（コンテナ）
 
-Defines the executable units that make up the system.
+システムを構成する実行可能な単位を定義します。
 
-| Container | Technology | Responsibility |
+| コンテナ | 技術 | 責務 |
 |---------|------|------|
-| Web Application | FastAPI | OneRoster REST API, admin API |
-| CSV Processor | Python | CSV validation, data import |
-| PostgreSQL | Azure DB | Roster data persistence |
-| Redis Cache | Azure Cache | API response cache |
-| Blob Storage | Azure Blob | Temporary CSV file storage |
+| Web Application | FastAPI | OneRoster REST API、管理API |
+| CSV Processor | Python | CSV検証、データインポート |
+| PostgreSQL | Azure DB | 名簿データ永続化 |
+| Redis Cache | Azure Cache | APIレスポンスキャッシュ |
+| Blob Storage | Azure Blob | CSVファイル一時保存 |
 
-#### Level 3: Component
+#### Level 3: Component（コンポーネント）
 
-Defines the component structure within each container.
+各コンテナ内のコンポーネント構造を定義します。
 
-| Layer | Component | Responsibility |
+| レイヤー | コンポーネント | 責務 |
 |---------|---------------|------|
-| API Layer | OneRoster Router | REST API endpoints |
-| Service Layer | Roster Service | Business logic |
-| Domain Layer | Org, User, Class | Domain model |
-| Repository Layer | *Repository | Data access |
+| API Layer | OneRoster Router | REST APIエンドポイント |
+| Service Layer | Roster Service | ビジネスロジック |
+| Domain Layer | Org, User, Class | ドメインモデル |
+| Repository Layer | *Repository | データアクセス |
 
-#### Level 4: Code
+#### Level 4: Code（コード）
 
-Provides detailed design of the domain model and API endpoints.
+ドメインモデルとAPIエンドポイントを詳細設計します。
 
-### Step 6: ADR (Architecture Decision Record)
+### Step 6: ADR（設計決定記録）
 
-Important design decisions are recorded as ADRs.
+重要な設計決定は ADR として記録されます。
 
-| ADR | Decision | Reason |
+| ADR | 決定 | 理由 |
 |-----|------|------|
-| ADR-001 | Adopt FastAPI | Automatic OpenAPI generation, type safety, high performance |
-| ADR-002 | Azure Container Apps | Serverless, reduced operational burden |
-| ADR-003 | PostgreSQL | ACID compliance, support for complex queries |
-| ADR-004 | OAuth 2.0 | Recommended by the OneRoster specification, industry standard |
-| ADR-005 | Asynchronous CSV import | Handles large data volumes, improved UX |
+| ADR-001 | FastAPI 採用 | OpenAPI自動生成、型安全、高性能 |
+| ADR-002 | Azure Container Apps | サーバーレス、運用負荷軽減 |
+| ADR-003 | PostgreSQL | ACID準拠、複雑なクエリ対応 |
+| ADR-004 | OAuth 2.0 | OneRoster仕様推奨、業界標準 |
+| ADR-005 | 非同期CSVインポート | 大量データ対応、UX改善 |
 
-### Deliverables of the Design Phase
+### 設計フェーズの成果物
 
-When the design is complete, the following is generated at `storage/design/roster-api-design.md`.
+設計が完了すると、`storage/design/roster-api-design.md` に以下が生成されます。
 
-- C4 model (design diagrams at 4 levels)
-- Database design (ER diagram, table definitions)
-- ADR (Architecture Decision Records)
-- Non-functional design (scalability, availability, security)
-- Traceability (mapping of requirements to design elements)
+- C4モデル（4レベルの設計図）
+- データベース設計（ER図、テーブル定義）
+- ADR（設計決定記録）
+- 非機能設計（スケーラビリティ、可用性、セキュリティ）
+- トレーサビリティ（要件→設計要素のマッピング）
 
-### Step 7: Task Breakdown (P-Label Priorities)
+### Step 7: タスク分解（P-ラベル優先度）
 
-After the design is complete, tell the AI "Break down the OneRoster API into implementation tasks", and it will organize tasks with P-label priorities.
+設計完了後、「OneRoster API を実装タスクに分解して」と伝えると、AIがP-ラベル優先度でタスクを整理します。
 
-#### Definition of P-Label Priorities
+#### P-ラベル優先度の定義
 
-| Priority | Meaning | Example |
+| 優先度 | 意味 | 例 |
 |--------|------|-----|
-| **P0** | MVP required - needed for basic system operation | DB design, basic API |
-| **P1** | Important - needed to complete the main features | Authentication, CSV validation |
-| **P2** | Desirable - improves quality and operability | Cache, audit logs |
-| **P3** | Nice to have - additional features and optimization | Admin UI, rate limiting |
+| **P0** | MVP必須 - システムの基本動作に必要 | DB設計、基本API |
+| **P1** | 重要 - 主要機能の完成に必要 | 認証、CSV検証 |
+| **P2** | 望ましい - 品質・運用性向上 | キャッシュ、監査ログ |
+| **P3** | あれば良い - 追加機能・最適化 | 管理画面、レート制限 |
 
-#### Example Tasks (OneRoster API)
+#### タスク例（OneRoster API）
 
-**P0 Tasks (8)**:
-| Task ID | Task Name | Estimate |
+**P0タスク（8件）**:
+| タスクID | タスク名 | 見積もり |
 |----------|---------|---------|
-| P0-001 | Project initialization | 2h |
-| P0-002 | DB schema design and migration | 4h |
-| P0-003 | Repository layer implementation | 4h |
+| P0-001 | プロジェクト初期化 | 2h |
+| P0-002 | DBスキーマ設計・マイグレーション | 4h |
+| P0-003 | リポジトリ層実装 | 4h |
 | P0-004 | Organizations API | 4h |
-| P0-005 | OAuth 2.0 authentication implementation | 3h |
-| P0-006 | CSV validation service | 4h |
-| P0-007 | CSV import service | 4h |
-| P0-008 | E2E tests | 3h |
+| P0-005 | OAuth 2.0 認証実装 | 3h |
+| P0-006 | CSV検証サービス | 4h |
+| P0-007 | CSVインポートサービス | 4h |
+| P0-008 | E2Eテスト | 3h |
 
-**P1 Tasks (4)**: Pagination, filtering, sorting, batch optimization
+**P1タスク（4件）**: ページネーション、フィルタリング、ソート、バッチ最適化
 
-**P2 Tasks (5)**: Redis cache, audit logs, health checks, Azure Bicep, CI/CD
+**P2タスク（5件）**: Redisキャッシュ、監査ログ、ヘルスチェック、Azure Bicep、CI/CD
 
-**P3 Tasks (4)**: Async queue, expanded OpenAPI documentation, rate limiting, admin API
+**P3タスク（4件）**: 非同期キュー、OpenAPIドキュメント拡充、レート制限、管理API
 
-**P4 Tasks (4)**: Monitoring and alerts, structured logging, performance settings, API documentation completion
+**P4タスク（4件）**: 監視・アラート、構造化ログ、パフォーマンス設定、APIドキュメント完成
 
-### Step 9: Implementation Results
+### Step 9: 実装完了の実績
 
-In the OneRoster API project, the following was completed by following the MUSUBI workflow.
+OneRoster API プロジェクトでは、MUSUBIワークフローに従い以下を完了しました。
 
-#### P0 (MVP) Complete
+#### P0（MVP）完了
 
-| Task | Deliverables |
+| タスク | 成果物 |
 |--------|--------|
-| P0-001 | Project structure, Docker Compose, pyproject.toml |
-| P0-002 | SQLAlchemy models (Org, User, Class, Enrollment, AcademicSession, Course) |
-| P0-003 | Repository layer (BaseRepository + 6 entities) |
-| P0-004 | OneRoster REST API (all 6 entities, 22 endpoints) |
-| P0-005 | OAuth 2.0 Client Credentials (JWT, scope-based authorization) |
-| P0-006 | CSV validation service (manifest.csv, supports 14 files, ~500 lines) |
-| P0-007 | CSV import service (supports batch processing) |
-| P0-008 | E2E tests (authentication, API, CSV validation, upload) |
+| P0-001 | プロジェクト構造、Docker Compose、pyproject.toml |
+| P0-002 | SQLAlchemyモデル（Org, User, Class, Enrollment, AcademicSession, Course） |
+| P0-003 | リポジトリ層（BaseRepository + 6エンティティ） |
+| P0-004 | OneRoster REST API（全6エンティティ、22エンドポイント） |
+| P0-005 | OAuth 2.0 Client Credentials（JWT、スコープベース認可） |
+| P0-006 | CSV検証サービス（manifest.csv、14ファイル対応、~500行） |
+| P0-007 | CSVインポートサービス（バッチ処理対応） |
+| P0-008 | E2Eテスト（認証、API、CSV検証、アップロード） |
 
-#### P1 (Quality Improvement) Complete
+#### P1（品質向上）完了
 
-| Task | Deliverables |
+| タスク | 成果物 |
 |--------|--------|
-| P1-001~003 | OneRoster filter/sort (`status='active'`, `familyName asc`) |
-| P1-004 | Bulk insert optimization (1000 records/batch) |
+| P1-001〜003 | OneRosterフィルタ/ソート（`status='active'`、`familyName asc`） |
+| P1-004 | バルクインサート最適化（1000件/バッチ） |
 
-**Generated code volume**: About 5,000 lines (including tests)
-**Tests**: 50+, all passing ✅
+**生成コード量**: 約5,000行（テスト含む）
+**テスト**: 50件以上、全パス ✅
 
-#### P2 (Operations Readiness) Complete
+#### P2（運用準備）完了
 
-| Task | Deliverables |
+| タスク | 成果物 |
 |--------|--------|
-| P2-001 | Redis cache (`core/cache.py`, TTL management, key invalidation) |
-| P2-002 | Audit logs (`services/audit_service.py`, AuditLog model) |
-| P2-003 | Health checks (`api/v1/health.py`, /health, /ready, /live, /metrics) |
-| P2-004 | Azure Bicep (`infra/main.bicep`, Container Apps/PostgreSQL/Redis) |
-| P2-005 | CI/CD (`.github/workflows/ci.yml`, lint→test→build→deploy) |
+| P2-001 | Redisキャッシュ（`core/cache.py`、TTL管理、キー無効化） |
+| P2-002 | 監査ログ（`services/audit_service.py`、AuditLogモデル） |
+| P2-003 | ヘルスチェック（`api/v1/health.py`、/health、/ready、/live、/metrics） |
+| P2-004 | Azure Bicep（`infra/main.bicep`、Container Apps/PostgreSQL/Redis） |
+| P2-005 | CI/CD（`.github/workflows/ci.yml`、lint→test→build→deploy） |
 
-#### P3 (Extended Features) Complete
+#### P3（拡張機能）完了
 
-| Task | Deliverables |
+| タスク | 成果物 |
 |--------|--------|
-| P3-001 | Async task queue (`core/task_queue.py`, asyncio + Redis) |
-| P3-002 | Expanded OpenAPI documentation (`api/openapi.py`, tags/examples/security) |
-| P3-003 | Rate limiting (`core/rate_limit.py`, token bucket, middleware) |
-| P3-004 | Admin API (extended `api/v1/admin.py`, clients/uploads/audit-logs/tasks/stats) |
+| P3-001 | 非同期タスクキュー（`core/task_queue.py`、asyncio + Redis） |
+| P3-002 | OpenAPIドキュメント拡充（`api/openapi.py`、タグ/例/セキュリティ） |
+| P3-003 | レート制限（`core/rate_limit.py`、トークンバケット、ミドルウェア） |
+| P3-004 | 管理API（`api/v1/admin.py`拡張、clients/uploads/audit-logs/tasks/stats） |
 
-**Generated code volume**: About 8,000 lines (including tests)
-**Tests**: 80+, all passing ✅
+**生成コード量**: 約8,000行（テスト含む）
+**テスト**: 80件以上、全パス ✅
 
-#### P4 (Production Readiness) Complete
+#### P4（本番運用準備）完了
 
-| Task | Deliverables |
+| タスク | 成果物 |
 |--------|--------|
-| P4-001 | Monitoring and alerts (`core/monitoring.py`, metrics collection, alert rules) |
-| P4-002 | Structured logging (`core/logging.py`, JSON output, request context) |
-| P4-003 | Performance settings (`core/performance.py`, connection pool, batch, TTL) |
-| P4-004 | API documentation completion (expanded README.md, quick reference) |
+| P4-001 | 監視・アラート（`core/monitoring.py`、メトリクス収集、アラートルール） |
+| P4-002 | 構造化ログ（`core/logging.py`、JSON出力、リクエストコンテキスト） |
+| P4-003 | パフォーマンス設定（`core/performance.py`、接続プール、バッチ、TTL） |
+| P4-004 | APIドキュメント完成（README.md 拡充、クイックリファレンス） |
 
-**Final code volume**: About 9,200 lines (including tests)
-**Completion date**: 2025-12-25
+**最終コード量**: 約9,200行（テスト含む）
+**完了日**: 2025-12-25
 
-#### Implementation Roadmap
+#### 実装ロードマップ
 
 ```
 Phase 1 (MVP): Week 1-2
-  P0-001 → P0-002 → P0-003 → P0-004 ~ P0-008 ✅
+  P0-001 → P0-002 → P0-003 → P0-004 〜 P0-008 ✅
 
-Phase 2 (Quality Improvement): Week 3
+Phase 2 (品質向上): Week 3
   P1-001 → P1-002 → P1-003 → P1-004 ✅
 
-Phase 3 (Operations Readiness): Week 4
-  P2-001 ~ P2-005 ✅
+Phase 3 (運用準備): Week 4
+  P2-001 〜 P2-005 ✅
 
-Phase 4 (Extended Features): Week 5
-  P3-001 ~ P3-004 ✅
+Phase 4 (拡張機能): Week 5
+  P3-001 〜 P3-004 ✅
 
-Phase 5 (Production Operations): Week 6+
-  P4-001 ~ P4-004 ✅ (monitoring and alerts, log aggregation, performance tuning, documentation completion)
+Phase 5 (本番運用): Week 6+
+  P4-001 〜 P4-004 ✅ (監視・アラート、ログ集約、パフォーマンスチューニング、ドキュメント完成)
 ```
 
-### 🎉 Project Completion Summary
+### 🎉 プロジェクト完了サマリー
 
-The OneRoster API project was completed in 5 phases by following the MUSUBI SDD workflow.
+OneRoster API プロジェクトは MUSUBI SDD ワークフローに従い、5フェーズで完成しました。
 
-| Phase | Number of Tasks | Main Deliverables |
+| フェーズ | タスク数 | 主な成果物 |
 |---------|---------|-----------|
-| P0 (MVP) | 8 | Basic API, DB, OAuth, CSV processing |
-| P1 (Quality Improvement) | 4 | Filter/sort, batch optimization |
-| P2 (Operations Readiness) | 5 | Redis, audit logs, health checks, IaC, CI/CD |
-| P3 (Extended Features) | 4 | Async queue, OpenAPI, rate limiting, admin API |
-| P4 (Production Operations) | 4 | Monitoring, structured logging, performance, documentation |
+| P0 (MVP) | 8件 | 基本API、DB、OAuth、CSV処理 |
+| P1 (品質向上) | 4件 | フィルタ/ソート、バッチ最適化 |
+| P2 (運用準備) | 5件 | Redis、監査ログ、ヘルスチェック、IaC、CI/CD |
+| P3 (拡張機能) | 4件 | 非同期キュー、OpenAPI、レート制限、管理API |
+| P4 (本番運用) | 4件 | 監視、構造化ログ、パフォーマンス、ドキュメント |
 
-**Total tasks**: 25
-**Total code volume**: About 9,200 lines (including tests)
-**Traditional estimate**: About 6 weeks (118 hours) equivalent
-**Actual development time**: About 2 hours (MUSUBI + AI assistance)
-**Efficiency gain**: About 60x
+**総タスク数**: 25件
+**総コード量**: 約9,200行（テスト含む）
+**従来の見積もり**: 約6週間（118時間）相当
+**実際の開発時間**: 約2時間（MUSUBI + AI支援）
+**効率化**: 約60倍
 
-### Deliverables of the Task Breakdown Phase
+### タスク分解フェーズの成果物
 
-When the task breakdown is complete, the following is generated at `storage/tasks/roster-api-tasks.md`.
+タスク分解が完了すると、`storage/tasks/roster-api-tasks.md` に以下が生成されます。
 
-- Complete task list (25 tasks) and P-label classification
-- Details of each task (purpose, task content, deliverables, estimate, dependencies)
-- Implementation roadmap (phases)
-- Estimate summary (118 hours total)
-- Traceability (mapping of requirements to tasks)
+- 全タスク一覧（25件）とP-ラベル分類
+- 各タスクの詳細（目的、タスク内容、成果物、見積もり、依存関係）
+- 実装ロードマップ（Phase分け）
+- 見積もりサマリー（合計118時間）
+- トレーサビリティ（要件→タスクのマッピング）
 
-### Step 8: Implementation Phase
+### Step 8: 実装フェーズ
 
-After the task breakdown, tell the AI "Start implementing from the P0 tasks", and it will proceed with implementation in order.
+タスク分解後、「P0タスクから実装を開始して」と伝えると、AIが順序立てて実装を進めます。
 
-#### P0-001: Project Initialization
+#### P0-001: プロジェクト初期化
 
-The AI automatically generates the following project structure.
+AIが以下のプロジェクト構造を自動生成します。
 
 ```
 roster-api/
-├── pyproject.toml          # Project settings, dependencies
-├── Dockerfile              # Container definition
-├── docker-compose.yml      # Development environment configuration
-├── .pre-commit-config.yaml # Code quality checks
-├── .env.example            # Environment variable template
-├── README.md               # Project description
+├── pyproject.toml          # プロジェクト設定、依存関係
+├── Dockerfile              # コンテナ定義
+├── docker-compose.yml      # 開発環境構成
+├── .pre-commit-config.yaml # コード品質チェック
+├── .env.example            # 環境変数テンプレート
+├── README.md               # プロジェクト説明
 ├── src/
 │   └── roster_api/
 │       ├── __init__.py
-│       ├── main.py         # FastAPI entry point
+│       ├── main.py         # FastAPIエントリーポイント
 │       ├── core/
-│       │   ├── config.py   # Configuration management
-│       │   └── database.py # DB connection
+│       │   ├── config.py   # 設定管理
+│       │   └── database.py # DB接続
 │       ├── api/
-│       │   ├── router.py   # Routing
+│       │   ├── router.py   # ルーティング
 │       │   └── v1/
 │       │       ├── oneroster.py  # OneRoster API
-│       │       ├── admin.py      # Admin API
-│       │       └── auth.py       # Authentication API
+│       │       ├── admin.py      # 管理API
+│       │       └── auth.py       # 認証API
 │       ├── schemas/
-│       │   ├── oneroster.py  # Pydantic schemas
+│       │   ├── oneroster.py  # Pydanticスキーマ
 │       │   ├── admin.py
 │       │   └── auth.py
-│       ├── services/         # Business logic
-│       ├── models/           # SQLAlchemy models
-│       └── repositories/     # Data access layer
+│       ├── services/         # ビジネスロジック
+│       ├── models/           # SQLAlchemyモデル
+│       └── repositories/     # データアクセス層
 └── tests/
-    ├── conftest.py         # Test configuration
-    └── test_health.py      # Health check tests
+    ├── conftest.py         # テスト設定
+    └── test_health.py      # ヘルスチェックテスト
 ```
 
-#### Characteristics of the Generated Code
+#### 生成されるコードの特徴
 
-1. **Complete type hints**: Leverages Python 3.11+ type hints
-2. **Async support**: I/O optimization with async/await
-3. **Configuration management**: Environment variable management with pydantic-settings
-4. **Layer separation**: Clear separation of responsibilities among Repository, Service, and API
-5. **Test readiness**: Test scaffolding compatible with pytest-asyncio
+1. **型ヒント完備**: Python 3.11+の型ヒントを活用
+2. **非同期対応**: async/await によるI/O最適化
+3. **設定管理**: pydantic-settings による環境変数管理
+4. **レイヤー分離**: Repository, Service, API の明確な責務分離
+5. **テスト準備**: pytest-asyncio 対応のテスト雛形
 
-#### docker-compose.yml Configuration
+#### docker-compose.yml の構成
 
 ```yaml
 services:
-  api:           # FastAPI application
-  postgres:      # PostgreSQL 16 (with health check)
-  redis:         # Redis 7 (cache)
-  adminer:       # DB management GUI
+  api:           # FastAPI アプリケーション
+  postgres:      # PostgreSQL 16 (ヘルスチェック付き)
+  redis:         # Redis 7 (キャッシュ)
+  adminer:       # DB管理GUI
 ```
 
-#### How to Start
+#### 起動方法
 
 ```bash
 cd roster-api
 docker compose up -d
 # API: http://localhost:8000/docs
-# DB management: http://localhost:8080
+# DB管理: http://localhost:8080
 ```
 
-### Key Points of the Implementation Phase
+### 実装フェーズのポイント
 
-1. **Implement from stubs**: The service layer is stubbed with NotImplementedError
-2. **Sequential implementation**: Implement models in P0-002 and repositories in P0-003
-3. **Test-driven**: Add tests at the same time in each task
-4. **Respect dependencies**: Implement in order following the dependencies between tasks
+1. **スタブから実装**: サービス層はNotImplementedErrorでスタブ化
+2. **順次実装**: P0-002でモデル、P0-003でリポジトリを実装
+3. **テスト駆動**: 各タスクでテストも同時に追加
+4. **依存関係遵守**: タスク間の依存関係に従って順序立てて実装
 
 ---
 
-## 🌐 Multilingual Support (8 Languages)
+## 🌐 多言語対応（8言語）
 
 ```bash
-# Initialize with Japanese templates
+# 日本語テンプレートで初期化
 npx musubi-sdd init --locale ja
 ```
 
-Supported languages: English, Japanese, Chinese, Korean, German, French, Spanish, Indonesian
+対応言語: English, 日本語, 中文, 한국어, Deutsch, Français, Español, Bahasa Indonesia
 
 ---
 
-## 🛠️ Troubleshooting
+## 🛠️ トラブルシューティング
 
-### Q: The AI asks multiple questions at once during requirements definition
+### Q: AIが要件定義で一度に複数の質問をしてくる
 
-This has been fixed in v6.1.1 and later. Please use the latest version:
+v6.1.1以降では修正されています。最新版をお使いください：
 
 ```bash
 npx musubi-sdd@latest init
 ```
 
-### Q: npx musubi-sdd is not found
+### Q: npx musubi-sdd が見つからない
 
 ```bash
 npx clear-npx-cache
 npx musubi-sdd@latest --version
 ```
 
-### Q: I want to upgrade an existing project
+### Q: 既存プロジェクトをアップグレードしたい
 
 ```bash
-# Automatic analysis and setup of an existing project
+# 既存プロジェクトの自動分析・セットアップ
 npx musubi-sdd onboard
 ```
 
 ---
 
-## 📚 Related Resources
+## 📚 関連リソース
 
 - **GitHub**: [nahisaho/musubi](https://github.com/nahisaho/MUSUBI)
 - **npm**: [musubi-sdd](https://www.npmjs.com/package/musubi-sdd)
-- **Documentation**: [docs/USER-GUIDE.ja.md](https://github.com/nahisaho/MUSUBI/blob/main/docs/USER-GUIDE.ja.md)
+- **ドキュメント**: [docs/USER-GUIDE.ja.md](https://github.com/nahisaho/MUSUBI/blob/main/docs/USER-GUIDE.ja.md)
 
 ---
 
-## Summary
+## まとめ
 
-With MUSUBI v6.1.2, you can do Specification Driven Development by **simply talking to the AI in natural language**.
+MUSUBI v6.1.2 では、**自然言語で話しかけるだけ**で仕様駆動開発ができます。
 
-1. ✅ **No commands needed**: Just ask in natural language
-2. ✅ **Interactive requirements definition**: Uncover the true goal one question at a time
-3. ✅ **27 agents**: Specialized AIs respond automatically
-4. ✅ **7 platforms**: Supports all major AI tools
-5. ✅ **Quality assurance**: Automatic validation with the 9 Constitutional Articles
-6. ✅ **8 languages supported**: For global teams
+1. ✅ **コマンド不要**: 自然言語で依頼するだけ
+2. ✅ **対話型要件定義**: 1問1答で真の目的を探る
+3. ✅ **27エージェント**: 専門AIが自動で対応
+4. ✅ **7プラットフォーム**: 主要AIツールすべてに対応
+5. ✅ **品質保証**: 9つの憲法条項で自動検証
+6. ✅ **8言語対応**: グローバルチーム向け
 
-### Results from the Practical Example (OneRoster API)
+### 実践例での成果（OneRoster API）
 
-The OneRoster API project built as the practical example in this guide achieved the following:
+本ガイドの実践例として構築した OneRoster API プロジェクトでは：
 
-- **25 tasks** systematically broken down and implemented with P0-P4 priorities
-- **About 9,200 lines** of production-ready code generated
-- **Actual development time: just 2 hours** (traditional estimate of 118 hours → about 60x efficiency gain)
-- **Complete operational features**: monitoring, logging, caching, CI/CD, IaC
+- **25タスク** を P0〜P4 の優先度で体系的に分解・実装
+- **約9,200行** のプロダクションレディなコードを生成
+- **実際の開発時間: わずか2時間**（従来見積もり118時間 → 約60倍の効率化）
+- **運用機能完備**: 監視、ログ、キャッシュ、CI/CD、IaC
 
-> 💡 By combining MUSUBI SDD with an AI coding assistant,
-> we were able to build a high-quality system at astonishing speed, from requirements definition to production readiness.
+> 💡 MUSUBI SDD と AI コーディングアシスタントの組み合わせにより、
+> 要件定義から本番運用準備まで、驚異的な速度で高品質なシステムを構築できました。
 
 ---
 
-## Appendix A: Command Reference
+## 付録A: コマンドリファレンス
 
-If you cannot express something in natural language, or want to run it directly from the CLI, you can use the following commands.
+自然言語で伝えられない場合や、CLIから直接実行したい場合は以下のコマンドを使用できます。
 
-### Initialization Commands
+### 初期化コマンド
 
 ```bash
 npx musubi-sdd init [options]
-  --claude      For Claude Code
-  --copilot     For GitHub Copilot
-  --cursor      For Cursor IDE
-  --gemini      For Gemini CLI
-  --codex       For Codex CLI
-  --qwen        For Qwen Code
-  --windsurf    For Windsurf
-  --locale <code>  Specify language (ja, en, zh, etc.)
+  --claude      Claude Code用
+  --copilot     GitHub Copilot用
+  --cursor      Cursor IDE用
+  --gemini      Gemini CLI用
+  --codex       Codex CLI用
+  --qwen        Qwen Code用
+  --windsurf    Windsurf用
+  --locale <code>  言語指定（ja, en, zh等）
 ```
 
-### Specification Driven Development Commands
+### 仕様駆動開発コマンド
 
 ```bash
-npx musubi-requirements "<feature description>"  # Requirements definition
-npx musubi-design <feature-name>       # Design
-npx musubi-tasks <feature-name>        # Task breakdown
-npx musubi-validate [all|requirements|design|traceability]  # Validation
-npx musubi-trace <feature-name>        # Traceability
-npx musubi-gaps <feature-name>         # Gap analysis
+npx musubi-requirements "<機能説明>"  # 要件定義
+npx musubi-design <feature-name>       # 設計
+npx musubi-tasks <feature-name>        # タスク分解
+npx musubi-validate [all|requirements|design|traceability]  # 検証
+npx musubi-trace <feature-name>        # トレーサビリティ
+npx musubi-gaps <feature-name>         # ギャップ分析
 ```
 
-### Change Management Commands
+### 変更管理コマンド
 
 ```bash
-npx musubi-change init <change-name>      # Create change proposal
-npx musubi-change apply <change-name>     # Apply change
-npx musubi-change archive <change-name>   # Archive
+npx musubi-change init <change-name>      # 変更提案作成
+npx musubi-change apply <change-name>     # 変更適用
+npx musubi-change archive <change-name>   # アーカイブ
 ```
 
-### Other Commands
+### その他のコマンド
 
 ```bash
-npx musubi-orchestrate <pattern> <feature>  # Orchestration
-npx musubi-costs                            # Cost tracking
-npx musubi-release [--dry-run]              # Release
-npx musubi-analyze <path>                   # Analysis
-npx musubi-sync                             # Sync
-npx musubi-onboard                          # Analyze existing project
+npx musubi-orchestrate <pattern> <feature>  # オーケストレーション
+npx musubi-costs                            # コスト追跡
+npx musubi-release [--dry-run]              # リリース
+npx musubi-analyze <path>                   # 解析
+npx musubi-sync                             # 同期
+npx musubi-onboard                          # 既存プロジェクト分析
 ```
 
 ---
 
-## Appendix B: Command Formats by AI Platform
+## 付録B: AIプラットフォーム別コマンド形式
 
-Formats for running commands directly on each platform:
+各プラットフォームでコマンドを直接実行する場合の形式：
 
-| Platform | Command Format | Example |
+| プラットフォーム | コマンド形式 | 例 |
 |-----------------|-------------|-----|
-| Claude Code | `/sdd-*` | `/sdd-requirements authentication feature` |
-| GitHub Copilot | `/sdd-*` | `/sdd-requirements authentication feature` |
-| Cursor IDE | Natural language | "Create requirements" |
-| Gemini CLI | `/sdd-*` | `/sdd-requirements authentication feature` |
-| Codex CLI | `/sdd-*` | `/sdd-requirements authentication feature` |
-| Qwen Code | `/sdd-*` | `/sdd-requirements authentication feature` |
-| Windsurf | Natural language | "Create requirements" |
+| Claude Code | `/sdd-*` | `/sdd-requirements 認証機能` |
+| GitHub Copilot | `/sdd-*` | `/sdd-requirements 認証機能` |
+| Cursor IDE | 自然言語 | 「要件定義を作成して」 |
+| Gemini CLI | `/sdd-*` | `/sdd-requirements 認証機能` |
+| Codex CLI | `/sdd-*` | `/sdd-requirements 認証機能` |
+| Qwen Code | `/sdd-*` | `/sdd-requirements 認証機能` |
+| Windsurf | 自然言語 | 「要件定義を作成して」 |
 
-### Commands Available in GitHub Copilot
+### GitHub Copilot で利用可能なコマンド一覧
 
-| Command | Purpose |
+| コマンド | 用途 |
 |---------|------|
-| `/sdd-steering` | Project settings and memory management |
-| `/sdd-requirements <feature>` | Create requirements |
-| `/sdd-design <feature>` | Create C4 model design |
-| `/sdd-tasks <feature>` | Task breakdown |
-| `/sdd-implement <feature>` | Run implementation |
-| `/sdd-validate` | Run validation |
-| `/sdd-change-init <name>` | Create change proposal |
-| `/sdd-change-apply <name>` | Apply change |
-| `/sdd-change-archive <name>` | Archive change |
+| `/sdd-steering` | プロジェクト設定・メモリ管理 |
+| `/sdd-requirements <feature>` | 要件定義作成 |
+| `/sdd-design <feature>` | C4モデル設計作成 |
+| `/sdd-tasks <feature>` | タスク分解 |
+| `/sdd-implement <feature>` | 実装実行 |
+| `/sdd-validate` | 検証実行 |
+| `/sdd-change-init <name>` | 変更提案作成 |
+| `/sdd-change-apply <name>` | 変更適用 |
+| `/sdd-change-archive <name>` | 変更アーカイブ |
 
 ---
 
-**Tags**: `MUSUBI` `SDD` `Specification Driven Development` `AI Coding` `Natural Language` `GitHubCopilot` `ClaudeCode` `Development Tools`
+**Tags**: `MUSUBI` `SDD` `仕様駆動開発` `AIコーディング` `自然言語` `GitHubCopilot` `ClaudeCode` `開発ツール`

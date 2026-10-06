@@ -1,184 +1,184 @@
-# [MUSUBI v6.2.0] Featuring the Review Gate Engine! The Complete SDD Guide That Automatically Protects Quality
+# 【MUSUBI v6.2.0】Review Gate Engine搭載！品質を自動で守るSDD完全ガイド
 
-## Introduction
+## はじめに
 
-**MUSUBI SDD v6.2.0** is a framework that enables Specification Driven Development (SDD) by **simply talking to your AI coding assistant in natural language**.
+**MUSUBI SDD v6.2.0** は、AIコーディングアシスタントに**自然言語で話しかけるだけ**で、仕様駆動開発（SDD）を実現するフレームワークです。
 
-With v6.2.0, the **Review Gate Engine** is now included, so quality can be validated automatically at each phase from requirements to design to implementation.
+v6.2.0 では、**Review Gate Engine** を搭載し、要件→設計→実装の各フェーズで品質を自動検証できるようになりました。
 
 ---
 
-## 🆕 New Features in v6.2.0
+## 🆕 v6.2.0 の新機能
 
-### 🚪 Review Gate Engine (The Highlight)
+### 🚪 Review Gate Engine（最大の目玉）
 
-**Automatic review gates** are placed between development phases to ensure quality.
+各開発フェーズ間に**自動レビューゲート**を設置し、品質を確保します。
 
 ```
-Requirements → [RequirementsReviewGate] → Design → [DesignReviewGate] → Implementation → [ImplementationReviewGate] → Complete
+要件定義 → [RequirementsReviewGate] → 設計 → [DesignReviewGate] → 実装 → [ImplementationReviewGate] → 完了
 ```
 
-#### New Review Prompts
+#### 新しいレビュープロンプト
 
-| Prompt | Description |
+| プロンプト | 説明 |
 |-----------|------|
-| `#sdd-review-requirements <feature>` | Review the requirements document (EARS format, stakeholders, acceptance criteria) |
-| `#sdd-review-design <feature>` | Review the design document (C4 model, ADR, Constitutional Articles) |
-| `#sdd-review-implementation <feature>` | Review the implementation (test coverage, code quality, traceability) |
-| `#sdd-review-all <feature>` | Complete review cycle for all phases |
+| `#sdd-review-requirements <feature>` | 要件ドキュメントをレビュー（EARS形式、ステークホルダー、受入基準） |
+| `#sdd-review-design <feature>` | 設計ドキュメントをレビュー（C4モデル、ADR、Constitutional Articles） |
+| `#sdd-review-implementation <feature>` | 実装をレビュー（テストカバレッジ、コード品質、トレーサビリティ） |
+| `#sdd-review-all <feature>` | 全フェーズの完全レビューサイクル |
 
-### 📊 Workflow Dashboard
+### 📊 ワークフローダッシュボード
 
-Visualize the progress of each feature in real time:
+機能ごとの進捗状況をリアルタイムで可視化：
 
 ```bash
 musubi dash --feature IMP-6.2
 ```
 
-Displayed content:
-- Current stage (Requirements / Design / Implementation)
-- Completion rate (%)
-- List of blockers
-- Suggested next actions
+表示内容：
+- 現在のステージ（Requirements / Design / Implementation）
+- 完了率（%）
+- ブロッカー一覧
+- 次のアクション提案
 
-### 🔗 Traceability Automation
+### 🔗 トレーサビリティ自動化
 
-Automatically extract requirement IDs from code, tests, and commits:
+コード、テスト、コミットから要件IDを自動抽出：
 
 ```typescript
-// REQ-AUTH-001: User authentication
-// IMP-6.2-001-01: Requirements review gate
+// REQ-AUTH-001: ユーザー認証
+// IMP-6.2-001-01: 要件レビューゲート
 ```
 
-Gap detection features:
-- Detect requirements without implementation
-- Detect requirements without tests
-- Suggest corrective actions
+ギャップ検出機能：
+- 実装のない要件を検出
+- テストのない要件を検出
+- 修正アクションを提案
 
-### 🏛️ Enhanced Constitutional Compliance
+### 🏛️ Constitutional Compliance 強化
 
-Automatically validate compliance with the 9 Constitutional Articles:
+9つのConstitutional Articlesへの準拠を自動検証：
 
-- **Article VII (Simplicity)** violation → Phase -1 Gate triggered automatically
-- **Article VIII (Anti-Abstraction)** violation → Phase -1 Gate triggered automatically
+- **Article VII（Simplicity）** 違反 → Phase -1 Gate 自動トリガー
+- **Article VIII（Anti-Abstraction）** 違反 → Phase -1 Gate 自動トリガー
 
-### 📝 Automatic Document Generation
+### 📝 ドキュメント自動生成
 
-#### Experiment Report Generation
+#### 実験レポート生成
 
-Generated automatically after test runs:
+テスト実行後に自動生成：
 
 ```bash
 musubi report --test-results coverage/coverage-summary.json
 ```
 
-#### Technical Article Templates
+#### 技術記事テンプレート
 
-Supports 4 platforms:
+4つのプラットフォームに対応：
 
-| Platform | Command |
+| プラットフォーム | コマンド |
 |-----------------|---------|
 | Qiita | `musubi article --platform qiita` |
 | Zenn | `musubi article --platform zenn` |
 | Medium | `musubi article --platform medium` |
 | Dev.to | `musubi article --platform devto` |
 
-### 🔧 Error Recovery and Rollback
+### 🔧 エラーリカバリー＆ロールバック
 
-#### Error Recovery
+#### エラーリカバリー
 
-Automatic analysis when a stage fails:
-- Identify the root cause
-- Suggest fix steps
-- Record failure history
+ステージ失敗時に自動分析：
+- 根本原因の特定
+- 修正手順の提案
+- 失敗履歴の記録
 
-#### Rollback Feature
+#### ロールバック機能
 
-Rollback is possible at 4 levels of granularity:
+4つの粒度レベルでロールバック可能：
 
-| Level | Target | Description |
+| レベル | 対象 | 説明 |
 |--------|------|------|
-| File | Individual file | Revert only a specific file to its previous version |
-| Commit | Git commit | Revert up to the specified commit |
-| Stage | Workflow stage | Per Req/Design/Task/Impl unit |
-| Sprint | Entire sprint | Return to the start of the sprint |
+| File | 個別ファイル | 特定ファイルのみを前バージョンに |
+| Commit | Git コミット | 指定コミットまでリバート |
+| Stage | ワークフローステージ | Req/Design/Task/Impl単位 |
+| Sprint | スプリント全体 | スプリント開始時点に戻す |
 
 ---
 
-## 🚀 Getting Started with SDD in Natural Language (Start in 5 Minutes)
+## 🚀 自然言語で始めるSDD（5分で開始）
 
-### Step 1: Install MUSUBI
+### Step 1: MUSUBI のインストール
 
 ```bash
 npx musubi-sdd init --copilot
 ```
 
-### Step 2: Start Developing by Just Talking to the AI
+### Step 2: AIに話しかけるだけで開発開始
 
-Once initialization is complete, Specification Driven Development begins when you **simply talk to the AI in natural language**.
-
----
-
-## 💬 Examples of Working in Natural Language
-
-### 🎯 Want to Create Requirements
-
-> **"Create requirements for the user authentication feature"**
-
-The AI starts a dialogue, asking one question at a time, and defines comprehensive requirements using MECE analysis.
-
-### 📐 Want to Create a Design
-
-> **"Create a design for the user authentication feature using the C4 model"**
-
-### 📋 Want to Break Down into Tasks
-
-> **"Break down the user authentication feature into implementation tasks"**
-
-### ⚙️ Want to Proceed with Implementation
-
-> **"Start implementing from the P0 tasks"**
-
-### ✅ Want to Review (New in v6.2.0)
-
-> **"Review the requirements for the user authentication feature"**
-
-The AI checks the following:
-- EARS format syntax validation
-- Stakeholder coverage
-- Completeness of acceptance criteria
-
-> **"Review the design for the user authentication feature"**
-
-The AI checks the following:
-- Completeness of the C4 model (Context, Container, Component)
-- Existence and quality of ADRs
-- Constitutional Articles compliance
-
-> **"Review the implementation of the user authentication feature"**
-
-The AI checks the following:
-- Test coverage (configurable, default 80%)
-- Code quality (lint, type check)
-- Traceability (requirements → design → code → tests)
-
-> **"Do a full review of the user authentication feature"**
-
-Reviews all phases in order.
-
-### 📊 Want to Check Progress (New in v6.2.0)
-
-> **"Show the progress of IMP-6.2"**
-
-### 🔙 Want to Roll Back (New in v6.2.0)
-
-> **"Roll back to the design stage"**
+初期化が完了したら、**AIに自然言語で話しかけるだけ**で仕様駆動開発が始まります。
 
 ---
 
-## 🤖 Supported AI Platforms (7 Types)
+## 💬 自然言語での作業例
 
-| Platform | Setup |
+### 🎯 要件定義を作成したい
+
+> **「ユーザー認証機能の要件定義を作成して」**
+
+AIが1問1答形式で対話を開始し、MECE分析で網羅的な要件を定義します。
+
+### 📐 設計を作成したい
+
+> **「ユーザー認証機能の設計をC4モデルで作成して」**
+
+### 📋 タスクに分解したい
+
+> **「ユーザー認証機能を実装タスクに分解して」**
+
+### ⚙️ 実装を進めたい
+
+> **「P0タスクから順に実装を開始して」**
+
+### ✅ レビューしたい（v6.2.0 新機能）
+
+> **「ユーザー認証機能の要件をレビューして」**
+
+AIが以下をチェック：
+- EARS形式の構文検証
+- ステークホルダーカバレッジ
+- 受入基準の完全性
+
+> **「ユーザー認証機能の設計をレビューして」**
+
+AIが以下をチェック：
+- C4モデルの完全性（Context, Container, Component）
+- ADRの存在と品質
+- Constitutional Articles準拠
+
+> **「ユーザー認証機能の実装をレビューして」**
+
+AIが以下をチェック：
+- テストカバレッジ（設定可能、デフォルト80%）
+- コード品質（lint, type check）
+- トレーサビリティ（要件→設計→コード→テスト）
+
+> **「ユーザー認証機能をフルレビューして」**
+
+全フェーズを順番にレビュー。
+
+### 📊 進捗を確認したい（v6.2.0 新機能）
+
+> **「IMP-6.2の進捗状況を表示して」**
+
+### 🔙 ロールバックしたい（v6.2.0 新機能）
+
+> **「設計ステージまでロールバックして」**
+
+---
+
+## 🤖 対応AIプラットフォーム（7種類）
+
+| プラットフォーム | セットアップ |
 |-----------------|-------------|
 | **Claude Code** | `npx musubi-sdd init --claude` |
 | **GitHub Copilot** | `npx musubi-sdd init --copilot` |
@@ -190,118 +190,118 @@ Reviews all phases in order.
 
 ---
 
-## 📋 27+4 Specialized AI Agents
+## 📋 27+4 の専門AIエージェント
 
-v6.2.0 adds 4 new agents.
+v6.2.0 では4つの新エージェントが追加されました。
 
-### 🆕 New Agents (v6.2.0)
+### 🆕 新エージェント（v6.2.0）
 
-| Agent | What It Can Do | Example Phrasing |
+| エージェント | できること | 伝え方の例 |
 |-------------|-----------|-----------|
-| **Review Gate Agent** | Run review gates | "Review the XX feature" |
-| **Dashboard Agent** | Visualize progress | "Show the progress status" |
-| **Traceability Agent** | Traceability analysis | "Detect requirement gaps" |
-| **Recovery Agent** | Error recovery | "Roll back" |
+| **Review Gate Agent** | レビューゲートの実行 | 「〇〇機能をレビューして」 |
+| **Dashboard Agent** | 進捗可視化 | 「進捗状況を表示して」 |
+| **Traceability Agent** | トレーサビリティ分析 | 「要件のギャップを検出して」 |
+| **Recovery Agent** | エラーリカバリー | 「ロールバックして」 |
 
-### Core Workflow (9)
+### コアワークフロー（9個）
 
-| What You Can Do | Example Phrasing |
+| できること | 伝え方の例 |
 |-----------|-----------|
-| Project setup | "Set up the project architecture" |
-| Requirements definition | "Define requirements for the XX feature" |
-| System design | "Create a design for the XX feature using the C4 model" |
-| Task breakdown | "Break down the XX feature into implementation tasks" |
-| Implementation | "Implement the P0 tasks" |
-| Validation | "Validate the consistency between requirements and implementation" |
-| Change analysis | "Analyze the impact of adding XX" |
-| Change application | "Apply the change proposal" |
-| Archive | "Archive the completed changes" |
+| プロジェクト設定 | 「プロジェクトのアーキテクチャを設定して」 |
+| 要件定義 | 「〇〇機能の要件を定義して」 |
+| システム設計 | 「〇〇機能の設計をC4モデルで作成して」 |
+| タスク分解 | 「〇〇機能を実装タスクに分解して」 |
+| 実装 | 「P0タスクを実装して」 |
+| 検証 | 「要件と実装の整合性を検証して」 |
+| 変更分析 | 「〇〇を追加する影響を分析して」 |
+| 変更適用 | 「変更提案を適用して」 |
+| アーカイブ | 「完了した変更をアーカイブして」 |
 
-### Quality Assurance (6)
+### 品質保証（6個）
 
-| What You Can Do | Example Phrasing |
+| できること | 伝え方の例 |
 |-----------|-----------|
-| Test design | "Design tests for the XX feature" |
-| Code review | "Review this code" |
-| Security audit | "Check for security vulnerabilities" |
-| Performance optimization | "Optimize this process" |
-| Quality management | "Check the quality metrics" |
-| Governance validation | "Check compliance with the Constitutional Articles" |
+| テスト設計 | 「〇〇機能のテストを設計して」 |
+| コードレビュー | 「このコードをレビューして」 |
+| セキュリティ監査 | 「セキュリティ脆弱性をチェックして」 |
+| パフォーマンス最適化 | 「この処理を最適化して」 |
+| 品質管理 | 「品質メトリクスを確認して」 |
+| ガバナンス検証 | 「憲法条項への準拠を確認して」 |
 
-### Specialized Areas (12)
+### 専門領域（12個）
 
-| What You Can Do | Example Phrasing |
+| できること | 伝え方の例 |
 |-----------|-----------|
-| API design | "Design a REST API" |
-| Database design | "Design the schema for the users table" |
-| Database operations | "Optimize the query" |
-| UI/UX design | "Design the UI for the login screen" |
-| DevOps | "Build a CI/CD pipeline" |
-| Cloud design | "Design an AWS architecture" |
-| AI/ML implementation | "Implement a recommendation system" |
-| Documentation | "Create API documentation" |
-| Release management | "Create release notes" |
-| SRE | "Configure alert settings" |
-| Bug investigation | "Investigate the cause of this error" |
-| Issue resolution | "Resolve this Issue" |
+| API設計 | 「REST APIを設計して」 |
+| データベース設計 | 「ユーザーテーブルのスキーマを設計して」 |
+| データベース運用 | 「クエリを最適化して」 |
+| UI/UX設計 | 「ログイン画面のUIを設計して」 |
+| DevOps | 「CI/CDパイプラインを構築して」 |
+| クラウド設計 | 「AWSアーキテクチャを設計して」 |
+| AI/ML実装 | 「推薦システムを実装して」 |
+| ドキュメント作成 | 「APIドキュメントを作成して」 |
+| リリース管理 | 「リリースノートを作成して」 |
+| SRE | 「アラート設定を構成して」 |
+| バグ調査 | 「このエラーの原因を調査して」 |
+| 課題解決 | 「このIssueを解決して」 |
 
 ---
 
-## 🏛️ Nine Constitutional Articles That Protect Quality
+## 🏛️ 品質を守る9つの憲法条項
 
-MUSUBI guarantees quality through a "Constitution". **v6.2.0 strengthens automatic validation.**
+MUSUBI は「憲法」で品質を保証します。**v6.2.0 では自動検証が強化されました。**
 
-| Article | Principle | Enhancement in v6.2.0 |
+| 条項 | 原則 | v6.2.0 での強化 |
 |------|------|----------------|
-| I | Library-First | Validated by DesignReviewGate |
-| II | CLI Interface | Validated by DesignReviewGate |
-| III | Test-First | Validated by ImplementationReviewGate |
-| IV | EARS Format | Validated by RequirementsReviewGate |
-| V | Traceability | Automatically extracted by the Traceability Agent |
-| VI | Project Memory | Automatically synchronized by SteeringSyncer |
-| VII | Simplicity Gate | **Phase -1 Gate automatic trigger** |
-| VIII | Anti-Abstraction | **Phase -1 Gate automatic trigger** |
-| IX | Integration-First | Validated by ImplementationReviewGate |
+| I | Library-First | DesignReviewGateで検証 |
+| II | CLI Interface | DesignReviewGateで検証 |
+| III | Test-First | ImplementationReviewGateで検証 |
+| IV | EARS Format | RequirementsReviewGateで検証 |
+| V | Traceability | トレーサビリティエージェントで自動抽出 |
+| VI | Project Memory | SteeringSyncerで自動同期 |
+| VII | Simplicity Gate | **Phase -1 Gate自動トリガー** |
+| VIII | Anti-Abstraction | **Phase -1 Gate自動トリガー** |
+| IX | Integration-First | ImplementationReviewGateで検証 |
 
-### What Is the Phase -1 Gate?
+### Phase -1 Gate とは？
 
-A special review process triggered when a change that violates Article VII (Simplicity) or Article VIII (Anti-Abstraction) is detected.
+Article VII（Simplicity）またはArticle VIII（Anti-Abstraction）に違反する変更を検出した際に発動する特別レビュープロセスです。
 
-- Mandatory review by the system architect
-- Optional review by the project manager
-- Final approval by a human
+- システムアーキテクト必須レビュー
+- プロジェクトマネージャー任意レビュー
+- 人間による最終承認
 
 ---
 
-## 📁 Project Structure
+## 📁 プロジェクト構造
 
-A project initialized with MUSUBI:
+MUSUBI で初期化されたプロジェクト：
 
 ```
 your-project/
-├── AGENTS.md                    # AI agent definitions (including review prompts)
+├── AGENTS.md                    # AIエージェント定義（レビュープロンプト含む）
 ├── steering/
-│   ├── structure.md             # Architecture
-│   ├── tech.md                  # Technology stack
-│   ├── product.md               # Product information
+│   ├── structure.md             # アーキテクチャ
+│   ├── tech.md                  # 技術スタック
+│   ├── product.md               # プロダクト情報
 │   └── rules/
-│       └── constitution.md      # The 9 Constitutional Articles
+│       └── constitution.md      # 9つの憲法条項
 ├── storage/
-│   ├── specs/                   # Requirements and design documents
-│   ├── features/                # Per-feature files
-│   ├── reviews/                 # Review results (v6.2.0)
-│   ├── dashboard/               # Dashboard data (v6.2.0)
-│   ├── transitions/             # Stage transition records (v6.2.0)
-│   └── traceability/            # Traceability matrix (v6.2.0)
+│   ├── specs/                   # 要件・設計ドキュメント
+│   ├── features/                # 機能別ファイル
+│   ├── reviews/                 # レビュー結果（v6.2.0）
+│   ├── dashboard/               # ダッシュボードデータ（v6.2.0）
+│   ├── transitions/             # ステージ遷移記録（v6.2.0）
+│   └── traceability/            # トレーサビリティマトリクス（v6.2.0）
 └── lib/
-    └── musubi-review-gate/      # Review Gate Engine (v6.2.0)
+    └── musubi-review-gate/      # Review Gate Engine（v6.2.0）
 ```
 
 ---
 
-## 🔧 Configuration Options
+## 🔧 設定オプション
 
-### Review Gate Configuration
+### Review Gate 設定
 
 ```yaml
 # steering/project.yml
@@ -315,12 +315,12 @@ reviewGate:
     adrRequired: true
     constitutionalArticles: [1, 2, 7, 8]
   implementation:
-    minCoverage: 80        # Test coverage threshold
+    minCoverage: 80        # テストカバレッジ閾値
     coverageType: 'line'   # line / branch / function
-    lintStrict: true       # Block on lint errors
+    lintStrict: true       # Lintエラー時にブロック
 ```
 
-### Traceability Configuration
+### トレーサビリティ設定
 
 ```yaml
 # steering/project.yml
@@ -336,74 +336,74 @@ traceability:
 
 ---
 
-## 📈 Test Results
+## 📈 テスト結果
 
-v6.2.0 is backed by **4,827 tests** of coverage.
+v6.2.0 は **4,827 テスト** でカバレッジを確保しています。
 
-| Category | Number of Tests |
+| カテゴリ | テスト数 |
 |---------|---------|
 | Review Gate Engine | 105 |
 | Dashboard & Traceability | 141 |
 | Constitutional Compliance | 144 |
 | Enterprise Features | 100 |
-| Existing features | 4,337 |
-| **Total** | **4,827** |
+| 既存機能 | 4,337 |
+| **合計** | **4,827** |
 
 ---
 
-## 🎯 Use Cases
+## 🎯 ユースケース
 
-### Use Case 1: New Feature Development
-
-```
-1. "Define requirements for the user authentication feature"
-2. "Review the requirements" ← New in v6.2.0
-3. "Create a design using the C4 model"
-4. "Review the design" ← New in v6.2.0
-5. "Break it down into tasks"
-6. "Implement it"
-7. "Review the implementation" ← New in v6.2.0
-8. "Do a full review" ← New in v6.2.0
-```
-
-### Use Case 2: Early Detection of Quality Issues
+### ユースケース1: 新機能開発
 
 ```
-1. "Detect traceability gaps"
-   → Detect requirements without implementation and requirements without tests
-
-2. "Check Constitutional compliance"
-   → Detect Article violations and trigger the Phase -1 Gate
+1. 「ユーザー認証機能の要件を定義して」
+2. 「要件をレビューして」 ← v6.2.0 新機能
+3. 「設計をC4モデルで作成して」
+4. 「設計をレビューして」 ← v6.2.0 新機能
+5. 「タスクに分解して」
+6. 「実装して」
+7. 「実装をレビューして」 ← v6.2.0 新機能
+8. 「フルレビューして」 ← v6.2.0 新機能
 ```
 
-### Use Case 3: Progress Management
+### ユースケース2: 品質問題の早期発見
 
 ```
-1. "Show the progress of IMP-6.2"
-   → Visualize on the dashboard
+1. 「トレーサビリティギャップを検出して」
+   → 実装のない要件、テストのない要件を検出
 
-2. "Show the stage transition history"
-   → Check who approved what and when
+2. 「Constitutional準拠をチェックして」
+   → Article違反を検出、Phase -1 Gateをトリガー
+```
+
+### ユースケース3: 進捗管理
+
+```
+1. 「IMP-6.2の進捗を表示して」
+   → ダッシュボードで可視化
+
+2. 「ステージ遷移履歴を表示して」
+   → いつ誰が承認したかを確認
 ```
 
 ---
 
-## 🔄 How to Upgrade
+## 🔄 アップグレード方法
 
-Upgrade an existing project to v6.2.0:
+既存プロジェクトをv6.2.0にアップグレード：
 
 ```bash
-# Upgrade with the latest version (recommended)
+# 最新版でアップグレード（推奨）
 npx musubi-sdd@latest upgrade
 
-# Specify a particular version
+# 特定バージョンを指定
 npx musubi-sdd@latest upgrade --to 6.2.0
 
-# Preview changes (without applying)
+# 変更内容をプレビュー（適用しない）
 npx musubi-sdd upgrade --dry-run
 ```
 
-For a local installation:
+ローカルインストールの場合：
 
 ```bash
 npm install musubi-sdd@latest
@@ -412,27 +412,27 @@ npx musubi-sdd upgrade
 
 ---
 
-## 📚 Related Documents
+## 📚 関連ドキュメント
 
-- [MUSUBI SDD Official Documentation](https://github.com/nahisaho/MUSUBI)
+- [MUSUBI SDD 公式ドキュメント](https://github.com/nahisaho/MUSUBI)
 - [Constitutional Governance](steering/rules/constitution.md)
 - [Review Gate Engine API Reference](docs/API-REFERENCE.md)
 - [CHANGELOG v6.2.0](CHANGELOG.md)
 
 ---
 
-## Summary
+## まとめ
 
-With MUSUBI v6.2.0, quality management has been significantly strengthened by the **Review Gate Engine**.
+MUSUBI v6.2.0 では、**Review Gate Engine** により品質管理が大幅に強化されました。
 
-✅ **Automatic review at each phase of requirements, design, and implementation**
-✅ **Automatic extraction of traceability and gap detection**
-✅ **Automatic validation of Constitutional Articles compliance**
-✅ **Prevention of excessive complexity via the Phase -1 Gate**
-✅ **Progress visualization with the workflow dashboard**
-✅ **Error recovery and rollback features**
+✅ **要件・設計・実装の各フェーズで自動レビュー**
+✅ **トレーサビリティの自動抽出とギャップ検出**
+✅ **Constitutional Articles 準拠の自動検証**
+✅ **Phase -1 Gate による過度な複雑化の防止**
+✅ **ワークフローダッシュボードで進捗を可視化**
+✅ **エラーリカバリーとロールバック機能**
 
-Just talk to the AI in natural language to achieve high-quality software development.
+AIに自然言語で話しかけるだけで、高品質なソフトウェア開発を実現できます。
 
 ---
 
@@ -442,6 +442,6 @@ Just talk to the AI in natural language to achieve high-quality software develop
 
 ---
 
-## Tags
+## タグ
 
-`#MUSUBI` `#SDD` `#Specification Driven Development` `#AI Development` `#GitHub Copilot` `#Claude` `#Quality Management` `#Review Gate` `#Traceability`
+`#MUSUBI` `#SDD` `#仕様駆動開発` `#AI開発` `#GitHub Copilot` `#Claude` `#品質管理` `#Review Gate` `#トレーサビリティ`
