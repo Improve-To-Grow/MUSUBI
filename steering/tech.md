@@ -8,7 +8,7 @@
 
 ## Overview
 
-MUSUBI self-maintanance project
+MUSUBI self-maintenance project
 
 ---
 

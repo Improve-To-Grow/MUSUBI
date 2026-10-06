@@ -22,7 +22,7 @@
 
 ### What is MUSUBI?
 
-MUSUBI self-maintanance project
+MUSUBI self-maintenance project
 
 > [2-3 paragraphs explaining the product, its purpose, and core value proposition]
 

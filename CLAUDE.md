@@ -1,6 +1,6 @@
 # MUSUBI - MUSUBI
 
-MUSUBI self-maintanance project
+MUSUBI self-maintenance project
 
 ## Initialized with MUSUBI SDD for Claude Code
 
