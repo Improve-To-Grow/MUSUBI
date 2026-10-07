@@ -30,8 +30,9 @@ jobs:
       - name: Run linter
         run: npm run lint
       
+      # Audit only what ships: devDependencies are never installed by `npm install -g github:...`
       - name: Security audit
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high --omit=dev
 
   # MUSUBI is distributed from this GitHub fork, never published to the npm registry
   create-github-release:

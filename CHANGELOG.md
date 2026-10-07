@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Upgraded `chokidar` to v4 (drops the vulnerable `braces` dependency) and refreshed the lockfile with `npm audit fix` (ws, qs/express, path-to-regexp, minimatch, picomatch, js-yaml, yaml). `npm audit --omit=dev` reports 0 vulnerabilities.
 - Updated `proxy-addr` from 2.0.7 to 2.0.8 (transitive via `express`) for a critical advisory published after the previous audit fix; `npm audit --omit=dev --audit-level=high` reports 0 vulnerabilities again.
+- Upgraded `jest` from 29 to 30 (devDependency only). Jest 30 replaces `micromatch` with `picomatch`, which drops `braces`: GHSA-vfj7-8cjw-p6xm flags every `braces` release as high severity and has no patched version, so the release workflow failed on `npm audit --audit-level=high`. That audit now runs with `--omit=dev`, matching CI, so only the dependencies that `npm install -g github:...` actually installs are audited.
 
 ### Fixed
 
