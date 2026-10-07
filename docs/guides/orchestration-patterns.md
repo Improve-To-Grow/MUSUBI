@@ -57,10 +57,10 @@ console.log(result.selectedSkill); // 'requirements-analyst'
 
 ```bash
 # Auto-select skill based on task description
-npx musubi-orchestrate auto "Create API design for user management"
+musubi-orchestrate auto "Create API design for user management"
 
 # With verbose output
-npx musubi-orchestrate auto "Review code for security issues" --verbose
+musubi-orchestrate auto "Review code for security issues" --verbose
 ```
 
 ---
@@ -88,10 +88,10 @@ console.log(result.stages); // Array of skill outputs
 
 ```bash
 # Execute skills sequentially
-npx musubi-orchestrate sequential --skills requirements-analyst,system-architect,task-decomposer
+musubi-orchestrate sequential --skills requirements-analyst,system-architect,task-decomposer
 
 # With input
-npx musubi-orchestrate sequential --skills "requirements-analyst,system-architect" --input '{"feature":"login"}'
+musubi-orchestrate sequential --skills "requirements-analyst,system-architect" --input '{"feature":"login"}'
 ```
 
 ### Pipeline Example
@@ -132,7 +132,7 @@ const result = await engine.execute({
 
 ```bash
 # Execute nested workflow
-npx musubi-orchestrate nested --root orchestrator --config nested-workflow.json
+musubi-orchestrate nested --root orchestrator --config nested-workflow.json
 ```
 
 ---
@@ -162,7 +162,7 @@ console.log(result.consensus);  // Final agreed solution
 
 ```bash
 # Start group discussion
-npx musubi-orchestrate group-chat \
+musubi-orchestrate group-chat \
   --topic "Design microservices architecture" \
   --participants system-architect,security-analyst,devops-engineer \
   --rounds 3
@@ -209,12 +209,12 @@ console.log(result.failed);    // Failed tasks (if any)
 
 ```bash
 # Run parallel tasks
-npx musubi-orchestrate swarm \
+musubi-orchestrate swarm \
   --tasks "test-engineer:auth,test-engineer:user,documentation-writer:api" \
   --max-concurrent 4
 
 # With P-labels
-npx musubi-orchestrate swarm \
+musubi-orchestrate swarm \
   --tasks "P0:security-audit,P1:code-review,P2:documentation" \
   --strategy all
 ```
@@ -254,13 +254,13 @@ const result = await engine.execute({
 
 ```bash
 # Execute with human checkpoints
-npx musubi-orchestrate human-in-loop \
+musubi-orchestrate human-in-loop \
   --skills "requirements-analyst,system-architect" \
   --checkpoint-after requirements-analyst \
   --checkpoint-after system-architect
 
 # Interactive mode
-npx musubi-orchestrate human-in-loop --interactive
+musubi-orchestrate human-in-loop --interactive
 ```
 
 ---
@@ -294,7 +294,7 @@ const result = await engine.execute({
 
 ```bash
 # Handoff task to specialist
-npx musubi-orchestrate handoff \
+musubi-orchestrate handoff \
   --from orchestrator \
   --to security-analyst \
   --context '{"task":"Security audit","priority":"high"}'
@@ -341,10 +341,10 @@ console.log(result.routedTo);    // 'software-developer'
 
 ```bash
 # Triage a request
-npx musubi-orchestrate triage --message "Add rate limiting to API endpoints"
+musubi-orchestrate triage --message "Add rate limiting to API endpoints"
 
 # With strategy
-npx musubi-orchestrate triage \
+musubi-orchestrate triage \
   --message "Review security of payment module" \
   --strategy confidence \
   --min-confidence 0.7
@@ -411,28 +411,28 @@ const implResult = await engine.execute({
 # Full SDD workflow
 
 # 1. Triage
-npx musubi-orchestrate triage --message "Add OAuth2 authentication"
+musubi-orchestrate triage --message "Add OAuth2 authentication"
 
 # 2. Requirements
-npx musubi-orchestrate auto "Create EARS requirements for OAuth2"
+musubi-orchestrate auto "Create EARS requirements for OAuth2"
 
 # 3. Design
-npx musubi-orchestrate group-chat \
+musubi-orchestrate group-chat \
   --topic "Design OAuth2 architecture" \
   --participants system-architect,security-analyst
 
 # 4. Review
-npx musubi-orchestrate human-in-loop \
+musubi-orchestrate human-in-loop \
   --skills constitution-enforcer \
   --checkpoint-after constitution-enforcer
 
 # 5. Implement in parallel
-npx musubi-orchestrate swarm \
+musubi-orchestrate swarm \
   --tasks "P0:oauth-client,P1:token-handler,P1:oauth-tests" \
   --strategy all
 
 # 6. Validate
-npx musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js
+musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js
 ```
 
 ---
@@ -471,19 +471,19 @@ const safeExecute = async (skill, input) => {
 
 ```bash
 # List available patterns
-npx musubi-orchestrate list-patterns
+musubi-orchestrate list-patterns
 
 # List registered skills
-npx musubi-orchestrate list-skills
+musubi-orchestrate list-skills
 
 # Check orchestration status
-npx musubi-orchestrate status
+musubi-orchestrate status
 
 # Run specific pattern
-npx musubi-orchestrate run <pattern> [options]
+musubi-orchestrate run <pattern> [options]
 
 # Help
-npx musubi-orchestrate --help
+musubi-orchestrate --help
 ```
 
 ---

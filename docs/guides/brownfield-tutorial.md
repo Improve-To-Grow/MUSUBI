@@ -47,7 +47,7 @@ MUSUBI provides three key tools for brownfield projects:
 ### Installation
 
 ```bash
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ### Initialize MUSUBI
@@ -540,7 +540,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: npm install -g musubi-sdd
+      - run: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
       - run: musubi-gaps coverage --min-coverage 100
 ```
 

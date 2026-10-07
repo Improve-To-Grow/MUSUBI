@@ -53,14 +53,14 @@ export const SKILLS = [
 ];
 
 export const CLI_COMMANDS = {
-  init: 'npx musubi-sdd init',
-  validate: 'npx musubi-sdd validate',
-  sync: 'npx musubi-sdd sync',
-  status: 'npx musubi-sdd status',
-  requirements: 'npx musubi-requirements',
-  design: 'npx musubi-design',
-  tasks: 'npx musubi-tasks',
-  analyze: 'npx musubi-analyze',
-  trace: 'npx musubi-trace',
-  gaps: 'npx musubi-gaps',
+  init: 'musubi-sdd init',
+  validate: 'musubi-sdd validate',
+  sync: 'musubi-sdd sync',
+  status: 'musubi-sdd status',
+  requirements: 'musubi-requirements',
+  design: 'musubi-design',
+  tasks: 'musubi-tasks',
+  analyze: 'musubi-analyze',
+  trace: 'musubi-trace',
+  gaps: 'musubi-gaps',
 } as const;

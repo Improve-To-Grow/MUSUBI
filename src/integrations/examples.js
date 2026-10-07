@@ -79,11 +79,11 @@ class ProjectTemplate {
         start: 'node src/index.js',
         test: 'jest',
         lint: 'eslint src',
-        validate: 'npx musubi validate',
+        validate: 'musubi validate',
         ...this.scripts,
       },
+      // MUSUBI itself is installed globally from the ITG fork, not as a project dependency
       dependencies: {
-        'musubi-sdd': '^3.0.0',
         ...this.dependencies,
       },
       devDependencies: {
@@ -487,7 +487,7 @@ class LaunchChecklist {
       id: 'musubi-validate',
       category: LaunchCategory.COMPLIANCE,
       title: 'MUSUBI validation passes',
-      command: 'npx musubi validate',
+      command: 'musubi validate',
       required: true,
     });
 

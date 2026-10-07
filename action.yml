@@ -60,7 +60,7 @@ runs:
 
     - name: Install MUSUBI
       shell: bash
-      run: npm install -g musubi-sdd
+      run: npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
     - name: Validate Constitution
       id: constitution
@@ -70,7 +70,7 @@ runs:
       run: |
         echo "🔍 Validating Constitutional Governance..."
         if [ -f "steering/rules/constitution.md" ]; then
-          npx musubi validate --constitution
+          musubi validate --constitution
           echo "result=passed" >> $GITHUB_OUTPUT
         else
           echo "⚠️ No constitution.md found, skipping constitutional check"
@@ -84,7 +84,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         echo "🔍 Running MUSUBI Validation..."
-        if npx musubi validate ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }}; then
+        if musubi validate ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }}; then
           echo "result=passed" >> $GITHUB_OUTPUT
         else
           echo "result=failed" >> $GITHUB_OUTPUT
@@ -98,7 +98,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         echo "📊 Running MUSUBI Analysis..."
-        RESULT=$(npx musubi analyze --format json ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }} 2>/dev/null || echo '{}')
+        RESULT=$(musubi analyze --format json ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }} 2>/dev/null || echo '{}')
         COVERAGE=$(echo "$RESULT" | jq -r '.coverage // 0')
         echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
         echo "Requirements Coverage: $COVERAGE%"
@@ -110,14 +110,14 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         echo "🔗 Checking Traceability Gaps..."
-        RESULT=$(npx musubi gaps --format json ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }} 2>/dev/null || echo '{"gaps":[]}')
+        RESULT=$(musubi gaps --format json ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }} 2>/dev/null || echo '{"gaps":[]}')
         COUNT=$(echo "$RESULT" | jq '.gaps | length')
         echo "count=$COUNT" >> $GITHUB_OUTPUT
         echo "Traceability Gaps: $COUNT"
         
         if [ "$COUNT" -gt 0 ] && [ "${{ inputs.fail-on-gaps }}" = "true" ]; then
           echo "❌ Traceability gaps found, failing workflow"
-          npx musubi gaps ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }}
+          musubi gaps ${{ inputs.feature && format('--feature {0}', inputs.feature) || '' }}
           exit 1
         fi
 

@@ -5,7 +5,7 @@ Get productive with MUSUBI in 5 minutes.
 ## 1. Install
 
 ```bash
-npx musubi-sdd init
+musubi-sdd init
 ```
 
 ## 2. Check Status

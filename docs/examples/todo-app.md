@@ -28,19 +28,19 @@ examples/todo-app/
 ```bash
 # Initialize in new directory
 mkdir todo-app && cd todo-app
-npx musubi-sdd init
+musubi-sdd init
 
 # Generate requirements
-npx musubi-requirements "Todo management with CRUD operations"
+musubi-requirements "Todo management with CRUD operations"
 
 # Generate design
-npx musubi-design todo-feature
+musubi-design todo-feature
 
 # Generate tasks
-npx musubi-tasks todo-feature
+musubi-tasks todo-feature
 
 # Validate
-npx musubi-validate all
+musubi-validate all
 ```
 
 ## 📋 EARS Requirements
@@ -308,13 +308,13 @@ describe('TodoService', () => {
 
 ```bash
 # Validate all artifacts
-npx musubi-validate all
+musubi-validate all
 
 # Generate traceability report
-npx musubi-trace
+musubi-trace
 
 # Check for gaps
-npx musubi-gaps
+musubi-gaps
 ```
 
 ## 📚 Related Examples

@@ -608,12 +608,10 @@ Low Power   │ [Open Source Community]      │ [Development Team]
 
 **npm Package Structure**:
 
-MUSUBI is distributed as an npm package (`musubi-sdd`) for easy installation and project initialization.
+The ITG fork of MUSUBI is distributed from GitHub as the npm package `@improve-to-grow/musubi-sdd` (never from the npm registry).
 
-**Installation Methods**:
-1. **npx (one-time use)**: `npx musubi-sdd init`
-2. **Global install**: `npm install -g musubi-sdd`
-3. **Local project dependency**: `npm install --save-dev musubi-sdd`
+**Installation**: global install only, then run the commands directly (never via `npx`):
+`npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'`
 
 **Package Directory Structure** (npm package repository):
 

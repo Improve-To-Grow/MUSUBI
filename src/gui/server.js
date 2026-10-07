@@ -286,9 +286,10 @@ class GUIServer {
       }
       try {
         const { spawn } = require('child_process');
-        const _child = spawn('npx', ['musubi-requirements', 'create'], {
+        // Run this installation's own bin so the wizard never resolves to another MUSUBI copy
+        const requirementsBin = path.join(__dirname, '..', '..', 'bin', 'musubi-requirements.js');
+        const _child = spawn(process.execPath, [requirementsBin, 'create'], {
           cwd: this.projectPath,
-          shell: true,
         });
         res.json({ success: true, message: 'Requirements wizard started' });
       } catch (error) {
@@ -424,10 +425,17 @@ ${description}
         this.clients.delete(ws);
       });
 
-      // Send initial project state
-      this.projectScanner.scan().then(project => {
-        ws.send(JSON.stringify({ type: 'project:init', data: project }));
-      });
+      // Send initial project state; a failed scan must not crash the server
+      this.projectScanner
+        .scan()
+        .then(project => {
+          if (ws.readyState === ws.OPEN) {
+            ws.send(JSON.stringify({ type: 'project:init', data: project }));
+          }
+        })
+        .catch(error => {
+          console.error('Error scanning project:', error);
+        });
     });
   }
 

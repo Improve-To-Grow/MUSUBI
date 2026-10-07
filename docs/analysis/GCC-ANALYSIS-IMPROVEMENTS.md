@@ -339,7 +339,7 @@ With these implementations, MUSUBI now
 ### Usage
 
 ```bash
-npm install musubi-sdd@latest
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ```javascript

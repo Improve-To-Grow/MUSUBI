@@ -89,7 +89,7 @@ The extension will **delegate to existing CLI commands** rather than reimplement
 ```typescript
 // Extension calls CLI internally
 async function validateConstitution(): Promise<ValidationResult> {
-  const result = await execAsync('npx musubi-sdd validate');
+  const result = await execAsync('musubi-sdd validate');
   return parseValidationOutput(result);
 }
 ```

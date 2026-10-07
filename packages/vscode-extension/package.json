@@ -171,7 +171,7 @@
         },
         "musubi.cliPath": {
           "type": "string",
-          "default": "npx musubi-sdd",
+          "default": "musubi-sdd",
           "description": "Path to MUSUBI CLI executable"
         }
       }

@@ -28,7 +28,8 @@ cache:
 .setup:
   before_script:
     - npm ci --cache .npm --prefer-offline
-    - npx musubi-sdd --version
+    - npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
+    - musubi-sdd --version
 
 # ================================================
 # Stage: Validate
@@ -39,7 +40,7 @@ validate:ears:
   stage: validate
   script:
     - echo "🔍 Validating EARS requirements..."
-    - npx musubi-validate ears
+    - musubi-validate ears
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -53,7 +54,7 @@ validate:constitution:
   stage: validate
   script:
     - echo "📜 Checking constitutional compliance..."
-    - npx musubi-validate constitution
+    - musubi-validate constitution
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -63,7 +64,7 @@ validate:traceability:
   stage: validate
   script:
     - echo "🔗 Generating traceability matrix..."
-    - npx musubi-trace --output reports/traceability.md
+    - musubi-trace --output reports/traceability.md
   artifacts:
     paths:
       - reports/traceability.md
@@ -77,7 +78,7 @@ validate:delta:
   stage: validate
   script:
     - echo "📊 Validating delta specifications..."
-    - npx musubi-validate delta
+    - musubi-validate delta
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
@@ -173,8 +174,8 @@ mr:review:
   stage: validate
   script:
     - echo "👀 Running code review checks..."
-    - npx musubi-validate all
-    - npx musubi-gaps
+    - musubi-validate all
+    - musubi-gaps
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   allow_failure: true
@@ -188,9 +189,9 @@ scheduled:full-validation:
   stage: validate
   script:
     - echo "📋 Full validation suite..."
-    - npx musubi-validate all
-    - npx musubi-trace --output reports/full-traceability.md
-    - npx musubi-gaps --output reports/gaps.md
+    - musubi-validate all
+    - musubi-trace --output reports/full-traceability.md
+    - musubi-gaps --output reports/gaps.md
   artifacts:
     paths:
       - reports/

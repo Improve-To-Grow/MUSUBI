@@ -219,7 +219,7 @@ jobs:
           node-version: '18'
       - run: npm ci
       - run: npm test
-      - run: npx musubi-validate all
+      - run: musubi-validate all
 ```
 
 ---

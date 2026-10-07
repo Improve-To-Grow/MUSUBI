@@ -29,7 +29,8 @@ pipeline {
                     // Use NodeJS plugin or nvm
                     sh '''
                         npm ci
-                        npx musubi-sdd --version
+                        npm install -g github:Improve-To-Grow/MUSUBI#ITG-adjustments
+                        musubi-sdd --version
                     '''
                 }
             }
@@ -41,7 +42,7 @@ pipeline {
                     steps {
                         sh '''
                             echo "🔍 Validating EARS requirements..."
-                            npx musubi-validate ears || true
+                            musubi-validate ears || true
                         '''
                     }
                     post {
@@ -56,7 +57,7 @@ pipeline {
                     steps {
                         sh '''
                             echo "📜 Checking constitutional compliance..."
-                            npx musubi-validate constitution
+                            musubi-validate constitution
                         '''
                     }
                 }
@@ -65,7 +66,7 @@ pipeline {
                     steps {
                         sh '''
                             echo "🔗 Generating traceability matrix..."
-                            npx musubi-trace --output reports/traceability.md
+                            musubi-trace --output reports/traceability.md
                         '''
                     }
                     post {

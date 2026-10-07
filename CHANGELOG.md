@@ -5,10 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [6.3.1-itg.1] - 2026-10-07
 
 ### Changed
 
+- **ITG fork distribution**: the package is now `@improve-to-grow/musubi-sdd` (private, never published to npm) and is installed globally from GitHub with `npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'`. The scoped name stops `npm update -g` from replacing the fork with the upstream `musubi-sdd` registry package.
+- **No more `npx`**: every MUSUBI command in the README, docs, agent templates, generated CI configs, GitHub Actions, the VS Code extension and the GUI now calls the globally installed command (`musubi-sdd`, `musubi-validate`, …). Generated CI configs install MUSUBI from the fork before running it.
+- **Versioning**: fork versions follow `<upstream base>-itg.<N>` (see CONTRIBUTING.md).
+- Generated example projects no longer list `musubi-sdd` as a project dependency.
+- The release workflow creates a GitHub release instead of publishing to npm; the npm publish workflow was removed.
 - **Changelog is kept only in `CHANGELOG.md`**: `README.md` replaces its per-release "What's New" sections with links to this file; steering files and the shared steering templates link to it instead of carrying a changelog section; the `/sdd-change-archive` command templates for all platforms direct changelog entries to `CHANGELOG.md`; the documentation site navigation links to this file
 - **Multilingual support is limited to technical-article publication** (CHANGE-001):
   - All SDD artifacts (steering, requirements, design, tasks, change proposals, skill deliverables) and agent chat are English only
@@ -26,6 +31,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `locale`, `agents.default_language` and `agents.bilingual_output` from the project schema, `musubi config`, `musubi onboard` and `steering/project.yml`
 - `TechArticleGenerator` (`src/enterprise/tech-article.js`) and its exports from `require('musubi-sdd').enterprise` (`TechArticleGenerator`, `createTechArticleGenerator`, `PLATFORM`, `ARTICLE_TYPE`, `LANGUAGE`), together with `tests/enterprise/tech-article.test.js` (CHANGE-002)
 - Article sources `docs/Qiita/` (12 files) and `docs/DevTo/` (1 file) and `docs/marketing/article-publication-checklist.md` (CHANGE-002); recoverable from commit `07dd8aa`
+
+### Security
+
+- Upgraded `chokidar` to v4 (drops the vulnerable `braces` dependency) and refreshed the lockfile with `npm audit fix` (ws, qs/express, path-to-regexp, minimatch, picomatch, js-yaml, yaml). `npm audit --omit=dev` reports 0 vulnerabilities.
+- Updated `proxy-addr` from 2.0.7 to 2.0.8 (transitive via `express`) for a critical advisory published after the previous audit fix; `npm audit --omit=dev --audit-level=high` reports 0 vulnerabilities again.
+
+### Fixed
+
+- GUI server: a failed project scan when a WebSocket client connected was an unhandled promise rejection, which crashed the server process. It is now logged, and the initial state is only sent to clients that are still connected.
+- `musubi-upgrade` compared versions with a pre-release suffix (e.g. `6.3.1-itg.1`) as `NaN`, so upgrades and `musubi-upgrade check` gave wrong results.
 
 ## [6.3.0] - 2026-01-02
 
@@ -1915,9 +1930,9 @@ A new intelligent replanning system that enables AI agents to dynamically adjust
 
 ```bash
 # Run browser automation
-npx musubi-browser navigate "https://example.com"
-npx musubi-browser screenshot "/dashboard" --output dashboard.png
-npx musubi-browser test login-flow.spec.js
+musubi-browser navigate "https://example.com"
+musubi-browser screenshot "/dashboard" --output dashboard.png
+musubi-browser test login-flow.spec.js
 ```
 
 #### Web GUI Dashboard (REQ-P1-002)
@@ -1932,10 +1947,10 @@ npx musubi-browser test login-flow.spec.js
 
 ```bash
 # Launch dashboard
-npx musubi-gui start           # Start server at localhost:3000
-npx musubi-gui dev             # Development mode with hot reload
-npx musubi-gui matrix          # Display traceability matrix
-npx musubi-gui start --port 4000  # Custom port
+musubi-gui start           # Start server at localhost:3000
+musubi-gui dev             # Development mode with hot reload
+musubi-gui matrix          # Display traceability matrix
+musubi-gui start --port 4000  # Custom port
 ```
 
 **REST API Endpoints**:
@@ -3027,7 +3042,7 @@ musubi-requirements metrics --json
 ### Migration Notes (v0.1.3)
 
 - Existing Claude Code projects: No changes required, Skills API continues to work
-- New projects: Use `npx musubi-sdd init --[platform]` to initialize with your preferred AI coding agent
+- New projects: Use `musubi-sdd init --[platform]` to initialize with your preferred AI coding agent
 - Multi-platform projects: AGENTS.md files are automatically copied to appropriate locations
 
 ## [0.1.2] - 2025-11-15

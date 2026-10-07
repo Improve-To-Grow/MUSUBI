@@ -167,16 +167,16 @@ src/
 
 ```bash
 # Start the server
-npx musubi gui
+musubi gui
 
 # Specify the port
-npx musubi gui --port 8080
+musubi gui --port 8080
 
 # Specify the project path
-npx musubi gui --project ./my-project
+musubi gui --project ./my-project
 
 # Read-only mode
-npx musubi gui --readonly
+musubi gui --readonly
 ```
 
 ## Implementation Phases

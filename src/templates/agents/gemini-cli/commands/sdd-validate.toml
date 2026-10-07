@@ -270,7 +270,7 @@ find . -name Dockerfile -not -path "./node_modules/*"
 grep -n "Phase -1" storage/design/{{feature-name}}-design.md
 
 # Code-size limits (VII-4 to VII-6): reports source files, functions and import lists over the configured limits
-npx musubi-validate project
+musubi-validate project
 ```
 
 **Pass Criteria**: At most 3 projects (VII-1), or Phase -1 Gate approval and a justification in design.md for each additional project (VII-2, VII-3). Code over the size limits (VII-4 to VII-6) needs no Phase -1 Gate; it is reported at Article VII's level
@@ -392,7 +392,7 @@ grep -r "query.*+.*params" lib/{{feature-name}}/
 **Evidence to Check**:
 ```bash
 # Check function length, file length and imports against the configured limits (VII-4 to VII-6)
-npx musubi-validate project
+musubi-validate project
 
 # Check for duplication
 npx jscpd lib/{{feature-name}}/

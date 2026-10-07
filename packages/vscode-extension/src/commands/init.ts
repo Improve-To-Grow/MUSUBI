@@ -45,7 +45,7 @@ export async function initProject(
     if (install === 'Install') {
       const terminal = vscode.window.createTerminal('MUSUBI Install');
       terminal.show();
-      terminal.sendText('npm install -g musubi-sdd');
+      terminal.sendText("npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'");
       return;
     }
     return;

@@ -17,16 +17,16 @@ MUSUBI Guardrails provide input/output validation, safety checks, and constituti
 
 ```bash
 # Input validation
-npx musubi-validate guardrails "user input here" --type input
+musubi-validate guardrails "user input here" --type input
 
 # Output validation with PII redaction
-npx musubi-validate guardrails "output content" --type output --redact
+musubi-validate guardrails "output content" --type output --redact
 
 # Safety check with constitutional compliance (the content type is required)
-npx musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js
+musubi-validate guardrails --type safety --constitutional --content-type code --file src/feature.js
 
 # Run guardrail chain
-npx musubi-validate guardrails-chain "content" --parallel
+musubi-validate guardrails-chain "content" --parallel
 ```
 
 ### Programmatic Usage
@@ -263,7 +263,7 @@ const rules = RuleRegistry.get('myRules');
 ### guardrails Command
 
 ```bash
-npx musubi-validate guardrails [content] [options]
+musubi-validate guardrails [content] [options]
 
 Options:
   --file <path>          Read content from file (also the content's path for --constitutional)
@@ -280,7 +280,7 @@ Options:
 ### guardrails-chain Command
 
 ```bash
-npx musubi-validate guardrails-chain [content] [options]
+musubi-validate guardrails-chain [content] [options]
 
 Options:
   --parallel           Run guardrails in parallel
@@ -294,23 +294,23 @@ Options:
 
 ```bash
 # Validate user input
-npx musubi-validate guardrails "Hello, my email is test@example.com" --type input
+musubi-validate guardrails "Hello, my email is test@example.com" --type input
 
 # Check a source file against the constitution
-npx musubi-validate guardrails --type safety --level strict --constitutional --content-type code --file src/feature.js
+musubi-validate guardrails --type safety --level strict --constitutional --content-type code --file src/feature.js
 
 # Check a requirements document for EARS
-npx musubi-validate guardrails --type safety --constitutional --content-type requirements --file storage/specs/auth-requirements.md
+musubi-validate guardrails --type safety --constitutional --content-type requirements --file storage/specs/auth-requirements.md
 
 # Redact PII from output
-npx musubi-validate guardrails "Contact: john@example.com, 555-1234" --type output --redact
+musubi-validate guardrails "Contact: john@example.com, 555-1234" --type output --redact
 
 # Run full chain
-npx musubi-validate guardrails-chain "user content here" --parallel
+musubi-validate guardrails-chain "user content here" --parallel
 
 # Batch validation
 for file in src/*.js; do
-  npx musubi-validate guardrails --type safety --constitutional --content-type code --file "$file"
+  musubi-validate guardrails --type safety --constitutional --content-type code --file "$file"
 done
 ```
 

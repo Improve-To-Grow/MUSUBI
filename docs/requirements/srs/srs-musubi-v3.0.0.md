@@ -429,7 +429,7 @@ WHEN a user requests a checkpoint, THEN the system SHALL save a complete snapsho
 ### 8.2 Reference Documents
 
 - MUSUBI GitHub Repository: https://github.com/nahisaho/MUSUBI
-- MUSUBI npm Package: https://www.npmjs.com/package/musubi-sdd
+- MUSUBI (ITG fork): https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments
 - AI Coding Tool Comprehensive Survey Report 2025
 - GitHub Spec Kit: https://github.com/github/spec-kit
 

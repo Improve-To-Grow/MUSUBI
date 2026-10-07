@@ -109,7 +109,7 @@ Quality gates before implementation:
 ## Getting Started
 
 ```bash
-npx musubi-sdd init
+musubi-sdd init
 ```
 
 See [Getting Started](/guide/getting-started) for detailed instructions.

@@ -19,8 +19,8 @@ echo ""
 echo "📦 Initialize MUSUBI in 30 seconds..."
 sleep 1
 
-# Simulate npx command (don't actually run to avoid side effects)
-echo "$ npx musubi-sdd init"
+# Simulate the init command (don't actually run to avoid side effects)
+echo "$ musubi-sdd init"
 sleep 2
 echo ""
 echo "🎋 MUSUBI Initialized!"

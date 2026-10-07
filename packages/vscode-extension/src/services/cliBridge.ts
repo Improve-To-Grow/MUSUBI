@@ -22,7 +22,7 @@ export class CliBridge {
 
   constructor() {
     const config = vscode.workspace.getConfiguration('musubi');
-    this.cliPath = config.get<string>('cliPath', 'npx musubi-sdd');
+    this.cliPath = config.get<string>('cliPath', 'musubi-sdd');
     this.workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   }
 
@@ -86,7 +86,7 @@ export class CliBridge {
    * Execute validate score command
    */
   async validateScore(): Promise<CliResult> {
-    return this.execute('npx musubi-validate score', { json: true });
+    return this.execute('musubi-validate score', { json: true });
   }
 
   /**
@@ -109,8 +109,8 @@ export class CliBridge {
    */
   async requirements(feature?: string): Promise<CliResult> {
     const cmd = feature 
-      ? `npx musubi-requirements "${feature}"`
-      : 'npx musubi-requirements';
+      ? `musubi-requirements "${feature}"`
+      : 'musubi-requirements';
     return this.execute(cmd);
   }
 
@@ -119,8 +119,8 @@ export class CliBridge {
    */
   async design(feature?: string): Promise<CliResult> {
     const cmd = feature 
-      ? `npx musubi-design "${feature}"`
-      : 'npx musubi-design';
+      ? `musubi-design "${feature}"`
+      : 'musubi-design';
     return this.execute(cmd);
   }
 
@@ -129,8 +129,8 @@ export class CliBridge {
    */
   async tasks(feature?: string): Promise<CliResult> {
     const cmd = feature 
-      ? `npx musubi-tasks "${feature}"`
-      : 'npx musubi-tasks';
+      ? `musubi-tasks "${feature}"`
+      : 'musubi-tasks';
     return this.execute(cmd);
   }
 
@@ -138,21 +138,21 @@ export class CliBridge {
    * Execute analyze command
    */
   async analyze(type = 'all'): Promise<CliResult> {
-    return this.execute(`npx musubi-analyze --type ${type}`, { json: true });
+    return this.execute(`musubi-analyze --type ${type}`, { json: true });
   }
 
   /**
    * Execute trace command
    */
   async trace(): Promise<CliResult> {
-    return this.execute('npx musubi-trace', { json: true });
+    return this.execute('musubi-trace', { json: true });
   }
 
   /**
    * Execute gaps command
    */
   async gaps(): Promise<CliResult> {
-    return this.execute('npx musubi-gaps', { json: true });
+    return this.execute('musubi-gaps', { json: true });
   }
 
   /**

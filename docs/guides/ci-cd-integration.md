@@ -18,7 +18,7 @@ MUSUBI provides ready-to-use CI/CD templates for automated validation, testing, 
 
 ```bash
 # Initialize MUSUBI with GitHub Actions
-npx musubi-sdd init --platform github-actions
+musubi-sdd init --platform github-actions
 
 # Or copy existing workflows
 cp -r node_modules/musubi-sdd/.github/workflows .github/
@@ -36,7 +36,7 @@ Generated workflows:
 cp node_modules/musubi-sdd/templates/ci-cd/gitlab-ci.yml .gitlab-ci.yml
 
 # Or initialize
-npx musubi-sdd init --platform gitlab
+musubi-sdd init --platform gitlab
 ```
 
 ### Jenkins
@@ -73,7 +73,7 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
-      - run: npx musubi-validate all
+      - run: musubi-validate all
 ```
 
 ## 📊 Validation Jobs
@@ -82,13 +82,13 @@ jobs:
 
 ```yaml
 # GitHub Actions
-- run: npx musubi-validate ears
+- run: musubi-validate ears
 ```
 
 ```yaml
 # GitLab CI
 validate:ears:
-  script: npx musubi-validate ears
+  script: musubi-validate ears
 ```
 
 Validates all requirements follow EARS format:
@@ -99,7 +99,7 @@ Validates all requirements follow EARS format:
 ### 2. Constitutional Compliance
 
 ```yaml
-- run: npx musubi-validate constitution
+- run: musubi-validate constitution
 ```
 
 Checks all 9 Constitutional Articles:
@@ -110,7 +110,7 @@ Checks all 9 Constitutional Articles:
 ### 3. Traceability Matrix
 
 ```yaml
-- run: npx musubi-trace --output reports/traceability.md
+- run: musubi-trace --output reports/traceability.md
 ```
 
 Generates requirement ↔ code ↔ test mapping.
@@ -118,7 +118,7 @@ Generates requirement ↔ code ↔ test mapping.
 ### 4. Gap Analysis
 
 ```yaml
-- run: npx musubi-gaps --output reports/gaps.md
+- run: musubi-gaps --output reports/gaps.md
 ```
 
 Identifies:
@@ -141,10 +141,10 @@ npm install --save-dev husky lint-staged
   },
   "lint-staged": {
     "storage/specs/**/*.md": [
-      "npx musubi-validate ears"
+      "musubi-validate ears"
     ],
     "storage/changes/**/*.md": [
-      "npx musubi-validate delta"
+      "musubi-validate delta"
     ]
   }
 }
@@ -181,17 +181,17 @@ jobs:
   ears:
     runs-on: ubuntu-latest
     steps:
-      - run: npx musubi-validate ears
+      - run: musubi-validate ears
   
   constitution:
     runs-on: ubuntu-latest
     steps:
-      - run: npx musubi-validate constitution
+      - run: musubi-validate constitution
   
   traceability:
     runs-on: ubuntu-latest
     steps:
-      - run: npx musubi-trace
+      - run: musubi-trace
 ```
 
 ### 4. Artifact Storage

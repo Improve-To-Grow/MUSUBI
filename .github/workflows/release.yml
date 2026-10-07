@@ -33,34 +33,11 @@ jobs:
       - name: Security audit
         run: npm audit --audit-level=high
 
-  publish-npm:
-    name: Publish to npm
-    runs-on: ubuntu-latest
-    needs: verify
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-      
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Publish to npm
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
+  # MUSUBI is distributed from this GitHub fork, never published to the npm registry
   create-github-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: publish-npm
+    needs: verify
     steps:
       - uses: actions/checkout@v4
         with:
@@ -93,7 +70,7 @@ jobs:
             
             ## Installation
             ```bash
-            npm install musubi-sdd@${{ github.ref_name }}
+            npm install -g 'github:Improve-To-Grow/MUSUBI#${{ github.ref_name }}'
             ```
           draft: false
           prerelease: false

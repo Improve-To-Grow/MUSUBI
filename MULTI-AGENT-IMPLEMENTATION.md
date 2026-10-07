@@ -226,7 +226,7 @@ All agents share:
 
 ### Claude Code
 ```bash
-npx musubi-sdd init --claude
+musubi-sdd init --claude
 
 # Results in:
 # .claude/skills/     (25 skills)
@@ -239,7 +239,7 @@ npx musubi-sdd init --claude
 
 ### GitHub Copilot
 ```bash
-npx musubi-sdd init --copilot
+musubi-sdd init --copilot
 
 # Results in:
 # .github/prompts/    (6 prompts)
@@ -251,7 +251,7 @@ npx musubi-sdd init --copilot
 
 ### Cursor IDE
 ```bash
-npx musubi-sdd init --cursor
+musubi-sdd init --cursor
 
 # Results in:
 # .cursor/commands/   (6 commands)
@@ -263,7 +263,7 @@ npx musubi-sdd init --cursor
 
 ### Gemini CLI
 ```bash
-npx musubi-sdd init --gemini
+musubi-sdd init --gemini
 
 # Results in:
 # .gemini/commands/   (6 TOML commands - unique format!)
@@ -283,7 +283,7 @@ npx musubi-sdd init --gemini
 
 ### Codex CLI
 ```bash
-npx musubi-sdd init --codex
+musubi-sdd init --codex
 
 # Results in:
 # .codex/prompts/     (6 prompts)
@@ -295,7 +295,7 @@ npx musubi-sdd init --codex
 
 ### Qwen Code
 ```bash
-npx musubi-sdd init --qwen
+musubi-sdd init --qwen
 
 # Results in:
 # .qwen/commands/     (6 commands)
@@ -307,7 +307,7 @@ npx musubi-sdd init --qwen
 
 ### Windsurf IDE
 ```bash
-npx musubi-sdd init --windsurf
+musubi-sdd init --windsurf
 
 # Results in:
 # .windsurf/workflows/ (6 workflows)

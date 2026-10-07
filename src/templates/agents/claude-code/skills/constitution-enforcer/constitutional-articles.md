@@ -558,7 +558,7 @@ def simplicity_check(design):
 
 def code_size_check(project):
     # VII-4 to VII-6: reported at Article VII's level (CONST-007), not a Phase -1 Gate item.
-    # Implemented by `npx musubi-validate project` (project-wide) and the CI
+    # Implemented by `musubi-validate project` (project-wide) and the CI
     # constitutional check (changed files).
     limits = load_code_limits()  # constitution-levels.yml, then constitution.overrides.code_limits
     for file in source_files(project.core_paths + project.delivery_paths):

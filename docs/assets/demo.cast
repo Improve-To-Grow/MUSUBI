@@ -1,6 +1,6 @@
 {"version": 2, "width": 257, "height": 7, "timestamp": 1765104834, "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"}}
 [0.004881, "o", "=== MUSUBI Demo ===\r\n\r\n📦 Initialize MUSUBI in 30 seconds...\r\n"]
-[1.013937, "o", "$ npx musubi-sdd init\r\n"]
+[1.013937, "o", "$ musubi-sdd init\r\n"]
 [3.023627, "o", "\r\n🎋 MUSUBI Initialized!\r\n   ✅ Created steering/structure.md\r\n   ✅ Created steering/tech.md\r\n   ✅ Created steering/product.md\r\n   ✅ Created 25 Claude Code skills\r\n   ✅ Created constitutional governance\r\n\r\n"]
 [5.035453, "o", "📋 Available SDD Commands:\r\n\r\n  /sdd-requirements  - Generate EARS requirements\r\n  /sdd-design        - Create C4 + ADR designs\r\n  /sdd-tasks         - Break down into tasks\r\n  /sdd-implement     - Execute implementation\r\n  /sdd-validate      - Validate constitution\r\n\r\n"]
 [7.038794, "o", "🔄 Workflow Engine (v2.1.0):\r\n\r\n$ musubi-workflow status\r\n"]

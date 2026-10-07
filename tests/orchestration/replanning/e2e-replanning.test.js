@@ -431,7 +431,7 @@ describe('E2E Replanning Engine Tests', () => {
       await guiService.updateState({ status: 'evaluating' });
       await guiService.recordReplan({
         trigger: 'cli_manual',
-        command: 'npx musubi-orchestrate replan context-123',
+        command: 'musubi-orchestrate replan context-123',
         success: true,
       });
       await guiService.updateState({ status: 'idle' });

@@ -91,7 +91,7 @@ describe('Example Projects & Launch', () => {
       const pkg = template.generatePackageJson();
 
       expect(pkg.name).toBe('test-project');
-      expect(pkg.dependencies['musubi-sdd']).toBeDefined();
+      expect(pkg.dependencies['musubi-sdd']).toBeUndefined();
       expect(pkg.dependencies.express).toBe('^4.18.0');
     });
 

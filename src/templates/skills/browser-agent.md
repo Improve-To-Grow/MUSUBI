@@ -23,7 +23,7 @@ An agent that operates the browser with natural language commands, captures and 
 ### Interactive Mode
 
 ```bash
-npx musubi browser
+musubi browser
 ```
 
 Launches the browser and accepts natural language commands.
@@ -31,25 +31,25 @@ Launches the browser and accepts natural language commands.
 ### Single Command Execution
 
 ```bash
-npx musubi browser run "Open https://example.com and click the login button"
+musubi browser run "Open https://example.com and click the login button"
 ```
 
 ### Script Execution
 
 ```bash
-npx musubi browser script ./test-script.txt
+musubi browser script ./test-script.txt
 ```
 
 ### Screenshot Comparison
 
 ```bash
-npx musubi browser compare expected.png actual.png --threshold 0.95
+musubi browser compare expected.png actual.png --threshold 0.95
 ```
 
 ### Test Generation
 
 ```bash
-npx musubi browser generate-test --history actions.json --output tests/e2e/login.spec.ts
+musubi browser generate-test --history actions.json --output tests/e2e/login.spec.ts
 ```
 
 ## Supported Commands

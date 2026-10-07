@@ -69,13 +69,13 @@ Initialize with your preferred AI coding platform:
 | `musubi.autoValidate` | `true` | Auto-validate on save |
 | `musubi.showStatusBar` | `true` | Show status bar item |
 | `musubi.defaultPlatform` | `claude-code` | Default platform |
-| `musubi.cliPath` | `npx musubi-sdd` | CLI executable path |
+| `musubi.cliPath` | `musubi-sdd` | CLI executable path |
 
 ## Requirements
 
 - **VS Code** 1.85.0+
 - **Node.js** 18.0.0+
-- **MUSUBI CLI** (`npm install -g musubi-sdd`)
+- **MUSUBI CLI** (`npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'`)
 
 ## Installation
 
@@ -101,7 +101,7 @@ code --install-extension musubi-sdd-0.1.0.vsix
 ## Links
 
 - [MUSUBI Documentation](https://github.com/nahisaho/MUSUBI)
-- [npm Package](https://www.npmjs.com/package/musubi-sdd)
+- [ITG fork](https://github.com/Improve-To-Grow/MUSUBI/tree/ITG-adjustments)
 - [Report Issues](https://github.com/nahisaho/MUSUBI/issues)
 
 ## License

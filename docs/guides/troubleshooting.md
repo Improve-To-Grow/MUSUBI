@@ -24,7 +24,7 @@
 
 **Symptoms:**
 ```bash
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 npm ERR! code EACCES
 npm ERR! permission denied
 ```
@@ -33,17 +33,14 @@ npm ERR! permission denied
 
 ```bash
 # Option 1: Use sudo (not recommended)
-sudo npm install -g musubi-sdd
+sudo npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 # Option 2: Fix npm permissions (recommended)
 mkdir ~/.npm-global
 npm config set prefix '~/.npm-global'
 echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
-npm install -g musubi-sdd
-
-# Option 3: Use npx (no installation required)
-npx musubi-sdd init
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ---
@@ -67,7 +64,7 @@ nvm use 18
 node --version  # v18.x.x or later
 
 # Reinstall
-npm install -g musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ---
@@ -83,13 +80,10 @@ Error: Cannot find module 'musubi-sdd'
 
 ```bash
 # Verify global installation
-npm list -g musubi-sdd
+npm ls -g @improve-to-grow/musubi-sdd
 
 # If not found, reinstall
-npm install -g musubi-sdd
-
-# Or use npx
-npx musubi-sdd --version
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
 
 ---
@@ -254,16 +248,13 @@ bash: musubi: command not found
 
 ```bash
 # 1. Verify installation
-npm list -g musubi-sdd
+npm ls -g @improve-to-grow/musubi-sdd
 
 # 2. Check the global bin
 npm bin -g
 
 # 3. Add to PATH
 export PATH="$(npm bin -g):$PATH"
-
-# 4. Or use npx
-npx musubi-sdd --version
 ```
 
 ---
@@ -494,8 +485,8 @@ gh auth login
 npm cache clean --force
 
 # 2. Reinstall
-npm uninstall -g musubi-sdd
-npm install -g musubi-sdd
+npm uninstall -g @improve-to-grow/musubi-sdd
+npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 # 3. Sync the project
 musubi sync --force
