@@ -1,9 +1,5 @@
 # Implementation Guide: Gradual Output Pattern for All Agents
 
-> Bilingual output (an additional translated copy of each deliverable) is optional. For the
-> template that adds translation steps, see
-> [BILINGUAL-IMPLEMENTATION.md](../BILINGUAL-IMPLEMENTATION.md) (Step 4.3).
-
 ## Status
 
 **Date**: 2025-11-22  

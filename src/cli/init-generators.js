@@ -315,7 +315,7 @@ const LANG_INFO = {
 /**
  * Generate language-specific tech.md content
  */
-function generateTechMd(languages, answers, _locale) {
+function generateTechMd(languages, answers) {
   const isUndecided = languages[0] === 'undecided';
   const date = new Date().toISOString().split('T')[0];
 

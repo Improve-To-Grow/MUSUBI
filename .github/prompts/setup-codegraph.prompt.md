@@ -101,4 +101,3 @@ After setup is complete, report the following:
 ## Related Links
 
 - [CodeGraph MCP Server GitHub](https://github.com/nahisaho/CodeGraphMCPServer)
-- [MUSUBI × CodeGraph Integration Guide](../docs/Qiita/MUSUBI-CodeGraph-MCP-Integration.md)

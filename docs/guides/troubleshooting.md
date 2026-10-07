@@ -476,27 +476,6 @@ gh auth login
 
 ---
 
-### ❌ Problem: Non-English text (e.g. translated documents) is garbled
-
-This applies when bilingual output is enabled (see [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md)).
-
-**Solution:**
-
-```bash
-# 1. Set a UTF-8 locale
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-
-# 2. Editor settings
-# VS Code: settings.json
-# "files.encoding": "utf8"
-
-# 3. Terminal settings
-# Use a UTF-8-capable terminal
-```
-
----
-
 ### ❌ Problem: Things stop working after an upgrade
 
 **Solution:**

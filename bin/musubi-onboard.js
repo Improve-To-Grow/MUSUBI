@@ -435,10 +435,6 @@ steering:
 
 # Agent configuration
 agents:
-  default_language: "en"
-  bilingual_output:
-    enabled: false
-    languages: ["en"]
   
   output:
     gradual_generation: true

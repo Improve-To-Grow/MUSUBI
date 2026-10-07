@@ -22,7 +22,7 @@
 
 ### What is MUSUBI?
 
-MUSUBI self-maintanance project
+MUSUBI self-maintenance project
 
 > [2-3 paragraphs explaining the product, its purpose, and core value proposition]
 
@@ -506,17 +506,10 @@ Key concepts and terminology used in this domain:
 
 ## Localization & Internationalization
 
-### Supported Languages
-
-- **Primary**: English (en-US)
-- **Secondary**: [Languages, e.g., Japanese (ja-JP), Spanish (es-ES)]
-
-### Localization Strategy
-
-- **UI Strings**: i18n framework (next-intl, react-i18next)
-- **Date/Time**: Locale-aware formatting
-- **Currency**: Multi-currency support
-- **Right-to-Left (RTL)**: Support for Arabic, Hebrew (if needed)
+MUSUBI is English only (CHANGE-002). All documents, agent chat, reports and CLI output are
+written in English; there is no secondary language, no localization setting and no i18n
+framework. The former technical-article publication pipeline (Qiita, Zenn, Medium and Dev.to
+templates with Japanese boilerplate) was removed.
 
 ---
 
@@ -560,11 +553,9 @@ Key concepts and terminology used in this domain:
 
 ---
 
-## Changelog
+## Release Notes
 
-### Version 1.1 (Planned)
-
-- [Future product updates]
+Release history is kept in [CHANGELOG.md](../CHANGELOG.md) and is not repeated here.
 
 ---
 

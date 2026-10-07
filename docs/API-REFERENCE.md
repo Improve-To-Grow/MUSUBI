@@ -94,8 +94,7 @@ Generates requirements in EARS format.
 const { RequirementsGenerator } = require('musubi-sdd');
 
 const generator = new RequirementsGenerator({
-  format: 'EARS',
-  language: 'ja'
+  format: 'EARS'
 });
 
 const requirements = await generator.generate({

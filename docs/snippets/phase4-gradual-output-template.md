@@ -1,9 +1,5 @@
 # Phase 4: Gradual Output Template
 
-> Bilingual output (an additional translated copy of each deliverable) is optional. For the
-> template that adds translation steps, see
-> [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md) (Step 4.3).
-
 ## Copy this template to Phase 4 section of each agent
 
 ```markdown

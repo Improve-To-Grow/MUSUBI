@@ -23,8 +23,8 @@ Description:
 A comprehensive SDD (Specification-Driven Development) framework for Claude Code 
 that provides constitutional governance, multi-agent orchestration, and 
 structured project memory. Features 25+ skills, EARS requirements format, 
-C4+ADR design generation, and full traceability matrix support. Includes 
-bilingual (English/Japanese) documentation and VS Code/GitHub Copilot integration.
+C4+ADR design generation, and full traceability matrix support. Includes
+VS Code/GitHub Copilot integration.
 
 License: MIT
 
@@ -81,8 +81,8 @@ Author: nahisaho
 ```markdown
 - [MUSUBI](https://github.com/nahisaho/MUSUBI) - Specification-Driven Development 
   framework for GitHub Copilot that provides constitutional governance, 
-  multi-agent orchestration, and 25+ reusable skills. Includes bilingual 
-  documentation and VS Code integration.
+  multi-agent orchestration, and 25+ reusable skills. Includes VS Code
+  integration.
 ```
 
 ---
@@ -125,7 +125,6 @@ Before submitting:
 - [x] Demo GIF/SVG available
 - [x] MIT License
 - [x] npm package published (musubi-sdd)
-- [x] Bilingual documentation
 - [ ] GitHub Stars > 50 (recommended for some lists)
 - [ ] Active maintenance visible (recent commits)
 

@@ -474,7 +474,7 @@ environments/
 ### Language Policy
 
 - **Primary Language**: English
-- **Documentation**: English (`.md`); optional translations (`<name>.<lang>.md`) when bilingual output is enabled
+- **Documentation**: English (`.md`) only
 - **Code Comments**: English
 - **UI Strings**: i18n framework
 
@@ -539,11 +539,9 @@ This structure enforces:
 
 ---
 
-## Changelog
+## Release Notes
 
-### Version 1.1 (Planned)
-
-- [Future changes]
+Release history is kept in [CHANGELOG.md](../CHANGELOG.md) and is not repeated here.
 
 ---
 

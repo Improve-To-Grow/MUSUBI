@@ -469,26 +469,15 @@ environments/
 
 ---
 
-## Multi-Language Support
+## Language Policy
 
-### Language Policy
+MUSUBI is English only (CHANGE-001, CHANGE-002).
 
-- **Primary Language**: English
-- **Documentation**: English (`.md`); optional translations (`<name>.<lang>.md`) when bilingual output is enabled
-- **Code Comments**: English
-- **UI Strings**: i18n framework
-
-### i18n Organization
-
-```
-locales/
-├── en/
-│   ├── common.json
-│   └── auth.json
-└── ja/
-    ├── common.json
-    └── auth.json
-```
+- **Documentation**: English (`.md`) only; no translated copies
+- **Generated output**: all SDD artifacts, reports and CLI output in English; no language option, string table or locale code in `src/` or `bin/`
+- **Agent chat**: English
+- **Code comments**: English
+- **Enforcement**: `tests/language-policy.test.js` fails the suite on CJK text under `src/`, `bin/`, `tests/`, `steering/` or `docs/` (REQ-LANG-008)
 
 ---
 
@@ -539,11 +528,9 @@ This structure enforces:
 
 ---
 
-## Changelog
+## Release Notes
 
-### Version 1.1 (Planned)
-
-- [Future changes]
+Release history is kept in [CHANGELOG.md](../CHANGELOG.md) and is not repeated here.
 
 ---
 

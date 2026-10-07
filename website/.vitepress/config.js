@@ -29,7 +29,7 @@ export default defineConfig({
       {
         text: 'v3.0.0',
         items: [
-          { text: 'Changelog', link: '/changelog' },
+          { text: 'Changelog', link: 'https://github.com/nahisaho/MUSUBI/blob/main/CHANGELOG.md' },
           { text: 'Contributing', link: '/contributing' }
         ]
       }

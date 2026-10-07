@@ -127,23 +127,6 @@
       "type": "object",
       "description": "AI agent configuration",
       "properties": {
-        "default_language": {
-          "type": "string",
-          "enum": ["en", "ja", "zh", "ko", "es", "fr", "de"],
-          "default": "en"
-        },
-        "bilingual_output": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean" },
-            "languages": {
-              "type": "array",
-              "items": { "type": "string" },
-              "minItems": 1,
-              "maxItems": 2
-            }
-          }
-        },
         "output": {
           "type": "object",
           "properties": {

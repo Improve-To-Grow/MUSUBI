@@ -560,11 +560,9 @@ Key concepts and terminology used in this domain:
 
 ---
 
-## Changelog
+## Release Notes
 
-### Version 1.1 (Planned)
-
-- [Future product updates]
+Release history is kept in [CHANGELOG.md](../CHANGELOG.md) and is not repeated here.
 
 ---
 

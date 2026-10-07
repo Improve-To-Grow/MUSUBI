@@ -50,10 +50,6 @@ If the files do not exist, skip this step and proceed as usual.
 - Communicate with the user in English.
 ```
 
-Bilingual output (an additional translation such as `filename.ja.md`) is optional. When it is enabled,
-this section is replaced by the bilingual policy template in
-[BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md).
-
 ---
 
 ### 3. Document Reference Policy
@@ -62,8 +58,7 @@ this section is replaced by the bilingual policy template in
 
 **Check**:
 - [ ] References other agents' deliverables by their `.md` file paths
-- [ ] If bilingual output is enabled: references the English `.md` files, never translations
-  (see [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md))
+- [ ] Never references translated copies (`filename.<lang>.md`); MUSUBI does not create or maintain them
 
 ---
 

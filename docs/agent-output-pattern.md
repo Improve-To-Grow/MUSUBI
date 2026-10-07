@@ -1,9 +1,5 @@
 # Agent Output Pattern - Gradual File Generation
 
-> Bilingual output (an additional translated copy of each deliverable) is optional. For the
-> template that adds translation steps, see
-> [BILINGUAL-IMPLEMENTATION.md](../BILINGUAL-IMPLEMENTATION.md) (Step 4.3).
-
 ## Purpose
 
 Prevent context length overflow errors by breaking agent output into small chunks with file saves.
@@ -107,10 +103,8 @@ After user approval, **generate each file in order**:
 - User can resume from file 6
 - No need to regenerate completed files
 
-### 4. Optional Bilingual Output
-- English only by default
-- When bilingual output is enabled, generate each translation right after its English file
-  (see [BILINGUAL-IMPLEMENTATION.md](../BILINGUAL-IMPLEMENTATION.md))
+### 4. English Only
+- All deliverables are written in English; no translated copies are generated
 
 ## Agent-Specific Adaptations
 
@@ -177,17 +171,14 @@ For each agent's SKILL.md:
 ### System Architect Agent
 
 **Phase 4 Output:**
-1. Architecture Design Doc (EN) → Save → ✅
-2. C4 Context Diagram (EN) → Save → ✅
-3. C4 Container Diagram (EN) → Save → ✅
-4. C4 Component Diagram (EN) → Save → ✅
-5. Tech Stack Analysis (EN) → Save → ✅
-6. ADR Document (EN) → Save → ✅
-7. Architecture Design Doc (JA) → Save → ✅
-8. C4 Context Diagram (JA) → Save → ✅
-... (continues for all files)
+1. Architecture Design Doc → Save → ✅
+2. C4 Context Diagram → Save → ✅
+3. C4 Container Diagram → Save → ✅
+4. C4 Component Diagram → Save → ✅
+5. Tech Stack Analysis → Save → ✅
+6. ADR Document → Save → ✅
 
-**Total**: 12 files, each saved separately
+**Total**: 6 files, each saved separately
 
 ### Software Developer Agent
 

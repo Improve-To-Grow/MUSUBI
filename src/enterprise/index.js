@@ -2,7 +2,7 @@
  * Enterprise Module - MUSUBI SDD
  *
  * Phase 6: Enterprise-grade features for multi-tenant deployments
- * Phase 4 (v6.2): Document generation, error handling, rollback
+ * Phase 4 (v6.2): Experiment reports, error handling, rollback
  *
  * @module enterprise
  */
@@ -28,13 +28,6 @@ const {
   REPORT_FORMAT,
   TEST_STATUS,
 } = require('./experiment-report');
-
-const {
-  TechArticleGenerator,
-  createTechArticleGenerator,
-  PLATFORM,
-  ARTICLE_TYPE,
-} = require('./tech-article');
 
 const {
   ErrorRecoveryHandler,
@@ -71,12 +64,6 @@ module.exports = {
   createExperimentReportGenerator,
   REPORT_FORMAT,
   TEST_STATUS,
-
-  // Tech Article (IMP-6.2-006-02)
-  TechArticleGenerator,
-  createTechArticleGenerator,
-  PLATFORM,
-  ARTICLE_TYPE,
 
   // Error Recovery (IMP-6.2-008-01)
   ErrorRecoveryHandler,

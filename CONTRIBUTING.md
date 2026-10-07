@@ -518,7 +518,7 @@ When you change functionality:
 (For maintainers)
 
 1. **Version Bump**: Update `package.json` version
-2. **Changelog**: Update CHANGELOG.md with changes
+2. **Changelog**: Update [CHANGELOG.md](CHANGELOG.md) with changes (the changelog lives only there; README and other docs link to it)
 3. **Git Tag**: Create git tag (`v0.1.0`)
 4. **Publish**: `npm publish`
 5. **GitHub Release**: Create GitHub release with notes

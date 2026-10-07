@@ -534,11 +534,9 @@ When evaluating new technologies:
 
 ---
 
-## Changelog
+## Release Notes
 
-### Version 1.1 (Planned)
-
-- [Planned technology updates]
+Release history is kept in [CHANGELOG.md](../CHANGELOG.md) and is not repeated here.
 
 ---
 

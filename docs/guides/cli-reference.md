@@ -94,8 +94,7 @@ musubi requirements --feature login --format markdown
 musubi requirements --interactive              # Interactive mode
 ```
 
-> Documents are generated in English. To also produce a translated copy of each document, see
-> [BILINGUAL-IMPLEMENTATION.md](../../BILINGUAL-IMPLEMENTATION.md).
+> Documents are generated in English only.
 
 **5 EARS Patterns:**
 | Pattern | Syntax |

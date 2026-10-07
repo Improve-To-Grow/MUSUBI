@@ -92,10 +92,7 @@ The project profile (`library | cli | application`) in `steering/project.yml` de
 
 ## Documentation Language
 
-All agent-generated documents are written in English, and agents communicate with the user in English.
-
-Bilingual output (an additional translation such as `.ja.md`, and chatting in that language) is optional
-and disabled by default. See `BILINGUAL-IMPLEMENTATION.md` in the MUSUBI repository for how to enable it.
+All agent-generated documents are written in English, and agents communicate with the user in English. There is no documentation-language setting.
 
 ## OpenHands-Inspired Modules (v3.0.0)
 
