@@ -2,9 +2,10 @@
 
 **Change ID**: CHANGE-002  
 **Date**: 2026-10-07  
-**Status**: ~~Proposed~~ → ~~Approved~~ → **Implemented**  
+**Status**: ~~Proposed~~ → ~~Approved~~ → ~~Implemented~~ → **Archived**  
 **Approved**: 2026-10-07 (maintainer, in chat)  
-**Implemented**: 2026-10-07 on `ITG-adjustments` (commit hash recorded at archive; see [CHANGE-002-implementation.md](CHANGE-002-implementation.md))  
+**Implemented**: 2026-10-07 (commit `deb1238` on `ITG-adjustments`; see [CHANGE-002-implementation.md](CHANGE-002-implementation.md))  
+**Archived**: 2026-10-07 (`storage/archive/2026/CHANGE-002/`)  
 **Type**: Refactor / Scope reduction  
 **Priority**: P2  
 **Supersedes**: CHANGE-001 (`storage/archive/2026/CHANGE-001/`), which kept one multilingual
@@ -387,3 +388,7 @@ Findings on the clean graph:
 - [ ] Product review complete
 - [ ] Security review complete (not needed: no security surface)
 - [ ] Ready to apply
+
+Approval was recorded through the Status field (Approved, 2026-10-07, maintainer in chat); the
+checklist above is left as submitted. Implementation and archive records:
+`CHANGE-002-implementation.md`, `CHANGE-002-archive.md` in the same directory.

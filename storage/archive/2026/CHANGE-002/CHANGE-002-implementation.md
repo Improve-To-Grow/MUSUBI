@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Change ID**: CHANGE-002
-- **Proposal**: [CHANGE-002.md](CHANGE-002.md)
+- **Proposal**: [CHANGE-002.md](CHANGE-002.md) (archived together with this report; see [CHANGE-002-archive.md](CHANGE-002-archive.md))
 - **Status**: Implemented
 - **Implemented**: 2026-10-07
 - **Implemented By**: Yaroslav (with Claude Code)
@@ -169,6 +169,6 @@ you depend on it. Article sources live in git history only; published articles a
 
 ## Next Steps
 
-1. Commit: `refactor(lang): remove publication pipeline and make MUSUBI English only (CHANGE-002)`.
+1. Commit: `refactor(lang): remove publication pipeline and make MUSUBI English only (CHANGE-002)` — done, `deb1238`.
 2. Decide the release version for the `[Unreleased]` CHANGELOG entry.
 3. Archive the change: `/sdd-change-archive CHANGE-002`.
