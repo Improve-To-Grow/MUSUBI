@@ -2,7 +2,8 @@
  * Reviewer Corrections Tests (CHANGE-001)
  *
  * SDD documents are English only. applyCorrections() modifies the named document (plus its
- * backup) and leaves any translated sibling such as <doc>.ja.md untouched.
+ * backup) and leaves any translated sibling such as <doc>.ja.md untouched. The sibling fixture is
+ * English too: the repository carries no CJK text (CHANGE-002, REQ-LANG-008).
  */
 
 const fs = require('fs-extra');
@@ -16,7 +17,12 @@ const ORIGINAL = 'The system should respond quickly.';
 const CORRECTED = 'WHEN a request is received, the system SHALL respond within 2 seconds.';
 
 const DOC = `# Requirements\n\n## REQ-001\n\n${ORIGINAL}\n`;
-const JA_DOC = `# 要件定義\n\n## REQ-001\n\n${ORIGINAL}\n`;
+const SIBLING_DOC = `# Requirements (translated sibling)
+
+## REQ-001
+
+${ORIGINAL}
+`;
 
 const CASES = [
   {
@@ -47,7 +53,7 @@ describe.each(CASES)(
       docPath = path.join(tmpDir, 'requirements.md');
       jaPath = path.join(tmpDir, 'requirements.ja.md');
       await fs.writeFile(docPath, DOC, 'utf-8');
-      await fs.writeFile(jaPath, JA_DOC, 'utf-8');
+      await fs.writeFile(jaPath, SIBLING_DOC, 'utf-8');
     });
 
     afterEach(async () => {
@@ -66,14 +72,14 @@ describe.each(CASES)(
       expect(result.success).toBe(true);
       expect(result.changesApplied).toHaveLength(1);
       expect(await fs.readFile(docPath, 'utf-8')).toContain(CORRECTED);
-      expect(await fs.readFile(jaPath, 'utf-8')).toBe(JA_DOC);
+      expect(await fs.readFile(jaPath, 'utf-8')).toBe(SIBLING_DOC);
       expect(result.filesModified).toEqual([docPath, `${docPath}.backup`]);
     });
 
     it('ignores the removed updateJapanese option', async () => {
       const result = await applyAccept({ updateJapanese: true });
 
-      expect(await fs.readFile(jaPath, 'utf-8')).toBe(JA_DOC);
+      expect(await fs.readFile(jaPath, 'utf-8')).toBe(SIBLING_DOC);
       expect(result.filesModified).not.toContain(jaPath);
     });
   }

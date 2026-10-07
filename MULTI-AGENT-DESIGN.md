@@ -247,8 +247,7 @@ npx musubi-sdd init --windsurf     # Windsurf IDE
    - Same Phase -1 Gates
    - Same validation checklist
 
-3. **Documentation Language** - All agents generate English documents; bilingual output
-   (e.g. `requirements.md` + `requirements.ja.md`) is optional — see [BILINGUAL-IMPLEMENTATION.md](BILINGUAL-IMPLEMENTATION.md)
+3. **Documentation Language** - All agents generate English documents and communicate in English; MUSUBI is English only
 
 4. **Library-First Pattern** - All agents enforce Article I
    - Features in `lib/` directory
@@ -346,7 +345,6 @@ All agents share:
 
 ### Phase 1: Foundation (Completed)
 - ✅ Claude Code implementation (25 skills + 6 commands)
-- ✅ Bilingual documentation support
 - ✅ Constitutional governance
 
 ### Phase 2: Multi-Agent Support (Current)
@@ -372,7 +370,6 @@ All agents share:
 | Steering | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Constitution | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | EARS Format | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Bilingual (optional) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Library-First | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Benefits

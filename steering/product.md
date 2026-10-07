@@ -506,17 +506,10 @@ Key concepts and terminology used in this domain:
 
 ## Localization & Internationalization
 
-### Supported Languages
-
-- **Primary**: English (en-US)
-- **Secondary**: [Languages, e.g., Japanese (ja-JP), Spanish (es-ES)]
-
-### Localization Strategy
-
-- **UI Strings**: i18n framework (next-intl, react-i18next)
-- **Date/Time**: Locale-aware formatting
-- **Currency**: Multi-currency support
-- **Right-to-Left (RTL)**: Support for Arabic, Hebrew (if needed)
+MUSUBI is English only (CHANGE-002). All documents, agent chat, reports and CLI output are
+written in English; there is no secondary language, no localization setting and no i18n
+framework. The former technical-article publication pipeline (Qiita, Zenn, Medium and Dev.to
+templates with Japanese boilerplate) was removed.
 
 ---
 

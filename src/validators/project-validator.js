@@ -39,8 +39,8 @@ const DEFAULT_PROJECT_CONFIG = {
 /**
  * Configuration keys removed by CHANGE-001 (REQ-LANG-007).
  *
- * MUSUBI writes all SDD documents and chats in English only; multilingual output exists
- * solely in the technical-article generator. Any of these keys fails validation.
+ * MUSUBI is English only (CHANGE-002): all documents, chat and generated output. Any of these
+ * keys fails validation.
  */
 const REMOVED_PROJECT_KEYS = [
   {

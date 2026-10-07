@@ -32,7 +32,7 @@ MUSUBI (musubi - "binding/connection") is a Specification Driven Development (SD
 - **Delta Specifications** - Brownfield change management
 - **Full Traceability** - Requirement ↔ Code ↔ Test mapping
 - **7 Platform Support** - Claude Code, GitHub Copilot, Cursor, Gemini CLI, Codex CLI, Qwen Code, Windsurf
-- **Documentation Language** - English for all documents and agent chat; Japanese is available only for Qiita/Zenn technical articles
+- **Documentation Language** - English only, for all documents, agent chat and generated output
 
 ### Philosophy
 

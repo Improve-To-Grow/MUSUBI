@@ -515,9 +515,9 @@ Analyzing your project...
 ✅ Technology stack detected
    - Node.js, TypeScript, React, Jest
 ✅ Steering documents generated
-   - steering/structure.md (en + ja)
-   - steering/tech.md (en + ja)
-   - steering/product.md (en + ja)
+   - steering/structure.md
+   - steering/tech.md
+   - steering/product.md
 ✅ Memories initialized (6 files)
 ✅ Project configuration created
    - steering/project.yml
@@ -862,10 +862,9 @@ AND the system SHALL create a session.
 
 ## Documentation Language
 
-All agent-generated documents are written in English, and agents communicate with users in English.
-There is no documentation-language setting. The one multilingual feature is technical-article
-generation: `TechArticleGenerator` (`src/enterprise/tech-article.js`) can emit Japanese articles for
-Qiita and Zenn through its `language` option.
+MUSUBI is English only. All agent-generated documents, reports and CLI output are written in
+English, and agents communicate with users in English. There is no documentation-language
+setting and no other output language (CHANGE-002).
 
 ## Delta Specifications (Brownfield)
 

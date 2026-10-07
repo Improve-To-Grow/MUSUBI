@@ -469,27 +469,15 @@ environments/
 
 ---
 
-## Multi-Language Support
+## Language Policy
 
-### Language Policy
+MUSUBI is English only (CHANGE-001, CHANGE-002).
 
-- **Primary Language**: English
-- **Documentation**: English (`.md`) only; no translated copies (CHANGE-001)
-- **Language boundary**: `src/enterprise/tech-article.js` (`TechArticleGenerator`) is the only multilingual component; it emits Qiita/Zenn articles in Japanese through its `language` option
-- **Code Comments**: English
-- **UI Strings**: i18n framework
-
-### i18n Organization
-
-```
-locales/
-├── en/
-│   ├── common.json
-│   └── auth.json
-└── ja/
-    ├── common.json
-    └── auth.json
-```
+- **Documentation**: English (`.md`) only; no translated copies
+- **Generated output**: all SDD artifacts, reports and CLI output in English; no language option, string table or locale code in `src/` or `bin/`
+- **Agent chat**: English
+- **Code comments**: English
+- **Enforcement**: `tests/language-policy.test.js` fails the suite on CJK text under `src/`, `bin/`, `tests/`, `steering/` or `docs/` (REQ-LANG-008)
 
 ---
 

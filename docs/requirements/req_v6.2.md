@@ -350,6 +350,8 @@ that includes test summary, performance metrics, and experimental observations.
 
 #### IMP-6.2-006-02: Technical Article Template Generation
 
+> **Withdrawn by CHANGE-002 (2026-10-07)**: the technical-article generator and its article sources were removed; MUSUBI is English only. The requirement is kept for the v6.2 record.
+
 **EARS Pattern**: Optional (WHERE) - Triggered by user request
 
 ```

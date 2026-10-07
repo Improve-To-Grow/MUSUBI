@@ -1,6 +1,6 @@
 # CodeGraph MCP Index Report
 
-**Generated**: 2026-10-06T07:41:42.080Z
+**Generated**: 2026-10-07T10:06:13.574Z
 **Version**: MUSUBI v6.3.1
 **Indexed by**: CodeGraph MCP Server
 
@@ -10,20 +10,20 @@
 
 | Metric | Value |
 |--------|-------|
-| Entities | 4.520 |
-| Relations | 17.015 |
-| Communities | 68 |
-| Files Indexed | 417 |
+| Entities | 4.469 |
+| Relations | 16.828 |
+| Communities | 76 |
+| Files Indexed | 415 |
 
 ## Entity Types
 
 | Type | Count |
 |------|-------|
-| class | 342 |
-| function | 506 |
+| class | 339 |
+| function | 507 |
 | interface | 8 |
-| method | 3.247 |
-| module | 417 |
+| method | 3.200 |
+| module | 415 |
 
 ---
 

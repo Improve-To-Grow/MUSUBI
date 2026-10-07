@@ -138,9 +138,11 @@ agents:
 
 **Purpose**: Defines how all agents should behave.
 
-**Language**: all agents write documents in English and chat in English. There is no language
-setting: `locale`, `agents.default_language` and `agents.bilingual_output` were removed in CHANGE-001
-and now fail validation. Multilingual output exists only in the technical-article generator.
+**Language**: MUSUBI is English only. All agents write documents in English and chat in English,
+and every generator emits English. There is no language setting: `locale`,
+`agents.default_language` and `agents.bilingual_output` were removed in CHANGE-001 and fail
+validation; the last multilingual component (the technical-article generator) was removed in
+CHANGE-002.
 
 **When to update**:
 - Adjust output thresholds

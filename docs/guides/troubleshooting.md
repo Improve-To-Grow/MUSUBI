@@ -485,28 +485,6 @@ gh auth login
 
 ---
 
-### ❌ Problem: Non-ASCII text (e.g. Japanese technical-article sources) is garbled
-
-MUSUBI writes SDD documents in English, but article sources under `docs/Qiita/`, generated Qiita/Zenn
-articles, and your own content may contain non-ASCII characters.
-
-**Solution:**
-
-```bash
-# 1. Set a UTF-8 locale
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-
-# 2. Editor settings
-# VS Code: settings.json
-# "files.encoding": "utf8"
-
-# 3. Terminal settings
-# Use a UTF-8-capable terminal
-```
-
----
-
 ### ❌ Problem: Things stop working after an upgrade
 
 **Solution:**

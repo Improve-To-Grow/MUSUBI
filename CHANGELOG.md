@@ -17,12 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `RequirementsReviewer.applyCorrections` / `DesignReviewer.applyCorrections` no longer accept `updateJapanese` and never touch `<doc>.ja.md` siblings; the `updateJapanese` input of the built-in reviewer skills is gone
   - Platform instruction templates (Claude Code, Codex, Cursor, GitHub Copilot, Windsurf, Gemini CLI, Qwen Code): "Documentation Language" is a single English-only statement
   - `ProjectValidator` fails validation with an error naming the key when `steering/project.yml` still contains `locale`, `agents.default_language` or `agents.bilingual_output` (REQ-LANG-007)
+- **MUSUBI is English only** (CHANGE-002): the technical-article publication pipeline is gone, so no language option, string table or locale code remains in `src/` or `bin/`; `tests/language-policy.test.js` fails the suite on CJK text under `src/`, `bin/`, `tests/`, `steering/` or `docs/`; README, user guide, API reference, troubleshooting guide and steering files no longer describe Japanese or bilingual output
 
 ### Removed
 
 - `BILINGUAL-IMPLEMENTATION.md` (opt-in bilingual output guide)
 - `LocaleManager` and the `src/templates` module exports (`LocaleManager`, `SUPPORTED_LOCALES`, `LOCALE_NAMES`, `TEMPLATE_CATEGORIES`)
 - `locale`, `agents.default_language` and `agents.bilingual_output` from the project schema, `musubi config`, `musubi onboard` and `steering/project.yml`
+- `TechArticleGenerator` (`src/enterprise/tech-article.js`) and its exports from `require('musubi-sdd').enterprise` (`TechArticleGenerator`, `createTechArticleGenerator`, `PLATFORM`, `ARTICLE_TYPE`, `LANGUAGE`), together with `tests/enterprise/tech-article.test.js` (CHANGE-002)
+- Article sources `docs/Qiita/` (12 files) and `docs/DevTo/` (1 file) and `docs/marketing/article-publication-checklist.md` (CHANGE-002); recoverable from commit `07dd8aa`
 
 ## [6.3.0] - 2026-01-02
 
