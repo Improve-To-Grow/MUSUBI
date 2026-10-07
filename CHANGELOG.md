@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Upgraded `chokidar` to v4 (drops the vulnerable `braces` dependency) and refreshed the lockfile with `npm audit fix` (ws, qs/express, path-to-regexp, minimatch, picomatch, js-yaml, yaml). `npm audit --omit=dev` reports 0 vulnerabilities.
+- Updated `proxy-addr` from 2.0.7 to 2.0.8 (transitive via `express`) for a critical advisory published after the previous audit fix; `npm audit --omit=dev --audit-level=high` reports 0 vulnerabilities again.
 
 ### Fixed
 
