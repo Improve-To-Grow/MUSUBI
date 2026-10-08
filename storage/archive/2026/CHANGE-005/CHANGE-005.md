@@ -2,11 +2,14 @@
 
 **Change ID**: CHANGE-005  
 **Date**: 2026-10-08  
-**Status**: ~~Proposed~~ → ~~Approved~~ → **Implemented**  
+**Status**: ~~Proposed~~ → ~~Approved~~ → ~~Implemented~~ → **Archived**  
 **Approved**: 2026-10-08 (maintainer, `musubi-change approve Change-005`; the CLI stored the
-delta record as `storage/changes/Change-005/`)  
-**Implemented**: 2026-10-08 (commit `3ac90dc`; commit 2 staged for the maintainer; see
+delta record as `storage/changes/Change-005/`, normalised to `CHANGE-005` at archive)  
+**Implemented**: 2026-10-08 (commits `3ac90dc` and `b4c6797` on
+`chore/scip-typescript-replace-codegraph`; see
 [CHANGE-005-implementation.md](CHANGE-005-implementation.md))  
+**Archived**: 2026-10-08 (`storage/archive/2026/CHANGE-005/`, see
+[CHANGE-005-archive.md](CHANGE-005-archive.md))  
 **Type**: Enhancement (agent instructions, Claude Code templates, code index hook)  
 **Priority**: P2  
 **Baseline**: commit `1610689` on `chore/scip-typescript-replace-codegraph` (not yet merged into
@@ -626,3 +629,8 @@ name `musubi-code`. Nothing here is a candidate for `nahisaho/MUSUBI`.
 - [ ] Security review complete (not needed: the hook reads tool input and a local names list,
       and writes only to stdout)
 - [ ] Ready to apply
+
+Approval was recorded through the Status field (Approved, 2026-10-08, `musubi-change approve`);
+the checklist above is left as submitted. Implementation and archive records:
+`CHANGE-005-implementation.md`, `CHANGE-005-archive.md` and `CHANGE-005-delta.json` (the
+`musubi-change` delta record) in the same directory.

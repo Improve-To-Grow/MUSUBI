@@ -3,7 +3,8 @@
 ## Metadata
 
 - **Change ID**: CHANGE-005
-- **Proposal**: [CHANGE-005.md](CHANGE-005.md)
+- **Proposal**: [CHANGE-005.md](CHANGE-005.md) (archived together with this report; see
+  [CHANGE-005-archive.md](CHANGE-005-archive.md))
 - **Status**: Implemented
 - **Implemented**: 2026-10-08
 - **Implemented By**: Yaroslav (with Claude Code)
@@ -40,7 +41,10 @@ Two commits, as planned:
    the 6 Claude Code templates and their `.claude/` copies, the `musubi-code setup` refresh
    (`CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, `.claude/skills/code-references/SKILL.md`),
    4 steering files, `tests/code-navigation-guidance.test.js`, the third CHANGELOG `### Changed`
-   entry and the change records. Hash recorded at archive time.
+   entry and the change records. Hash recorded at archive time. At archive: the maintainer
+   committed the staged set unchanged as `b4c6797`,
+   `feat(templates): index-first lookups in SDD commands (CHANGE-005)` (27 files, 2026-10-08
+   18:43 +0200), with their own message instead of the suggested one.
 
 Both are fork-only (`musubi-code` does not exist upstream).
 
@@ -225,7 +229,7 @@ The facts used during implementation came from the index first:
 - [x] Documentation updated (`docs/guides/scip-typescript.md`, steering)
 - [x] CHANGELOG entries added (`[Unreleased]`)
 - [x] Live verification in Claude Code
-- [ ] Commit 2: staged, awaiting the maintainer
+- [x] Commit 2: staged, awaiting the maintainer — committed by the maintainer as `b4c6797`
 - [ ] Version bump / release notes: decide at release time
 - [x] Rollback plan: `git revert` of both commits, then remove the PreToolUse `hint --hook`
       entries from `.claude/settings.json` and run `musubi-code setup` (proposal, Rollback Plan)
