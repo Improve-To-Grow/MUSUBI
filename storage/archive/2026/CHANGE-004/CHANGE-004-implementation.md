@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Change ID**: CHANGE-004
-- **Proposal**: [CHANGE-004.md](CHANGE-004.md)
+- **Proposal**: [CHANGE-004.md](CHANGE-004.md) (archived together with this report; see [CHANGE-004-archive.md](CHANGE-004-archive.md))
 - **Status**: Implemented
 - **Implemented**: 2026-10-08
 - **Implemented By**: Yaroslav (with Claude Code)
@@ -35,7 +35,10 @@ Two commits, as the proposal's Risks table plans, so that the first can go upstr
    instructions, the CI/CD guide, `tests/package-name.test.js`, the REQ-PKG-004 scan switched to
    the scoped name, the second CHANGELOG entry and the change records.
 
-Commit hashes: recorded at archive time.
+Commit hashes: recorded at archive time — both sets were committed together as one commit,
+`f70352e` (`fix(docs): correct library imports and the package name (CHANGE-004)`, 40 files
+including the change records). Commit 1 does not exist on its own; see
+[CHANGE-004-archive.md](CHANGE-004-archive.md) for how to cut the upstream pull request.
 
 ## Changes Applied
 
@@ -217,13 +220,16 @@ Coverage: 3 requirements, 3 implemented (100%), 3 with automated tests (100%).
   library class `CICDManager`.
 - **Upstream**: commit 1 can be proposed to `nahisaho/MUSUBI` as its own pull request; its
   CHANGELOG hunk sits under the fork's `[Unreleased]` CHANGE-003 entry and needs rebasing there.
+  (At archive: commit 1 was not kept as a separate commit; the pull request has to be cut from
+  `f70352e`.)
 
 ## Deployment Readiness
 
 - [x] Feature flag — not applicable
 - [x] Documentation updated
 - [x] CHANGELOG entries added (`[Unreleased]`)
-- [ ] Commits — commit 1 is staged in the index, commit 2 is in the working tree; committing
-      awaits the maintainer
+- [x] Commits — commit 1 is staged in the index, commit 2 is in the working tree; committing
+      awaits the maintainer — committed together as one commit, `f70352e`
 - [ ] Version bump / release notes — decide at release time
-- [x] Rollback plan — `git revert` of the two commits; pre-change state is `451914e`
+- [x] Rollback plan — `git revert` of the two commits; pre-change state is `451914e` — with one
+      commit, `git revert f70352e`
