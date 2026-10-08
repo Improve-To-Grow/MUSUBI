@@ -289,10 +289,9 @@ Actual time spent
 - [ ] Documentation is updated
 - [ ] No performance issues
 
-**MCP Tools** (when using CodeGraph):
-- `find_callers` - Check the impact scope of a change
-- `find_dependencies` - Check dependencies
-- `query_codebase` - Search for similar code
+**Code navigation** (`code-references` skill, see `docs/guides/scip-typescript.md`):
+- `node bin/musubi-code.js refs <Name>` - Check the impact scope of a change
+- `node bin/musubi-code.js deps <file>` / `dependents <file>` - Check dependencies
 
 **Review Types**:
 

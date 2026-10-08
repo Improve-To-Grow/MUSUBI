@@ -228,7 +228,6 @@ src/
 │
 ├── analyzers/                  # Analysis engines
 │   ├── ast-extractor.js       # AST extraction
-│   ├── codegraph-auto-update.js # Automatic code graph update
 │   ├── complexity-analyzer.js # Complexity analysis
 │   ├── context-optimizer.js   # Context optimization
 │   ├── gap-detector.js        # Gap detection
@@ -238,6 +237,12 @@ src/
 │   ├── security-analyzer.js   # Security analysis
 │   ├── stuck-detector.js      # Stuck detection
 │   └── traceability.js        # Traceability analysis
+│
+├── code-index/                 # Code navigation (musubi-code)
+│   ├── indexer.js             # scip-typescript index build, staleness, hook mode
+│   ├── query.js               # References, callers, file dependencies
+│   ├── format.js              # CLI text output
+│   └── setup.js               # Project setup: skill, hooks, instructions
 │
 ├── converters/                 # Spec conversion
 │   ├── index.js               # Converter exports
@@ -280,7 +285,6 @@ src/
 ├── integrations/               # External integrations
 │   ├── index.js               # Integration exports
 │   ├── cicd.js                # CI/CD integration
-│   ├── codegraph-mcp.js       # CodeGraph MCP
 │   ├── documentation.js       # Documentation integration
 │   ├── enterprise-integrations.js # Enterprise integrations
 │   │   ├── JiraIntegration    # JIRA

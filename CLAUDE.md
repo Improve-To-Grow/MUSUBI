@@ -38,3 +38,22 @@ Check `.claude/skills/` directory for all installed skills.
 **Agent**: Claude Code
 **Initialized**: 2026-10-02
 **MUSUBI Version**: 0.1.0
+
+<!-- musubi-code:start -->
+## Code Navigation
+
+Use these commands instead of grep for questions such as "who calls, uses, instantiates or
+requires X" and "what depends on this file":
+
+- `node bin/musubi-code.js refs <Name>` - every reference (new, call, require, extends, ...) with the enclosing function
+- `node bin/musubi-code.js callers <Name>` - functions that call or instantiate it
+- `node bin/musubi-code.js deps <file>` and `node bin/musubi-code.js dependents <file>` - file dependencies in both directions
+- `node bin/musubi-code.js symbols <file>` - definitions in a file
+
+They read a compiler-accurate scip-typescript index in `.scip/` and rebuild it first when
+source files changed. Use grep only for names that appear as strings, such as dynamic
+`require()` paths, registries and templates.
+
+The `code-references` skill lists all options; hooks in `.claude/settings.json` keep the
+index fresh in the background.
+<!-- musubi-code:end -->

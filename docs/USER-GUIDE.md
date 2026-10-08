@@ -189,6 +189,18 @@ REQ-AUTH-001 ←→ src/auth/login.js ←→ tests/auth.test.js
 | `musubi change apply`   | Apply delta spec      |
 | `musubi sync`           | Sync specs with code  |
 
+### Code Navigation
+
+For JavaScript/TypeScript projects. `musubi init` and `musubi upgrade` set it up; see the [code navigation guide](./guides/scip-typescript.md).
+
+| Command                         | Description                                        |
+| ------------------------------- | -------------------------------------------------- |
+| `musubi-code refs <Name>`       | Every reference: new, call, require, extends, ...  |
+| `musubi-code callers <Name>`    | Functions that call or instantiate a symbol        |
+| `musubi-code deps <file>`       | Files and packages a file depends on               |
+| `musubi-code dependents <file>` | Files that depend on a file                        |
+| `musubi-code setup`             | Configure a project: skill, hooks, instructions    |
+
 ---
 
 ## Orchestration Patterns
@@ -522,26 +534,6 @@ console.log(analysis.summary);
 // { totalFiles, unsafePatterns, securityComponents, migrationPriorities }
 ```
 
-### CodeGraph MCP Integration
-
-Deep code relationship analysis:
-
-```javascript
-const { CodeGraphMCP } = require('musubi-sdd');
-
-const mcp = new CodeGraphMCP('/path/to/project');
-await mcp.indexRepository();
-
-// Call graph
-const callGraph = await mcp.getCallGraph('main', { depth: 3 });
-
-// Impact analysis
-const affected = await mcp.getImpactAnalysis(['src/parser.c']);
-
-// Circular dependencies
-const cycles = await mcp.detectCircularDependencies();
-```
-
 ### Hierarchical Reporter
 
 Generate drilldown reports for large projects:
@@ -570,6 +562,7 @@ const report = reporter.generateReport(analysis);
 - [CI/CD Integration](./guides/ci-cd-integration.md)
 - [Change Management](./guides/change-management.md)
 - [Traceability Matrix](./guides/traceability-matrix-guide.md)
+- [Code Navigation (musubi-code)](./guides/scip-typescript.md)
 
 ---
 

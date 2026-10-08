@@ -122,6 +122,10 @@ initCommand.option(
 initCommand.option('--workspace', 'Initialize as workspace/monorepo project');
 initCommand.option('--template <name>', 'Use project template (e.g., microservices, clean-arch)');
 
+// Code navigation (musubi-code): asked for JavaScript/TypeScript projects unless set here
+initCommand.option('--code-index', 'Set up compiler-accurate code navigation (musubi-code)');
+initCommand.option('--no-code-index', 'Do not set up code navigation');
+
 initCommand.action(async options => {
   const agentKey = detectAgentFromFlags(options);
   const agent = getAgentDefinition(agentKey);
@@ -138,6 +142,7 @@ initCommand.action(async options => {
     workspace: options.workspace,
     template: options.template,
     references: references.length > 0 ? references : undefined,
+    codeIndex: options.codeIndex,
   };
 
   // Delegate to musubi-init.js with agent info and options
@@ -360,10 +365,27 @@ program
   .option('--to <version>', 'Target version to upgrade to', 'latest')
   .option('--dry-run', 'Preview changes without applying')
   .option('--force', 'Force upgrade even if already at target version')
+  .option('--no-code-index', 'Do not set up code navigation (musubi-code)')
   .action(async _options => {
     // Delegate to musubi-upgrade.js
     process.argv = ['node', 'musubi-upgrade', ...process.argv.slice(3)];
     require('./musubi-upgrade.js');
+  });
+
+// ============================================================================
+// Command: code
+// ============================================================================
+program
+  .command('code')
+  .description('Code navigation: refs, callers, deps, dependents, symbols, setup (musubi-code)')
+  .argument('[args...]', 'musubi-code arguments')
+  .allowUnknownOption()
+  .helpOption(false)
+  .action(async () => {
+    // Delegate to musubi-code.js with everything after "code"
+    const { run } = require('./musubi-code.js');
+    const codeArgs = process.argv.slice(process.argv.indexOf('code') + 1);
+    await run(['node', 'musubi-code', ...codeArgs]);
   });
 
 // ============================================================================

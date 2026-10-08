@@ -61,7 +61,12 @@ console.log(result.stats);
 
 ---
 
-## 2. ✅ High: CodeGraph MCP Integration (Implemented)
+## 2. ✅ High: CodeGraph MCP Integration (Implemented, later removed)
+
+> **Removed** (see `CHANGELOG.md`, Unreleased): the CodeGraph MCP integration, including the
+> `CodeGraphMCP` export shown below, was removed because codegraph-mcp records no `require()`
+> or cross-file `new X()` edges for CommonJS code. Contributors use scip-typescript instead
+> (`docs/guides/scip-typescript.md`).
 
 ### Problem
 
@@ -347,7 +352,6 @@ const {
   LargeProjectAnalyzer,
   ComplexityAnalyzer,
   RustMigrationGenerator,
-  CodeGraphMCP,
   HierarchicalReporter,
 } = require('musubi-sdd');
 ```

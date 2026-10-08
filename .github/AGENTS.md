@@ -8,29 +8,6 @@ This file defines 25 specialized AI agents for Specification Driven Development 
 
 ---
 
-## MCP Server Integration
-
-### CodeGraphMCPServer
-
-When CodeGraphMCPServer is available, agents can leverage these tools for enhanced code understanding:
-
-| MCP Tool                   | Primary Agents                                             | Usage                  |
-| -------------------------- | ---------------------------------------------------------- | ---------------------- |
-| `query_codebase`           | @orchestrator, @steering                                   | Search the entire codebase |
-| `find_dependencies`        | @change-impact-analyzer, @constitution-enforcer            | Dependency analysis and violation detection |
-| `find_callers`             | @change-impact-analyzer, @test-engineer, @security-auditor | Caller tracing         |
-| `find_callees`             | @software-developer                                        | Callee tracing         |
-| `find_implementations`     | @api-designer, @system-architect                           | Implementation class search         |
-| `analyze_module_structure` | @system-architect, @steering                               | Module structure analysis     |
-| `get_code_snippet`         | @software-developer, @code-reviewer                        | Source code retrieval       |
-| `global_search`            | @orchestrator, @technical-writer                           | GraphRAG global search |
-| `local_search`             | @software-developer, @bug-hunter                           | GraphRAG local search   |
-| `suggest_refactoring`      | @code-reviewer, @performance-optimizer                     | Refactoring suggestions   |
-
-**Setup**: See `steering/tech.md` for MCP configuration.
-
----
-
 ## Quick Reference
 
 | Category                            | Agents                                                                                                        |
@@ -96,12 +73,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **Category**: Quality
 
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `find_callers` - Identify the blast radius of a bug
-- `local_search` - Root cause analysis in local context
-- `get_code_snippet` - Retrieve the problematic code
-
 **Example Usage**:
 
 ```text
@@ -122,12 +93,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 **Description**: Analyzes impact of proposed changes on existing systems (brownfield projects) with delta spec validation.
 
 **Category**: Requirements
-
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `find_dependencies` - Analyze dependencies of the change target
-- `find_callers` - Identify the change impact scope (caller tracing)
-- `query_codebase` - Search related code
 
 **Example Usage**:
 
@@ -171,12 +136,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **Category**: Quality
 
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `suggest_refactoring` - Refactoring suggestions
-- `find_dependencies` - Complexity analysis of dependencies
-- `get_code_snippet` - Retrieve source code
-
 **Example Usage**:
 
 ```text
@@ -197,11 +156,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 **Description**: Validates compliance with 9 Constitutional Articles and Phase -1 Gates before implementation.
 
 **Category**: Orchestration
-
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `find_dependencies` - Detect core → delivery import violations (Article I, I-3)
-- `analyze_module_structure` - Verify Constitution compliance of module structure
 
 **Example Usage**:
 
@@ -286,11 +240,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 **Description**: Integrated orchestrator agent that manages and coordinates 18 specialized AI agents for Specification Driven Development
 
 **Category**: Orchestration
-
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `global_search` - Overview of the entire codebase and community detection
-- `query_codebase` - Search code related to the task
 
 **Example Usage**:
 
@@ -418,12 +367,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **Category**: Security
 
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `find_callers` - Trace callers of dangerous functions
-- `query_codebase` - Search for vulnerability patterns
-- `find_dependencies` - Analyze security dependencies
-
 **Example Usage**:
 
 ```text
@@ -466,13 +409,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **Category**: Development
 
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `get_code_snippet` - Reference existing code
-- `find_callees` - Check callees
-- `local_search` - Discover similar implementation patterns
-- `query_codebase` - Search related code
-
 **Example Usage**:
 
 ```text
@@ -494,12 +430,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **Category**: Orchestration
 
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `global_search` - Understand the codebase structure
-- `analyze_module_structure` - Analyze module structure
-- `query_codebase` - Detect the technology stack
-
 **Example Usage**:
 
 ```text
@@ -520,12 +450,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 **Description**: Copilot agent that assists with architecture design, C4 model diagrams, ADR creation, and tradeoff analysis
 
 **Category**: Architecture
-
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `global_search` - Discover module boundaries via community detection
-- `analyze_module_structure` - Module structure analysis
-- `find_dependencies` - Visualize dependencies between components
 
 **Example Usage**:
 
@@ -569,12 +493,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 
 **Category**: Quality
 
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `find_callers` - Automatically determine test coverage
-- `find_dependencies` - Discover untested code paths
-- `query_codebase` - Search for test targets
-
 **Example Usage**:
 
 ```text
@@ -595,12 +513,6 @@ When CodeGraphMCPServer is available, agents can leverage these tools for enhanc
 **Description**: Validates complete requirements traceability across EARS requirements → design → tasks → code → tests.
 
 **Category**: Quality
-
-**MCP Tools** (when CodeGraphMCPServer available):
-
-- `query_codebase` - Search the codebase by requirement ID
-- `find_callers` - Verify requirement → code → test mapping
-- `find_dependencies` - Verify the traceability chain
 
 **Example Usage**:
 

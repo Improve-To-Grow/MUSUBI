@@ -456,7 +456,6 @@ const CacheNamespace = {
   ANALYSIS: 'analysis', // Analysis results
   STEERING: 'steering', // Steering file contents
   LLM: 'llm', // LLM responses
-  CODEGRAPH: 'codegraph', // CodeGraph queries
   TEMPLATES: 'templates', // Template contents
   VALIDATION: 'validation', // Validation results
 };

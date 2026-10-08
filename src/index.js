@@ -4,16 +4,6 @@
  * This file exports all public modules for use as a library.
  */
 
-// Helper for optional requires
-function tryRequire(modulePath) {
-  try {
-    return require(modulePath);
-  } catch (e) {
-    // Return null if module has missing optional dependencies
-    return null;
-  }
-}
-
 // Analyzers
 const {
   LargeProjectAnalyzer,
@@ -43,10 +33,7 @@ const { RequirementsGenerator } = require('./generators/requirements');
 const { TaskGenerator } = require('./generators/tasks');
 const { ChangelogGenerator } = require('./generators/changelog-generator');
 
-// Integrations (some have optional dependencies)
-const codegraphModule = tryRequire('./integrations/codegraph-mcp');
-const CodeGraphMCP = codegraphModule ? codegraphModule.CodeGraphMCP : null;
-
+// Integrations
 const { CICDIntegration } = require('./integrations/cicd');
 const { GitHubClient } = require('./integrations/github-client');
 const { MCPConnector } = require('./integrations/mcp-connector');
@@ -132,7 +119,6 @@ module.exports = {
   ChangelogGenerator,
 
   // Integrations
-  CodeGraphMCP,
   CICDIntegration,
   GitHubClient,
   MCPConnector,

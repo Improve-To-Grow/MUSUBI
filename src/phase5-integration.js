@@ -43,12 +43,6 @@ const {
   ARTIFACT_TYPE,
   GAP_SEVERITY,
 } = require('./validators/advanced-validation');
-const {
-  CodeGraphAutoUpdate,
-  createCodeGraphAutoUpdate,
-  TRIGGER: CODEGRAPH_TRIGGER,
-  TARGET: CODEGRAPH_TARGET,
-} = require('./analyzers/codegraph-auto-update');
 
 /**
  * Phase 5 integration status
@@ -73,7 +67,6 @@ class Phase5Integration extends EventEmitter {
    * @param {Object} options.templates - Template constraints options
    * @param {Object} options.dashboard - Quality dashboard options
    * @param {Object} options.validation - Advanced validation options
-   * @param {Object} options.codegraph - CodeGraph auto-update options
    */
   constructor(options = {}) {
     super();
@@ -87,7 +80,6 @@ class Phase5Integration extends EventEmitter {
     this.templateConstraints = createTemplateConstraints(options.templates || {});
     this.qualityDashboard = createQualityDashboard(options.dashboard || {});
     this.advancedValidation = createAdvancedValidation(options.validation || {});
-    this.codeGraphAutoUpdate = createCodeGraphAutoUpdate(options.codegraph || {});
 
     // Thinking checklist
     this.thinkingChecklist = createThinkingChecklist();
@@ -129,16 +121,6 @@ class Phase5Integration extends EventEmitter {
         this.emit('gap-alert', result);
       }
     });
-
-    // When codegraph is updated, emit events
-    this.codeGraphAutoUpdate.on('update-complete', result => {
-      this.emit('codegraph-updated', result);
-    });
-
-    // When codegraph has errors, emit alerts
-    this.codeGraphAutoUpdate.on('update-error', error => {
-      this.emit('codegraph-error', error);
-    });
   }
 
   /**
@@ -154,7 +136,6 @@ class Phase5Integration extends EventEmitter {
       qualityDashboard: this.qualityDashboard,
       advancedValidation: this.advancedValidation,
       thinkingChecklist: this.thinkingChecklist,
-      codeGraphAutoUpdate: this.codeGraphAutoUpdate,
     };
     return components[name] || null;
   }
@@ -389,7 +370,6 @@ class Phase5Integration extends EventEmitter {
    */
   start() {
     this.qualityDashboard.startAutoCollection();
-    this.codeGraphAutoUpdate.start();
     this.status = INTEGRATION_STATUS.RUNNING;
     this.emit('started');
   }
@@ -399,7 +379,6 @@ class Phase5Integration extends EventEmitter {
    */
   stop() {
     this.qualityDashboard.stopAutoCollection();
-    this.codeGraphAutoUpdate.stop();
     this.status = INTEGRATION_STATUS.STOPPED;
     this.emit('stopped');
   }
@@ -452,10 +431,4 @@ module.exports = {
   VALIDATION_TYPE,
   ARTIFACT_TYPE,
   GAP_SEVERITY,
-
-  // Re-export Sprint 5.5: CodeGraph Auto-Update
-  CodeGraphAutoUpdate,
-  createCodeGraphAutoUpdate,
-  CODEGRAPH_TRIGGER,
-  CODEGRAPH_TARGET,
 };

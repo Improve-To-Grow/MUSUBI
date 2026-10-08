@@ -434,7 +434,6 @@ describe('CacheNamespace', () => {
     expect(CacheNamespace.ANALYSIS).toBe('analysis');
     expect(CacheNamespace.STEERING).toBe('steering');
     expect(CacheNamespace.LLM).toBe('llm');
-    expect(CacheNamespace.CODEGRAPH).toBe('codegraph');
     expect(CacheNamespace.TEMPLATES).toBe('templates');
     expect(CacheNamespace.VALIDATION).toBe('validation');
   });

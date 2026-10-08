@@ -191,7 +191,6 @@ MUSUBI v5.5.0 adds advanced modules for analyzing enterprise-scale projects (10,
 | **LargeProjectAnalyzer**   | Streaming analysis for 100K+ files   | `src/analyzers/large-project-analyzer.js`    |
 | **ComplexityAnalyzer**     | Cyclomatic & cognitive complexity    | `src/analyzers/complexity-analyzer.js`       |
 | **RustMigrationGenerator** | C/C++ to Rust migration analysis     | `src/generators/rust-migration-generator.js` |
-| **CodeGraphMCP**           | MCP-based code intelligence server   | `src/integrations/code-graph-mcp.js`         |
 | **HierarchicalReporter**   | Drilldown reports for large projects | `src/reporters/hierarchical-reporter.js`     |
 
 ### Usage Examples
