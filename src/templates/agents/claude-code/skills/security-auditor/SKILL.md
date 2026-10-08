@@ -168,7 +168,7 @@ The RustMigrationGenerator module assists in migrating C/C++ code to Rust for im
 ### Module Usage
 
 ```javascript
-const { RustMigrationGenerator, UNSAFE_PATTERNS, SECURITY_COMPONENTS } = require('musubi-sdd');
+const { RustMigrationGenerator, UNSAFE_PATTERNS, SECURITY_COMPONENTS } = require('@improve-to-grow/musubi-sdd');
 
 const generator = new RustMigrationGenerator();
 const analysis = await generator.analyzeRustMigration('src/buffer.c');

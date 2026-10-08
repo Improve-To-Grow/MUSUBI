@@ -42,7 +42,7 @@ musubi-orchestrate swarm \
 ### Programmatic Usage
 
 ```javascript
-const { createOrchestrationEngine, PatternType } = require('musubi-sdd/orchestration');
+const { createOrchestrationEngine, PatternType } = require('@improve-to-grow/musubi-sdd/src/orchestration');
 
 const engine = createOrchestrationEngine();
 
@@ -338,7 +338,7 @@ const tasks = {
 Enable automatic replanning for failed tasks:
 
 ```javascript
-const { ReplanningEngine } = require('musubi-sdd/orchestration/replanning');
+const { ReplanningEngine } = require('@improve-to-grow/musubi-sdd/src/orchestration/replanning');
 
 const replanningEngine = new ReplanningEngine();
 

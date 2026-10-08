@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **Plugin development guide** (CHANGE-004): `docs/guides/PLUGIN-DEVELOPMENT.md` documented a plugin system that does not exist (no plugin loader, no `PluginDefinition`, no `musubi-sdd/testing` module); the guide and its two links are removed
+
 ### Fixed
 
 - **Package entry point exports** (CHANGE-003): 11 exports of `require('musubi-sdd')` (`src/index.js`) were `undefined` since v5.5.0; every export is now defined
@@ -17,6 +21,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `docs/API-REFERENCE.md`: the task generator example uses `TasksGenerator`; the "Error Handling" section, which documented `MUSUBIError` and `ValidationError` classes that do not exist, is removed
   - `code-reviewer` skill: imports `COMPLEXITY_THRESHOLDS` instead of the non-existent `THRESHOLDS`
   - `tests/index.test.js` checks every export, the aliases and every name the API reference and agent templates destructure from the package
+- **Documented imports** (CHANGE-004): library examples in the docs and agent templates load modules that exist and names those modules export
+  - Subpaths are file paths from the package root: `musubi-sdd/orchestration`, `…/orchestration/guardrails`, `…/orchestration/replanning` and `…/orchestration/skill-executor` become `musubi-sdd/src/orchestration…` (13 references)
+  - `requirementsReviewerSkill` and `designReviewerSkill` are imported from `src/orchestration/builtin-skills`; `ErrorHandler` and `PatternRegistry` from `src/orchestration`
+  - `docs/USER-GUIDE.md` validation example uses `checkEarsFormat` and `ConstitutionalValidator#validateAll()` instead of the non-existent `EARSValidator` and `check()`
+  - Documentation of APIs that do not exist is removed: "TypeScript Support" in `docs/API-REFERENCE.md` (the package ships no type declarations) and "Validator Extension" (`ValidatorRegistry`) in `docs/guides/ARCHITECTURE-DEEP-DIVE.md`
+  - `tests/index.test.js` checks every module and name the live documentation imports from the package, including subpaths and ESM `import`
+- **Fork package name in library examples** (CHANGE-004): the docs and agent templates loaded `musubi-sdd`, the upstream package, which never resolves for this fork; they now load `@improve-to-grow/musubi-sdd` (80 imports in 27 files)
+  - `docs/API-REFERENCE.md` and the troubleshooting guide document the project-local install that `require()` needs, `npm install --save-dev 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'`; the global install provides the CLI only
+  - The CI/CD guide downloads the GitLab and Jenkins templates from the fork and calls the fork's reusable GitHub Actions workflow, instead of copying from `node_modules/musubi-sdd`, which never contained them
+  - Existing projects keep their copies of the agent templates: replace the package name by hand, or re-run `musubi-sdd init` for the agent and confirm the overwrite prompt (this replaces local changes to the agent files)
+  - `tests/package-name.test.js` guards the package name and the install instructions
 
 ## [6.3.1-itg.2] - 2026-10-08
 

@@ -33,7 +33,7 @@ MUSUBI provides 9 orchestration patterns inspired by [ag2](https://github.com/ag
 ### Usage
 
 ```javascript
-const { createOrchestrationEngine, PatternType } = require('musubi-sdd/orchestration');
+const { createOrchestrationEngine, PatternType } = require('@improve-to-grow/musubi-sdd/src/orchestration');
 
 const engine = createOrchestrationEngine();
 
@@ -272,7 +272,7 @@ musubi-orchestrate human-in-loop --interactive
 ### Usage
 
 ```javascript
-const { HandoffPattern, handoff } = require('musubi-sdd/orchestration');
+const { HandoffPattern, handoff } = require('@improve-to-grow/musubi-sdd/src/orchestration');
 
 // Define handoff
 const result = await engine.execute({
@@ -321,7 +321,7 @@ musubi-orchestrate handoff \
 ### Usage
 
 ```javascript
-const { TriagePattern, TriageCategory } = require('musubi-sdd/orchestration');
+const { TriagePattern, TriageCategory } = require('@improve-to-grow/musubi-sdd/src/orchestration');
 
 const result = await engine.execute({
   pattern: PatternType.TRIAGE,
@@ -442,7 +442,7 @@ musubi-validate guardrails --type safety --constitutional --content-type code --
 Combine orchestration with guardrails for safe execution:
 
 ```javascript
-const { InputGuardrail, OutputGuardrail, GuardrailChain } = require('musubi-sdd/orchestration/guardrails');
+const { InputGuardrail, OutputGuardrail, GuardrailChain } = require('@improve-to-grow/musubi-sdd/src/orchestration/guardrails');
 
 // Create guardrail chain
 const chain = new GuardrailChain([

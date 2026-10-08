@@ -274,7 +274,7 @@ Error: Skill 'my-custom-skill' not found in registry
 
 **Solution:**
 ```javascript
-const { SkillRegistry } = require('musubi-sdd');
+const { SkillRegistry } = require('@improve-to-grow/musubi-sdd');
 
 // Register the skill
 const registry = new SkillRegistry();

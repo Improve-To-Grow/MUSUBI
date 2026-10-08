@@ -654,7 +654,7 @@ musubi-orchestrate run requirements-reviewer --ears-check
 ### 9.2 Programmatic Usage
 
 ```javascript
-const { requirementsReviewerSkill } = require('musubi-sdd/src/orchestration');
+const { requirementsReviewerSkill } = require('@improve-to-grow/musubi-sdd/src/orchestration/builtin-skills');
 
 // Execute full review
 const result = await requirementsReviewerSkill.execute({
@@ -917,7 +917,7 @@ Processing flow when applying fixes:
 
 ```javascript
 // Programmatic correction example
-const { requirementsReviewerSkill } = require('musubi-sdd/src/orchestration');
+const { requirementsReviewerSkill } = require('@improve-to-grow/musubi-sdd/src/orchestration/builtin-skills');
 
 // Step 1: Execute review
 const reviewResult = await requirementsReviewerSkill.execute({

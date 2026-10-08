@@ -3,12 +3,13 @@
  *
  * `src/index.js` is the package `main`. Every export is a defined value (REQ-PKG-001), classes
  * are exported under the names they declare (REQ-PKG-002), the names the entry point advertised
- * before CHANGE-003 stay as deprecated aliases (REQ-PKG-003), and every name the documentation
- * and agent templates destructure from `require('musubi-sdd')` resolves (REQ-PKG-004).
+ * before CHANGE-003 stay as deprecated aliases (REQ-PKG-003), and every module and name the live
+ * documentation imports from the package resolves (REQ-PKG-004, widened by CHANGE-004).
  */
 
 const fs = require('fs');
 const path = require('path');
+const { ROOT, liveDocumentation, relative } = require('./helpers/live-documentation');
 
 // @octokit/rest 22 is ESM only, and Jest cannot require() ESM before Node 24.9. The entry point
 // loads it through src/integrations/github-client.js; no test here calls GitHubClient.
@@ -16,7 +17,6 @@ jest.mock('@octokit/rest', () => ({ Octokit: class Octokit {} }));
 
 const pkg = require('../src');
 
-const ROOT = path.resolve(__dirname, '..');
 const NAMESPACES = ['performance', 'enterprise', 'ai'];
 
 // [export name, source module under src/, name the module exports it under]
@@ -44,44 +44,93 @@ const DEPRECATED_ALIASES = {
   AgentMemory: 'AgentMemoryManager',
 };
 
-// const { A, B } = require('musubi-sdd')  or  require('musubi-sdd').performance
-const DESTRUCTURED_REQUIRE =
-  /const\s*\{([^}]*)\}\s*=\s*require\(\s*['"]musubi-sdd['"]\s*\)(?:\.(\w+))?/g;
+// The name documentation uses to load the package: the ITG fork's name (REQ-DIST-001).
+const PACKAGE = '@improve-to-grow/musubi-sdd';
+const PACKAGE_PATTERN = PACKAGE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-function* markdownFiles(dir) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      yield* markdownFiles(full);
-    } else if (entry.isFile() && entry.name.endsWith('.md')) {
-      yield full;
-    }
-  }
+// const { A, B } = require('<package>[/subpath]')  or  require('<package>').performance
+const DESTRUCTURED_REQUIRE = new RegExp(
+  `const\\s*\\{([^}]*)\\}\\s*=\\s*require\\(\\s*['"]${PACKAGE_PATTERN}(?:/([^'"]+))?['"]\\s*\\)(?:\\.(\\w+))?`,
+  'g'
+);
+// import { A, type B } from '<package>[/subpath]'
+const NAMED_IMPORT = new RegExp(
+  `import\\s*\\{([^}]*)\\}\\s*from\\s*['"]${PACKAGE_PATTERN}(?:/([^'"]+))?['"]()`,
+  'g'
+);
+
+// `A`, `A: alias`, `A as alias`, `type A`; comments inside the braces are ignored.
+function bindingNames(list) {
+  return list
+    .replace(/\/\/.*$/gm, '')
+    .split(',')
+    .map(binding =>
+      binding
+        .trim()
+        .replace(/^type\s+/, '')
+        .split(/\s*:\s*|\s+as\s+/)[0]
+        .trim()
+    )
+    .filter(Boolean);
 }
 
-function documentedNames() {
-  const files = [
-    path.join(ROOT, 'docs', 'API-REFERENCE.md'),
-    ...markdownFiles(path.join(ROOT, 'src', 'templates')),
-  ];
+// Every module and name the live documentation imports from the package. A subpath is a file
+// path from the package root (the package has no `exports` map).
+function documentedImports() {
   const references = [];
 
-  for (const file of files) {
+  for (const file of liveDocumentation()) {
     const content = fs.readFileSync(file, 'utf-8');
-    for (const match of content.matchAll(DESTRUCTURED_REQUIRE)) {
-      const [, list, namespace] = match;
-      const line = content.slice(0, match.index).split('\n').length;
-      const where = `${path.relative(ROOT, file).split(path.sep).join('/')}:${line}`;
-      for (const binding of list.split(',')) {
-        const name = binding.split(':')[0].trim();
-        if (name) {
-          references.push({ where, namespace, name });
+    for (const pattern of [DESTRUCTURED_REQUIRE, NAMED_IMPORT]) {
+      for (const match of content.matchAll(pattern)) {
+        const [, list, subpath = '', namespace] = match;
+        const line = content.slice(0, match.index).split('\n').length;
+        const where = `${relative(file)}:${line}`;
+        for (const name of bindingNames(list)) {
+          references.push({ where, subpath, namespace: namespace || undefined, name });
         }
       }
     }
   }
 
   return references;
+}
+
+// require(…musubi-sdd…) or import(…musubi-sdd…) whose argument the patterns above cannot read,
+// for example a mangled quote. Such a call would otherwise drop out of the scan unnoticed.
+function unreadableCalls() {
+  const call = /\b(?:require|import)\(\s*([^)]*?)musubi-sdd/g;
+  const offenders = [];
+
+  for (const file of liveDocumentation()) {
+    fs.readFileSync(file, 'utf-8')
+      .split(/\r?\n/)
+      .forEach((line, index) => {
+        for (const [, prefix] of line.matchAll(call)) {
+          if (!["'", '"'].some(quote => `${prefix}musubi-sdd` === `${quote}${PACKAGE}`)) {
+            offenders.push(`${relative(file)}:${index + 1}: ${line.trim()}`);
+          }
+        }
+      });
+  }
+
+  return offenders;
+}
+
+function resolvesModule(subpath) {
+  if (!subpath) {
+    return true;
+  }
+  try {
+    require.resolve(path.join(ROOT, subpath));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function loadModule(subpath) {
+  return subpath ? require(path.join(ROOT, subpath)) : pkg;
 }
 
 describe('package entry point', () => {
@@ -123,16 +172,37 @@ describe('package entry point', () => {
   });
 
   describe('documented API (REQ-PKG-004)', () => {
-    it('resolves every name the docs and agent templates destructure from the package', () => {
-      const references = documentedNames();
+    const references = documentedImports();
+
+    it('finds imports of the package in the live documentation', () => {
+      expect(references.length).toBeGreaterThan(0);
+    });
+
+    it('loads the package by its quoted name in every require() and import()', () => {
+      expect(unreadableCalls()).toEqual([]);
+    });
+
+    it('loads every module the live documentation imports from the package', () => {
+      const missing = references
+        .filter(({ subpath }) => !resolvesModule(subpath))
+        .map(({ where, subpath }) => `${where} ${PACKAGE}/${subpath}`);
+
+      expect([...new Set(missing)]).toEqual([]);
+    });
+
+    it('resolves every name the live documentation imports from the package', () => {
       const unresolved = references
-        .filter(({ namespace, name }) => {
-          const scope = namespace ? pkg[namespace] : pkg;
+        .filter(({ subpath }) => resolvesModule(subpath))
+        .filter(({ subpath, namespace, name }) => {
+          const mod = loadModule(subpath);
+          const scope = namespace ? mod[namespace] : mod;
           return !scope || scope[name] === undefined;
         })
-        .map(({ where, namespace, name }) => `${where} ${namespace ? `${namespace}.` : ''}${name}`);
+        .map(
+          ({ where, subpath, namespace, name }) =>
+            `${where} ${subpath ? `${subpath} ` : ''}${namespace ? `${namespace}.` : ''}${name}`
+        );
 
-      expect(references.length).toBeGreaterThan(0);
       expect(unresolved).toEqual([]);
     });
   });

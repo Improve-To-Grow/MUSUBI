@@ -138,7 +138,7 @@ test('REQ-001: User Login', async ({ page }) => {
 ## API
 
 ```javascript
-const BrowserAgent = require('musubi-sdd/src/agents/browser');
+const BrowserAgent = require('@improve-to-grow/musubi-sdd/src/agents/browser');
 
 const agent = new BrowserAgent({
   headless: true,

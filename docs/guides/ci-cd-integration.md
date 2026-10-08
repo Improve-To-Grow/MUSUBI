@@ -19,9 +19,6 @@ MUSUBI provides ready-to-use CI/CD templates for automated validation, testing, 
 ```bash
 # Initialize MUSUBI with GitHub Actions
 musubi-sdd init --platform github-actions
-
-# Or copy existing workflows
-cp -r node_modules/musubi-sdd/.github/workflows .github/
 ```
 
 Generated workflows:
@@ -29,11 +26,30 @@ Generated workflows:
 - `constitutional-governance.yml` - Constitutional compliance
 - `traceability-check.yml` - Traceability matrix
 
+Or call the ITG fork's reusable workflow from a workflow in your repository:
+
+```yaml
+# .github/workflows/musubi.yml
+name: MUSUBI
+on: [pull_request]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  musubi:
+    uses: Improve-To-Grow/MUSUBI/.github/workflows/musubi-reusable.yml@ITG-adjustments
+    with:
+      command: validate
+```
+
 ### GitLab CI
 
 ```bash
-# Copy template
-cp node_modules/musubi-sdd/templates/ci-cd/gitlab-ci.yml .gitlab-ci.yml
+# Download the template from the ITG fork
+curl -fsSL -o .gitlab-ci.yml https://raw.githubusercontent.com/Improve-To-Grow/MUSUBI/ITG-adjustments/templates/ci-cd/gitlab-ci.yml
 
 # Or initialize
 musubi-sdd init --platform gitlab
@@ -42,8 +58,8 @@ musubi-sdd init --platform gitlab
 ### Jenkins
 
 ```bash
-# Copy Jenkinsfile
-cp node_modules/musubi-sdd/templates/ci-cd/Jenkinsfile Jenkinsfile
+# Download the Jenkinsfile from the ITG fork
+curl -fsSL -o Jenkinsfile https://raw.githubusercontent.com/Improve-To-Grow/MUSUBI/ITG-adjustments/templates/ci-cd/Jenkinsfile
 ```
 
 ## 🔧 Configuration

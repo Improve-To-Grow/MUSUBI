@@ -673,7 +673,6 @@ After completing all tutorials, self-check with the following:
 
 ## 📚 Next Steps
 
-- [Plugin Development Guide](./PLUGIN-DEVELOPMENT.md) - Create your own extensions
 - [Architecture Deep Dive](./ARCHITECTURE-DEEP-DIVE.md) - Understand the internal design
 - [API Reference](../API-REFERENCE.md) - Complete API documentation
 

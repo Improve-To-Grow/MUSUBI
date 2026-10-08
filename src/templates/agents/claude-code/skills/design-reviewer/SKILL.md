@@ -803,7 +803,7 @@ musubi-orchestrate run design-reviewer --atam
 ### 10.2 Programmatic Usage
 
 ```javascript
-const { designReviewerSkill } = require('musubi-sdd/src/orchestration');
+const { designReviewerSkill } = require('@improve-to-grow/musubi-sdd/src/orchestration/builtin-skills');
 
 // Execute comprehensive review
 const result = await designReviewerSkill.execute({
@@ -1026,7 +1026,7 @@ Processing flow when applying fixes:
 
 ```javascript
 // Programmatic correction example
-const { designReviewerSkill } = require('musubi-sdd/src/orchestration');
+const { designReviewerSkill } = require('@improve-to-grow/musubi-sdd/src/orchestration/builtin-skills');
 
 // Step 1: Execute review
 const reviewResult = await designReviewerSkill.execute({

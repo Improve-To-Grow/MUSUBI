@@ -719,38 +719,11 @@ class MyCustomProvider extends BaseLLMProvider {
 }
 ```
 
-### 2. Validator Extension
-
-```javascript
-// Add a custom validator
-const { ValidatorRegistry } = require('musubi-sdd');
-
-ValidatorRegistry.register('my-custom-validator', {
-  name: 'My Custom Validator',
-  targetTypes: ['requirements', 'design'],
-  
-  async validate(content, context) {
-    const errors = [];
-    
-    // Custom validation logic
-    if (!content.includes('required keyword')) {
-      errors.push({
-        code: 'MISSING_KEYWORD',
-        message: 'Required keyword not found',
-        severity: 'error'
-      });
-    }
-    
-    return { valid: errors.length === 0, errors };
-  }
-});
-```
-
-### 3. Orchestration Pattern Extension
+### 2. Orchestration Pattern Extension
 
 ```javascript
 // Add a custom pattern
-const { PatternRegistry } = require('musubi-sdd');
+const { PatternRegistry } = require('@improve-to-grow/musubi-sdd/src/orchestration');
 
 PatternRegistry.register('my-custom-pattern', {
   name: 'My Custom Pattern',
@@ -777,11 +750,11 @@ PatternRegistry.register('my-custom-pattern', {
 });
 ```
 
-### 4. Skill Extension
+### 3. Skill Extension
 
 ```javascript
 // Add a custom skill
-const { SkillRegistry } = require('musubi-sdd');
+const { SkillRegistry } = require('@improve-to-grow/musubi-sdd');
 
 SkillRegistry.register('my-custom-skill', {
   name: 'My Custom Skill',
@@ -912,7 +885,6 @@ Inject `TenantContext` at request scope to achieve tenant isolation across all s
 
 - [API Reference](../API-REFERENCE.md)
 - [Interactive Tutorials](./INTERACTIVE-TUTORIALS.md)
-- [Plugin Development Guide](./PLUGIN-DEVELOPMENT.md)
 - [Quickstart Guide](../QUICKSTART.md)
 
 ---

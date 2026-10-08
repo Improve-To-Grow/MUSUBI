@@ -321,7 +321,7 @@ The HierarchicalReporter module generates hierarchical analysis reports for larg
 ### Module Usage
 
 ```javascript
-const { HierarchicalReporter } = require('musubi-sdd');
+const { HierarchicalReporter } = require('@improve-to-grow/musubi-sdd');
 
 const reporter = new HierarchicalReporter();
 const report = await reporter.generateReport('/path/to/project', {
