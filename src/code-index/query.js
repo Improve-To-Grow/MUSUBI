@@ -412,6 +412,15 @@ function isExportDefinition(model, def) {
 }
 
 /**
+ * `const Name = require('./x')` and import bindings are aliases of another file's export.
+ */
+function isAliasBinding(model, def, info) {
+  if (info.kind !== 'variable') return false;
+  const text = sourceLines(model, def.file)[def.range.sl] || '';
+  return /\brequire\s*\(/.test(text) || /^\s*import\b/.test(text);
+}
+
+/**
  * Resolve a query to definitions in the index, grouping a class with its constructor
  * and with the `module.exports = { Name }` property that destructured requires point to.
  * @returns {Array<{symbol: string, def: object, info: object, related: Array<{symbol: string, role: string}>, defaultExportOf: string|null}>}
@@ -463,14 +472,8 @@ function findEntities(model, query, { file = null, includeProperties = false } =
       }
     }
   }
-  // `const Name = require('./x')` bindings are aliases of another file's export; show them only
-  // when nothing else matches.
-  const isAlias = entity => {
-    if (entity.info.kind !== 'variable') return false;
-    const text = sourceLines(model, entity.def.file)[entity.def.range.sl] || '';
-    return /\brequire\s*\(/.test(text) || /^\s*import\b/.test(text);
-  };
-  const definitions = entities.filter(entity => !isAlias(entity));
+  // Alias bindings are shown only when nothing else matches.
+  const definitions = entities.filter(entity => !isAliasBinding(model, entity.def, entity.info));
   const result = definitions.length ? definitions : entities;
   return result.sort(
     (a, b) => a.def.file.localeCompare(b.def.file) || a.def.range.sl - b.def.range.sl
@@ -660,6 +663,46 @@ function symbolsQuery(model, fileArg) {
 // ---------------------------------------------------------------------------
 
 /**
+ * Definition names for the grep reminder hook (./hint.js), keyed by the last name part:
+ * classes, functions, methods, module-level variables and exported properties, as `refs`
+ * finds them. Class fields, other object-literal properties, constructors and alias bindings
+ * are left out, so that common words such as `name` or `path` do not match.
+ * @param {object} model
+ * @returns {Object<string, Array<{name: string, kind: string, file: string, line: number}>>}
+ *   a prototype-free object
+ */
+function definitionNames(model) {
+  const byName = new Map();
+  for (const [symbol, def] of model.definitions) {
+    const info = symbolInfo(model, symbol);
+    if (!info || NON_ENTITY_KINDS.has(info.kind) || info.kind === 'constructor') continue;
+    const isMeta = info.lastKind === 'meta';
+    if (isMeta ? !isExportDefinition(model, def) : info.kind === 'property') continue;
+    if (isAliasBinding(model, def, info)) continue;
+    const last = info.names[info.names.length - 1];
+    const name = isMeta ? stripMetaCounter(last) : last;
+    if (!byName.has(name)) byName.set(name, []);
+    byName.get(name).push({
+      name: info.display,
+      kind: info.kind,
+      file: def.file,
+      line: def.range.sl + 1,
+      isMeta,
+    });
+  }
+  const out = Object.create(null);
+  for (const name of [...byName.keys()].sort()) {
+    const entries = byName.get(name);
+    // An export property in the file that defines the name is that definition (findEntities).
+    out[name] = entries
+      .filter(e => !e.isMeta || !entries.some(o => !o.isMeta && o.file === e.file))
+      .sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line)
+      .map(({ name: display, kind, file, line }) => ({ name: display, kind, file, line }));
+  }
+  return out;
+}
+
+/**
  * Names similar to a query that found nothing, for a "did you mean" hint.
  * @param {object} model
  * @param {string} query
@@ -718,4 +761,5 @@ module.exports = {
   dependentsQuery,
   symbolsQuery,
   suggestNames,
+  definitionNames,
 };

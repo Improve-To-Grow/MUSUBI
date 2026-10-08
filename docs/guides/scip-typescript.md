@@ -1,8 +1,8 @@
 # Code Navigation with musubi-code
 
-`musubi-code` answers questions such as "who instantiates `ConstitutionValidator`?", "which functions call `makeWidget`?" and "which files depend on `src/validators/constitution.js`?" for JavaScript and TypeScript projects, with compiler accuracy.
+`musubi-code` answers questions such as "where is `ErrorHandler` defined?", "does `EARSValidator` exist?", "who instantiates `ConstitutionValidator`?", "which functions call `makeWidget`?" and "which files depend on `src/validators/constitution.js`?" for JavaScript and TypeScript projects, with compiler accuracy.
 
-It ships with MUSUBI. `musubi init` and `musubi upgrade` set it up in a project, so AI coding agents use it instead of grep. In Claude Code a skill tells the agent when to use it, and hooks keep its index fresh without anyone running a command.
+It ships with MUSUBI. `musubi init` and `musubi upgrade` set it up in a project, so AI coding agents use it before grep. In Claude Code a skill tells the agent when to use it, hooks keep its index fresh without anyone running a command, and a reminder hook points grep searches for indexed names to it.
 
 ## Why scip-typescript
 
@@ -48,20 +48,22 @@ What setup writes. Every step is idempotent, so running it again reports each fi
 | --- | --- |
 | `.gitignore` | Adds `.scip/` |
 | `.claude/skills/code-references/SKILL.md` | Claude Code only. Tells Claude when and how to query; managed by MUSUBI, so setup overwrites local edits |
-| `.claude/settings.json` | Claude Code only. Adds async `SessionStart` and `PostToolUse` hooks running `musubi-code index --hook`; keeps every other setting and hook, and replaces earlier versions of its own hooks |
-| `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` or `QWEN.md` | Adds or replaces a "Code Navigation" section between `<!-- musubi-code:start -->` and `<!-- musubi-code:end -->` |
+| `.claude/settings.json` | Claude Code only. Adds async `SessionStart` and `PostToolUse` hooks running `musubi-code index --hook`, and synchronous `PreToolUse` hooks running `musubi-code hint --hook` ([Grep reminder](#grep-reminder)); keeps every other setting and hook, and replaces earlier versions of its own hooks |
+| `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` or `QWEN.md` | Adds or replaces a "Code Navigation" section between `<!-- musubi-code:start -->` and `<!-- musubi-code:end -->`. It maps symbol questions (does it exist, where is it defined, what does a file export, who uses it, what depends on a file) to commands and tells the agent to ask the index before grep, also where an SDD command or skill says to grep |
 
 Setup does not build the index. The first session-start hook or the first query builds it; `musubi-code index` builds it immediately.
 
 ## Using it
 
 ```bash
+musubi-code refs ErrorHandler               # where it is defined (first line), then every reference
+musubi-code refs EARSValidator              # "No definition named ..." when it does not exist
 musubi-code refs ConstitutionValidator      # every reference, tagged, with the enclosing function
 musubi-code refs Widget.render              # a method
 musubi-code callers makeWidget              # distinct calling functions
 musubi-code deps bin/musubi-validate.js     # files and packages a file uses
 musubi-code dependents src/validators/constitution.js
-musubi-code symbols constitution.js         # definitions in a file
+musubi-code symbols constitution.js         # what a file defines and exports
 musubi-code status                          # index freshness
 musubi-code index                           # rebuild now
 ```
@@ -84,7 +86,7 @@ ConstitutionLevelManager (class) src/validators/constitution-level-manager.js:14
 - `in <name>` is the innermost named function, method or class around the reference. `top level` means module scope or an anonymous callback.
 - A class result includes its constructor calls. For `module.exports = Name` it also lists every file that requires the module.
 
-In Claude Code you can simply ask, for example "who instantiates ConstitutionLevelManager?" or "what breaks if I delete src/validators/constitution.js?". The `code-references` skill picks the command.
+In Claude Code you can simply ask, for example "where is ErrorHandler defined?", "who instantiates ConstitutionLevelManager?" or "what breaks if I delete src/validators/constitution.js?". The `code-references` skill picks the command.
 
 ## How it works
 
@@ -92,6 +94,24 @@ In Claude Code you can simply ask, for example "who instantiates ConstitutionLev
 2. The command ignores edits to files outside the index. Otherwise it fingerprints the indexed source files (path, size, modification time) and compares the result with `.scip/meta.json`.
 3. When the fingerprint changed, it runs scip-typescript under a lock and swaps the new index in atomically. Triggers that arrive during a build queue one follow-up build instead of starting another.
 4. Queries wait for a running build and rebuild a stale index before answering, so results are correct even without hooks.
+5. After each build, the names that the index defines are written to `.scip/names.json` for the grep reminder. An index without that file counts as stale, so existing indexes get it on their next hook run.
+
+### Grep reminder
+
+Instructions alone do not stop an agent from reaching for grep, which is its general-purpose search. So setup also adds synchronous `PreToolUse` hooks that run `musubi-code hint --hook` before the Grep tool and before shell commands that start with `grep`, `rg`, `git grep` (Bash) or `Select-String` (PowerShell). The shell entries use Claude Code's `if` filter, so other commands do not start the hook.
+
+When the search pattern consists only of names that the index defines (word boundaries, `class`, `function`, `new`, `exports.` and a trailing `(` are ignored; `A|B` is allowed), the hook adds a note for Claude:
+
+```text
+musubi-code: ErrorHandler and PatternRegistry are defined in the code index:
+  ErrorHandler (class) src/orchestration/error-handler.js:613  ->  `musubi-code refs ErrorHandler`
+  PatternRegistry (property) src/orchestration/index.js:304  ->  `musubi-code refs PatternRegistry`
+  PatternRegistry (class) src/orchestration/pattern-registry.js:106  ->  `musubi-code refs PatternRegistry`
+`musubi-code refs` gives the definition, exports and every reference, compiler-resolved.
+Keep grep for text: Markdown, templates, comments and string-keyed lookups.
+```
+
+The hook never blocks or approves the search. It stays silent for text patterns, for searches limited to paths or file types outside the index (for example `docs/` or `*.md`), for greps that filter piped output, and when `.scip/names.json` is missing. The names list holds classes, functions, methods, module-level variables and exported properties; class fields and other object properties are left out, so common words such as `name` or `path` do not trigger it. It reads only that list, not the index: on this repository a call takes about 0.2 seconds, mostly Node.js start-up.
 
 Nothing is written outside `.scip/`. Projects without a `tsconfig.json` get a generated one in `.scip/tsconfig.json`. The indexer's own `--infer-tsconfig` option is avoided because it creates `./tsconfig.json`.
 
@@ -117,7 +137,7 @@ Optional, in the project's `package.json`:
 
 ### Other AI coding agents
 
-GitHub Copilot, Cursor, Codex, Gemini CLI, Qwen Code and Windsurf have no Claude Code skills or hooks. Setup gives them the "Code Navigation" section in their instruction file, and each query refreshes a stale index itself, so no hook is required.
+GitHub Copilot, Cursor, Codex, Gemini CLI, Qwen Code and Windsurf have no Claude Code skills or hooks. Setup gives them the "Code Navigation" section in their instruction file, and each query refreshes a stale index itself, so no hook is required. They get no grep reminder.
 
 ### TypeScript projects and monorepos
 
@@ -141,11 +161,12 @@ GitHub Copilot, Cursor, Codex, Gemini CLI, Qwen Code and Windsurf have no Claude
 | `could not acquire the index build lock` | A build crashed while holding the lock. The lock expires after 15 minutes or when its process is gone; deleting `.scip/build.lock` also works |
 | Query results look outdated | `musubi-code status`, then `musubi-code index` |
 | A name returns several results | Add `--file <path>` |
+| No grep reminder appears | Check that `.scip/names.json` exists (`musubi-code index` writes it) and that `.claude/settings.json` has the `PreToolUse` entries (`musubi-code setup`). The hook runs only for the Grep tool and for shell commands that start with a grep tool |
 
 ## Developing MUSUBI itself
 
-- The code lives in `src/code-index/` (`indexer.js`, `query.js`, `format.js`, `setup.js`), the CLI in `bin/musubi-code.js`, the skill template in `src/templates/code-index/SKILL.md`, and the tests in `tests/code-index/`.
-- This repository runs the working copy instead of the global command. Its skill, hooks and `CLAUDE.md` section come from `node bin/musubi-code.js setup --agent claude-code --command "node bin/musubi-code.js"`.
+- The code lives in `src/code-index/` (`indexer.js`, `query.js`, `format.js`, `setup.js`, `hint.js`), the CLI in `bin/musubi-code.js`, the skill template in `src/templates/code-index/SKILL.md`, and the tests in `tests/code-index/`.
+- This repository calls the global `musubi-code`. Link it to the working copy with `npm link` in the repository, so hooks and queries run the code being changed. Its skill, hooks and the sections in `CLAUDE.md` and `AGENTS.md` come from `musubi-code setup`.
 - The `package.json` `"scip"` block excludes `src/templates`.
 
 ### Upgrading scip-typescript

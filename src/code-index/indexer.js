@@ -3,7 +3,8 @@
  *
  * Wraps @sourcegraph/scip-typescript, which resolves CommonJS `require()`, ES imports,
  * `new X()`, `extends` and method calls across files with the TypeScript compiler.
- * The index is written to `<project>/.scip/index.scip` and read by ./query.js.
+ * The index is written to `<project>/.scip/index.scip` and read by ./query.js; the names it
+ * defines go to `.scip/names.json`, read by ./hint.js.
  * Nothing is written outside `.scip/`: projects without a tsconfig.json get a generated
  * `.scip/tsconfig.json` instead of scip-typescript's `--infer-tsconfig`, which would create
  * `./tsconfig.json`.
@@ -46,6 +47,8 @@ const LOCK_TTL_MS = 15 * 60 * 1000;
 const WAIT_FOR_BUILD_MS = 5 * 60 * 1000;
 const MAX_LOG_BYTES = 256 * 1024;
 const MAX_FOLLOW_UP_BUILDS = 3;
+// Format of .scip/names.json, read by ./hint.js.
+const NAMES_VERSION = 1;
 
 function sleep(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
@@ -130,6 +133,7 @@ function loadConfig(root = findProjectRoot()) {
     dir,
     indexPath: path.join(dir, 'index.scip'),
     metaPath: path.join(dir, 'meta.json'),
+    namesPath: path.join(dir, 'names.json'),
     lockPath: path.join(dir, 'build.lock'),
     dirtyPath: path.join(dir, 'dirty'),
     logPath: path.join(dir, 'index.log'),
@@ -154,6 +158,24 @@ function isIndexedPath(cfg, filePath) {
   if (rel.split('/').some(part => ALWAYS_EXCLUDED_DIRS.has(part))) return false;
   if (isExcluded(cfg, rel)) return false;
   return cfg.roots.some(r => r === '.' || rel === r || rel.startsWith(r + '/'));
+}
+
+/**
+ * Does the index cover source files in a directory or below it?
+ * @param {object} cfg
+ * @param {string} dirPath - absolute, or relative to the project root
+ * @returns {boolean}
+ */
+function coversDirectory(cfg, dirPath) {
+  const rel = toPosix(path.relative(cfg.root, path.resolve(cfg.root, dirPath)));
+  if (rel.startsWith('..') || path.isAbsolute(rel)) return false;
+  if (!rel) return true;
+  if (rel.split('/').some(part => ALWAYS_EXCLUDED_DIRS.has(part)) || isExcluded(cfg, rel)) {
+    return false;
+  }
+  return cfg.roots.some(
+    r => r === '.' || rel === r || rel.startsWith(`${r}/`) || r.startsWith(`${rel}/`)
+  );
 }
 
 /**
@@ -234,6 +256,8 @@ function getFreshness(cfg) {
   const current = computeFingerprint(cfg);
   const meta = readMeta(cfg);
   if (!meta || !fs.existsSync(cfg.indexPath)) return { state: 'missing', meta, current };
+  // Indexes built before names.json existed get it on their next build.
+  if (!fs.existsSync(cfg.namesPath)) return { state: 'stale', meta, current };
   return { state: meta.fingerprint === current.hash ? 'fresh' : 'stale', meta, current };
 }
 
@@ -393,6 +417,27 @@ function runIndexer(cfg, { quiet }) {
 }
 
 /**
+ * Write .scip/names.json: the definition names that the hint hook looks up (./hint.js). When
+ * the list cannot be built, an empty one is written, so the index is not rebuilt over and over.
+ * @param {object} cfg
+ */
+function writeNames(cfg) {
+  let content;
+  try {
+    // query.js requires this module, so it is loaded here rather than at the top.
+    const query = require('./query');
+    const model = query.loadModel(cfg, { refresh: false });
+    content = { version: NAMES_VERSION, names: query.definitionNames(model) };
+  } catch (error) {
+    log(cfg, `names list not built: ${error.message}`);
+    content = { version: NAMES_VERSION, error: error.message, names: {} };
+  }
+  const tmpPath = `${cfg.namesPath}.${process.pid}.tmp`;
+  fs.writeFileSync(tmpPath, `${JSON.stringify(content)}\n`);
+  replaceFile(tmpPath, cfg.namesPath);
+}
+
+/**
  * Build the index under a lock. When another process is already building, mark the
  * index dirty so that build runs once more after it finishes, and return.
  * @param {object} cfg
@@ -415,6 +460,7 @@ function build(cfg, { quiet = false } = {}) {
       const fingerprint = computeFingerprint(cfg);
       const started = Date.now();
       runIndexer(cfg, { quiet });
+      writeNames(cfg);
       const meta = {
         fingerprint: fingerprint.hash,
         files: fingerprint.files,
@@ -555,17 +601,20 @@ function statusReport(cfg) {
 }
 
 module.exports = {
+  NAMES_VERSION,
   SOURCE_EXTENSIONS,
   findProjectRoot,
   isJavaScriptProject,
   loadConfig,
   isIndexedPath,
+  coversDirectory,
   listSourceFiles,
   computeFingerprint,
   getFreshness,
   build,
   ensureFresh,
   readStdin,
+  resolveHookRoot,
   runHook,
   statusReport,
   toPosix,

@@ -14,6 +14,8 @@
  *   musubi-code symbols <file>               definitions in a file
  *   musubi-code status                       index freshness
  *   musubi-code index [--if-stale | --hook]  build the index (--hook: Claude Code hook mode)
+ *   musubi-code hint --hook                  Claude Code PreToolUse hook: point a grep for an
+ *                                            indexed name to refs
  *   musubi-code setup                        configure the project: skill, hooks, instructions
  */
 
@@ -24,6 +26,7 @@ const packageJson = require('../package.json');
 const indexer = require('../src/code-index/indexer');
 const query = require('../src/code-index/query');
 const format = require('../src/code-index/format');
+const hint = require('../src/code-index/hint');
 const { setupCodeIndex } = require('../src/code-index/setup');
 
 function projectConfig(opts) {
@@ -174,6 +177,20 @@ function createProgram() {
           `musubi-code: indexed ${result.files} files in ${(result.durationMs / 1000).toFixed(1)} s`
         );
       }
+    });
+
+  program
+    .command('hint')
+    .description('Claude Code PreToolUse hook: point a grep for an indexed name to refs')
+    .option('--hook', 'read the hook JSON from stdin; print context or nothing, never fail')
+    .option('--command <command>', 'command named in the hint', 'musubi-code')
+    .option('--root <dir>', 'project directory (default: from the hook input)')
+    .action(async opts => {
+      if (!opts.hook) throw new Error('hint runs as a Claude Code hook: musubi-code hint --hook');
+      print(
+        hint.runHint(await indexer.readStdin(1000), { root: opts.root, command: opts.command })
+      );
+      process.exitCode = 0;
     });
 
   program

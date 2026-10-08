@@ -3,8 +3,9 @@
  *
  * Shared by `musubi init`, `musubi-upgrade` and `musubi-code setup`. It writes:
  * - `.scip/` to .gitignore
- * - Claude Code: the `code-references` skill and async hooks in `.claude/settings.json`
- *   that keep the index fresh
+ * - Claude Code: the `code-references` skill, async hooks in `.claude/settings.json` that keep
+ *   the index fresh, and synchronous PreToolUse hooks that point grep searches for indexed
+ *   names to `refs` (./hint.js)
  * - every selected agent: a marked "Code Navigation" section in its instruction file
  *   (CLAUDE.md, AGENTS.md, GEMINI.md, QWEN.md)
  *
@@ -27,8 +28,14 @@ const DEFAULT_COMMAND = 'musubi-code';
 const SECTION_START = '<!-- musubi-code:start -->';
 const SECTION_END = '<!-- musubi-code:end -->';
 const HOOK_TOOLS = 'Edit|Write|MultiEdit|Bash|PowerShell';
+// Shell commands that search files: the hint hook runs only for these (Claude Code `if` filter).
+const HINT_SHELL_FILTERS = {
+  Bash: ['Bash(grep *)', 'Bash(rg *)', 'Bash(git grep *)'],
+  PowerShell: ['PowerShell(Select-String *)'],
+};
+const HINT_TIMEOUT_SECONDS = 10;
 // Hook commands written by this setup, including the earlier `scripts/scip-index.js` form.
-const OWN_HOOK_PATTERN = /musubi-code(?:\.js)?\s+index\s+--hook|scip-index\.js\s+--hook/;
+const OWN_HOOK_PATTERN = /musubi-code(?:\.js)?\s+(?:index|hint)\s+--hook|scip-index\.js\s+--hook/;
 
 /**
  * Resolve an agent key or alias (`claude`, `--copilot`, ...) to a registry key.
@@ -104,14 +111,32 @@ function renderSkill(command) {
 }
 
 /**
- * Hook entries for `.claude/settings.json`.
+ * Hook groups for `.claude/settings.json`, per event.
  * @param {string} command
  */
 function hookGroups(command) {
-  const hook = () => ({ type: 'command', command: `${command} index --hook`, async: true });
+  const index = () => ({ type: 'command', command: `${command} index --hook`, async: true });
+  const hintCommand =
+    command === DEFAULT_COMMAND
+      ? `${command} hint --hook`
+      : `${command} hint --hook --command ${JSON.stringify(command)}`;
+  // Synchronous: Claude Code discards the output of async hooks, and the hint is that output.
+  const hint = condition => ({
+    type: 'command',
+    command: hintCommand,
+    ...(condition ? { if: condition } : {}),
+    timeout: HINT_TIMEOUT_SECONDS,
+  });
   return {
-    SessionStart: { matcher: 'startup|resume', hooks: [hook()] },
-    PostToolUse: { matcher: HOOK_TOOLS, hooks: [hook()] },
+    SessionStart: [{ matcher: 'startup|resume', hooks: [index()] }],
+    PostToolUse: [{ matcher: HOOK_TOOLS, hooks: [index()] }],
+    PreToolUse: [
+      { matcher: 'Grep', hooks: [hint()] },
+      ...Object.entries(HINT_SHELL_FILTERS).map(([tool, filters]) => ({
+        matcher: tool,
+        hooks: filters.map(hint),
+      })),
+    ],
   };
 }
 
@@ -125,7 +150,7 @@ function hookGroups(command) {
 function mergeHookSettings(settings, command) {
   const next = JSON.parse(JSON.stringify(settings || {}));
   if (!next.hooks || typeof next.hooks !== 'object' || Array.isArray(next.hooks)) next.hooks = {};
-  for (const [event, group] of Object.entries(hookGroups(command))) {
+  for (const [event, ownGroups] of Object.entries(hookGroups(command))) {
     const groups = Array.isArray(next.hooks[event]) ? next.hooks[event] : [];
     const kept = [];
     for (const existing of groups) {
@@ -138,39 +163,60 @@ function mergeHookSettings(settings, command) {
       );
       if (hooks.length) kept.push({ ...existing, hooks });
     }
-    kept.push(group);
-    next.hooks[event] = kept;
+    next.hooks[event] = [...kept, ...ownGroups];
   }
   return next;
 }
 
+/** A Markdown table with padded columns. */
+function markdownTable(header, rows) {
+  const widths = header.map((cell, i) => Math.max(cell.length, ...rows.map(row => row[i].length)));
+  const line = cells => `| ${cells.map((cell, i) => cell.padEnd(widths[i])).join(' | ')} |`;
+  return [line(header), line(widths.map(w => '-'.repeat(w))), ...rows.map(line)];
+}
+
 /**
- * The marked instruction-file section.
+ * The marked instruction-file section: symbol questions go to the index before grep.
  * @param {string} command
  * @param {boolean} forClaude - mention the skill and hooks
  */
 function instructionSection(command, forClaude) {
+  const code = text => `\`${command} ${text}\``;
   const lines = [
     SECTION_START,
     '## Code Navigation',
     '',
-    'Use these commands instead of grep for questions such as "who calls, uses, instantiates or',
-    'requires X" and "what depends on this file":',
+    `Answer symbol questions with \`${command}\` before grep. A symbol question is about a class,`,
+    'function, method, constant or module in the indexed code: does it exist, where is it defined,',
+    'what does a file export, who uses it, what depends on a file.',
     '',
-    `- \`${command} refs <Name>\` - every reference (new, call, require, extends, ...) with the enclosing function`,
-    `- \`${command} callers <Name>\` - functions that call or instantiate it`,
-    `- \`${command} deps <file>\` and \`${command} dependents <file>\` - file dependencies in both directions`,
-    `- \`${command} symbols <file>\` - definitions in a file`,
+    ...markdownTable(
+      ['Question', 'Command'],
+      [
+        [
+          'Does `X` exist? Where is it defined?',
+          `${code('refs X')}: each result starts with kind and file:line; "No definition named" means absent`,
+        ],
+        ['What does a file define or export?', code('symbols <file>')],
+        ['Who references, calls or instantiates `X`?', `${code('refs X')}, ${code('callers X')}`],
+        [
+          'What does a file load, and what loads it?',
+          `${code('deps <file>')}, ${code('dependents <file>')}`,
+        ],
+      ]
+    ),
     '',
-    'They read a compiler-accurate scip-typescript index in `.scip/` and rebuild it first when',
-    'source files changed. Use grep only for names that appear as strings, such as dynamic',
-    '`require()` paths, registries and templates.',
+    'This also applies where an SDD command, prompt or skill says to grep for code. Use grep for',
+    'text the index does not cover: Markdown, templates, configuration, comments, string-keyed registries',
+    'and dynamic `require()` paths, and once for the name as a string before a rename or deletion.',
+    `${code('status')} lists the indexed directories. The index is compiler-accurate (scip-typescript,`,
+    '`.scip/`) and is rebuilt first when source files changed.',
   ];
   if (forClaude) {
     lines.push(
       '',
-      'The `code-references` skill lists all options; hooks in `.claude/settings.json` keep the',
-      'index fresh in the background.'
+      'The `code-references` skill lists all options. Hooks in `.claude/settings.json` keep the index',
+      'fresh and add a note when a grep searches for an indexed name.'
     );
   }
   lines.push(SECTION_END);

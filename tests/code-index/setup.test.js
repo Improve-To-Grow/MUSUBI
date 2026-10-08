@@ -66,6 +66,13 @@ describe('code-index setup', () => {
       '.claude/settings.json': JSON.stringify({
         permissions: { allow: ['Bash(npm test)'] },
         hooks: {
+          PreToolUse: [
+            { matcher: 'Bash', hooks: [{ type: 'command', command: 'node guard.js' }] },
+            {
+              matcher: 'Grep',
+              hooks: [{ type: 'command', command: 'node bin/musubi-code.js hint --hook' }],
+            },
+          ],
           PostToolUse: [
             { matcher: 'Write', hooks: [{ type: 'command', command: 'npx prettier --write' }] },
             {
@@ -106,6 +113,28 @@ describe('code-index setup', () => {
     });
     expect(settings.hooks.PostToolUse[1].hooks[0].async).toBe(true);
 
+    // REQ-NAV-005: synchronous reminder before Grep and grep-like shell commands; the earlier
+    // hint entry is replaced, a foreign PreToolUse hook is kept.
+    expect(settings.hooks.PreToolUse.map(g => g.matcher)).toEqual([
+      'Bash',
+      'Grep',
+      'Bash',
+      'PowerShell',
+    ]);
+    expect(settings.hooks.PreToolUse[0].hooks).toEqual([
+      { type: 'command', command: 'node guard.js' },
+    ]);
+    const hintHooks = settings.hooks.PreToolUse.slice(1).flatMap(g => g.hooks);
+    expect(new Set(hintHooks.map(h => h.command))).toEqual(new Set(['musubi-code hint --hook']));
+    expect(hintHooks.every(h => h.async === undefined && h.timeout === 10)).toBe(true);
+    expect(hintHooks.map(h => h.if)).toEqual([
+      undefined,
+      'Bash(grep *)',
+      'Bash(rg *)',
+      'Bash(git grep *)',
+      'PowerShell(Select-String *)',
+    ]);
+
     const claudeMd = read(root, 'CLAUDE.md');
     expect(
       claudeMd.startsWith('# Project\r\n\r\nExisting text.\r\n\r\n<!-- musubi-code:start -->')
@@ -128,12 +157,55 @@ describe('code-index setup', () => {
     const claudeMd = read(root, 'CLAUDE.md');
     expect(claudeMd.split(SECTION_START)).toHaveLength(2);
     expect(claudeMd.split(SECTION_END)).toHaveLength(2);
-    expect(claudeMd).toContain('`node bin/musubi-code.js refs <Name>`');
+    expect(claudeMd).toContain('`node bin/musubi-code.js refs X`');
     const settings = JSON.parse(read(root, '.claude/settings.json'));
     expect(settings.hooks.SessionStart).toHaveLength(1);
     expect(settings.hooks.SessionStart[0].hooks[0].command).toBe(
       'node bin/musubi-code.js index --hook'
     );
+    const hint = settings.hooks.PreToolUse.flatMap(g => g.hooks.map(h => h.command));
+    expect(hint).toHaveLength(5);
+    expect(new Set(hint)).toEqual(
+      new Set(['node bin/musubi-code.js hint --hook --command "node bin/musubi-code.js"'])
+    );
+  });
+
+  test('the managed section maps symbol questions to commands (REQ-NAV-001, REQ-NAV-002)', () => {
+    root = makeTempProject({ 'package.json': '{}' });
+    setupCodeIndex(root, { agents: ['claude-code', 'copilot'] });
+    for (const file of ['CLAUDE.md', 'AGENTS.md']) {
+      const section = read(root, file);
+      expect(section).toContain('Answer symbol questions with `musubi-code` before grep');
+      expect(section).toMatch(/Does `X` exist\? Where is it defined\?\s*\|\s*`musubi-code refs X`/);
+      expect(section).toMatch(
+        /What does a file define or export\?\s*\|\s*`musubi-code symbols <file>`/
+      );
+      expect(section).toMatch(
+        /calls or instantiates `X`\?\s*\|\s*`musubi-code refs X`, `musubi-code callers X`/
+      );
+      expect(section).toContain('`musubi-code deps <file>`, `musubi-code dependents <file>`');
+      expect(section).toContain('No definition named');
+      expect(section).toContain('where an SDD command, prompt or skill says to grep for code');
+      expect(section).toContain(
+        'Markdown, templates, configuration, comments, string-keyed registries'
+      );
+    }
+    expect(read(root, 'CLAUDE.md')).toContain('when a grep searches for an indexed name');
+    expect(read(root, 'AGENTS.md')).not.toContain('.claude/settings.json');
+  });
+
+  test('the skill description covers definition questions within the listing cap (REQ-NAV-003)', () => {
+    root = makeTempProject({ 'package.json': '{}' });
+    setupCodeIndex(root, { agents: ['claude-code'] });
+    const skill = read(root, '.claude/skills/code-references/SKILL.md').replace(/\r\n/g, '\n');
+    const description = skill
+      .match(/\ndescription: \|\n([\s\S]*?)\n[a-z-]+:/)[1]
+      .replace(/^ {2}/gm, '');
+    for (const term of ['where is X defined', 'does X exist', 'is X exported', 'find definition']) {
+      expect(description).toContain(term);
+    }
+    expect(description.length).toBeLessThanOrEqual(1536);
+    expect(skill).toContain('`musubi-code symbols user.js`');
   });
 
   test('writes one section per instruction file for other agents, without Claude files', () => {

@@ -103,6 +103,31 @@ describe('code index of a CommonJS project', () => {
     ).toBe('fresh');
   });
 
+  test('writes the definition names that refs finds, for the hint hook (REQ-NAV-005)', () => {
+    const namesPath = path.join(root, '.scip', 'names.json');
+    const content = fs.readFileSync(namesPath, 'utf8');
+    const { version, names } = JSON.parse(content);
+    expect(version).toBe(1);
+    const show = name => (names[name] || []).map(e => `${e.kind} ${e.name} ${e.file}:${e.line}`);
+    // Destructured require() bindings in app.js and fancy.js are aliases, not definitions.
+    expect(show('Widget')).toEqual(['class Widget lib/widget.js:1']);
+    expect(show('makeWidget')).toEqual(['function makeWidget lib/widget.js:9']);
+    expect(show('render')).toEqual([
+      'method FancyWidget.render lib/fancy.js:3',
+      'method Widget.render lib/widget.js:5',
+    ]);
+    expect(show('main')).toEqual(['function main lib/app.js:3']);
+    // Class fields and constructors are not listed.
+    expect(Object.keys(names)).not.toContain('name');
+    expect(Object.keys(names)).not.toContain('constructor');
+
+    const cfg = loadConfig(root);
+    fs.rmSync(namesPath);
+    expect(getFreshness(cfg).state).toBe('stale');
+    fs.writeFileSync(namesPath, content);
+    expect(getFreshness(cfg).state).toBe('fresh');
+  });
+
   test('finds cross-file new, extends, require and export sites of a class', () => {
     expect(refsOf('Widget', 'lib/widget.js')).toEqual([
       'lib/app.js:1 require -',
@@ -189,6 +214,28 @@ describe('code index of a CommonJS project', () => {
     );
     expect(hook.status).toBe(0);
     expect(hook.stdout).toBe('');
+
+    const hint = cli(
+      root,
+      ['hint', '--hook'],
+      JSON.stringify({
+        hook_event_name: 'PreToolUse',
+        tool_name: 'Bash',
+        tool_input: { command: 'grep -rn "\\bmakeWidget\\b" lib' },
+      })
+    );
+    expect(hint.status).toBe(0);
+    const context = JSON.parse(hint.stdout).hookSpecificOutput.additionalContext;
+    expect(context).toContain('makeWidget (function) lib/widget.js:9');
+    expect(context).toContain('`musubi-code refs makeWidget`');
+
+    const silent = cli(
+      root,
+      ['hint', '--hook'],
+      JSON.stringify({ tool_name: 'Grep', tool_input: { pattern: 'fixture', path: 'README.md' } })
+    );
+    expect(silent.status).toBe(0);
+    expect(silent.stdout).toBe('');
   }, 120000);
 
   test('marks the index stale after a source edit', () => {

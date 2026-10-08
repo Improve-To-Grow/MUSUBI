@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Grep reminder for Claude Code** (CHANGE-005): `musubi-code setup` adds synchronous `PreToolUse` hooks running `musubi-code hint --hook` before the Grep tool and before shell commands that start with `grep`, `rg`, `git grep` or `Select-String`. When the search pattern consists only of names the code index defines, the hook adds a note with each definition and its `musubi-code refs` command. It never blocks or approves the call, and stays silent for text searches and searches outside the index
+  - Each index build also writes `.scip/names.json`, the definition names the hook reads (about 0.2 s per call on this repository); an index without it counts as stale and is rebuilt once
+  - `query.definitionNames()` lists them with the same filters as `refs`
+
+### Changed
+
+- **Code Navigation instructions** (CHANGE-005): the section that `musubi-code setup` writes into `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` and `QWEN.md` now tells the agent to answer symbol questions with `musubi-code` before grep, maps each question (does it exist, where is it defined, what does a file export, who uses it, what depends on a file) to a command, and says that this also applies where an SDD command or skill says to grep. Existing projects receive it on `musubi upgrade` or `musubi-code setup`
+- **`code-references` skill** (CHANGE-005): describes definition, existence and export questions, so Claude Code picks it for "where is X defined?" as well as for usages
+
 ### Removed
 
 - **Plugin development guide** (CHANGE-004): `docs/guides/PLUGIN-DEVELOPMENT.md` documented a plugin system that does not exist (no plugin loader, no `PluginDefinition`, no `musubi-sdd/testing` module); the guide and its two links are removed
