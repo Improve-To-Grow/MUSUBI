@@ -6,9 +6,22 @@ MUSUBI SDD is a comprehensive toolkit for specification-driven development. This
 
 ## Installation
 
+Install the CLI globally:
+
 ```bash
 npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
+
+To use the modules below from your own code, also install the package into your project. Node
+does not resolve `require()` against a global install:
+
+```bash
+npm install --save-dev 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
+```
+
+Load it as `@improve-to-grow/musubi-sdd`, the ITG fork's package name; `musubi-sdd` on npm is the
+upstream version. Modules that the package root does not export are loaded by file path, for
+example `@improve-to-grow/musubi-sdd/src/orchestration`.
 
 ## Module Index
 
@@ -31,7 +44,7 @@ npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 A class for analyzing large projects.
 
 ```javascript
-const { LargeProjectAnalyzer } = require('musubi-sdd');
+const { LargeProjectAnalyzer } = require('@improve-to-grow/musubi-sdd');
 
 const analyzer = new LargeProjectAnalyzer({
   maxFiles: 1000,
@@ -55,7 +68,7 @@ console.log(analysis.summary);
 Analyzes code complexity.
 
 ```javascript
-const { ComplexityAnalyzer } = require('musubi-sdd');
+const { ComplexityAnalyzer } = require('@improve-to-grow/musubi-sdd');
 
 const analyzer = new ComplexityAnalyzer();
 const result = analyzer.analyzeFile('./src/index.js');
@@ -69,7 +82,7 @@ console.log(`Cognitive Complexity: ${result.cognitive}`);
 Detects gaps between requirements and code.
 
 ```javascript
-const { GapDetector } = require('musubi-sdd');
+const { GapDetector } = require('@improve-to-grow/musubi-sdd');
 
 const detector = new GapDetector();
 const gaps = await detector.detectGaps({
@@ -91,7 +104,7 @@ gaps.forEach(gap => {
 Generates requirements in EARS format.
 
 ```javascript
-const { RequirementsGenerator } = require('musubi-sdd');
+const { RequirementsGenerator } = require('@improve-to-grow/musubi-sdd');
 
 const generator = new RequirementsGenerator({
   format: 'EARS'
@@ -108,7 +121,7 @@ const requirements = await generator.generate({
 Generates design documents based on the C4 model.
 
 ```javascript
-const { DesignGenerator } = require('musubi-sdd');
+const { DesignGenerator } = require('@improve-to-grow/musubi-sdd');
 
 const generator = new DesignGenerator();
 const design = await generator.generate({
@@ -117,14 +130,14 @@ const design = await generator.generate({
 });
 ```
 
-### TaskGenerator
+### TasksGenerator
 
 Generates tasks from the design.
 
 ```javascript
-const { TaskGenerator } = require('musubi-sdd');
+const { TasksGenerator } = require('@improve-to-grow/musubi-sdd');
 
-const generator = new TaskGenerator({
+const generator = new TasksGenerator({
   granularity: 'fine',
   estimateEffort: true
 });
@@ -141,7 +154,7 @@ const tasks = await generator.generate(design);
 The main engine that executes workflows.
 
 ```javascript
-const { OrchestrationEngine } = require('musubi-sdd');
+const { OrchestrationEngine } = require('@improve-to-grow/musubi-sdd');
 
 const engine = new OrchestrationEngine({
   llmProvider: 'openai',
@@ -162,7 +175,7 @@ console.log(`Total cost: $${result.totalCost}`);
 Defines and executes custom workflows.
 
 ```javascript
-const { WorkflowOrchestrator } = require('musubi-sdd');
+const { WorkflowOrchestrator } = require('@improve-to-grow/musubi-sdd');
 
 const orchestrator = new WorkflowOrchestrator();
 
@@ -184,7 +197,7 @@ await orchestrator.run('custom', context);
 Verifies compliance with the 9-Article Constitution.
 
 ```javascript
-const { ConstitutionalValidator } = require('musubi-sdd');
+const { ConstitutionalValidator } = require('@improve-to-grow/musubi-sdd');
 
 const validator = new ConstitutionalValidator();
 const result = await validator.validate({
@@ -221,7 +234,7 @@ if (result.passed) {
 Provides lazy loading of modules.
 
 ```javascript
-const { performance } = require('musubi-sdd');
+const { performance } = require('@improve-to-grow/musubi-sdd');
 const { LazyLoader } = performance;
 
 const loader = new LazyLoader();
@@ -237,7 +250,7 @@ const module = await loader.load('heavyModule');
 Provides an LRU cache with TTL.
 
 ```javascript
-const { CacheManager } = require('musubi-sdd').performance;
+const { CacheManager } = require('@improve-to-grow/musubi-sdd').performance;
 
 const cache = new CacheManager({
   maxSize: 1000,
@@ -253,7 +266,7 @@ const cached = cache.get('key');
 Optimizes startup time.
 
 ```javascript
-const { StartupOptimizer, InitStage } = require('musubi-sdd').performance;
+const { StartupOptimizer, InitStage } = require('@improve-to-grow/musubi-sdd').performance;
 
 const optimizer = new StartupOptimizer();
 
@@ -274,7 +287,7 @@ await optimizer.initialize();
 Manages multi-tenant environments.
 
 ```javascript
-const { enterprise } = require('musubi-sdd');
+const { enterprise } = require('@improve-to-grow/musubi-sdd');
 const { TenantManager, TenantRole } = enterprise;
 
 const manager = new TenantManager();
@@ -298,7 +311,7 @@ const context = manager.createContext(tenant.id, user.id);
 Role-based access control.
 
 ```javascript
-const { Permission, ROLE_PERMISSIONS } = require('musubi-sdd').enterprise;
+const { Permission, ROLE_PERMISSIONS } = require('@improve-to-grow/musubi-sdd').enterprise;
 
 if (user.hasPermission(Permission.ORCHESTRATE)) {
   // Can run orchestration
@@ -318,7 +331,7 @@ if (user.hasAllPermissions([Permission.READ, Permission.WRITE])) {
 Selects the optimal model for a task.
 
 ```javascript
-const { ai } = require('musubi-sdd');
+const { ai } = require('@improve-to-grow/musubi-sdd');
 const { ModelRouter, TaskType } = ai;
 
 const router = new ModelRouter();
@@ -337,7 +350,7 @@ console.log(`Selected model: ${model.name}`);
 Provides RAG search over code knowledge.
 
 ```javascript
-const { RAGPipeline } = require('musubi-sdd').ai;
+const { RAGPipeline } = require('@improve-to-grow/musubi-sdd').ai;
 
 const rag = new RAGPipeline({ topK: 5 });
 
@@ -357,7 +370,7 @@ const augmented = await rag.augment(
 Manages large contexts.
 
 ```javascript
-const { ContextWindowManager } = require('musubi-sdd').ai;
+const { ContextWindowManager } = require('@improve-to-grow/musubi-sdd').ai;
 
 const manager = new ContextWindowManager();
 
@@ -390,44 +403,6 @@ musubi orchestrate <feature>
 
 # Cost tracking
 musubi costs --report
-```
-
----
-
-## TypeScript Support
-
-```typescript
-import {
-  OrchestrationEngine,
-  RequirementsGenerator,
-  ConstitutionalValidator,
-  type OrchestrationResult,
-  type Requirement
-} from 'musubi-sdd';
-
-const engine = new OrchestrationEngine();
-const result: OrchestrationResult = await engine.execute({
-  workflow: 'full-sdd',
-  feature: 'user-auth'
-});
-```
-
----
-
-## Error Handling
-
-```javascript
-const { MUSUBIError, ValidationError } = require('musubi-sdd');
-
-try {
-  await validator.validate(feature);
-} catch (error) {
-  if (error instanceof ValidationError) {
-    console.error('Validation failed:', error.violations);
-  } else if (error instanceof MUSUBIError) {
-    console.error('MUSUBI error:', error.message);
-  }
-}
 ```
 
 ---

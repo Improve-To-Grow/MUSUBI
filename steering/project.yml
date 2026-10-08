@@ -11,11 +11,13 @@ tech_stack:
   languages:
     - javascript
 
-# Constitution profile (constitution v1.1, "Project Profiles")
+# Constitution profile: decides how Articles I and II apply
+# (see "Project Profiles" in steering/rules/constitution.md)
 constitution:
   profile: cli # library | cli | application
   core_paths: [src]
   delivery_paths: [bin]
+  # levels: # optional per-article override (P-6), e.g. CONST-001: critical
 
 # Review Gate Settings (v6.2.0)
 reviewGate:

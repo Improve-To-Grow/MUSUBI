@@ -48,7 +48,7 @@ constitution:
 
 ### Requirements
 
-- **P-1** The project SHALL declare its profile as `constitution.profile` in `steering/project.yml`, with the value `library`, `cli` or `application`.
+- **P-1** The project SHALL declare its profile as `constitution.profile` in `steering/project.yml`, with the value `library`, `cli` or `application`. _(advisory)_
 - **P-2** IF `steering/project.yml` declares no profile, THEN the `constitution-enforcer` SHALL apply the `library` profile.
 - **P-3** IF a `library` or `cli` project declares no `core_paths`, THEN the `constitution-enforcer` SHALL use `lib/` and `packages/` as core paths.
 - **P-4** WHERE the project profile is `application`, `steering/project.yml` SHALL declare `core_paths` and `delivery_paths`.

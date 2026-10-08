@@ -50,12 +50,15 @@ musubi init --windsurf     # Windsurf IDE
 musubi init --force        # Overwrite existing files
 musubi init --minimal      # Initialize with minimal configuration
 musubi init --output ./dir # Specify output directory
+musubi init --code-index      # Set up code navigation without asking
+musubi init --no-code-index   # Skip code navigation without asking
 ```
 
 **Generated files:**
 - `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` / `QWEN.md`
 - Full set of `steering/` directories
 - Full set of `storage/` directories
+- JavaScript/TypeScript projects that accept code navigation: `.claude/skills/code-references/`, hooks in `.claude/settings.json`, `.scip/` in `.gitignore` (see [`musubi code`](#musubi-code--musubi-code))
 
 ### `musubi onboard`
 
@@ -222,6 +225,25 @@ musubi trace --feature login      # Specific feature only
 musubi trace --format matrix      # Matrix format
 musubi trace --format graph       # Graph format
 musubi trace --output ./trace/    # Specify output destination
+```
+
+### `musubi code` / `musubi-code`
+
+Compiler-accurate code navigation for JavaScript/TypeScript projects, built on scip-typescript. See the [code navigation guide](scip-typescript.md).
+
+```bash
+musubi-code refs <Name|Owner.member>   # Every reference: new, call, require, extends, ...
+musubi-code callers <Name>             # Functions that call or instantiate it
+musubi-code deps <file>                # Files and packages a file depends on
+musubi-code dependents <file>          # Files that depend on a file
+musubi-code symbols <file>             # Definitions in a file
+musubi-code status                     # Index freshness
+musubi-code index                      # Build the index in .scip/
+musubi-code setup                      # Configure the project: skill, hooks, instructions
+
+# Options for queries
+musubi-code refs Widget --file lib/widget.js   # Pick one of several definitions
+musubi-code refs Widget --limit 0 --json       # All references as JSON
 ```
 
 ---
@@ -411,6 +433,7 @@ Options available for all commands:
 | `analyze` | All | Analysis |
 | `gaps` | Validate | Gap detection |
 | `trace` | All | Traceability |
+| `code` | All | Code navigation (references, callers, dependencies) |
 | `remember` | All | Memory management |
 | `sync` | All | Sync |
 | `change` | All | Change management |

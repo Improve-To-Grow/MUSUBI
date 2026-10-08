@@ -5,6 +5,66 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Grep reminder for Claude Code** (CHANGE-005): `musubi-code setup` adds synchronous `PreToolUse` hooks running `musubi-code hint --hook` before the Grep tool and before shell commands that start with `grep`, `rg`, `git grep` or `Select-String`. When the search pattern consists only of names the code index defines, the hook adds a note with each definition and its `musubi-code refs` command. It never blocks or approves the call, and stays silent for text searches and searches outside the index
+  - Each index build also writes `.scip/names.json`, the definition names the hook reads (about 0.2 s per call on this repository); an index without it counts as stale and is rebuilt once
+  - `query.definitionNames()` lists them with the same filters as `refs`
+
+### Changed
+
+- **Code Navigation instructions** (CHANGE-005): the section that `musubi-code setup` writes into `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` and `QWEN.md` now tells the agent to answer symbol questions with `musubi-code` before grep, maps each question (does it exist, where is it defined, what does a file export, who uses it, what depends on a file) to a command, and says that this also applies where an SDD command or skill says to grep. Existing projects receive it on `musubi upgrade` or `musubi-code setup`
+- **`code-references` skill** (CHANGE-005): describes definition, existence and export questions, so Claude Code picks it for "where is X defined?" as well as for usages
+- **Claude Code SDD templates** (CHANGE-005): `/sdd-change-init`, `/sdd-change-apply`, `/sdd-change-archive`, `/sdd-requirements` and the `change-impact-analyzer` skill look up classes, functions and file dependencies with `musubi-code` first when the project has a code index, and keep grep for text and for projects without one. `/sdd-change-init` asks the proposal to say which facts came from the index and which from grep. Existing projects keep their copies until they re-run `musubi init` for Claude Code
+
+### Removed
+
+- **Plugin development guide** (CHANGE-004): `docs/guides/PLUGIN-DEVELOPMENT.md` documented a plugin system that does not exist (no plugin loader, no `PluginDefinition`, no `musubi-sdd/testing` module); the guide and its two links are removed
+
+### Fixed
+
+- **Package entry point exports** (CHANGE-003): 11 exports of `require('musubi-sdd')` (`src/index.js`) were `undefined` since v5.5.0; every export is now defined
+  - `GapDetector`, `DesignGenerator`, `RequirementsGenerator` and `ChangeManager` keep their names and now resolve
+  - Classes are exported under their own names: `ASTExtractor`, `TraceabilityAnalyzer`, `TasksGenerator`, `CICDManager`, `TraceabilityMatrixReport`, `ConstitutionValidator`, `AgentMemoryManager`
+  - The previously advertised names stay as deprecated aliases: `AstExtractor` (use `ASTExtractor`), `TaskGenerator` (`TasksGenerator`), `CICDIntegration` (`CICDManager`), `TraceabilityMatrixReporter` (`TraceabilityMatrixReport`), `Constitution` (`ConstitutionValidator`), `AgentMemory` (`AgentMemoryManager`)
+  - `createTraceabilityMatrix` is removed; it was never defined. Use `await new TraceabilityAnalyzer(workspaceRoot).generateMatrix(options)`
+  - `docs/API-REFERENCE.md`: the task generator example uses `TasksGenerator`; the "Error Handling" section, which documented `MUSUBIError` and `ValidationError` classes that do not exist, is removed
+  - `code-reviewer` skill: imports `COMPLEXITY_THRESHOLDS` instead of the non-existent `THRESHOLDS`
+  - `tests/index.test.js` checks every export, the aliases and every name the API reference and agent templates destructure from the package
+- **Documented imports** (CHANGE-004): library examples in the docs and agent templates load modules that exist and names those modules export
+  - Subpaths are file paths from the package root: `musubi-sdd/orchestration`, `…/orchestration/guardrails`, `…/orchestration/replanning` and `…/orchestration/skill-executor` become `musubi-sdd/src/orchestration…` (13 references)
+  - `requirementsReviewerSkill` and `designReviewerSkill` are imported from `src/orchestration/builtin-skills`; `ErrorHandler` and `PatternRegistry` from `src/orchestration`
+  - `docs/USER-GUIDE.md` validation example uses `checkEarsFormat` and `ConstitutionalValidator#validateAll()` instead of the non-existent `EARSValidator` and `check()`
+  - Documentation of APIs that do not exist is removed: "TypeScript Support" in `docs/API-REFERENCE.md` (the package ships no type declarations) and "Validator Extension" (`ValidatorRegistry`) in `docs/guides/ARCHITECTURE-DEEP-DIVE.md`
+  - `tests/index.test.js` checks every module and name the live documentation imports from the package, including subpaths and ESM `import`
+- **Fork package name in library examples** (CHANGE-004): the docs and agent templates loaded `musubi-sdd`, the upstream package, which never resolves for this fork; they now load `@improve-to-grow/musubi-sdd` (80 imports in 27 files)
+  - `docs/API-REFERENCE.md` and the troubleshooting guide document the project-local install that `require()` needs, `npm install --save-dev 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'`; the global install provides the CLI only
+  - The CI/CD guide downloads the GitLab and Jenkins templates from the fork and calls the fork's reusable GitHub Actions workflow, instead of copying from `node_modules/musubi-sdd`, which never contained them
+  - Existing projects keep their copies of the agent templates: replace the package name by hand, or re-run `musubi-sdd init` for the agent and confirm the overwrite prompt (this replaces local changes to the agent files)
+  - `tests/package-name.test.js` guards the package name and the install instructions
+
+## [6.3.1-itg.2] - 2026-10-08
+
+### Added
+
+- **`musubi-code`: compiler-accurate code navigation** for JavaScript/TypeScript projects (also `musubi code`). It builds a SCIP index in `.scip/` with `@sourcegraph/scip-typescript`, now a runtime dependency pinned to an exact version, and answers `refs`, `callers`, `deps`, `dependents` and `symbols`, resolving CommonJS `require()`, cross-file `new X()`, `extends` and method calls. Queries rebuild a stale index first; `musubi-code index --hook` rebuilds it in the background from Claude Code hooks. Library: `src/code-index/`
+- **`musubi-code setup`** configures a project: `.scip/` in `.gitignore`, the `code-references` Claude Code skill, async hooks in `.claude/settings.json` (merged with existing settings), and a marked "Code Navigation" section in the agent instruction file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`). Idempotent; `--agent`, `--dry-run`, `--force`, `--command`
+- **`musubi init`** asks whether to set up code navigation when the project uses JavaScript/TypeScript or already has `package.json`/`tsconfig.json`; `--code-index` and `--no-code-index` answer in advance
+- **`musubi upgrade`** sets up code navigation in JavaScript/TypeScript projects that lack it, even when they are already at the current version; `--no-code-index` skips it, `--dry-run` previews it
+- `docs/guides/scip-typescript.md` describes setup, commands, configuration and limits
+
+### Removed
+
+- **CodeGraph MCP integration** (breaking for library users of these exports). codegraph-mcp records no `require()` or cross-file `new X()` edges for CommonJS code, so its graph could not answer usage questions for MUSUBI or other JavaScript projects
+  - `CodeGraphMCP` export and `src/integrations/codegraph-mcp.js`
+  - `CodeGraphAutoUpdate`, `createCodeGraphAutoUpdate`, `CODEGRAPH_TRIGGER` and `CODEGRAPH_TARGET` from `phase5-integration`, and `src/analyzers/codegraph-auto-update.js`; `Phase5Integration` no longer emits `codegraph-updated` or `codegraph-error`, and `getComponent('codeGraphAutoUpdate')` returns `null`
+  - `CacheNamespace.CODEGRAPH` and the `codegraph-mcp` lazy-loader entry
+  - `musubi-analyze --codegraph`, `--codegraph-full` and `--type codegraph`
+  - CodeGraph MCP setup and tool sections in the orchestrator skill, the shared `AGENTS.md`, the platform instruction templates, the README and the user guide; the `setup-codegraph` GitHub Copilot prompt
+  - Repository files `.mcp.json` and `steering/memories/codegraph.md`
+
 ## [6.3.1-itg.1] - 2026-10-07
 
 ### Changed

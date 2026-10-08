@@ -7,8 +7,8 @@ node_modules/
 References/
 Refecences/
 
-# CodeGraph MCP Server (local database)
-.codegraph/
+# scip-typescript code index (scripts/scip-index.js)
+.scip/
 
 # Python
 __pycache__/

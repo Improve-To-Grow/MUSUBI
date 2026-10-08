@@ -167,7 +167,7 @@ By Operation:
 ### Use from Node.js
 
 ```javascript
-const { OrchestrationEngine } = require('musubi-sdd');
+const { OrchestrationEngine } = require('@improve-to-grow/musubi-sdd');
 
 const engine = new OrchestrationEngine({
   llmProvider: 'openai',

@@ -1,7 +1,7 @@
 # Project Structure
 
 **Project**: MUSUBI
-**Last Updated**: 2026-10-02
+**Last Updated**: 2026-10-08
 **Version**: 1.0
 
 ---
@@ -135,6 +135,15 @@ MUSUBI/
 ├── templates/            # Document templates
 └── [Other directories]
 ```
+
+### Navigating the Code
+
+`musubi-code` indexes `bin/`, `src/` and `tests/`, but not `src/templates/` or Markdown. Look up
+definitions, exports, references and file dependencies with `musubi-code refs <Name>`,
+`musubi-code symbols <file>`, `musubi-code callers <Name>` and
+`musubi-code deps|dependents <file>` before grep. Grep the unindexed parts (`src/templates/`,
+`docs/`, `steering/`, `storage/`) for text, and grep once for a name as a string before renaming
+or deleting it (dynamic `require()` paths and string-keyed registries are invisible to the index).
 
 ---
 
@@ -534,21 +543,5 @@ Release history is kept in [CHANGELOG.md](../CHANGELOG.md) and is not repeated h
 
 ---
 
-**Last Updated**: 2026-10-02
+**Last Updated**: 2026-10-08
 **Maintained By**: {{MAINTAINER}}
-
-
-## New Directories (Detected 2026-10-02)
-
-```
-website/
-tests/
-templates/
-storage/
-steering/
-src/
-packages/
-orchestrator/
-docs/
-bin/
-```

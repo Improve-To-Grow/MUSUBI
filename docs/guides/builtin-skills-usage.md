@@ -50,7 +50,7 @@ const {
   designReviewerSkill,
   registerBuiltInSkills,
   getBuiltInSkills,
-} = require('musubi-sdd/src/orchestration');
+} = require('@improve-to-grow/musubi-sdd/src/orchestration/builtin-skills');
 ```
 
 ### Workflow Mode Manager
@@ -170,8 +170,8 @@ console.log(changelog.changes);
 ## Register with Custom Registry
 
 ```javascript
-const { SkillRegistry } = require('musubi-sdd/src/orchestration');
-const { registerBuiltInSkills } = require('musubi-sdd/src/orchestration');
+const { SkillRegistry } = require('@improve-to-grow/musubi-sdd/src/orchestration');
+const { registerBuiltInSkills } = require('@improve-to-grow/musubi-sdd/src/orchestration');
 
 const registry = new SkillRegistry();
 const count = registerBuiltInSkills(registry);
@@ -195,7 +195,7 @@ The `requirements-reviewer` skill provides systematic requirements review using 
 ### Usage Examples
 
 ```javascript
-const { requirementsReviewerSkill } = require('musubi-sdd/src/orchestration');
+const { requirementsReviewerSkill } = require('@improve-to-grow/musubi-sdd/src/orchestration/builtin-skills');
 
 // Full review using combined method
 const result = await requirementsReviewerSkill.execute({
@@ -290,7 +290,7 @@ The `design-reviewer` skill provides systematic design document review using ATA
 ### Usage Examples
 
 ```javascript
-const { designReviewerSkill } = require('musubi-sdd/src/orchestration');
+const { designReviewerSkill } = require('@improve-to-grow/musubi-sdd/src/orchestration/builtin-skills');
 
 // Full design review
 const result = await designReviewerSkill.execute({
@@ -401,7 +401,7 @@ console.log(correctionResult.report);               // Correction report
 ## Integration with Workflows
 
 ```javascript
-const { createOrchestrationEngine } = require('musubi-sdd/src/orchestration');
+const { createOrchestrationEngine } = require('@improve-to-grow/musubi-sdd/src/orchestration');
 
 const engine = createOrchestrationEngine();
 

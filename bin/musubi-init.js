@@ -40,6 +40,8 @@ const {
   buildConstitutionYml,
 } = require('../src/cli/init-generators');
 
+const { setupCodeIndex } = require('../src/code-index/setup');
+
 const TEMPLATE_DIR = path.join(__dirname, '..', 'src', 'templates');
 const SHARED_TEMPLATE_DIR = path.join(TEMPLATE_DIR, 'shared');
 const AGENTS_TEMPLATE_DIR = path.join(TEMPLATE_DIR, 'agents');
@@ -334,6 +336,27 @@ async function main(agent, agentKey, options = {}) {
     answers.languages = ['undecided'];
   }
 
+  // Code navigation (musubi-code): offered for JavaScript/TypeScript projects
+  answers.codeIndex = options.codeIndex;
+  if (answers.codeIndex === undefined) {
+    const isJsProject =
+      (answers.languages || []).includes('javascript') ||
+      ['package.json', 'tsconfig.json', 'jsconfig.json'].some(file => fs.existsSync(file));
+    answers.codeIndex = false;
+    if (isJsProject) {
+      const codeIndexAnswer = await inquirer.default.prompt([
+        {
+          type: 'confirm',
+          name: 'codeIndex',
+          message:
+            'Set up compiler-accurate code navigation for AI agents (references, callers, dependencies)?',
+          default: true,
+        },
+      ]);
+      answers.codeIndex = codeIndexAnswer.codeIndex;
+    }
+  }
+
   // Ask template questions if workspace or microservices
   if (answers.projectStructure === 'workspace' || answers.projectStructure === 'microservices') {
     const templateAnswer = await inquirer.default.prompt(templatePrompts);
@@ -539,6 +562,20 @@ async function main(agent, agentKey, options = {}) {
   await createReadme(answers, agent, agentKey);
   console.log(chalk.green(`  Created ${agent.layout.docFile || 'MUSUBI.md'} guide`));
 
+  // Set up code navigation after the guide exists, so its section is appended to it
+  if (answers.codeIndex) {
+    const codeIndex = setupCodeIndex(process.cwd(), {
+      agents: [agentKey],
+      force: options.codeIndex === true,
+    });
+    if (codeIndex.skippedReason) {
+      console.log(chalk.yellow(`  Code navigation not set up: ${codeIndex.skippedReason}`));
+    } else {
+      console.log(chalk.green('  Set up code navigation (musubi-code)'));
+      for (const warning of codeIndex.warnings) console.log(chalk.yellow(`  ⚠️  ${warning}`));
+    }
+  }
+
   // Success message
   console.log(chalk.blue.bold(`\n✅ MUSUBI initialization complete for ${agent.label}!\n`));
   console.log(chalk.white('Next steps:'));
@@ -552,7 +589,11 @@ async function main(agent, agentKey, options = {}) {
   }
 
   const cmdExample = agent.commands.requirements.replace(' <feature>', ' authentication');
-  console.log(chalk.gray(`  4. Try commands: ${cmdExample}\n`));
+  console.log(chalk.gray(`  4. Try commands: ${cmdExample}`));
+  if (answers.codeIndex) {
+    console.log(chalk.gray('  5. Find where code is used: musubi-code refs <Name>'));
+  }
+  console.log('');
   console.log(chalk.cyan('Learn more: https://github.com/nahisaho/MUSUBI\n'));
 }
 

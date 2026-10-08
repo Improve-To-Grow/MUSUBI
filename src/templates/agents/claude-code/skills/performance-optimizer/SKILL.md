@@ -36,7 +36,7 @@ The LargeProjectAnalyzer module provides scale-aware analysis for enterprise-gra
 ### Module Usage
 
 ```javascript
-const { LargeProjectAnalyzer, LARGE_PROJECT_THRESHOLDS } = require('musubi-sdd');
+const { LargeProjectAnalyzer, LARGE_PROJECT_THRESHOLDS } = require('@improve-to-grow/musubi-sdd');
 
 const analyzer = new LargeProjectAnalyzer({
   maxMemoryMB: 4096,

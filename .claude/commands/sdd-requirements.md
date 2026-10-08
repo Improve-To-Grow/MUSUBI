@@ -60,7 +60,9 @@ Use `AskUserQuestion` tool to ask:
 
 #### B. Research Existing System (brownfield)
 
-- Search for existing implementation: `grep -r "{{feature}}" src/`
+- Search for existing implementation: with a code index (CLAUDE.md "Code Navigation"),
+  `musubi-code refs <Symbol>` and `musubi-code symbols <file>` for classes, functions and modules;
+  `grep -rn "{{feature}}" src/` for the feature's words and in projects without an index
 - Read related code
 - Identify current behavior
 - Document what needs to change (delta spec)
@@ -416,7 +418,8 @@ Present summary to user:
 - **Read**: Read steering files, existing specs
 - **Write**: Create requirements document
 - **AskUserQuestion**: Gather stakeholder input (if needed)
-- **Grep**: Search for existing implementations (brownfield)
+- **Bash (`musubi-code`)**: Find existing classes, functions and their uses (brownfield, projects with a code index)
+- **Grep**: Search for text, and for existing implementations in projects without a code index (brownfield)
 
 ### Optional Tools:
 

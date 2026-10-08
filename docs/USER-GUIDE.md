@@ -189,6 +189,18 @@ REQ-AUTH-001 ←→ src/auth/login.js ←→ tests/auth.test.js
 | `musubi change apply`   | Apply delta spec      |
 | `musubi sync`           | Sync specs with code  |
 
+### Code Navigation
+
+For JavaScript/TypeScript projects. `musubi init` and `musubi upgrade` set it up; see the [code navigation guide](./guides/scip-typescript.md).
+
+| Command                         | Description                                        |
+| ------------------------------- | -------------------------------------------------- |
+| `musubi-code refs <Name>`       | Every reference: new, call, require, extends, ...  |
+| `musubi-code callers <Name>`    | Functions that call or instantiate a symbol        |
+| `musubi-code deps <file>`       | Files and packages a file depends on               |
+| `musubi-code dependents <file>` | Files that depend on a file                        |
+| `musubi-code setup`             | Configure a project: skill, hooks, instructions    |
+
 ---
 
 ## Orchestration Patterns
@@ -416,7 +428,7 @@ musubi-validate all --verbose
 ### Node.js API
 
 ```javascript
-const { SkillRegistry, SkillExecutor } = require('musubi-sdd');
+const { SkillRegistry, SkillExecutor } = require('@improve-to-grow/musubi-sdd');
 
 // Register skill
 const registry = new SkillRegistry();
@@ -435,7 +447,7 @@ const result = await executor.execute('my-skill', { data: 'input' });
 ### Orchestration API
 
 ```javascript
-const { OrchestrationEngine } = require('musubi-sdd');
+const { OrchestrationEngine } = require('@improve-to-grow/musubi-sdd');
 
 const engine = new OrchestrationEngine();
 
@@ -455,15 +467,16 @@ await engine.executePattern('parallel', {
 ### Validation API
 
 ```javascript
-const { EARSValidator, ConstitutionalValidator } = require('musubi-sdd');
+const { ConstitutionalValidator } = require('@improve-to-grow/musubi-sdd');
+const { checkEarsFormat } = require('@improve-to-grow/musubi-sdd/src/constitutional/ears');
 
-// Validate EARS
-const ears = new EARSValidator();
-const result = ears.validate(requirementText);
+// Validate EARS: an array of findings, empty when the text complies
+const findings = checkEarsFormat({ content: requirementText, force: true });
 
-// Validate Constitution
-const constitution = new ConstitutionalValidator();
-const compliance = constitution.check(artifacts);
+// Validate the project against the constitution
+const constitution = new ConstitutionalValidator(projectRoot);
+const report = await constitution.validateAll();
+console.log(report.summary.status);
 ```
 
 ---
@@ -475,7 +488,7 @@ const compliance = constitution.check(artifacts);
 Analyze projects with 10,000+ files efficiently:
 
 ```javascript
-const { LargeProjectAnalyzer } = require('musubi-sdd');
+const { LargeProjectAnalyzer } = require('@improve-to-grow/musubi-sdd');
 
 const analyzer = new LargeProjectAnalyzer('/path/to/large-project', {
   chunkSize: 1000, // Files per chunk
@@ -493,7 +506,7 @@ console.log(result.stats);
 Calculate cyclomatic and cognitive complexity:
 
 ```javascript
-const { ComplexityAnalyzer } = require('musubi-sdd');
+const { ComplexityAnalyzer } = require('@improve-to-grow/musubi-sdd');
 
 const analyzer = new ComplexityAnalyzer();
 
@@ -513,7 +526,7 @@ const analysis = analyzer.analyzeCode(code, 'javascript');
 Analyze C/C++ code for Rust migration:
 
 ```javascript
-const { RustMigrationGenerator } = require('musubi-sdd');
+const { RustMigrationGenerator } = require('@improve-to-grow/musubi-sdd');
 
 const generator = new RustMigrationGenerator('/path/to/c-project');
 const analysis = await generator.analyze();
@@ -522,32 +535,12 @@ console.log(analysis.summary);
 // { totalFiles, unsafePatterns, securityComponents, migrationPriorities }
 ```
 
-### CodeGraph MCP Integration
-
-Deep code relationship analysis:
-
-```javascript
-const { CodeGraphMCP } = require('musubi-sdd');
-
-const mcp = new CodeGraphMCP('/path/to/project');
-await mcp.indexRepository();
-
-// Call graph
-const callGraph = await mcp.getCallGraph('main', { depth: 3 });
-
-// Impact analysis
-const affected = await mcp.getImpactAnalysis(['src/parser.c']);
-
-// Circular dependencies
-const cycles = await mcp.detectCircularDependencies();
-```
-
 ### Hierarchical Reporter
 
 Generate drilldown reports for large projects:
 
 ```javascript
-const { HierarchicalReporter } = require('musubi-sdd');
+const { HierarchicalReporter } = require('@improve-to-grow/musubi-sdd');
 
 const reporter = new HierarchicalReporter({
   maxDepth: 4,
@@ -570,6 +563,7 @@ const report = reporter.generateReport(analysis);
 - [CI/CD Integration](./guides/ci-cd-integration.md)
 - [Change Management](./guides/change-management.md)
 - [Traceability Matrix](./guides/traceability-matrix-guide.md)
+- [Code Navigation (musubi-code)](./guides/scip-typescript.md)
 
 ---
 

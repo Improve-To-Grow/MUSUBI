@@ -280,8 +280,12 @@ export async function POST(req: NextRequest) {
 #### Step 5.1: Read Current Implementation
 
 ```bash
-# Find current code
-grep -r "{{existing-function}}" lib/
+# Find current code: definition and callers (code index, when the project has one)
+musubi-code refs {{ExistingFunction}}
+musubi-code callers {{ExistingFunction}}
+
+# The name in strings, docs and templates, or projects without a code index
+grep -rn "{{existing-function}}" lib/
 ```
 
 #### Step 5.2: Write Tests for New Behavior

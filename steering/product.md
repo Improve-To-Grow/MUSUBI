@@ -1,7 +1,7 @@
 # Product Context
 
 **Project**: MUSUBI
-**Last Updated**: 2026-10-02
+**Last Updated**: 2026-10-08
 **Version**: 1.0
 
 ---
@@ -22,7 +22,7 @@
 
 ### What is MUSUBI?
 
-MUSUBI self-maintenance project
+ITG MUSUBI Fork
 
 > [2-3 paragraphs explaining the product, its purpose, and core value proposition]
 
@@ -559,5 +559,5 @@ Release history is kept in [CHANGELOG.md](../CHANGELOG.md) and is not repeated h
 
 ---
 
-**Last Updated**: 2026-10-02
+**Last Updated**: 2026-10-08
 **Maintained By**: {{MAINTAINER}}

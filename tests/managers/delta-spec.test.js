@@ -153,6 +153,48 @@ describe('DeltaSpecManager', () => {
 
       expect(() => manager.updateStatus('DELTA-STATUS-002', 'invalid')).toThrow(/Invalid status/);
     });
+
+    it('should create the delta from a musubi-change init proposal', () => {
+      const changesDir = path.join(tempDir, 'storage', 'changes');
+      fs.mkdirSync(changesDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(changesDir, 'CHANGE-007.md'),
+        [
+          '# Fix undefined exports',
+          '',
+          '**Change ID**: CHANGE-007  ',
+          '**Date**: 2026-10-08  ',
+          '**Status**: Pending',
+          '',
+          '## Description',
+          '',
+          'Two exports resolve to undefined.',
+          '',
+          '## Requirements Changes',
+          '',
+          '### ADDED',
+          '',
+        ].join('\r\n')
+      );
+
+      const updated = manager.updateStatus('CHANGE-007', 'approved');
+
+      expect(updated).toMatchObject({
+        id: 'CHANGE-007',
+        type: DeltaType.MODIFIED,
+        target: 'Fix undefined exports',
+        description: 'Two exports resolve to undefined.',
+        status: 'approved',
+        createdAt: '2026-10-08T00:00:00.000Z',
+      });
+      expect(manager.load('CHANGE-007')).toEqual(updated);
+    });
+
+    it('should throw when neither a delta nor a proposal exists', () => {
+      expect(() => manager.updateStatus('CHANGE-404', 'approved')).toThrow(
+        'Delta not found: CHANGE-404'
+      );
+    });
   });
 
   describe('archive', () => {

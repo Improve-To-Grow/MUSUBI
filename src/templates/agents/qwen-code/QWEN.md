@@ -191,25 +191,24 @@ MUSUBI v5.5.0 adds advanced modules for analyzing enterprise-scale projects (10,
 | **LargeProjectAnalyzer**   | Streaming analysis for 100K+ files   | `src/analyzers/large-project-analyzer.js`    |
 | **ComplexityAnalyzer**     | Cyclomatic & cognitive complexity    | `src/analyzers/complexity-analyzer.js`       |
 | **RustMigrationGenerator** | C/C++ to Rust migration analysis     | `src/generators/rust-migration-generator.js` |
-| **CodeGraphMCP**           | MCP-based code intelligence server   | `src/integrations/code-graph-mcp.js`         |
 | **HierarchicalReporter**   | Drilldown reports for large projects | `src/reporters/hierarchical-reporter.js`     |
 
 ### Usage Examples
 
 ```javascript
 // Analyze large projects (100,000+ files)
-const { LargeProjectAnalyzer } = require('musubi-sdd');
+const { LargeProjectAnalyzer } = require('@improve-to-grow/musubi-sdd');
 const analyzer = new LargeProjectAnalyzer('/path/to/project');
 const result = await analyzer.analyze();
 console.log(result.stats.totalFiles);
 
 // Calculate code complexity
-const { ComplexityAnalyzer } = require('musubi-sdd');
+const { ComplexityAnalyzer } = require('@improve-to-grow/musubi-sdd');
 const complexity = new ComplexityAnalyzer();
 const score = complexity.calculateCyclomaticComplexity(code, 'javascript');
 
 // Analyze C/C++ for Rust migration
-const { RustMigrationGenerator } = require('musubi-sdd');
+const { RustMigrationGenerator } = require('@improve-to-grow/musubi-sdd');
 const generator = new RustMigrationGenerator('/path/to/cpp-project');
 const analysis = await generator.analyze();
 ```

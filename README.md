@@ -91,7 +91,6 @@ Release notes are kept in one place: **[CHANGELOG.md](CHANGELOG.md)**. This READ
 
 - 🤖 **Multi-Agent Support** - Works with 7 AI coding agents (Claude Code, GitHub Copilot, Cursor, Gemini CLI, Codex CLI, Qwen Code, Windsurf)
 - 🧠 **Dynamic Replanning** - AI agents dynamically adjust plans on failure with LLM-powered alternatives (v3.6.0+)
-- 🔌 **MCP Server Integration** - CodeGraphMCPServer for advanced code analysis (v2.0.0)
 - 📄 **Flexible Command Formats** - Supports Markdown, TOML, and AGENTS.md formats
 - 🎯 **27 Specialized Skills (All Platforms)** - 25 platform agents + 5 orchestrator built-in skills (v5.9.0)
   - Claude Code: Skills API (25 skills + 5 built-in)
@@ -301,6 +300,7 @@ Comprehensive guides are available in `docs/guides/`:
 - **[Change Management Workflow](docs/guides/change-management-workflow.md)** - End-to-end workflow documentation
 - **[Traceability Matrix Guide](docs/guides/traceability-matrix-guide.md)** - Traceability system usage
 - **[Video Tutorial Plan](docs/guides/video-tutorial-plan.md)** - Video content script
+- **[Code Navigation (musubi-code)](docs/guides/scip-typescript.md)** - Compiler-accurate references, callers and file dependencies for AI agents in JavaScript/TypeScript projects, set up by `musubi init` and `musubi upgrade`
 
 ### Project Types
 
@@ -946,96 +946,9 @@ musubi-sdd init
 
 ## Configuration
 
-### MCP Server Integration
+### MCP Servers
 
-MUSUBI v2.0.0 integrates with **CodeGraphMCPServer** for advanced code analysis.
-
-#### Option 1: Claude Code (Terminal)
-
-```bash
-# Install CodeGraph MCP with pipx (--force ensures latest version)
-pipx install --force codegraph-mcp-server
-
-# Add to Claude Code
-claude mcp add codegraph -- codegraph-mcp serve --repo .
-
-# Verify installation
-claude mcp list
-```
-
-#### Option 2: VS Code with Claude Extension
-
-1. **Install Prerequisites**:
-
-   ```bash
-   # --force ensures latest version even if already installed
-   pipx install --force codegraph-mcp-server
-   ```
-
-2. **Configure VS Code** (`.vscode/mcp.json`):
-
-   ```json
-   {
-     "servers": {
-       "codegraph": {
-         "type": "stdio",
-         "command": "codegraph-mcp",
-         "args": ["serve", "--repo", "${workspaceFolder}"]
-       }
-     }
-   }
-   ```
-
-3. **Or use Claude Desktop config** (`~/.claude/claude_desktop_config.json` on macOS/Linux, `%APPDATA%\Claude\claude_desktop_config.json` on Windows):
-
-   ```json
-   {
-     "mcpServers": {
-       "codegraph": {
-         "command": "codegraph-mcp",
-         "args": ["serve", "--repo", "/path/to/your/project"]
-       }
-     }
-   }
-   ```
-
-#### Option 3: npx (No Installation)
-
-```bash
-# Add via npx (no global install needed)
-claude mcp add codegraph -- npx -y @anthropic/codegraph-mcp --codebase .
-```
-
-#### Verify MCP Server is Working
-
-After setup, test in Claude:
-
-```text
-Use the init_graph tool to analyze this codebase
-```
-
-If successful, you'll see the code graph initialization output.
-
-**Available MCP Tools (14 tools)**:
-
-| Category   | Tools                                                                 | Description                      |
-| ---------- | --------------------------------------------------------------------- | -------------------------------- |
-| Code Graph | `init_graph`, `get_code_snippet`, `find_callers`, `find_dependencies` | Build and query code graph       |
-| Search     | `local_search`, `global_search`, `query_codebase`                     | GraphRAG-powered semantic search |
-| Analysis   | `analyze_module_structure`, `suggest_refactoring`                     | Code structure analysis          |
-| Navigation | `jump_to_definition`, `find_implementations`                          | Code navigation                  |
-
-**Agent × MCP Tool Mapping**:
-
-| Agent                   | Primary MCP Tools                           | Use Case                         |
-| ----------------------- | ------------------------------------------- | -------------------------------- |
-| @change-impact-analyzer | `find_dependencies`, `find_callers`         | Impact analysis                  |
-| @traceability-auditor   | `query_codebase`, `find_callers`            | Traceability validation          |
-| @system-architect       | `analyze_module_structure`, `global_search` | Architecture analysis            |
-| @code-reviewer          | `suggest_refactoring`, `get_code_snippet`   | Code quality review              |
-| @security-auditor       | `find_callers`, `query_codebase`            | Security vulnerability detection |
-
-Also integrates with other MCP servers:
+Skills use the MCP servers configured in your AI coding agent when they are available, for example:
 
 - **Context7 MCP** - Up-to-date library documentation (Next.js, React, etc.)
 - **Azure MCP** - Azure resource management

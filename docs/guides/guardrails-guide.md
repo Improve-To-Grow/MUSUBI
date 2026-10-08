@@ -39,7 +39,7 @@ const {
   GuardrailChain,
   createInputGuardrail,
   createOutputGuardrail
-} = require('musubi-sdd/orchestration/guardrails');
+} = require('@improve-to-grow/musubi-sdd/src/orchestration/guardrails');
 
 // Create guardrails
 const inputGuardrail = createInputGuardrail('security');
@@ -157,7 +157,7 @@ Injection detection targets untrusted text. For typed artifacts (`context.conten
 **Phase**: the guardrail checks what a skill produces, so its default phase is `post` (see [With Skill Execution](#with-skill-execution)). Use `InputGuardrail` for skill input, or pass `phase: 'pre'` or `'both'`.
 
 ```javascript
-const { SafetyCheckGuardrail, SafetyLevel } = require('musubi-sdd/orchestration/guardrails');
+const { SafetyCheckGuardrail, SafetyLevel } = require('@improve-to-grow/musubi-sdd/src/orchestration/guardrails');
 
 const safetyGuard = new SafetyCheckGuardrail({
   level: SafetyLevel.STRICT,
@@ -180,7 +180,7 @@ console.log(result.metadata.articleScores); // { I: 1, II: 'not-applicable', ...
 Compose multiple guardrails for pipeline execution.
 
 ```javascript
-const { GuardrailChain, InputGuardrail, OutputGuardrail, SafetyCheckGuardrail } = require('musubi-sdd/orchestration/guardrails');
+const { GuardrailChain, InputGuardrail, OutputGuardrail, SafetyCheckGuardrail } = require('@improve-to-grow/musubi-sdd/src/orchestration/guardrails');
 
 // Create chain
 const chain = new GuardrailChain([
@@ -222,7 +222,7 @@ const result = await chain.run(content);
 Build custom validation rules with fluent API.
 
 ```javascript
-const { RuleBuilder, RuleRegistry, CommonRuleSets } = require('musubi-sdd/orchestration/guardrails');
+const { RuleBuilder, RuleRegistry, CommonRuleSets } = require('@improve-to-grow/musubi-sdd/src/orchestration/guardrails');
 
 // Build custom rules
 const customRules = new RuleBuilder()
@@ -332,11 +332,11 @@ Each guardrail gets the content and a context that says what it is:
 A failing guardrail fails the execution with `Guardrail '<name>' failed (<phase>): <reason> [<codes>]`. A failing `pre` guardrail stops the skill from running. Each outcome is recorded in `result.guardrails`.
 
 ```javascript
-const { SkillExecutor } = require('musubi-sdd/orchestration/skill-executor');
+const { SkillExecutor } = require('@improve-to-grow/musubi-sdd/src/orchestration/skill-executor');
 const {
   createInputGuardrail,
   SafetyCheckGuardrail,
-} = require('musubi-sdd/orchestration/guardrails');
+} = require('@improve-to-grow/musubi-sdd/src/orchestration/guardrails');
 
 registry.registerSkill(
   { id: 'implement-service', name: 'Implement Service', contentType: 'code' },
@@ -427,7 +427,7 @@ console.log(result.violations); // ['SQL injection detected']
 The constitution governs artifacts, so a guardrail checks content against it only as the artifact it is. Set `context.contentType` to `code`, `test`, `requirements` or `design`. Content without a content type, or with an unknown one, is unclassified: the check fails with `CONSTITUTIONAL_UNCLASSIFIED`, and every article is scored not applicable.
 
 ```javascript
-const { SafetyCheckGuardrail, NOT_APPLICABLE } = require('musubi-sdd/orchestration/guardrails');
+const { SafetyCheckGuardrail, NOT_APPLICABLE } = require('@improve-to-grow/musubi-sdd/src/orchestration/guardrails');
 
 const guard = new SafetyCheckGuardrail({ enforceConstitution: true });
 

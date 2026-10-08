@@ -292,9 +292,12 @@ WHEN user enables 2FA, the system SHALL require OTP during login.
 ### Phase 2: Codebase Scanning
 
 ```bash
-# Find affected files
-grep -r "User" src/ --include="*.ts"
-grep -r "login" src/ --include="*.ts"
+# Find affected code (code index, when the project has one: CLAUDE.md "Code Navigation")
+musubi-code refs User                        # definition and every reference
+musubi-code dependents src/models/user.ts    # files that load it
+
+# Words the index does not cover (comments, docs, configuration), or no code index
+grep -rn "login" src/ --include="*.ts"
 
 # Find test files
 find tests/ -name "*auth*.test.ts"

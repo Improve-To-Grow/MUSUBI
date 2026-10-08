@@ -445,7 +445,7 @@ steps:
 #### 2. Implement Circuit Breaker
 ```javascript
 // In your custom integration
-const { ErrorHandler } = require('musubi-sdd');
+const { ErrorHandler } = require('@improve-to-grow/musubi-sdd/src/orchestration');
 
 const handler = new ErrorHandler();
 const breaker = handler.getCircuitBreaker('external-api', {

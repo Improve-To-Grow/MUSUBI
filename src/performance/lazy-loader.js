@@ -75,15 +75,6 @@ const MODULE_REGISTRY = {
     estimatedSize: 'medium',
   },
 
-  // Integration modules
-  'codegraph-mcp': {
-    path: '../integrations/codegraph-mcp',
-    category: ModuleCategory.INTEGRATION,
-    exports: ['CodeGraphMCP'],
-    estimatedSize: 'large',
-    optional: true,
-  },
-
   // GUI modules
   'gui-server': {
     path: '../gui/server',

@@ -69,22 +69,25 @@ npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 ---
 
-### ❌ Error: `Cannot find module 'musubi-sdd'`
+### ❌ Error: `Cannot find module '@improve-to-grow/musubi-sdd'`
 
 **Symptoms:**
 ```bash
-Error: Cannot find module 'musubi-sdd'
+Error: Cannot find module '@improve-to-grow/musubi-sdd'
 ```
+
+**Cause:** Node resolves `require()` from the project's `node_modules`. The global install
+provides the CLI only. Code written for upstream MUSUBI loads the upstream name `musubi-sdd` and
+fails the same way.
 
 **Solution:**
 
 ```bash
-# Verify global installation
-npm ls -g @improve-to-grow/musubi-sdd
-
-# If not found, reinstall
-npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
+# Install the package into the project
+npm install --save-dev 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 ```
+
+Then load it as `@improve-to-grow/musubi-sdd`.
 
 ---
 
