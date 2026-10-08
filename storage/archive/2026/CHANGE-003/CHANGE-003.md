@@ -2,10 +2,11 @@
 
 **Change ID**: CHANGE-003  
 **Date**: 2026-10-08  
-**Status**: ~~Proposed~~ → ~~Approved~~ → **Implemented**  
+**Status**: ~~Proposed~~ → ~~Approved~~ → ~~Implemented~~ → **Archived**  
 **Approved**: 2026-10-08 (maintainer, `musubi-change approve CHANGE-003`; aliases as recommended)  
-**Implemented**: 2026-10-08, uncommitted on `chore/scip-typescript-replace-codegraph` (commit hash
-recorded at archive; see [CHANGE-003-implementation.md](CHANGE-003-implementation.md))  
+**Implemented**: 2026-10-08 (commit `a790247` on `chore/scip-typescript-replace-codegraph`; see
+[CHANGE-003-implementation.md](CHANGE-003-implementation.md))  
+**Archived**: 2026-10-08 (`storage/archive/2026/CHANGE-003/`)  
 **Type**: Bug Fix  
 **Priority**: P2  
 **Baseline**: commit `3da9d34` on `chore/scip-typescript-replace-codegraph` (not yet merged into
@@ -346,3 +347,8 @@ follow-up is fork-only and would not.
 - [ ] Product review complete
 - [ ] Security review complete (not needed: no security surface)
 - [ ] Ready to apply
+
+Approval was recorded through the Status field (Approved, 2026-10-08, `musubi-change approve`);
+the checklist above is left as submitted. Implementation and archive records:
+`CHANGE-003-implementation.md`, `CHANGE-003-archive.md` and `CHANGE-003-delta.json` (the
+`musubi-change` delta record) in the same directory.

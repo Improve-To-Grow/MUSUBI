@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Change ID**: CHANGE-003
-- **Proposal**: [CHANGE-003.md](CHANGE-003.md)
+- **Proposal**: [CHANGE-003.md](CHANGE-003.md) (archived together with this report; see [CHANGE-003-archive.md](CHANGE-003-archive.md))
 - **Status**: Implemented
 - **Implemented**: 2026-10-08
 - **Implemented By**: Yaroslav (with Claude Code)
@@ -171,9 +171,10 @@ after the edits, 387 files):
 - [x] Feature flag — not applicable
 - [x] Documentation updated
 - [x] CHANGELOG entry added (`[Unreleased]`)
-- [ ] Commit — the working tree also holds unrelated uncommitted edits (`.claude/settings.json`,
+- [x] Commit — the working tree also holds unrelated uncommitted edits (`.claude/settings.json`,
   `AGENTS.md`, `CLAUDE.md`, six `bin/` files, the `delta-spec` fix); commit CHANGE-003's files on
-  their own
+  their own — committed as `a790247` together with the `delta-spec` fix and the
+  `.claude/settings.json`, `AGENTS.md`, `CLAUDE.md` and `code-references` skill edits
 - [ ] Version bump / release notes — decide at release time
 - [x] Rollback plan — `git revert` of the implementing commit; pre-change state is `3da9d34`
 
@@ -203,6 +204,8 @@ after the edits, 387 files):
 
 1. Review the implementation.
 2. Commit CHANGE-003's files on their own, for example
-   `fix(index): define all package entry point exports (CHANGE-003)`.
-3. Archive the change: `/sdd-change-archive CHANGE-003`.
+   `fix(index): define all package entry point exports (CHANGE-003)` — done, `a790247`
+   (`fix(exports): ...`; it also carries the `delta-spec` fix and the `musubi-code` hook and
+   docs switch, see [CHANGE-003-archive.md](CHANGE-003-archive.md)).
+3. Archive the change: `/sdd-change-archive CHANGE-003` — done, 2026-10-08.
 4. Optional: open the upstream pull request (the fix touches no fork-only file).
