@@ -1,7 +1,7 @@
 # Project Structure
 
 **Project**: MUSUBI
-**Last Updated**: 2026-10-02
+**Last Updated**: 2026-10-08
 **Version**: 1.0
 
 ---
@@ -543,21 +543,5 @@ Release history is kept in [CHANGELOG.md](../CHANGELOG.md) and is not repeated h
 
 ---
 
-**Last Updated**: 2026-10-02
+**Last Updated**: 2026-10-08
 **Maintained By**: {{MAINTAINER}}
-
-
-## New Directories (Detected 2026-10-02)
-
-```
-website/
-tests/
-templates/
-storage/
-steering/
-src/
-packages/
-orchestrator/
-docs/
-bin/
-```

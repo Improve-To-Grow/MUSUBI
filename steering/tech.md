@@ -1,14 +1,14 @@
 # Technology Stack
 
 **Project**: MUSUBI
-**Last Updated**: 2026-10-02
+**Last Updated**: 2026-10-08
 **Version**: 0.1.0
 
 ---
 
 ## Overview
 
-MUSUBI self-maintenance project
+ITG MUSUBI Fork
 
 ---
 

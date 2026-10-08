@@ -1,6 +1,6 @@
 # MUSUBI - MUSUBI
 
-MUSUBI self-maintenance project
+ITG MUSUBI Fork
 
 ## Initialized with MUSUBI SDD for Claude Code
 
@@ -36,7 +36,7 @@ Check `.claude/skills/` directory for all installed skills.
 ---
 
 **Agent**: Claude Code
-**Initialized**: 2026-10-02
+**Initialized**: 2026-10-08
 **MUSUBI Version**: 0.1.0
 
 <!-- musubi-code:start -->
