@@ -1,0 +1,13 @@
+{
+  "id": "CHANGE-003",
+  "type": "MODIFIED",
+  "target": "Package entry point: `Constitution`, `CICDIntegration` and nine other exports undefined",
+  "description": "Make every export of the package entry point `src/index.js` (`package.json` `main`) a defined\nvalue, export the affected classes under their real names, and correct the documentation that\nadvertises names the package does not have.\n\n`require('@improve-to-grow/musubi-sdd')` returns 58 top-level keys; 11 of them are `undefined`.\nThe report that opened this change named `Constitution` and `CICDIntegration`; a runtime check\nover all exports finds nine more with the same defect class. All 11 have been broken since\n`src/index.js` was created in commit `9c8d401` (v5.5.0, 2025-12-10). Nothing noticed because no\nfile in `bin/`, `src/` or `tests/` loads the entry point (see Appendix). The CLI is unaffected:\nit requires modules by path.\n\nFixed:\n\n- The 11 broken bindings (table under Current State). Four need only the correct `require()`\n  form; seven point at a class that exists under another name.\n- `docs/API-REFERENCE.md`: `TaskGenerator` example uses the real class name; the \"Error Handling\"\n  section, which documents `MUSUBIError` and `ValidationError` classes that do not exist anywhere\n  in `src/`, is removed.\n- `code-reviewer` skill (template and installed copy): imports `THRESHOLDS`, which the package\n  exports as `COMPLEXITY_THRESHOLDS`.\n\nNot in scope (follow-ups):\n\n- Documentation and templates use `require('musubi-sdd')`, but this fork installs as\n  `@improve-to-grow/musubi-sdd` from GitHub. Fork-only; separate change.\n- `docs/API-REFERENCE.md` \"TypeScript Support\" imports types from the package, which ships no\n  `.d.ts` files.\n- `docs/analysis/GCC-ANALYSIS-IMPROVEMENTS.md` still shows `CodeGraphMCP` (removed in `3da9d34`).\n  Historical analysis document, left as-is as in CHANGE-002.\n\n**Decision for review**: the advertised names `Constitution`, `CICDIntegration`, `AstExtractor`,\n`TaskGenerator`, `TraceabilityMatrixReporter` and `AgentMemory` stay as deprecated aliases of the\nreal classes (REQ-PKG-003). The alternative is to export the real names only: one name per\nclass and six fewer keys, but `const { Constitution } = require(...)` stays `undefined` and the\ndocumented `TaskGenerator` example needs the rename to work. This proposal recommends the\naliases because they make the reported names work and cost six lines.",
+  "rationale": "",
+  "impactedAreas": [],
+  "before": null,
+  "after": null,
+  "status": "implemented",
+  "createdAt": "2026-10-08T00:00:00.000Z",
+  "updatedAt": "2026-10-08T14:00:21.093Z"
+}

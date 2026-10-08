@@ -200,6 +200,43 @@ class DeltaSpecManager {
   }
 
   /**
+   * Build a delta spec from a proposal created by `musubi-change init`
+   * (storage/changes/<id>.md), so approve/reject work on it
+   * @param {string} id - Change ID
+   * @returns {DeltaSpec|null} Delta spec, or null when there is no proposal
+   */
+  importProposal(id) {
+    const proposalPath = path.join(this.changesDir, `${id}.md`);
+    if (!fs.existsSync(proposalPath)) {
+      return null;
+    }
+
+    const content = fs.readFileSync(proposalPath, 'utf-8');
+    const titleMatch = content.match(/^# (.+?)\s*$/m);
+    const dateMatch = content.match(/^\*\*Date\*\*:\s*(\d{4}-\d{2}-\d{2})/m);
+    const descriptionMatch = content.match(/^## Description\s*$([\s\S]*?)(?=^## |(?![\s\S]))/m);
+
+    const title = titleMatch ? titleMatch[1] : id;
+    const now = new Date().toISOString();
+
+    // A proposal can mix ADDED/MODIFIED/REMOVED/RENAMED sections; as a whole
+    // it modifies the existing system.
+    return {
+      id,
+      type: DeltaType.MODIFIED,
+      target: title,
+      description: (descriptionMatch && descriptionMatch[1].trim()) || title,
+      rationale: '',
+      impactedAreas: [],
+      before: null,
+      after: null,
+      status: 'proposed',
+      createdAt: dateMatch ? new Date(dateMatch[1]).toISOString() : now,
+      updatedAt: now,
+    };
+  }
+
+  /**
    * List all delta specs
    * @param {Object} options - Filter options
    * @returns {DeltaSpec[]} List of delta specs
@@ -241,7 +278,7 @@ class DeltaSpecManager {
       throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
     }
 
-    const delta = this.load(id);
+    const delta = this.load(id) || this.importProposal(id);
     if (!delta) {
       throw new Error(`Delta not found: ${id}`);
     }

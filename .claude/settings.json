@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node bin/musubi-code.js index --hook",
+            "command": "musubi-code index --hook",
             "async": true
           }
         ]
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node bin/musubi-code.js index --hook",
+            "command": "musubi-code index --hook",
             "async": true
           }
         ]

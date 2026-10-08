@@ -12,12 +12,12 @@ description: |
   Use when: you need to know where a class, function, method or file is used before changing, renaming,
   moving or deleting it, or to trace how modules depend on each other. Prefer this over grep for symbol
   usage; use grep only for strings, comments and dynamic lookups.
-allowed-tools: [Read, Grep, Glob, 'Bash(node bin/musubi-code.js *)', 'PowerShell(node bin/musubi-code.js *)']
+allowed-tools: [Read, Grep, Glob, 'Bash(musubi-code *)', 'PowerShell(musubi-code *)']
 ---
 
 # Code References (scip-typescript)
 
-`node bin/musubi-code.js` answers usage questions from `.scip/index.scip`, a SCIP index built by
+`musubi-code` answers usage questions from `.scip/index.scip`, a SCIP index built by
 `@sourcegraph/scip-typescript` with the TypeScript compiler. Unlike grep it resolves aliases,
 destructured `require()` bindings and method calls on typed receivers; unlike editor "find references"
 it follows `module.exports = { X }` across files.
@@ -29,14 +29,14 @@ Run from the project root. Each query rebuilds the index first when source files
 
 | Question                                 | Command                                          |
 | ---------------------------------------- | ------------------------------------------------ |
-| Every use of a class, function or method | `node bin/musubi-code.js refs UserService`                  |
-| A method                                 | `node bin/musubi-code.js refs UserService.save`             |
-| Which functions call or instantiate it   | `node bin/musubi-code.js callers createOrder`               |
-| What a file depends on (files, packages) | `node bin/musubi-code.js deps src/app.js`                   |
-| Which files depend on a file             | `node bin/musubi-code.js dependents src/services/user.js`   |
-| Definitions in a file                    | `node bin/musubi-code.js symbols user.js`                   |
-| Index state                              | `node bin/musubi-code.js status`                            |
-| Rebuild now                              | `node bin/musubi-code.js index`                             |
+| Every use of a class, function or method | `musubi-code refs UserService`                  |
+| A method                                 | `musubi-code refs UserService.save`             |
+| Which functions call or instantiate it   | `musubi-code callers createOrder`               |
+| What a file depends on (files, packages) | `musubi-code deps src/app.js`                   |
+| Which files depend on a file             | `musubi-code dependents src/services/user.js`   |
+| Definitions in a file                    | `musubi-code symbols user.js`                   |
+| Index state                              | `musubi-code status`                            |
+| Rebuild now                              | `musubi-code index`                             |
 
 Options: `--file <path>` narrows a name to definitions in matching files, `--limit <n>` caps references
 per definition (default 100, `0` for all), `--json` gives machine-readable output, `--no-refresh` skips the
@@ -73,9 +73,9 @@ Widget (class) lib/widget.js:1
 ## Limits
 
 - Only the directories in `package.json` `"scip"."roots"` are indexed (default: whichever of `bin`, `src`,
-  `lib`, `app`, `scripts`, `tests`, `test` exist). `node bin/musubi-code.js status` shows the roots.
+  `lib`, `app`, `scripts`, `tests`, `test` exist). `musubi-code status` shows the roots.
 - Calls on values whose type TypeScript cannot infer (untyped parameters, `any`) are not resolved to a
   definition. JSDoc types improve this.
-- If the index cannot be built, `node bin/musubi-code.js index` prints the reason.
+- If the index cannot be built, `musubi-code index` prints the reason.
 
 This skill is managed by MUSUBI (`musubi-code setup`); running setup again overwrites local edits.

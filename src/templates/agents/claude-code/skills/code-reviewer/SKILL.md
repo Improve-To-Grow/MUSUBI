@@ -125,7 +125,7 @@ The ComplexityAnalyzer module provides automated cyclomatic and cognitive comple
 ### Module Usage
 
 ```javascript
-const { ComplexityAnalyzer, THRESHOLDS } = require('musubi-sdd');
+const { ComplexityAnalyzer, COMPLEXITY_THRESHOLDS } = require('musubi-sdd');
 
 const analyzer = new ComplexityAnalyzer();
 

@@ -117,14 +117,14 @@ const design = await generator.generate({
 });
 ```
 
-### TaskGenerator
+### TasksGenerator
 
 Generates tasks from the design.
 
 ```javascript
-const { TaskGenerator } = require('musubi-sdd');
+const { TasksGenerator } = require('musubi-sdd');
 
-const generator = new TaskGenerator({
+const generator = new TasksGenerator({
   granularity: 'fine',
   estimateEffort: true
 });
@@ -410,24 +410,6 @@ const result: OrchestrationResult = await engine.execute({
   workflow: 'full-sdd',
   feature: 'user-auth'
 });
-```
-
----
-
-## Error Handling
-
-```javascript
-const { MUSUBIError, ValidationError } = require('musubi-sdd');
-
-try {
-  await validator.validate(feature);
-} catch (error) {
-  if (error instanceof ValidationError) {
-    console.error('Validation failed:', error.violations);
-  } else if (error instanceof MUSUBIError) {
-    console.error('MUSUBI error:', error.message);
-  }
-}
 ```
 
 ---

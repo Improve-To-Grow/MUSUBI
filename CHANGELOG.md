@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Package entry point exports** (CHANGE-003): 11 exports of `require('musubi-sdd')` (`src/index.js`) were `undefined` since v5.5.0; every export is now defined
+  - `GapDetector`, `DesignGenerator`, `RequirementsGenerator` and `ChangeManager` keep their names and now resolve
+  - Classes are exported under their own names: `ASTExtractor`, `TraceabilityAnalyzer`, `TasksGenerator`, `CICDManager`, `TraceabilityMatrixReport`, `ConstitutionValidator`, `AgentMemoryManager`
+  - The previously advertised names stay as deprecated aliases: `AstExtractor` (use `ASTExtractor`), `TaskGenerator` (`TasksGenerator`), `CICDIntegration` (`CICDManager`), `TraceabilityMatrixReporter` (`TraceabilityMatrixReport`), `Constitution` (`ConstitutionValidator`), `AgentMemory` (`AgentMemoryManager`)
+  - `createTraceabilityMatrix` is removed; it was never defined. Use `await new TraceabilityAnalyzer(workspaceRoot).generateMatrix(options)`
+  - `docs/API-REFERENCE.md`: the task generator example uses `TasksGenerator`; the "Error Handling" section, which documented `MUSUBIError` and `ValidationError` classes that do not exist, is removed
+  - `code-reviewer` skill: imports `COMPLEXITY_THRESHOLDS` instead of the non-existent `THRESHOLDS`
+  - `tests/index.test.js` checks every export, the aliases and every name the API reference and agent templates destructure from the package
+
 ## [6.3.1-itg.2] - 2026-10-08
 
 ### Added

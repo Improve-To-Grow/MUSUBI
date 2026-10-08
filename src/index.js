@@ -14,13 +14,13 @@ const {
   ComplexityAnalyzer,
   THRESHOLDS: COMPLEXITY_THRESHOLDS,
 } = require('./analyzers/complexity-analyzer');
-const { AstExtractor } = require('./analyzers/ast-extractor');
-const { GapDetector } = require('./analyzers/gap-detector');
+const { ASTExtractor } = require('./analyzers/ast-extractor');
+const GapDetector = require('./analyzers/gap-detector');
 const { ImpactAnalyzer } = require('./analyzers/impact-analyzer');
 const { RepositoryMap } = require('./analyzers/repository-map');
 const { SecurityAnalyzer } = require('./analyzers/security-analyzer');
 const { StuckDetector } = require('./analyzers/stuck-detector');
-const { createTraceabilityMatrix } = require('./analyzers/traceability');
+const TraceabilityAnalyzer = require('./analyzers/traceability');
 
 // Generators
 const {
@@ -28,24 +28,24 @@ const {
   UNSAFE_PATTERNS,
   SECURITY_COMPONENTS,
 } = require('./generators/rust-migration-generator');
-const { DesignGenerator } = require('./generators/design');
-const { RequirementsGenerator } = require('./generators/requirements');
-const { TaskGenerator } = require('./generators/tasks');
+const DesignGenerator = require('./generators/design');
+const RequirementsGenerator = require('./generators/requirements');
+const TasksGenerator = require('./generators/tasks');
 const { ChangelogGenerator } = require('./generators/changelog-generator');
 
 // Integrations
-const { CICDIntegration } = require('./integrations/cicd');
+const { CICDManager } = require('./integrations/cicd');
 const { GitHubClient } = require('./integrations/github-client');
 const { MCPConnector } = require('./integrations/mcp-connector');
 
 // Reporters
 const { HierarchicalReporter } = require('./reporters/hierarchical-reporter');
 const { CoverageReporter } = require('./reporters/coverage-report');
-const { TraceabilityMatrixReporter } = require('./reporters/traceability-matrix-report');
+const { TraceabilityMatrixReport } = require('./reporters/traceability-matrix-report');
 
 // Validators
 const { ConstitutionalValidator } = require('./validators/constitutional-validator');
-const { Constitution } = require('./validators/constitution');
+const ConstitutionValidator = require('./validators/constitution');
 const { DeltaFormatValidator } = require('./validators/delta-format');
 const { TraceabilityValidator } = require('./validators/traceability-validator');
 const {
@@ -62,8 +62,8 @@ const { SkillRegistry } = require('./orchestration/skill-registry');
 const { WorkflowOrchestrator } = require('./orchestration/workflow-orchestrator');
 
 // Managers
-const { AgentMemory } = require('./managers/agent-memory');
-const { ChangeManager } = require('./managers/change');
+const { AgentMemoryManager } = require('./managers/agent-memory');
+const ChangeManager = require('./managers/change');
 const { CheckpointManager } = require('./managers/checkpoint-manager');
 const { DeltaSpecManager } = require('./managers/delta-spec');
 const { MemoryCondenser } = require('./managers/memory-condenser');
@@ -101,13 +101,13 @@ module.exports = {
   CHUNK_SIZE,
   ComplexityAnalyzer,
   COMPLEXITY_THRESHOLDS,
-  AstExtractor,
+  ASTExtractor,
   GapDetector,
   ImpactAnalyzer,
   RepositoryMap,
   SecurityAnalyzer,
   StuckDetector,
-  createTraceabilityMatrix,
+  TraceabilityAnalyzer,
 
   // Generators
   RustMigrationGenerator,
@@ -115,22 +115,22 @@ module.exports = {
   SECURITY_COMPONENTS,
   DesignGenerator,
   RequirementsGenerator,
-  TaskGenerator,
+  TasksGenerator,
   ChangelogGenerator,
 
   // Integrations
-  CICDIntegration,
+  CICDManager,
   GitHubClient,
   MCPConnector,
 
   // Reporters
   HierarchicalReporter,
   CoverageReporter,
-  TraceabilityMatrixReporter,
+  TraceabilityMatrixReport,
 
   // Validators
   ConstitutionalValidator,
-  Constitution,
+  ConstitutionValidator,
   DeltaFormatValidator,
   TraceabilityValidator,
   ConstitutionLevelManager,
@@ -146,7 +146,7 @@ module.exports = {
   WorkflowOrchestrator,
 
   // Managers
-  AgentMemory,
+  AgentMemoryManager,
   ChangeManager,
   CheckpointManager,
   DeltaSpecManager,
@@ -176,4 +176,13 @@ module.exports = {
 
   // AI (Phase 6)
   ai,
+
+  // Deprecated aliases (CHANGE-003): names this module advertised before the classes were
+  // exported under their own names. Use the name on the right.
+  AstExtractor: ASTExtractor,
+  TaskGenerator: TasksGenerator,
+  CICDIntegration: CICDManager, // src/integrations/cicd.js
+  TraceabilityMatrixReporter: TraceabilityMatrixReport,
+  Constitution: ConstitutionValidator, // src/validators/constitution.js, not ConstitutionalValidator
+  AgentMemory: AgentMemoryManager,
 };

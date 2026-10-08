@@ -51,3 +51,19 @@ This project uses **MUSUBI** (Ultimate Specification Driven Development).
 **Agent**: GitHub Copilot
 **Initialized**: 2026-01-02
 **MUSUBI Version**: 6.3.0
+
+<!-- musubi-code:start -->
+## Code Navigation
+
+Use these commands instead of grep for questions such as "who calls, uses, instantiates or
+requires X" and "what depends on this file":
+
+- `musubi-code refs <Name>` - every reference (new, call, require, extends, ...) with the enclosing function
+- `musubi-code callers <Name>` - functions that call or instantiate it
+- `musubi-code deps <file>` and `musubi-code dependents <file>` - file dependencies in both directions
+- `musubi-code symbols <file>` - definitions in a file
+
+They read a compiler-accurate scip-typescript index in `.scip/` and rebuild it first when
+source files changed. Use grep only for names that appear as strings, such as dynamic
+`require()` paths, registries and templates.
+<!-- musubi-code:end -->
