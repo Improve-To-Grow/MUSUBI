@@ -230,6 +230,7 @@ Actual time spent
 - Tasks document
 - Design document
 - Steering context (`steering/structure.md`, `steering/tech.md`)
+- Code index (`musubi-code`) for definitions and usages: ask it before grep
 
 **Output**:
 - Source code
@@ -289,9 +290,10 @@ Actual time spent
 - [ ] Documentation is updated
 - [ ] No performance issues
 
-**Code navigation** (`code-references` skill, see `docs/guides/scip-typescript.md`):
-- `node bin/musubi-code.js refs <Name>` - Check the impact scope of a change
-- `node bin/musubi-code.js deps <file>` / `dependents <file>` - Check dependencies
+**Code navigation** (`code-references` skill, see `docs/guides/scip-typescript.md`), before grep:
+- `musubi-code refs <Name>` - Definition and every reference: check the impact scope of a change
+- `musubi-code symbols <file>` - What a file defines and exports
+- `musubi-code deps <file>` / `dependents <file>` - Check dependencies
 
 **Review Types**:
 
@@ -624,6 +626,7 @@ Requirement ←→ Design Component ←→ Task ←→ Code ←→ Test
 - ✅ Write tests based on EARS acceptance criteria
 - ✅ Update documents when changes occur
 - ✅ Use templates from `steering/templates/`
+- ✅ Answer symbol questions (exists, defined, exported, used) with `musubi-code` before grep
 
 ### DON'T:
 - ❌ Skip requirements documentation
@@ -632,6 +635,7 @@ Requirement ←→ Design Component ←→ Task ←→ Code ←→ Test
 - ❌ Break traceability links
 - ❌ Deploy without testing
 - ❌ Forget to update steering context
+- ❌ Grep for a class or function name that the code index can resolve
 
 ---
 

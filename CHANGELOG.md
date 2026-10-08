@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Code Navigation instructions** (CHANGE-005): the section that `musubi-code setup` writes into `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` and `QWEN.md` now tells the agent to answer symbol questions with `musubi-code` before grep, maps each question (does it exist, where is it defined, what does a file export, who uses it, what depends on a file) to a command, and says that this also applies where an SDD command or skill says to grep. Existing projects receive it on `musubi upgrade` or `musubi-code setup`
 - **`code-references` skill** (CHANGE-005): describes definition, existence and export questions, so Claude Code picks it for "where is X defined?" as well as for usages
+- **Claude Code SDD templates** (CHANGE-005): `/sdd-change-init`, `/sdd-change-apply`, `/sdd-change-archive`, `/sdd-requirements` and the `change-impact-analyzer` skill look up classes, functions and file dependencies with `musubi-code` first when the project has a code index, and keep grep for text and for projects without one. `/sdd-change-init` asks the proposal to say which facts came from the index and which from grep. Existing projects keep their copies until they re-run `musubi init` for Claude Code
 
 ### Removed
 

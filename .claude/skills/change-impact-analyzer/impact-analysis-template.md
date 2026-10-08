@@ -208,8 +208,10 @@ Framework for analyzing the impact of proposed changes on a system.
 ### Finding Dependencies
 
 ```bash
-# Find files that import the changed file
-grep -r "import.*from.*'./changed-file'" src/
+# Find files that import the changed file (code index, when the project has one)
+musubi-code dependents src/changed-file.ts
+# Without a code index
+grep -rn "import.*from.*'./changed-file'" src/
 
 # TypeScript: Find usages
 npx ts-unused-exports tsconfig.json

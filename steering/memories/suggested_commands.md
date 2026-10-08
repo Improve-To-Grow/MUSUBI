@@ -41,6 +41,19 @@ npm run format
 npm run type-check
 ```
 
+## Code Navigation
+
+Symbol questions go to the code index before grep (`CLAUDE.md` "Code Navigation").
+
+```bash
+musubi-code refs <Name>          # definition, exports, every reference ("No definition named" = absent)
+musubi-code callers <Name>       # functions that call or instantiate it
+musubi-code symbols <file>       # what a file defines and exports
+musubi-code deps <file>          # what a file loads
+musubi-code dependents <file>    # what loads a file
+musubi-code status               # index state and roots
+```
+
 ## Git Workflow
 
 ```bash

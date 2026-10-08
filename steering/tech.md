@@ -46,6 +46,22 @@ MUSUBI self-maintenance project
 
 ---
 
+## Code Navigation
+
+| Tool | Use for |
+|------|---------|
+| `musubi-code` (scip-typescript 0.4.0; index in `.scip/`; roots `bin`, `src`, `tests`, without `src/templates`) | Symbol questions: does X exist, where is it defined, what a file exports, who references, calls or instantiates X, file dependencies and dependents |
+| grep, the Grep tool | Text: Markdown, templates, YAML and JSON, comments, string-keyed registries, dynamic `require()` paths |
+
+Answer symbol questions with `musubi-code` before grep, also inside `/sdd-*` commands and
+skills: `musubi-code refs <Name>` (definition and every reference; "No definition named" means it
+does not exist), `musubi-code symbols <file>`, `musubi-code callers <Name>`,
+`musubi-code deps <file>`, `musubi-code dependents <file>`. Analysis records say which facts came
+from the index and which from grep. A PreToolUse hook adds a note when a grep searches for an
+indexed name. Commands: `CLAUDE.md` "Code Navigation"; guide: `docs/guides/scip-typescript.md`.
+
+---
+
 ## Architecture Decisions
 
 | Decision | Choice | Rationale |

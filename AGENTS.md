@@ -55,15 +55,20 @@ This project uses **MUSUBI** (Ultimate Specification Driven Development).
 <!-- musubi-code:start -->
 ## Code Navigation
 
-Use these commands instead of grep for questions such as "who calls, uses, instantiates or
-requires X" and "what depends on this file":
+Answer symbol questions with `musubi-code` before grep. A symbol question is about a class,
+function, method, constant or module in the indexed code: does it exist, where is it defined,
+what does a file export, who uses it, what depends on a file.
 
-- `musubi-code refs <Name>` - every reference (new, call, require, extends, ...) with the enclosing function
-- `musubi-code callers <Name>` - functions that call or instantiate it
-- `musubi-code deps <file>` and `musubi-code dependents <file>` - file dependencies in both directions
-- `musubi-code symbols <file>` - definitions in a file
+| Question                                   | Command                                                                                              |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Does `X` exist? Where is it defined?       | `musubi-code refs X`: each result starts with kind and file:line; "No definition named" means absent |
+| What does a file define or export?         | `musubi-code symbols <file>`                                                                         |
+| Who references, calls or instantiates `X`? | `musubi-code refs X`, `musubi-code callers X`                                                        |
+| What does a file load, and what loads it?  | `musubi-code deps <file>`, `musubi-code dependents <file>`                                           |
 
-They read a compiler-accurate scip-typescript index in `.scip/` and rebuild it first when
-source files changed. Use grep only for names that appear as strings, such as dynamic
-`require()` paths, registries and templates.
+This also applies where an SDD command, prompt or skill says to grep for code. Use grep for
+text the index does not cover: Markdown, templates, configuration, comments, string-keyed registries
+and dynamic `require()` paths, and once for the name as a string before a rename or deletion.
+`musubi-code status` lists the indexed directories. The index is compiler-accurate (scip-typescript,
+`.scip/`) and is rebuilt first when source files changed.
 <!-- musubi-code:end -->

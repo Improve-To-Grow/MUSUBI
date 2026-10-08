@@ -136,6 +136,15 @@ MUSUBI/
 └── [Other directories]
 ```
 
+### Navigating the Code
+
+`musubi-code` indexes `bin/`, `src/` and `tests/`, but not `src/templates/` or Markdown. Look up
+definitions, exports, references and file dependencies with `musubi-code refs <Name>`,
+`musubi-code symbols <file>`, `musubi-code callers <Name>` and
+`musubi-code deps|dependents <file>` before grep. Grep the unindexed parts (`src/templates/`,
+`docs/`, `steering/`, `storage/`) for text, and grep once for a name as a string before renaming
+or deleting it (dynamic `require()` paths and string-keyed registries are invisible to the index).
+
 ---
 
 ## Testable-Core Pattern (Article I)

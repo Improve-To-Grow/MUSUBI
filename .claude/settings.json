@@ -24,6 +24,52 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "musubi-code hint --hook",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "musubi-code hint --hook",
+            "if": "Bash(grep *)",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "musubi-code hint --hook",
+            "if": "Bash(rg *)",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "musubi-code hint --hook",
+            "if": "Bash(git grep *)",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "musubi-code hint --hook",
+            "if": "PowerShell(Select-String *)",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }
