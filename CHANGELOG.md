@@ -7,8 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.1-itg.2] - 2026-10-08
+
 ### Added
 
+- **`musubi-code`: compiler-accurate code navigation** for JavaScript/TypeScript projects (also `musubi code`). It builds a SCIP index in `.scip/` with `@sourcegraph/scip-typescript`, now a runtime dependency pinned to an exact version, and answers `refs`, `callers`, `deps`, `dependents` and `symbols`, resolving CommonJS `require()`, cross-file `new X()`, `extends` and method calls. Queries rebuild a stale index first; `musubi-code index --hook` rebuilds it in the background from Claude Code hooks. Library: `src/code-index/`
+- **`musubi-code setup`** configures a project: `.scip/` in `.gitignore`, the `code-references` Claude Code skill, async hooks in `.claude/settings.json` (merged with existing settings), and a marked "Code Navigation" section in the agent instruction file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`). Idempotent; `--agent`, `--dry-run`, `--force`, `--command`
+- **`musubi init`** asks whether to set up code navigation when the project uses JavaScript/TypeScript or already has `package.json`/`tsconfig.json`; `--code-index` and `--no-code-index` answer in advance
+- **`musubi upgrade`** sets up code navigation in JavaScript/TypeScript projects that lack it, even when they are already at the current version; `--no-code-index` skips it, `--dry-run` previews it
+- `docs/guides/scip-typescript.md` describes setup, commands, configuration and limits
 - **Grep reminder for Claude Code** (CHANGE-005): `musubi-code setup` adds synchronous `PreToolUse` hooks running `musubi-code hint --hook` before the Grep tool and before shell commands that start with `grep`, `rg`, `git grep` or `Select-String`. When the search pattern consists only of names the code index defines, the hook adds a note with each definition and its `musubi-code refs` command. It never blocks or approves the call, and stays silent for text searches and searches outside the index
   - Each index build also writes `.scip/names.json`, the definition names the hook reads (about 0.2 s per call on this repository); an index without it counts as stale and is rebuilt once
   - `query.definitionNames()` lists them with the same filters as `refs`
@@ -21,6 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- **CodeGraph MCP integration** (breaking for library users of these exports). codegraph-mcp records no `require()` or cross-file `new X()` edges for CommonJS code, so its graph could not answer usage questions for MUSUBI or other JavaScript projects
+  - `CodeGraphMCP` export and `src/integrations/codegraph-mcp.js`
+  - `CodeGraphAutoUpdate`, `createCodeGraphAutoUpdate`, `CODEGRAPH_TRIGGER` and `CODEGRAPH_TARGET` from `phase5-integration`, and `src/analyzers/codegraph-auto-update.js`; `Phase5Integration` no longer emits `codegraph-updated` or `codegraph-error`, and `getComponent('codeGraphAutoUpdate')` returns `null`
+  - `CacheNamespace.CODEGRAPH` and the `codegraph-mcp` lazy-loader entry
+  - `musubi-analyze --codegraph`, `--codegraph-full` and `--type codegraph`
+  - CodeGraph MCP setup and tool sections in the orchestrator skill, the shared `AGENTS.md`, the platform instruction templates, the README and the user guide; the `setup-codegraph` GitHub Copilot prompt
+  - Repository files `.mcp.json` and `steering/memories/codegraph.md`
 - **Plugin development guide** (CHANGE-004): `docs/guides/PLUGIN-DEVELOPMENT.md` documented a plugin system that does not exist (no plugin loader, no `PluginDefinition`, no `musubi-sdd/testing` module); the guide and its two links are removed
 
 ### Fixed
@@ -44,26 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The CI/CD guide downloads the GitLab and Jenkins templates from the fork and calls the fork's reusable GitHub Actions workflow, instead of copying from `node_modules/musubi-sdd`, which never contained them
   - Existing projects keep their copies of the agent templates: replace the package name by hand, or re-run `musubi-sdd init` for the agent and confirm the overwrite prompt (this replaces local changes to the agent files)
   - `tests/package-name.test.js` guards the package name and the install instructions
-
-## [6.3.1-itg.2] - 2026-10-08
-
-### Added
-
-- **`musubi-code`: compiler-accurate code navigation** for JavaScript/TypeScript projects (also `musubi code`). It builds a SCIP index in `.scip/` with `@sourcegraph/scip-typescript`, now a runtime dependency pinned to an exact version, and answers `refs`, `callers`, `deps`, `dependents` and `symbols`, resolving CommonJS `require()`, cross-file `new X()`, `extends` and method calls. Queries rebuild a stale index first; `musubi-code index --hook` rebuilds it in the background from Claude Code hooks. Library: `src/code-index/`
-- **`musubi-code setup`** configures a project: `.scip/` in `.gitignore`, the `code-references` Claude Code skill, async hooks in `.claude/settings.json` (merged with existing settings), and a marked "Code Navigation" section in the agent instruction file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`). Idempotent; `--agent`, `--dry-run`, `--force`, `--command`
-- **`musubi init`** asks whether to set up code navigation when the project uses JavaScript/TypeScript or already has `package.json`/`tsconfig.json`; `--code-index` and `--no-code-index` answer in advance
-- **`musubi upgrade`** sets up code navigation in JavaScript/TypeScript projects that lack it, even when they are already at the current version; `--no-code-index` skips it, `--dry-run` previews it
-- `docs/guides/scip-typescript.md` describes setup, commands, configuration and limits
-
-### Removed
-
-- **CodeGraph MCP integration** (breaking for library users of these exports). codegraph-mcp records no `require()` or cross-file `new X()` edges for CommonJS code, so its graph could not answer usage questions for MUSUBI or other JavaScript projects
-  - `CodeGraphMCP` export and `src/integrations/codegraph-mcp.js`
-  - `CodeGraphAutoUpdate`, `createCodeGraphAutoUpdate`, `CODEGRAPH_TRIGGER` and `CODEGRAPH_TARGET` from `phase5-integration`, and `src/analyzers/codegraph-auto-update.js`; `Phase5Integration` no longer emits `codegraph-updated` or `codegraph-error`, and `getComponent('codeGraphAutoUpdate')` returns `null`
-  - `CacheNamespace.CODEGRAPH` and the `codegraph-mcp` lazy-loader entry
-  - `musubi-analyze --codegraph`, `--codegraph-full` and `--type codegraph`
-  - CodeGraph MCP setup and tool sections in the orchestrator skill, the shared `AGENTS.md`, the platform instruction templates, the README and the user guide; the `setup-codegraph` GitHub Copilot prompt
-  - Repository files `.mcp.json` and `steering/memories/codegraph.md`
 
 ## [6.3.1-itg.1] - 2026-10-07
 
