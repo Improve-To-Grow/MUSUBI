@@ -183,7 +183,7 @@ function hasSourceFiles(cfg, extensions) {
 
 /**
  * The supported languages a project uses: those with a project marker in `root` or with source
- * files under the configured roots, in the order of LANGUAGES.
+ * files under the configured roots (or among the root files), in the order of LANGUAGES.
  * @param {string} root
  * @returns {string[]} language keys (`typescript`, `python`)
  */
@@ -192,6 +192,7 @@ function detectLanguages(root) {
   return LANGUAGE_KEYS.filter(key => {
     const { markers, extensions } = LANGUAGES[key];
     if (markers.some(m => fs.existsSync(path.join(cfg.root, m)))) return true;
+    if (cfg.rootFiles.some(file => languageOf(file) === key)) return true;
     return hasSourceFiles(cfg, new Set(extensions));
   });
 }

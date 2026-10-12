@@ -300,7 +300,7 @@ Comprehensive guides are available in `docs/guides/`:
 - **[Change Management Workflow](docs/guides/change-management-workflow.md)** - End-to-end workflow documentation
 - **[Traceability Matrix Guide](docs/guides/traceability-matrix-guide.md)** - Traceability system usage
 - **[Video Tutorial Plan](docs/guides/video-tutorial-plan.md)** - Video content script
-- **[Code Navigation (musubi-code)](docs/guides/scip-typescript.md)** - Compiler-accurate references, callers and file dependencies for AI agents in JavaScript/TypeScript projects, set up by `musubi init` and `musubi upgrade`
+- **[Code Navigation (musubi-code)](docs/guides/scip-typescript.md)** - Compiler-accurate references, callers and file dependencies for AI agents in JavaScript/TypeScript and Python projects, set up by `musubi init` and `musubi upgrade` without asking
 
 ### Project Types
 

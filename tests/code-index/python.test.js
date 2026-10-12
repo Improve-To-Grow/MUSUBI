@@ -8,7 +8,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { loadConfig, getFreshness, runHook, statusReport } = require('../../src/code-index/indexer');
+const {
+  loadConfig,
+  getFreshness,
+  ensureFresh,
+  runHook,
+  statusReport,
+} = require('../../src/code-index/indexer');
 const {
   loadModel,
   refsQuery,
@@ -176,6 +182,31 @@ describe('code index of a Python project', () => {
     expect(freshness.state).toBe('stale');
     expect(freshness.languages).toEqual({ python: 'stale' });
   });
+
+  test('a query refreshes the stale index first, and a leftover single-file index goes (REQ-IDX-007)', () => {
+    const cfg = loadConfig(root);
+    expect(ensureFresh(cfg)).toEqual({ state: 'fresh', rebuilt: true });
+    expect(ensureFresh(cfg)).toEqual({ state: 'fresh', rebuilt: false });
+    // The single-file layout of earlier versions counts as stale and is removed on the next build.
+    const legacy = path.join(root, '.scip', 'index.scip');
+    fs.writeFileSync(legacy, '');
+    expect(getFreshness(cfg)).toMatchObject({ state: 'stale', languages: { python: 'fresh' } });
+    expect(runHook(SESSION_START, { root })).toBe('built');
+    expect(fs.existsSync(legacy)).toBe(false);
+    expect(getFreshness(cfg).state).toBe('fresh');
+    expect(refsQuery(loadModel(cfg), 'run', {})).toHaveLength(1);
+  }, 180000);
+
+  test('refuses to build a project without sources', () => {
+    const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'musubi-code-empty-'));
+    try {
+      writeFixture(empty, { 'pyproject.toml': PYPROJECT });
+      expect(() => loadModel(loadConfig(empty))).toThrow(/nothing to index/);
+      expect(fs.existsSync(path.join(empty, '.scip'))).toBe(false);
+    } finally {
+      fs.rmSync(empty, { recursive: true, force: true });
+    }
+  });
 });
 
 describe('code index of a src-layout Python project (REQ-IDX-010)', () => {
@@ -214,4 +245,17 @@ describe('code index of a src-layout Python project (REQ-IDX-010)', () => {
     ]);
     expect(fs.existsSync(path.join(root, 'pyrightconfig.json'))).toBe(false);
   });
+
+  test('leaves a pyright configuration of the project alone', () => {
+    const configPath = path.join(root, 'pyrightconfig.json');
+    const own = '{\n  "extraPaths": ["src"],\n  "typeCheckingMode": "basic"\n}\n';
+    fs.writeFileSync(configPath, own);
+    const file = path.join(root, 'src', 'demo', 'core.py');
+    fs.appendFileSync(file, '# edited\n');
+    touchLater(file);
+    expect(runHook(SESSION_START, { root })).toBe('built');
+    expect(fs.readFileSync(configPath, 'utf8')).toBe(own);
+    const model = loadModel(loadConfig(root), { refresh: false });
+    expect(refsQuery(model, 'handler', {})[0].references).toHaveLength(2);
+  }, 180000);
 });

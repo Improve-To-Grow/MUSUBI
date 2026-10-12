@@ -191,7 +191,7 @@ REQ-AUTH-001 ←→ src/auth/login.js ←→ tests/auth.test.js
 
 ### Code Navigation
 
-For JavaScript/TypeScript projects. `musubi init` and `musubi upgrade` set it up; see the [code navigation guide](./guides/scip-typescript.md).
+For JavaScript, TypeScript and Python projects, mixed ones included. `musubi init` and `musubi upgrade` set it up without asking; see the [code navigation guide](./guides/scip-typescript.md).
 
 | Command                         | Description                                        |
 | ------------------------------- | -------------------------------------------------- |

@@ -227,7 +227,7 @@ musubi trace --output ./trace/    # Specify output destination
 
 ### `musubi code` / `musubi-code`
 
-Compiler-accurate code navigation for JavaScript/TypeScript projects, built on scip-typescript. See the [code navigation guide](scip-typescript.md).
+Compiler-accurate code navigation for JavaScript/TypeScript and Python projects, built on scip-typescript and scip-python. See the [code navigation guide](scip-typescript.md).
 
 ```bash
 musubi-code refs <Name|Owner.member>   # Every reference: new, call, require, extends, ...

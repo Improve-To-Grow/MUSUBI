@@ -50,15 +50,16 @@ ITG MUSUBI Fork
 
 | Tool | Use for |
 |------|---------|
-| `musubi-code` (scip-typescript 0.4.0; index in `.scip/`; roots `bin`, `src`, `tests`, without `src/templates`) | Symbol questions: does X exist, where is it defined, what a file exports, who references, calls or instantiates X, file dependencies and dependents |
+| `musubi-code` (scip-typescript 0.4.0 for JavaScript, scip-python 0.6.6 for Python; one index per language in `.scip/`; roots `bin`, `src`, `tests` plus the root-level `convert-agents-to-skills.py`, without `src/templates`) | Symbol questions: does X exist, where is it defined, what a file exports, who references, calls or instantiates X, file dependencies and dependents |
 | grep, the Grep tool | Text: Markdown, templates, YAML and JSON, comments, string-keyed registries, dynamic `require()` paths |
 
 Answer symbol questions with `musubi-code` before grep, also inside `/sdd-*` commands and
 skills: `musubi-code refs <Name>` (definition and every reference; "No definition named" means it
 does not exist), `musubi-code symbols <file>`, `musubi-code callers <Name>`,
 `musubi-code deps <file>`, `musubi-code dependents <file>`. Analysis records say which facts came
-from the index and which from grep. A PreToolUse hook adds a note when a grep searches for an
-indexed name. Commands: `CLAUDE.md` "Code Navigation"; guide: `docs/guides/scip-typescript.md`.
+from the index and which from grep. A PreToolUse hook blocks a grep that searches only for indexed
+names and points to `refs`; quote the name (`'Name'`) to search it as text. Commands: `CLAUDE.md`
+"Code Navigation"; guide: `docs/guides/scip-typescript.md`.
 
 ---
 

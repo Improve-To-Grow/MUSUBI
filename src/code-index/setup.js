@@ -225,15 +225,17 @@ function instructionSection(command, forClaude) {
     '',
     'This also applies where an SDD command, prompt or skill says to grep for code. Use grep for',
     'text the index does not cover: Markdown, templates, configuration, comments, string-keyed registries',
-    'and dynamic `require()` paths, and once for the name as a string before a rename or deletion.',
-    `${code('status')} lists the indexed directories. The index is compiler-accurate (scip-typescript,`,
-    '`.scip/`) and is rebuilt first when source files changed.',
+    "and dynamic `require()` or `importlib` paths, and once for the quoted name (`'Name'`) before a",
+    `rename or deletion. ${code('status')} lists the indexed directories and languages. The index is`,
+    'compiler-accurate (scip-typescript for JavaScript/TypeScript, scip-python for Python; `.scip/`) and',
+    'is rebuilt first when source files changed.',
   ];
   if (forClaude) {
     lines.push(
       '',
       'The `code-references` skill lists all options. Hooks in `.claude/settings.json` keep the index',
-      'fresh and add a note when a grep searches for an indexed name.'
+      'fresh and block a grep that searches only for indexed names, pointing to `refs`; quote the name',
+      'to search it as text.'
     );
   }
   lines.push(SECTION_END);

@@ -214,8 +214,14 @@ describe('code-index setup', () => {
       expect(section).toContain(
         'Markdown, templates, configuration, comments, string-keyed registries'
       );
+      // REQ-NAV-001/002 (modified) and REQ-IDX-012: the quoted name, both languages.
+      expect(section).toContain("once for the quoted name (`'Name'`)");
+      expect(section).toContain(
+        'scip-typescript for JavaScript/TypeScript, scip-python for Python'
+      );
     }
-    expect(read(root, 'CLAUDE.md')).toContain('when a grep searches for an indexed name');
+    expect(read(root, 'CLAUDE.md')).toContain('block a grep that searches only for indexed names');
+    expect(read(root, 'CLAUDE.md')).toContain('quote the name');
     expect(read(root, 'AGENTS.md')).not.toContain('.claude/settings.json');
   });
 
@@ -229,8 +235,11 @@ describe('code-index setup', () => {
     for (const term of ['where is X defined', 'does X exist', 'is X exported', 'find definition']) {
       expect(description).toContain(term);
     }
+    expect(description).toContain('Python');
     expect(description.length).toBeLessThanOrEqual(1536);
     expect(skill).toContain('`musubi-code symbols user.js`');
+    expect(skill).toContain('`musubi-code refs User.save`');
+    expect(skill).toContain("grep once for the quoted name (`'Name'`)");
   });
 
   test('writes one section per instruction file for other agents, without Claude files', () => {

@@ -14,6 +14,7 @@ const {
   listSourceFiles,
   computeFingerprint,
   getFreshness,
+  build,
   runHook,
   statusReport,
 } = require('../../src/code-index/indexer');
@@ -87,14 +88,19 @@ describe('code-index indexer', () => {
     fs.writeFileSync(path.join(root, 'pyproject.toml'), '[project]\nname = "x"\n');
     expect(detectLanguages(root)).toEqual(['typescript', 'python']);
     const python = makeTempProject({ 'scripts/tool.py': 'print(1)\n' });
+    const script = makeTempProject({ 'package.json': '{}', 'src/a.js': '', 'tool.py': '' });
     const rust = makeTempProject({ 'Cargo.toml': '', 'src/main.rs': 'fn main() {}\n' });
     const empty = makeTempProject({ 'README.md': '' });
     try {
       expect(detectLanguages(python)).toEqual(['python']);
+      // A root-level script counts, like this repository's convert-agents-to-skills.py.
+      expect(detectLanguages(script)).toEqual(['typescript', 'python']);
       expect(detectLanguages(rust)).toEqual([]);
       expect(detectLanguages(empty)).toEqual([]);
     } finally {
-      for (const dir of [python, rust, empty]) fs.rmSync(dir, { recursive: true, force: true });
+      for (const dir of [python, script, rust, empty]) {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
     }
   });
 
@@ -195,6 +201,18 @@ describe('code-index indexer', () => {
       'skipped'
     );
     expect(fs.existsSync(path.join(root, '.scip'))).toBe(false);
+  });
+
+  test('a build reports queued while another process holds the lock', () => {
+    const cfg = loadConfig(root);
+    fs.mkdirSync(cfg.dir, { recursive: true });
+    fs.writeFileSync(cfg.lockPath, JSON.stringify({ pid: process.pid, startedAt: Date.now() }));
+    try {
+      expect(build(cfg, { quiet: true })).toEqual({ built: false, queued: true });
+      expect(fs.existsSync(cfg.dirtyPath)).toBe(true);
+    } finally {
+      fs.rmSync(cfg.lockPath, { force: true });
+    }
   });
 
   test('the hook resolves the project from CLAUDE_PROJECT_DIR', () => {
