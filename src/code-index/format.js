@@ -6,6 +6,8 @@
 
 'use strict';
 
+const { LANGUAGES } = require('./indexer');
+
 const DEFAULT_LIMIT = 100;
 
 function plural(n, word) {
@@ -126,16 +128,28 @@ function formatSymbols(result) {
  */
 function formatStatus(report) {
   const excluded = report.exclude.length ? ` (excluding ${report.exclude.join(', ')})` : '';
+  const rootFiles =
+    report.rootFiles && report.rootFiles.length ? ` + ${report.rootFiles.join(', ')}` : '';
   const lines = [
-    `index:   ${report.index} (${report.state})`,
-    `roots:   ${report.roots.join(', ')}${excluded}`,
+    `state:   ${report.state}`,
+    `roots:   ${report.roots.join(', ')}${rootFiles}${excluded}`,
     `files:   ${report.files} source files now`,
   ];
-  if (report.meta) {
+  const languages = Object.values(report.languages || {});
+  if (languages.length === 0) {
+    lines.push('languages: none (no JavaScript, TypeScript or Python sources under the roots)');
+  }
+  for (const language of languages) {
     lines.push(
-      `built:   ${report.meta.builtAt} in ${report.meta.durationMs} ms, ${report.meta.files} files`
+      `${language.label}: ${language.index} (${language.state}), ${plural(language.files, 'file')}`
     );
-    lines.push(`indexer: scip-typescript ${report.meta.indexer}, ${report.meta.tsconfig}`);
+    if (language.meta) {
+      const { builtAt, durationMs, files, indexer, tsconfig } = language.meta;
+      const config = tsconfig ? `, ${tsconfig}` : '';
+      lines.push(
+        `  built: ${builtAt} in ${durationMs} ms, ${plural(files, 'file')}, ${language.tool} ${indexer}${config}`
+      );
+    }
   }
   if (report.building) lines.push('build:   running');
   return lines.join('\n');
@@ -148,7 +162,13 @@ function formatStatus(report) {
 function formatSetup(result) {
   if (result.skippedReason) return `Code navigation not set up: ${result.skippedReason}`;
   const verb = result.dryRun ? 'would be' : '';
-  const lines = [`Code navigation for ${result.agents.join(', ')} (command: ${result.command})`];
+  const languages = (result.languages || []).map(key =>
+    LANGUAGES[key] ? LANGUAGES[key].label : key
+  );
+  const detected = languages.length ? `; ${languages.join(', ')}` : '';
+  const lines = [
+    `Code navigation for ${result.agents.join(', ')} (command: ${result.command}${detected})`,
+  ];
   for (const change of result.changes) {
     const status =
       verb && change.status !== 'unchanged' ? `${verb} ${change.status}` : change.status;

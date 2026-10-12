@@ -298,9 +298,10 @@ Comprehensive guides are available in `docs/guides/`:
 - **[Brownfield Tutorial](docs/guides/brownfield-tutorial.md)** - Step-by-step guide for managing changes in existing projects
 - **[Delta Specification Guide](docs/guides/delta-spec-guide.md)** - Format reference for change tracking
 - **[Change Management Workflow](docs/guides/change-management-workflow.md)** - End-to-end workflow documentation
+- **[SDD Command Flows](docs/guides/sdd-command-flows.md)** - Step-by-step command order for a greenfield feature and for a brownfield change, with human review points and command formats
 - **[Traceability Matrix Guide](docs/guides/traceability-matrix-guide.md)** - Traceability system usage
 - **[Video Tutorial Plan](docs/guides/video-tutorial-plan.md)** - Video content script
-- **[Code Navigation (musubi-code)](docs/guides/scip-typescript.md)** - Compiler-accurate references, callers and file dependencies for AI agents in JavaScript/TypeScript projects, set up by `musubi init` and `musubi upgrade`
+- **[Code Navigation (musubi-code)](docs/guides/scip-typescript.md)** - Compiler-accurate references, callers and file dependencies for AI agents in JavaScript/TypeScript and Python projects, set up by `musubi init` and `musubi upgrade` without asking
 
 ### Project Types
 
