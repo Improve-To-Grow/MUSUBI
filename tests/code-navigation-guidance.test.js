@@ -5,9 +5,13 @@
 
 const fs = require('fs');
 const path = require('path');
+const { globSync } = require('glob');
 
 const ROOT = path.join(__dirname, '..');
 const TEMPLATES = 'src/templates/agents/claude-code';
+// This repository's own Claude Code files: they get the framework changes of the templates, not
+// the ITG project policies (steering/rules/itg-fork.md, FORK-08)
+const INSTALLED = '.claude';
 const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/\r\n/g, '\n');
 
 // Lookup steps: template file, the grep that stays as fallback for text and projects without a
@@ -43,8 +47,11 @@ const LOOKUP_STEPS = [
 const TEXT_CHECKS = [`grep -rE "from '@/(app|components|hooks|contexts)/"`];
 
 describe('Claude Code SDD templates look up code in the index first (REQ-NAV-004)', () => {
-  test.each(LOOKUP_STEPS)('%s names the index before %s', (file, fallback, indexCommand) => {
-    const lines = read(`${TEMPLATES}/${file}`).split('\n');
+  const steps = [TEMPLATES, INSTALLED].flatMap(root =>
+    LOOKUP_STEPS.map(([file, ...rest]) => [`${root}/${file}`, ...rest])
+  );
+  test.each(steps)('%s names the index before %s', (file, fallback, indexCommand) => {
+    const lines = read(file).split('\n');
     const at = lines.findIndex(line => line.includes(fallback));
     expect(at).toBeGreaterThan(-1);
     const step = lines.slice(Math.max(0, at - 10), at + 1).join('\n');
@@ -66,26 +73,10 @@ describe('Claude Code SDD templates look up code in the index first (REQ-NAV-004
     expect(unlisted).toEqual([]);
   });
 
-  test('the copies installed in .claude/ are identical to their templates', () => {
-    const pairs = [];
-    for (const name of fs.readdirSync(path.join(ROOT, '.claude', 'commands'))) {
-      pairs.push([`.claude/commands/${name}`, `${TEMPLATES}/commands/${name}`]);
-    }
-    for (const skill of fs.readdirSync(path.join(ROOT, '.claude', 'skills'))) {
-      const template = `${TEMPLATES}/skills/${skill}`;
-      if (!fs.existsSync(path.join(ROOT, template))) continue; // code-references: code index
-      for (const name of fs.readdirSync(path.join(ROOT, '.claude', 'skills', skill))) {
-        pairs.push([`.claude/skills/${skill}/${name}`, `${template}/${name}`]);
-      }
-    }
-    expect(pairs.length).toBeGreaterThan(30);
-    const different = pairs
-      .filter(([installed, template]) => {
-        if (fs.statSync(path.join(ROOT, installed)).isDirectory()) return false;
-        return read(installed) !== read(template);
-      })
-      .map(([installed]) => installed);
-    expect(different).toEqual([]);
+  test('the files installed in .claude/ keep ITG project policies out', () => {
+    const files = globSync(`${INSTALLED}/{commands,skills}/**/*.md`, { cwd: ROOT });
+    expect(files.length).toBeGreaterThan(30);
+    expect(files.filter(file => read(file).includes('steering/rules/itg/'))).toEqual([]);
   });
 });
 

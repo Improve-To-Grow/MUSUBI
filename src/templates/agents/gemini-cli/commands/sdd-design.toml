@@ -23,6 +23,7 @@ Create a comprehensive technical design for the given feature based on requireme
 1. **Steering Context**:
    - `steering/structure.md` - Architecture patterns
    - `steering/tech.md` - Technology stack
+   - `steering/rules/itg/README.md` - ITG delivery policies: read the files mapped to your task
    - `steering/product.md` - Product context
    - `steering/project.yml` - `constitution.profile` (library | cli | application; `library` when absent)
 
@@ -36,7 +37,7 @@ Follow this design methodology:
 1. **Understand Requirements**: Map all EARS requirements
 2. **Align with Architecture**: Follow patterns from steering/structure.md
 3. **Technology Alignment**: Use stack from steering/tech.md
-4. **C4 Model**: Create architecture diagrams
+4. **C4 Model**: Create Mermaid C4 architecture diagrams (ITG-DEL-12)
 5. **ADR**: Document architectural decisions
 6. **API Design**: Define interfaces
 7. **Data Model**: Design database schema
@@ -50,216 +51,148 @@ Follow this design methodology:
 - Design goals
 - Constraints from steering
 
-## 2. Architecture (C4 Model)
+## 2. Architecture (Mermaid C4)
 
-### Context Diagram (Level 1)
-- System boundary
-- External actors
-- External systems
+Every architecture diagram SHALL be a Mermaid C4 block, and every decision tree a Mermaid `flowchart` (ITG-DEL-12). Do not use ASCII art. Start from the context and container views in `steering/tech.md`.
 
-### Container Diagram (Level 2)
-- Application components
-- Databases
-- Message queues
-- External services
+### Context Diagram (Level 1): `C4Context`
+- Users, the system, external systems (Firebase, Azure Communication Services, Vertex AI, ITG log-ingest, vendor APIs)
 
-### Component Diagram (Level 3)
-- Internal components
-- Responsibilities
-- Dependencies
-- Communication patterns
+### Container Diagram (Level 2): `C4Container`
+- Worker (Next.js via OpenNext), Firebase Functions, Firestore, R2
+- PostgreSQL only when ITG-DAT-02 applies; n8n only when ITG-INT-06 applies
+
+### Component Diagram (Level 3): `C4Component`
+- Route handlers through `withApiRoute`, guards, feature services in `src/features/<domain>/api/`, `src/lib` modules
 
 ### Code Organization (Level 4)
-- Directory structure (aligned with steering/structure.md)
-- Key classes/modules
-- File organization
+- Directory structure aligned with steering/structure.md: `src/features/<domain>/`, `src/types/<domain>/<entity>.ts`, shared code in `src/lib/`
 
 ## 3. Architectural Decision Records (ADRs)
 
-For each major decision:
-
-**ADR-NNN: [Decision Title]**
-
-- **Status**: Proposed / Accepted / Deprecated
-- **Context**: What problem are we solving?
-- **Decision**: What did we decide?
-- **Consequences**: What are the trade-offs?
-- **Alternatives Considered**: What other options were evaluated?
+For each major decision: Status, Context, Decision, Consequences, Alternatives Considered. Write an ADR for the database choice (ITG-DAT-02), every deviation from an ITG rule, every runtime-constraint client (VIII-5) and background job placement (ITG-INT-06).
 
 Example:
 ```
-ADR-001: Use JWT for Authentication Tokens
+ADR-001: Store RSVPs in Firestore
 
 Status: Accepted
-Context: Need stateless authentication mechanism for API
-Decision: Use JWT (RS256) with 24-hour expiry
+Context: REQ-RSVP-001 needs per-meeting RSVPs read in real time; a few hundred per meeting
+Decision: Firestore collection `rsvps`, scoped by organizationId (ITG-DAT-01, ITG-DAT-02)
 Consequences:
-  + Stateless, scales horizontally
-  + Standard, well-supported
-  - Cannot revoke tokens before expiry
-  - Larger token size than session IDs
-Alternatives: Session cookies, OAuth tokens
+  + Realtime reads, no extra database; rules enforce the tenant scope
+  - Cross-meeting reporting needs an export
+Alternatives: PostgreSQL, rejected (small, non-relational data)
 ```
 
-## 4. Requirements Mapping
-
-Map each requirement to design components:
+## 4. Requirements Mapping and ITG Policy Compliance
 
 | Requirement ID | Component | Implementation |
 |---------------|-----------|----------------|
-| REQ-AUTH-001  | AuthService | EmailRegistration class |
-| REQ-AUTH-002  | PasswordValidator | validatePassword() |
-| REQ-AUTH-003  | AuthService | login() method |
+| REQ-RSVP-001  | POST /api/rsvp | withApiRoute + withAuth, zod schema |
+| REQ-RSVP-002  | src/features/rsvp/api/ | recordRsvp() |
+
+Add a table of the ITG rules the design relies on or deviates from (read `steering/rules/itg/README.md`):
+
+| Rule | How the design meets it |
+|------|-------------------------|
+| ITG-SEC-13 | Every route exported through withApiRoute with a guard |
+| ITG-SEC-05 | Organization id read from custom claims only |
+| ITG-LOG-02 | rsvp.response.set with .denied and .failed |
 
 ## 5. API Design
 
-### Endpoints
+Every endpoint is a `src/app/api/**/route.ts` exported through `withApiRoute('<route-id>', guard(handler), { rateLimit, schema })` and returns `{ success: true, data }` or `{ success: false, error: { code, message } }` (ITG-SEC-13, ITG-SEC-14).
 
-For each API endpoint:
-
-**POST /api/auth/register**
-- Request: { email: string, password: string }
-- Response: { userId: string, status: string }
-- Errors: 400 (validation), 409 (conflict)
-- Requirements: REQ-AUTH-001, REQ-AUTH-002
-
-**POST /api/auth/login**
-- Request: { email: string, password: string }
-- Response: { token: string, expiresAt: string }
-- Errors: 401 (unauthorized), 429 (rate limit)
-- Requirements: REQ-AUTH-003
-
-### GraphQL Schema (if applicable)
-```graphql
-type User {
-  id: ID!
-  email: String!
-  createdAt: DateTime!
-}
-
-type Mutation {
-  register(email: String!, password: String!): User!
-  login(email: String!, password: String!): AuthPayload!
-}
-```
+**POST /api/rsvp**
+- Route id: `api-rsvp-create`; guard `withAuth`; rate limit `write`; schema `createRsvpSchema` (zod)
+- Request: { meetingId: string, response: "yes" | "no" | "maybe" }
+- Response: { success: true, data: { rsvpId: string } }
+- Errors: 400 badRequest, 401 unauthorized, 403 forbidden, 409 conflict RSVP_CLOSED, 429 tooManyRequests
+- Events: rsvp.response.set, .denied, .failed (ITG-LOG-07)
+- Requirements: REQ-RSVP-001
 
 ## 6. Data Model
 
-### Database Schema
+Decide Firestore or PostgreSQL with `steering/rules/itg/data.md` (ITG-DAT-02). Draw the model as a Mermaid `erDiagram`; give every entity a classification (ITG-DAT-11) and, if multi-tenant, a tenant field (ITG-SEC-10). No entity has a role field (ITG-SEC-06).
 
-**users table**
-```sql
-CREATE TABLE users (
-  id UUID PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-**sessions table**
-```sql
-CREATE TABLE sessions (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES users(id),
-  token VARCHAR(512) NOT NULL,
-  expires_at TIMESTAMP NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+```mermaid
+erDiagram
+    MEETING ||--o{ RSVP : has
+    RSVP {
+        string id
+        string organizationId
+        string meetingId
+        string userId
+        string response
+    }
 ```
 
-### ER Diagram
-```
-[User] 1 ---- * [Session]
-[User] 1 ---- * [RefreshToken]
-```
+- Firestore: collections, indexes (`firestore.indexes.json`), server-write-only rules scoped by the tenant claim (ITG-SEC-15)
+- PostgreSQL (only if ITG-DAT-02 applies): numbered, idempotent migrations `database/migrations/NNNN_<name>.sql` (ITG-DAT-05, ITG-DAT-06)
 
 ## 7. Component Design
 
 Choose the variant for `constitution.profile` (Article I: Testable Core). The design SHALL name the core module for each feature (I-1).
 
-- **`library` / `cli`**: each feature is a standalone library, e.g. `lib/auth/` with its own tests, a public API (`index.ts`) and a CLI (`cli.ts`) (I-L1–I-L3, II-L1)
-- **`application`**: each feature is a core module folder, e.g. `src/lib/auth/` with co-located `*.test.ts`, no own `package.json` and no `cli.ts`; route handlers and server actions delegate to it (I-A1–I-A3, II-A3). WHERE the project profile is `application`, the design SHALL list the delivery paths (e.g. `src/app/api/auth/login/route.ts`) and each machine-facing endpoint with its input schema and documented status and error codes (II-A4, II-A5)
+- **`library` / `cli`**: each feature is a standalone library, e.g. `lib/rsvp/` with its own tests, a public API (`index.ts`) and a CLI (`cli.ts`) (I-L1–I-L3, II-L1)
+- **`application`** (ITG): each feature is a self-contained folder `src/features/<domain>/` (components, hooks, api, types.ts); shared logic is in the core path `src/lib/`; route handlers delegate to the feature service (I-A3, II-A3). The design SHALL list the delivery paths and each machine-facing endpoint with its input schema and documented status and error codes (II-A4, II-A5)
 
-### AuthService
 ```typescript
-class AuthService {
-  async register(email: string, password: string): Promise<User>
-  async login(email: string, password: string): Promise<AuthToken>
-  async logout(userId: string): Promise<void>
-  async refreshToken(token: string): Promise<AuthToken>
-}
-```
-
-### PasswordValidator
-```typescript
-class PasswordValidator {
-  validate(password: string): ValidationResult
-  hash(password: string): Promise<string>
-  verify(password: string, hash: string): Promise<boolean>
-}
+// src/features/rsvp/api/rsvp-service.ts
+export async function recordRsvp(organizationId: string, input: CreateRsvpInput): Promise<Rsvp>
 ```
 
 ## 8. Integration Points
 
 ### Internal Dependencies
-- UserRepository (lib/users/)
-- EmailService (lib/notifications/)
-- TokenService (lib/auth/tokens/)
+- `src/lib/firebase-rest/` (runtime-constraint client: `firebase-admin` cannot run on Workers, VIII-4)
+- `src/lib/email/` (`sendEmail()`, ACS), `src/lib/audit/`, `src/lib/logs/`
 
 ### External Dependencies
-- PostgreSQL database
-- Redis cache (for rate limiting)
-- Email SMTP service
+- Firebase Authentication and Firestore (REST)
+- Azure Communication Services (ITG-INT-03)
+- Vertex AI only, never the public Gemini API (ITG-SEC-20)
+- Each one documented in `documentation/INTEGRATIONS.md` (ITG-INT-08)
 
 ## 9. Security Design
 
-Based on Constitutional Article (OWASP Top 10):
+Follow `steering/rules/itg/security.md`:
 
-- **A01: Broken Access Control**: JWT validation on all protected routes
-- **A02: Cryptographic Failures**: bcrypt for passwords, RS256 for JWT
-- **A03: Injection**: Parameterized queries with Prisma ORM
-- **A05: Security Misconfiguration**: Environment variables for secrets
-- **A07: Authentication Failures**: Rate limiting, account lockout
+- **A01: Broken Access Control**: roles and tenant from custom claims only; guards in withApiRoute; Firestore rules server-write-only (ITG-SEC-05, ITG-SEC-13, ITG-SEC-15)
+- **A02: Cryptographic Failures**: Firebase Authentication; server-signed session cookies (ITG-SEC-11)
+- **A03: Injection**: zod schemas on every route (ITG-PLT-06)
+- **A05: Security Misconfiguration**: secrets only in GitHub Environments; CSP at compile time (ITG-PLT-08, ITG-SEC-22)
+- **A07: Authentication Failures**: Turnstile, App Check, admin TOTP MFA, rate limiting (ITG-SEC-01, ITG-SEC-02)
 
 ## 10. Performance Considerations
 
-- **Caching**: Cache user sessions in Redis
-- **Database**: Index on email, user_id
-- **Rate Limiting**: 5 login attempts per IP per minute
-- **Async Operations**: Email sending via background queue
+- **Runtime**: Worker bundle within the plan limit; no heavy SDKs in the Worker (ITG-PLT-18)
+- **Shared state**: Cloudflare KV, Durable Objects or Rate Limiting bindings, never isolate memory (ITG-PLT-17)
+- **Data**: Firestore composite indexes for every query
+- **Async work**: Firebase Functions or Cron Triggers; n8n only for large workflows (ITG-INT-06)
 
 ## 11. Error Handling
 
-### Error Codes
-- AUTH_001: Invalid credentials
-- AUTH_002: Account locked
-- AUTH_003: Token expired
-- AUTH_004: Validation failed
+Typed `ApiRouteError` helpers (`badRequest`, `unauthorized`, `forbidden`, `notFound`, `conflict`, `tooManyRequests`); anything else becomes a generic 500 and an `error_events` row. Status codes are never derived from message text (ITG-SEC-14).
 
-### Error Response Format
 ```json
 {
-  "error": {
-    "code": "AUTH_001",
-    "message": "Invalid credentials",
-    "details": { ... }
-  }
+  "success": false,
+  "error": { "code": "RSVP_CLOSED", "message": "The RSVP deadline has passed" }
 }
 ```
 
 ## 12. Testing Strategy
 
-### Unit Tests
-- PasswordValidator.validate()
-- AuthService.register()
-- AuthService.login()
+### Unit Tests (Vitest, written first)
+- recordRsvp() for every acceptance criterion (ITG-TST-01, ITG-TST-02)
 
-### Integration Tests
-- POST /api/auth/register
-- POST /api/auth/login
-- Token validation flow
+### Integration Tests (Vitest against the staging Firebase project, no emulator)
+- POST /api/rsvp, Firestore rules, tenant isolation (ITG-TST-06, ITG-TST-08)
+
+### E2E Tests (Playwright)
+- Member RSVPs; member of another organization is blocked (ITG-TST-10)
 
 ### Test Coverage Requirements
 - Coverage at or above the configured threshold, default 80% (III-6)
@@ -268,46 +201,48 @@ Based on Constitutional Article (OWASP Top 10):
 
 ## 13. Deployment
 
-### Environment Variables
-- DATABASE_URL
-- JWT_SECRET
-- JWT_EXPIRES_IN
-- REDIS_URL
+### Configuration (GitHub Environments, listed in `.env.example`)
+- New keys: [names only]; `NEXT_PUBLIC_*` as Variables, everything else as Secrets (ITG-PLT-09)
 
 ### Infrastructure
-- Database migrations (Prisma)
-- Redis for sessions
-- SMTP configuration
+- Firestore rules and indexes deployed to both Firebase projects in the same change (ITG-PLT-23)
+- New Cloudflare bindings per environment in `wrangler.jsonc` (ITG-PLT-19)
 
 ## 14. Constitutional Compliance
 
 Verify alignment with Constitutional Articles:
 
-- ✅ **Article I: Testable Core**: Core module named per feature: lib/auth/ (`library`, `cli`) or src/lib/auth/ (`application`) (I-1)
-- ✅ **Article II: Automation Interface**: CLI tool for user management (`library`, `cli`), or HTTP API with schema-validated machine-facing endpoints (`application`)
+- ✅ **Article I: Testable Core**: Core module named per feature: lib/rsvp/ (`library`, `cli`), or the feature folder src/features/rsvp/ and the src/lib/ modules it uses (`application`) (I-1)
+- ✅ **Article II: Automation Interface**: CLI tool (`library`, `cli`), or HTTP API with schema-validated machine-facing endpoints (`application`)
 - ✅ **Article III: Test-First**: Test strategy defined
 - ✅ **Article IV: EARS Format**: All requirements mapped
 - ✅ **Article V: Traceability**: Requirements → Design mapping complete (V-1), requirements coverage matrix included (V-5)
 - ✅ **Article VII: Simplicity Gate**: At most 3 projects (VII-1); more need Phase -1 Gate approval before they are implemented (VII-2) and a justification in design.md: business requirements, technical constraints, team capacity analysis (VII-3)
 - **Code-size limits (VII-4 to VII-6)**: components sized so the code can stay within source files <= 500 lines of code, functions <= 50 and imports <= 10 (`index` files exempt), or the configured `code_limits`; these limits are not Phase -1 Gate items
-- ✅ **Article VIII: Anti-Abstraction**: Use Prisma directly, no custom ORM wrapper (VIII-1, VIII-2); any abstraction over a framework needs Phase -1 Gate approval with a multi-framework support justification, a team expertise analysis and a migration path (VIII-3)
+- ✅ **Article VIII: Anti-Abstraction**: Vendor SDKs called directly, no custom wrapper (VIII-1, VIII-2, ITG-INT-02); any abstraction over a framework needs Phase -1 Gate approval with a multi-framework support justification, a team expertise analysis and a migration path (VIII-3)
 - **Runtime constraint (VIII-4, VIII-5)**: IF the design adds a project-owned client because the vendor SDK cannot run on the target runtime (e.g. `firebase-admin` on Cloudflare Workers), THEN design.md SHALL document that constraint here
+- ✅ **ITG policies**: compliance table included; deviations recorded in steering
 
 # Step 4: Save Design Document
 
 Save to: `storage/design/{{feature-name}}-design.md`
 
-# Example C4 Diagrams
-
-Use Mermaid or ASCII art:
+# Example C4 Diagram
 
 ```mermaid
-graph TB
-    User[User] --> WebApp[Web Application]
-    WebApp --> AuthAPI[Auth API]
-    AuthAPI --> DB[(PostgreSQL)]
-    AuthAPI --> Cache[(Redis)]
-    AuthAPI --> EmailService[Email Service]
+C4Container
+    title Meeting RSVP: containers
+    Person(member, "Member", "Client user")
+    System_Boundary(app, "Client portal") {
+        Container(web, "Web application", "Next.js on a Cloudflare Worker", "Pages and route handlers through withApiRoute")
+        ContainerDb(fs, "Firestore", "Firebase", "meetings, rsvps; server-write-only rules")
+    }
+    System_Ext(acs, "Azure Communication Services", "Reminder email")
+    System_Ext(logs, "ITG log-ingest", "Audit and app events")
+    Rel(member, web, "RSVP", "HTTPS, App Check")
+    Rel(web, fs, "Read and write", "REST via src/lib/firebase-rest")
+    Rel(web, acs, "sendEmail()", "REST")
+    Rel(web, logs, "rsvp.response.set", "HTTPS, HMAC")
 ```
 
 # Validation Checklist

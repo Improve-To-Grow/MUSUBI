@@ -16,6 +16,15 @@ Steering provides **project memory** for all Claude Code skills. It consists of 
 2. **tech.md** - Technology stack, frameworks, tools
 3. **product.md** - Business context, product goals, users
 
+It also includes the ITG delivery policies in `steering/rules/itg/` (ITG Software Delivery Playbook). `musubi init` writes all of them, and `structure.md`, `tech.md` and `product.md` start from the ITG defaults.
+
+### ITG Rules for Steering
+
+- Never remove or overwrite an ITG default. Record a project-specific choice in the `## Deviations from the ITG Playbook` table of `tech.md` (stack, platform, data) or `structure.md` (layout, naming), with the rule id, decision, reason, date and approver.
+- WHEN the code contradicts an ITG rule and no deviation is recorded, report it as drift with the rule id (e.g. `ITG-PLT-14`). Do not change the steering files to match the code.
+- Never edit `steering/rules/itg/`; those files come from the ITG MUSUBI fork.
+- Draw architecture as Mermaid C4 and decision logic as Mermaid `flowchart` (ITG-DEL-12).
+
 ### Your Task
 
 **Mode Detection**: Determine which mode to use:
@@ -99,9 +108,11 @@ Steering provides **project memory** for all Claude Code skills. It consists of 
      constitution:
        profile: application # library | cli | application
        core_paths: [src/lib]
-       delivery_paths: [src/app, src/components, src/hooks, src/contexts]
-       adapter_paths: []
+       delivery_paths: [src/app, src/components, src/features, src/middleware]
+       adapter_paths: [src/lib/auth]
      ```
+
+     These are the ITG defaults (`steering/structure.md`, "Testable-Core Pattern").
 
    - IF the block exists, THEN confirm it with the user, and change it only after the user agrees
 
@@ -109,6 +120,7 @@ Steering provides **project memory** for all Claude Code skills. It consists of 
    - Copy constitutional governance files
    - Copy workflow guide
    - Copy EARS format guide
+   - Copy the ITG delivery policies to `steering/rules/itg/` (from the ITG fork's `src/templates/shared/steering/rules/itg/`, or run `musubi init`)
 
 ### Output
 
@@ -124,6 +136,7 @@ Created steering files:
 - steering/product.md
 - steering/project.yml (constitution profile)
 - steering/rules/ (constitution, workflow, EARS)
+- steering/rules/itg/ (ITG delivery policies)
 
 ### Key Findings:
 
@@ -151,6 +164,7 @@ Please review the generated files and adjust as needed.
    - Read `steering/tech.md`
    - Read `steering/product.md`
    - Read the `constitution:` block in `steering/project.yml`
+   - Read `steering/rules/itg/README.md` and the Deviations tables
 
 2. **Analyze Current Codebase**:
    - Same analysis as Bootstrap mode
@@ -162,6 +176,7 @@ Please review the generated files and adjust as needed.
    - New components added?
    - Directory structure evolved?
    - Project profile or core/delivery paths no longer match `steering/project.yml`?
+   - Code that breaks an ITG rule without a recorded deviation? (report the rule id)
 
 4. **Update Steering Files** (after approval, VI-6):
    - Present the detected changes and apply them only after the user approves
@@ -261,12 +276,13 @@ By maintaining accurate steering files, all skills can:
 
 ### Tech Stack (steering/tech.md)
 
-- **Language**: TypeScript 5.3
-- **Framework**: Next.js 14 (App Router)
-- **Database**: PostgreSQL 15 with Prisma ORM
-- **API**: REST (Next.js API Routes)
-- **Testing**: Jest + React Testing Library
-- **CI/CD**: GitHub Actions
+- **Language**: TypeScript (strict), Node 22
+- **Framework**: Next.js (App Router) on Cloudflare Workers via OpenNext
+- **Database**: Firestore over the Firebase REST client (ITG-DAT-01)
+- **API**: Route Handlers through withApiRoute (ITG-SEC-13)
+- **Testing**: Vitest + Playwright
+- **CI/CD**: GitHub Actions + Wrangler
+- **Deviations**: none recorded
 
 ### Product (steering/product.md)
 
@@ -282,13 +298,14 @@ By maintaining accurate steering files, all skills can:
 
 ### Changes Detected:
 
-1. **New Technology**: Redis added for caching
-2. **Architecture Evolution**: Added background job processing
-3. **New Component**: `lib/notifications/` added
+1. **New Technology**: Cloudflare KV binding added for the rate limiter
+2. **Architecture Evolution**: Nightly export moved to a Firebase Function (ITG-INT-06)
+3. **New Component**: `src/features/notifications/` added
+4. **ITG drift**: `src/app/api/export/route.ts` imports `firebase-admin` (ITG-PLT-14), reported, not documented as a deviation
 
 ### Updated:
 
-- ✅ steering/tech.md - Added Redis 7.0, BullMQ
+- ✅ steering/tech.md - Added the KV binding and the Functions job
 - ✅ steering/structure.md - Documented background jobs pattern
 
 ### No Changes:

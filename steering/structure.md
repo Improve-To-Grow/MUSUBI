@@ -8,10 +8,16 @@
 
 ## Architecture Pattern
 
-**Primary Pattern**: {{ARCHITECTURE_PATTERN}}
+**Primary Pattern**: Node.js CLI package (`bin/` entry points over `src/` modules) that ships project templates in `src/templates/`.
 
-> [Description of the architecture pattern used in this project]
-> Examples: Monorepo with Library-First, Microservices, Modular Monolith, Serverless
+### Template Layers (ITG fork)
+
+This repository has two kinds of steering:
+
+- `steering/` (this folder): memory for agents working on MUSUBI itself. Not shipped.
+- `src/templates/shared/steering/` and `src/templates/shared/steering/rules/itg/`: what `musubi init` installs into ITG projects. These implement the ITG Software Delivery Playbook (`docs/itg/`).
+
+The rules for changing the templates, and a diagram of the layers, are in [rules/itg-fork.md](rules/itg-fork.md).
 
 ---
 

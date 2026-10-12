@@ -41,6 +41,7 @@ storage/specs/{{feature-name}}-requirements.md
 # Steering Context
 steering/structure.md
 steering/tech.md
+steering/rules/itg/README.md  # ITG delivery policies: read the files mapped to your task
 steering/product.md
 steering/project.yml   # constitution.profile (library | cli | application)
 ```
@@ -142,7 +143,7 @@ lib/{{feature}}/
   },
   "scripts": {
     "build": "tsc",
-    "test": "jest",
+    "test": "vitest run",
     "lint": "eslint src/"
   }
 }
@@ -185,22 +186,26 @@ export interface Create{{Resource}}Response {
 }
 ```
 
-**`application` profile: create core module and delivery wiring** (I-A1, I-A2, I-A3):
+**`application` profile (ITG): create the feature folder and delivery wiring** (I-A3, ITG-GIT-01 to ITG-GIT-03):
 
 ```typescript
 // Create directory structure (no package.json, no cli.ts)
-src/lib/{{feature}}/          // Core module
-├── index.ts                  // Public interface: service, types, errors
-├── service.ts                // Business logic
-├── service.test.ts           // Co-located tests, run without the app server (I-2)
-├── repository.ts             // Data access
-├── types.ts                  // Same types as above
-└── errors.ts                 // Custom errors
+src/features/{{feature}}/
+├── components/               // UI (shadcn/ui), delivery code
+├── hooks/                    // TanStack Query hooks
+├── api/
+│   ├── {{feature}}-service.ts        // Feature logic and vendor calls
+│   ├── {{feature}}-service.test.ts   // Written first, runs without the app (ITG-TST-01)
+│   └── {{feature}}-repository.ts     // Data access through src/lib/firebase-rest
+└── types.ts                  // Feature-local types
+src/types/{{domain}}/{{entity}}.ts   // Entity type, one file per entity (ITG-GIT-03)
 src/app/api/{{resource}}/
-└── route.ts                  // Delivery: route handler that calls core (TASK-006)
+└── route.ts                  // Delivery: withApiRoute + guard + zod schema (TASK-006)
 ```
 
-For `application`, read the paths in the examples below as `lib/{{feature}}/src/*` → `src/lib/{{feature}}/*` and `lib/{{feature}}/tests/*` → `src/lib/{{feature}}/*.test.ts`.
+Shared modules (`src/lib/firebase-rest`, `src/lib/email`, `src/lib/logs`, `src/lib/audit`) already exist from Sprint 0. Promote code to `src/lib/` only when a second feature needs it (ITG-GIT-02).
+
+For `application`, read the paths in the examples below as `lib/{{feature}}/src/*` → `src/features/{{feature}}/api/*` and `lib/{{feature}}/tests/*` → `src/features/{{feature}}/api/*.test.ts`.
 
 **Mark TASK-001 as completed**.
 
@@ -215,18 +220,21 @@ For `application`, read the paths in the examples below as `lib/{{feature}}/src/
 ```typescript
 // lib/{{feature}}/tests/service.test.ts
 
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 describe('REQ-{{COMPONENT}}-001: [Requirement Title]', () => {
   let service: {{COMPONENT}}Service;
-  let mockRepository: jest.Mocked<{{COMPONENT}}Repository>;
+  let mockRepository: { create: ReturnType<typeof vi.fn>; findById: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
+    // A unit-test double for the repository; the integration test in TASK-005 uses the
+    // real staging Firebase project (ITG-TST-06)
     mockRepository = {
-      create: jest.fn(),
-      findById: jest.fn(),
-      // ... other methods
-    } as any;
+      create: vi.fn(),
+      findById: vi.fn(),
+    };
 
-    service = new {{COMPONENT}}Service(mockRepository);
+    service = new {{COMPONENT}}Service(mockRepository as unknown as {{COMPONENT}}Repository);
   });
 
   // Acceptance Criterion 1
@@ -452,111 +460,71 @@ git commit -m "refactor: extract validator and improve {{component}} service"
 
 ---
 
-#### TASK-005: Implement Database Repository
+#### TASK-005: Implement Data Access
 
-**Create Prisma schema**:
+Use the database recorded in `steering/tech.md` (ITG-DAT-02). Firestore is the default.
 
-```prisma
-// prisma/schema.prisma
-
-model {{Resource}} {
-  id        String   @id @default(uuid())
-  field1    String
-  field2    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([field1])
-}
-```
-
-**Generate migration**:
-
-```bash
-npx prisma migrate dev --name create_{{resource}}_table
-```
-
-**Implement repository**:
+**Firestore (default)**: call the project-owned REST client from the repository. `firebase-admin` does not run on Cloudflare Workers (ITG-PLT-14):
 
 ```typescript
-// lib/{{feature}}/src/repository.ts
+// lib/{{feature}}/src/repository.ts  (application: src/features/{{feature}}/api/{{feature}}-repository.ts)
 
-import { PrismaClient } from '@prisma/client';
-import { {{Resource}}, Create{{Resource}}Request } from './types';
+import { createDocument, getDocument } from '@/lib/firebase-rest/firestore';
+import type { {{Resource}}, Create{{Resource}}Request } from './types';
+
+const COLLECTION = '{{resources}}';
 
 export class {{COMPONENT}}Repository {
-  constructor(private prisma: PrismaClient) {}
-
   /**
-   * REQ-{{COMPONENT}}-004: Persist {{resource}} to database
+   * REQ-{{COMPONENT}}-004: Persist {{resource}} in Firestore, scoped to the tenant
    */
-  async create(data: Create{{Resource}}Request): Promise<{{Resource}}> {
-    return this.prisma.{{resource}}.create({
-      data: {
-        field1: data.field1,
-        field2: data.field2
-      }
-    });
+  async create(organizationId: string, data: Create{{Resource}}Request): Promise<{{Resource}}> {
+    return createDocument<{{Resource}}>(COLLECTION, { ...data, organizationId });
   }
 
   async findById(id: string): Promise<{{Resource}} | null> {
-    return this.prisma.{{resource}}.findUnique({
-      where: { id }
-    });
+    return getDocument<{{Resource}}>(COLLECTION, id);
   }
 }
 ```
 
-**Write integration tests** (Article IX: real, isolated test database, IX-1, IX-2):
+Update `firestore.rules` (deny-by-default, server-write-only, tenant scope from the claim) and `firestore.indexes.json` in the same PR, for both Firebase projects (ITG-SEC-15, ITG-PLT-23).
+
+**PostgreSQL (only when ITG-DAT-02 applies)**: add a numbered, idempotent migration `database/migrations/NNNN_<name>.sql` (`BEGIN; … COMMIT;`, `IF NOT EXISTS`), update `database/schema.sql`, and query with the driver directly, without a wrapper layer (ITG-DAT-05 to ITG-DAT-07, Article VIII).
+
+**Write integration tests** (Article IX: real services, ITG-TST-06 to ITG-TST-08). They run against the staging Firebase project under a test prefix, never the emulator and never production:
 
 ```typescript
 // lib/{{feature}}/tests/integration.test.ts
 
-import { PrismaClient } from '@prisma/client';
+import { afterAll, describe, expect, it } from 'vitest';
+import { deleteDocument } from '@/lib/firebase-rest/firestore';
 import { {{COMPONENT}}Repository } from '../src/repository';
 
-describe('{{COMPONENT}}Repository Integration Tests', () => {
-  let prisma: PrismaClient;
-  let repository: {{COMPONENT}}Repository;
+const TEST_ORG = `test-${Date.now()}`; // test tenant, cleaned up below (ITG-TST-08)
 
-  beforeAll(async () => {
-    // Use test database (Docker container)
-    prisma = new PrismaClient({
-      datasourceUrl: process.env.TEST_DATABASE_URL
-    });
-    repository = new {{COMPONENT}}Repository(prisma);
-
-    // Clean database
-    await prisma.{{resource}}.deleteMany();
-  });
+describe('REQ-{{COMPONENT}}-004: {{COMPONENT}}Repository against staging Firestore', () => {
+  const repository = new {{COMPONENT}}Repository();
+  const created: string[] = [];
 
   afterAll(async () => {
-    await prisma.$disconnect();
+    await Promise.all(created.map(id => deleteDocument('{{resources}}', id)));
   });
 
-  it('should create {{resource}} in real database', async () => {
-    const data = { field1: 'test', field2: 42 };
+  it('stores the {{resource}} with its tenant', async () => {
+    const result = await repository.create(TEST_ORG, { field1: 'test', field2: 42 });
+    created.push(result.id);
 
-    const result = await repository.create(data);
-
-    expect(result).toMatchObject({
-      id: expect.any(String),
-      field1: 'test',
-      field2: 42
-    });
-
-    // Verify in database
     const found = await repository.findById(result.id);
-    expect(found).toMatchObject(data);
+    expect(found).toMatchObject({ organizationId: TEST_ORG, field1: 'test', field2: 42 });
   });
 });
 ```
 
-**Run integration tests**:
+**Run integration tests** (CI uses the `staging` GitHub Environment):
 
 ```bash
-docker-compose up -d test-db
-npm test lib/{{feature}}/tests/integration.test.ts
+npx vitest run lib/{{feature}}/tests/integration.test.ts
 ```
 
 **Mark TASK-005 as completed**.
@@ -576,11 +544,9 @@ Use the variant for the project profile from `steering/project.yml`.
 import { Command } from 'commander';
 import { {{COMPONENT}}Service } from './src/service';
 import { {{COMPONENT}}Repository } from './src/repository';
-import { PrismaClient } from '@prisma/client';
 
 const program = new Command();
-const prisma = new PrismaClient();
-const repository = new {{COMPONENT}}Repository(prisma);
+const repository = new {{COMPONENT}}Repository();
 const service = new {{COMPONENT}}Service(repository);
 
 program
@@ -637,45 +603,37 @@ chmod +x lib/{{feature}}/cli.ts
 ./lib/{{feature}}/cli.ts create --field1=test --field2=42
 ```
 
-**`application` profile: implement route handlers that delegate to core** (I-A3, II-A1, II-A4, II-A5). No CLI is required (II-A3).
+**`application` profile: implement route handlers through `withApiRoute`** (ITG-SEC-13, ITG-SEC-14, ITG-LOG-02; I-A3, II-A1, II-A4, II-A5). No CLI is required (II-A3).
 
 ```typescript
 // src/app/api/{{resource}}/route.ts
 
-import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { {{component}}Service, ValidationError } from '@/lib/{{feature}}'; // core module
+import { withApiRoute } from '@/middleware/with-api-route';
+import { withRole } from '@/middleware/with-auth';
+import { create{{Resource}} } from '@/features/{{feature}}/api/{{feature}}-service';
 
-// II-A4: validate input against a schema
-const Create{{Resource}}Schema = z.object({
-  field1: z.string().min(1),
-  field2: z.number().int().positive(),
+// II-A4, ITG-PLT-06: validate body and query against a zod schema
+const create{{Resource}}Schema = z.object({
+  body: z.object({
+    field1: z.string().min(1),
+    field2: z.number().int().positive(),
+  }),
 });
 
-export async function POST(request: NextRequest) {
-  const parsed = Create{{Resource}}Schema.safeParse(await request.json());
-  if (!parsed.success) {
-    // II-4, II-A5: documented status plus machine-readable error code
-    return NextResponse.json(
-      { error: { code: 'VALIDATION_FAILED', details: parsed.error.flatten() } },
-      { status: 400 }
-    );
-  }
-
-  try {
-    // I-A3: delegate to core, then shape the response
-    const result = await {{component}}Service.create(parsed.data);
-    return NextResponse.json(result, { status: 201 });
-  } catch (error) {
-    if (error instanceof ValidationError) {
-      return NextResponse.json({ error: { code: 'VALIDATION_FAILED' } }, { status: 400 });
-    }
-    return NextResponse.json({ error: { code: 'INTERNAL_ERROR' } }, { status: 500 });
-  }
-}
+// The wrapper adds the request id, App Check, the guard, rate limiting, schema validation,
+// typed ApiRouteError handling, the { success, data } envelope and the audit event
+// ({{domain}}.{{resource}}.create, .denied, .failed)
+export const POST = withApiRoute(
+  'api-{{resource}}-create',
+  withRole('member', async ({ body, claims }) => create{{Resource}}(claims.organizationId, body)),
+  { rateLimit: 'write', schema: create{{Resource}}Schema }
+);
 ```
 
-Server actions follow the same pattern: validate, authorize, call core, return a result. Operational tasks (seeding, user creation) go in `scripts/*.ts`, registered in `package.json`, with `--help`, an explicit target environment and `--dry-run` for production writes (II-A6–II-A9, advisory).
+Errors inside the feature service are thrown as typed `ApiRouteError` helpers (`badRequest`, `notFound`, `conflict`, …); never derive a status code from a message. Identity and tenant come only from `claims`, never from the body (ITG-SEC-06).
+
+Server actions follow the same pattern: validate, authorize from claims, call the feature service, return a result. Operational tasks (seeding, user creation) go in `scripts/*.ts`, registered in `package.json`, with `--help`, an explicit target environment and `--dry-run` for production writes (II-A6–II-A9, advisory).
 
 **Mark TASK-006 as completed**.
 
@@ -683,58 +641,28 @@ Server actions follow the same pattern: validate, authorize, call core, return a
 
 #### TASK-007: Implement API Endpoints
 
-For `application`, route handlers are built in TASK-006; use this task only for endpoints not covered there.
+For `application`, route handlers are built in TASK-006; use this task only for endpoints not covered there. Every endpoint uses the same `withApiRoute` pattern; nothing else exports a handler (ITG-SEC-13):
 
 ```typescript
-// app/api/{{resource}}/route.ts
+// src/app/api/{{resource}}/[id]/route.ts
 
-import { NextRequest, NextResponse } from 'next/server';
-import { {{COMPONENT}}Service } from '@/lib/{{feature}}';
+import { z } from 'zod';
+import { withApiRoute } from '@/middleware/with-api-route';
+import { withAuth } from '@/middleware/with-auth';
+import { notFound } from '@/middleware/api-errors';
+import { get{{Resource}} } from '@/features/{{feature}}/api/{{feature}}-service';
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
+const get{{Resource}}Schema = z.object({ params: z.object({ id: z.string().min(1) }) });
 
-    // REQ-{{COMPONENT}}-001: Create {{resource}}
-    const result = await service.create(body);
-
-    return NextResponse.json(result, { status: 201 });
-  } catch (error) {
-    if (error instanceof ValidationError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
-    }
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-
-  if (!id) {
-    return NextResponse.json(
-      { error: 'ID required' },
-      { status: 400 }
-    );
-  }
-
-  const result = await repository.findById(id);
-
-  if (!result) {
-    return NextResponse.json(
-      { error: 'Not found' },
-      { status: 404 }
-    );
-  }
-
-  return NextResponse.json(result);
-}
+export const GET = withApiRoute(
+  'api-{{resource}}-get',
+  withAuth(async ({ params, claims }) => {
+    const result = await get{{Resource}}(claims.organizationId, params.id);
+    if (!result) throw notFound('{{RESOURCE}}_NOT_FOUND');
+    return result;
+  }),
+  { rateLimit: 'read', schema: get{{Resource}}Schema }
+);
 ```
 
 **Mark TASK-007 as completed**.
@@ -746,18 +674,19 @@ export async function GET(request: NextRequest) {
 After completing each task:
 
 ```bash
-# Run tests
-npm test
-
-# Run linter
-npm run lint
-
-# Type check
-npm run type-check
-
-# Run security audit
-npm audit
+# The required CI checks (ITG-CI-01)
+npx tsc --noEmit
+npx eslint . && npm run lint:security
+npx prettier --check .
+npx vitest run
+npx knip
+npm audit --omit=dev --audit-level=high
+node scripts/checks/check-route-guards.mjs
+node scripts/checks/check-route-logging.mjs
+musubi validate
 ```
+
+Add a `CHANGELOG.md` entry under `Unreleased` (ITG-GIT-08) and remove any old code path the change replaces (ITG-GIT-15).
 
 ---
 
@@ -766,7 +695,7 @@ npm audit
 Run comprehensive validation:
 
 ```bash
-# application profile: use src/lib/{{feature}}/ (core) and the delivery paths instead of lib/{{feature}}/
+# application profile: use src/features/{{feature}}/ and the src/lib/ modules it changed instead of lib/{{feature}}/
 
 # Traceability validation
 @traceability-auditor validate requirements.md tasks.md lib/{{feature}}/
@@ -808,12 +737,13 @@ Run comprehensive validation:
 
 ### Constitutional Compliance:
 
-- ✅ Article I: Testable Core: core module lib/{{feature}}/ (`library`, `cli`) or src/lib/{{feature}}/ (`application`)
+- ✅ Article I: Testable Core: core module lib/{{feature}}/ (`library`, `cli`), or feature folder src/features/{{feature}}/ with tests written first (`application`)
 - ✅ Article II: Automation Interface: CLI (`library`, `cli`) or HTTP API with schema-validated endpoints (`application`)
 - ✅ Article III: Test-First followed (Red-Green-Blue)
 - ✅ Article V: All requirements implemented
 - ✅ Article VII: Code within the size limits (VII-4–VII-6)
-- ✅ Article IX: Integration tests use real database
+- ✅ Article IX: Integration tests use real services (staging Firebase project, no emulator)
+- ✅ ITG: every route through withApiRoute, events emitted, CHANGELOG updated
 
 ### Files Created:
 
@@ -823,7 +753,7 @@ Run comprehensive validation:
 - lib/{{feature}}/cli.ts
 - lib/{{feature}}/tests/\*.test.ts
 - app/api/{{resource}}/route.ts
-- (`application` instead: src/lib/{{feature}}/\*, src/app/api/{{resource}}/route.ts, no cli.ts)
+- (`application` instead: src/features/{{feature}}/\*, src/types/{{domain}}/\*, src/app/api/{{resource}}/route.ts, no cli.ts)
 
 ### Next Steps:
 

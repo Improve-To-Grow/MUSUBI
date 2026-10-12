@@ -1,6 +1,6 @@
 {
   "name": "@improve-to-grow/musubi-sdd",
-  "version": "6.3.1-itg.2",
+  "version": "6.3.1-itg.3",
   "private": true,
   "description": "Ultimate Specification Driven Development Tool with 27 Agents for 7 AI Coding Platforms + MCP Integration (Claude Code, GitHub Copilot, Cursor, Gemini CLI, Windsurf, Codex, Qwen Code)",
   "main": "src/index.js",
@@ -38,7 +38,8 @@
     "lint": "eslint bin/ src/ tests/",
     "lint:fix": "eslint bin/ src/ tests/ --fix",
     "format": "prettier --write bin/ src/ tests/",
-    "format:check": "prettier --check 'bin/**/*.js' 'src/**/*.js' 'tests/**/*.js'"
+    "format:check": "prettier --check 'bin/**/*.js' 'src/**/*.js' 'tests/**/*.js'",
+    "sync:commands": "node scripts/sync-commands.js"
   },
   "keywords": [
     "specification-driven-development",

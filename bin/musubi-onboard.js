@@ -19,6 +19,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
 const { glob } = require('glob');
+const { copyItgPolicies } = require('../src/cli/init-steering');
 
 /**
  * Analyze codebase and generate steering context
@@ -98,6 +99,10 @@ async function main() {
   await generateProductMd(businessContext);
   console.log(chalk.gray('  Created steering/product.md'));
 
+  // Install the ITG delivery policies
+  await copyItgPolicies();
+  console.log(chalk.gray('  Created steering/rules/itg/ (ITG delivery policies)'));
+
   // Step 7: Initialize memories (if not skipped)
   if (!skipMemories) {
     console.log(chalk.green('\n📝 Initializing memory system...\n'));
@@ -117,6 +122,7 @@ async function main() {
   console.log(chalk.gray('  steering/structure.md - Architecture patterns'));
   console.log(chalk.gray('  steering/tech.md - Technology stack'));
   console.log(chalk.gray('  steering/product.md - Business context'));
+  console.log(chalk.gray('  steering/rules/itg/ - ITG delivery policies'));
   if (!skipMemories) {
     console.log(chalk.gray('  steering/memories/ - Memory system (6 files)'));
   }
@@ -516,6 +522,15 @@ ${techStack.frameworks.map(f => `- **${f.name}** (${f.version})${f.purpose ? ` -
 ## Tools
 
 ${techStack.tools.map(t => `- **${t.name}** (${t.version})${t.purpose ? ` - ${t.purpose}` : ''}`).join('\n') || '- None detected'}
+
+## Deviations from the ITG Playbook
+
+This stack was detected in existing code. Compare it with the ITG default stack
+(\`steering/rules/itg/platform.md\`, ITG-PLT-01) and record every difference here.
+
+| Rule | Decision | Reason | Date | Approved by |
+|---|---|---|---|---|
+| — | Not reviewed yet | — | — | — |
 
 ---
 

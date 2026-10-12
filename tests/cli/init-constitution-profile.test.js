@@ -57,7 +57,8 @@ describe('init constitution profile', () => {
     await fs.ensureDir(path.join(tmpDir, 'src'));
     expect(defaultApplicationPaths(tmpDir)).toEqual({
       corePaths: 'src/lib',
-      deliveryPaths: 'src/app, src/components, src/hooks',
+      deliveryPaths: 'src/app, src/components, src/features, src/middleware',
+      adapterPaths: 'src/lib/auth',
     });
   });
 
@@ -65,7 +66,8 @@ describe('init constitution profile', () => {
     await fs.ensureDir(path.join(tmpDir, 'app'));
     expect(defaultApplicationPaths(tmpDir)).toEqual({
       corePaths: 'lib',
-      deliveryPaths: 'app, components, hooks',
+      deliveryPaths: 'app, components, features, middleware',
+      adapterPaths: 'lib/auth',
     });
   });
 

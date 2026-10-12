@@ -33,6 +33,7 @@ Generate a change proposal specification that documents what will be added, modi
 steering/product.md      # Current product context
 steering/structure.md    # Existing architecture
 steering/tech.md         # Current technology stack
+steering/rules/itg/README.md  # ITG delivery policies: read the files mapped to your task
 ```
 
 **Extract**:
@@ -49,9 +50,14 @@ steering/tech.md         # Current technology stack
 **Research Current Implementation**:
 
 ```bash
-# Search for related code
-grep -r "{{related-feature}}" src/
-grep -r "{{related-feature}}" lib/
+# Symbols (classes, functions, modules): ask the code index first when the project has one
+# (CLAUDE.md "Code Navigation"; JavaScript/TypeScript projects set up with musubi-code)
+musubi-code refs {{RelatedSymbol}}             # definition, exports and every reference
+musubi-code symbols {{path/to/module.js}}      # what a file defines and exports
+musubi-code dependents {{path/to/module.js}}   # files that load it
+
+# Words and text the index does not cover, and projects without a code index
+grep -rn "{{related-feature}}" src/ lib/ docs/
 
 # Find existing requirements
 ls storage/specs/*requirements.md
@@ -59,6 +65,9 @@ ls storage/specs/*requirements.md
 # Check existing design documents
 ls storage/design/*design.md
 ```
+
+When you use both, record in the proposal which facts came from the code index and which from
+grep.
 
 **Document Current State**:
 
@@ -196,8 +205,8 @@ Use template from `templates/change-proposal.md`:
 
 ### Dependencies
 
-- [ ] Requires library upgrade: prisma@5.0 → 6.0
-- [ ] Requires new service: Redis for session storage
+- [ ] Requires library upgrade: next@15 → 16 (check OpenNext support)
+- [ ] Requires new binding: Cloudflare KV for shared state (ITG-PLT-17)
 - [ ] Affects: mobile app (API changes)
 - [ ] Affects: partner integrations (webhook schema)
 
@@ -532,14 +541,15 @@ Present summary to user:
 
 1. **Read Steering**:
    - `steering/structure.md` → Current auth in `lib/auth/`
-   - `steering/tech.md` → Using Prisma, PostgreSQL
+   - `steering/tech.md` → ITG default stack: Firebase Authentication, Firestore over REST
    - `steering/product.md` → B2B SaaS, security critical
 
 2. **Analyze Existing**:
 
    ```bash
-   grep -r "authentication" src/
-   # Found: lib/auth/password.ts, lib/auth/session.ts
+   musubi-code refs AuthService           # code index: definition and every use
+   # AuthService (class) lib/auth/auth-service.ts:12; used in lib/auth/password.ts, lib/auth/session.ts
+   grep -rn "authentication" src/ docs/   # text: comments, docs, configuration
    ```
 
 3. **Ask User**:

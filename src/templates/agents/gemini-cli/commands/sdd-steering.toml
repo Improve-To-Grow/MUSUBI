@@ -13,6 +13,15 @@ Steering provides **project memory** for all AI agents. It consists of 3 core fi
 2. **tech.md** - Technology stack, frameworks, tools
 3. **product.md** - Business context, product goals, users
 
+It also includes the ITG delivery policies in `steering/rules/itg/` (ITG Software Delivery Playbook). `musubi init` writes all of them, and the three files start from the ITG defaults.
+
+# ITG Rules for Steering
+
+- Never remove or overwrite an ITG default. Record a project-specific choice in the `## Deviations from the ITG Playbook` table of `tech.md` or `structure.md`, with the rule id, decision, reason, date and approver.
+- WHEN the code contradicts an ITG rule and no deviation is recorded, report it as drift with the rule id (e.g. `ITG-PLT-14`). Do not change the steering files to match the code.
+- Never edit `steering/rules/itg/`; those files come from the ITG MUSUBI fork.
+- Draw architecture as Mermaid C4 and decision logic as Mermaid `flowchart` (ITG-DEL-12).
+
 # Mode Detection
 
 Determine which mode to use:

@@ -88,7 +88,7 @@ describe('Platform Initialization Tests', () => {
     const sharedPath = path.join(__dirname, '..', 'src', 'templates', 'shared', 'steering');
     expect(fs.existsSync(sharedPath)).toBe(true);
 
-    const requiredFiles = ['structure.md', 'tech.md', 'product.md'];
+    const requiredFiles = ['structure.md', 'tech.md', 'product.md', 'rules/itg/README.md'];
     requiredFiles.forEach(file => {
       expect(fs.existsSync(path.join(sharedPath, file))).toBe(true);
     });

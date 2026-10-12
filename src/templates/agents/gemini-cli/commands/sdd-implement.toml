@@ -23,6 +23,7 @@ Implement the feature by executing tasks in the task breakdown document, followi
 1. **Steering Context**:
    - `steering/structure.md` - Architecture patterns
    - `steering/tech.md` - Technology stack
+   - `steering/rules/itg/README.md` - ITG delivery policies: read the files mapped to your task
    - `steering/product.md` - Product context
    - `steering/project.yml` - `constitution.profile` (library | cli | application; `library` when absent)
 
@@ -34,6 +35,10 @@ Implement the feature by executing tasks in the task breakdown document, followi
 
 4. **Tasks**:
    - `storage/tasks/{{feature-name}}-tasks.md`
+
+# ITG Implementation Rules
+
+Read `steering/rules/itg/README.md` and the policies for this task before writing code. In particular: every API route through `withApiRoute` with a guard and a zod schema (ITG-SEC-13); roles and tenant only from custom claims (ITG-SEC-05); Firebase only through `src/lib/firebase-rest/` on the Worker (ITG-PLT-14); every route emits its audit or app event (ITG-LOG-02); Vitest tests written first (ITG-TST-01); integration tests against the staging Firebase project (ITG-TST-06). The password-hashing examples below only illustrate the Red-Green-Blue loop: ITG projects use Firebase Authentication and never hash passwords themselves.
 
 # Step 2: Task Execution Strategy
 

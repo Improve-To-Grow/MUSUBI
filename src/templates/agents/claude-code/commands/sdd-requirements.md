@@ -33,6 +33,7 @@ Generate a comprehensive requirements specification in EARS format for the speci
 steering/product.md      # Business context, users, goals
 steering/structure.md    # Architecture patterns
 steering/tech.md         # Technology stack
+steering/rules/itg/README.md  # ITG delivery policies: read the files mapped to your task
 ```
 
 **Extract**:
@@ -373,8 +374,9 @@ Present summary to user:
 
 1. **Read Steering**:
    - `steering/product.md` → Target users: B2B SaaS companies
-   - `steering/tech.md` → Stack: Next.js, PostgreSQL, Prisma
-   - `steering/structure.md` → Pattern: Library-first (profile `library` in `steering/project.yml`)
+   - `steering/tech.md` → Stack: ITG default (Next.js on Cloudflare Workers, Firebase Authentication, Firestore)
+   - `steering/structure.md` → Pattern: feature folders (profile `application` in `steering/project.yml`)
+   - `steering/rules/itg/` → ITG-SEC (claims-only roles, admin MFA), ITG-LOG (audit events), ITG-TST (required flows)
 
 2. **Ask User** (if needed):
 

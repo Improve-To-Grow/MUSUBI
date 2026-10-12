@@ -36,6 +36,7 @@ storage/specs/{{feature-name}}-requirements.md
 # Steering Context
 steering/structure.md
 steering/tech.md
+steering/rules/itg/README.md  # ITG delivery policies: read the files mapped to your task
 steering/product.md
 steering/project.yml   # constitution.profile (library | cli | application)
 ```
@@ -182,7 +183,7 @@ Read `constitution.profile` from `steering/project.yml` first (`library` when ab
    - Coverage ≥ configured threshold, default 80% (III-6)
 
 9. **TASK-009: Implement Caching**
-   - Redis/memory cache
+   - TanStack Query on the client; Cloudflare KV for shared server state, never isolate memory (ITG-PLT-17)
    - Cache invalidation
 
 10. **TASK-010: Security Audit**
