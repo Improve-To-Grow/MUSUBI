@@ -225,9 +225,20 @@ describe('code index of a CommonJS project', () => {
       })
     );
     expect(hint.status).toBe(0);
-    const context = JSON.parse(hint.stdout).hookSpecificOutput.additionalContext;
-    expect(context).toContain('makeWidget (function) lib/widget.js:9');
-    expect(context).toContain('`musubi-code refs makeWidget`');
+    const guard = JSON.parse(hint.stdout).hookSpecificOutput;
+    expect(guard.permissionDecision).toBe('deny');
+    expect(guard.permissionDecisionReason).toContain('makeWidget (function) lib/widget.js:9');
+    expect(guard.permissionDecisionReason).toContain('`musubi-code refs makeWidget`');
+
+    const advisory = cli(
+      root,
+      ['hint', '--hook', '--advisory'],
+      JSON.stringify({ tool_name: 'Grep', tool_input: { pattern: 'makeWidget' } })
+    );
+    expect(advisory.status).toBe(0);
+    const note = JSON.parse(advisory.stdout).hookSpecificOutput;
+    expect(note.permissionDecision).toBeUndefined();
+    expect(note.additionalContext).toContain('makeWidget (function) lib/widget.js:9');
 
     const silent = cli(
       root,

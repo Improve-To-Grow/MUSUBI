@@ -144,37 +144,55 @@ describe('runHint', () => {
 
   afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
 
-  const context = raw => {
+  // The guard denies the call (REQ-NAV-005); the reason is what Claude reads.
+  const reason = raw => {
     const out = runHint(raw, { root });
     if (!out) return null;
     const parsed = JSON.parse(out);
     expect(parsed).not.toHaveProperty('decision');
+    expect(parsed.hookSpecificOutput).toMatchObject({
+      hookEventName: 'PreToolUse',
+      permissionDecision: 'deny',
+    });
+    expect(parsed.hookSpecificOutput).not.toHaveProperty('additionalContext');
+    return parsed.hookSpecificOutput.permissionDecisionReason;
+  };
+
+  // With --advisory the hook adds the CHANGE-005 note instead (REQ-NAV-006).
+  const context = raw => {
+    const out = runHint(raw, { root, advisory: true });
+    if (!out) return null;
+    const parsed = JSON.parse(out);
     expect(parsed.hookSpecificOutput).not.toHaveProperty('permissionDecision');
     expect(parsed.hookSpecificOutput.hookEventName).toBe('PreToolUse');
     return parsed.hookSpecificOutput.additionalContext;
   };
 
-  test('names the definition and the refs command for a Grep of a defined name', () => {
-    const text = context(grep('\\bErrorHandler\\b'));
+  test('denies a Grep of a defined name with the definition, the refs command and the escape', () => {
+    const text = reason(grep('\\bErrorHandler\\b'));
+    expect(text).toMatch(/blocked/);
     expect(text).toContain('ErrorHandler (class) src/orchestration/error-handler.js:613');
     expect(text).toContain('`musubi-code refs ErrorHandler`');
-    expect(text).toMatch(/grep/);
+    expect(text).toMatch(/quote/i);
+    expect(text).toContain("'ErrorHandler'");
+    expect(text).toMatch(/outside the index/);
   });
 
   test('covers several names, shell commands and PowerShell', () => {
-    const text = context(bash("grep -rnE 'ErrorHandler|PatternRegistry' src"));
+    const text = reason(bash("grep -rnE 'ErrorHandler|PatternRegistry' src"));
+    expect(text).toMatch(/the command is blocked/);
     expect(text).toContain('ErrorHandler (class)');
     expect(text).toContain('PatternRegistry (class) src/orchestration/pattern-registry.js:106');
     expect(
-      context(powershell("Select-String -Pattern 'PatternRegistry' -Path src\\*.js"))
+      reason(powershell("Select-String -Pattern 'PatternRegistry' -Path src\\*.js"))
     ).toContain('PatternRegistry (class)');
   });
 
   test('lists at most five definitions and narrows Owner.member', () => {
-    const text = context(grep('execute'));
+    const text = reason(grep('execute'));
     expect(text.match(/\(method\)/g)).toHaveLength(5);
     expect(text).toContain('2 more');
-    const save = context(grep('UserService\\.save'));
+    const save = reason(grep('UserService\\.save'));
     expect(save).toContain('UserService.save (method) src/services/user.js:12');
     expect(save).not.toContain('OrderService');
   });
@@ -183,9 +201,26 @@ describe('runHint', () => {
     const out = JSON.parse(
       runHint(grep('ErrorHandler'), { root, command: 'node bin/musubi-code.js' })
     );
-    expect(out.hookSpecificOutput.additionalContext).toContain(
+    expect(out.hookSpecificOutput.permissionDecisionReason).toContain(
       '`node bin/musubi-code.js refs ErrorHandler`'
     );
+  });
+
+  test('adds a note instead of denying with --advisory (REQ-NAV-006)', () => {
+    const text = context(grep('ErrorHandler'));
+    expect(text).toContain('ErrorHandler (class) src/orchestration/error-handler.js:613');
+    expect(text).toContain('Keep grep for text');
+    expect(runHint(grep('TODO: remove'), { root, advisory: true })).toBe('');
+  });
+
+  test('lets a quoted name through: that is how to search a name as text (REQ-NAV-006)', () => {
+    expect(runHint(grep("'ErrorHandler'"), { root })).toBe('');
+    expect(runHint(grep('"ErrorHandler"'), { root })).toBe('');
+    expect(runHint(bash(`grep -rn "'ErrorHandler'" src`), { root })).toBe('');
+    expect(runHint(bash(`grep -rn '"ErrorHandler"' src`), { root })).toBe('');
+    expect(
+      runHint(powershell(`Select-String -Pattern "'ErrorHandler'" -Path src\\*.js`), { root })
+    ).toBe('');
   });
 
   test('stays silent for text searches, unknown names and searches outside the index', () => {
@@ -201,7 +236,7 @@ describe('runHint', () => {
     expect(runHint(bash('git log | grep ErrorHandler'), { root })).toBe('');
   });
 
-  test('answers for the project root, an indexed directory, file or glob', () => {
+  test('denies for the project root, an indexed directory, file or glob', () => {
     for (const extra of [
       {},
       { path: '.' },
@@ -214,7 +249,7 @@ describe('runHint', () => {
       { type: 'py' },
       { type: 'python' },
     ]) {
-      expect(context(grep('ErrorHandler', extra))).toContain('ErrorHandler (class)');
+      expect(reason(grep('ErrorHandler', extra))).toContain('ErrorHandler (class)');
     }
   });
 

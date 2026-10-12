@@ -170,6 +170,31 @@ describe('code-index setup', () => {
     );
   });
 
+  test('keeps --advisory on the hint hooks when a project chose it (REQ-NAV-006)', () => {
+    root = makeTempProject({
+      'package.json': '{}',
+      '.claude/settings.json': JSON.stringify({
+        hooks: {
+          PreToolUse: [
+            {
+              matcher: 'Grep',
+              hooks: [
+                { type: 'command', command: 'musubi-code hint --hook --advisory', timeout: 10 },
+              ],
+            },
+          ],
+        },
+      }),
+    });
+    setupCodeIndex(root, { agents: ['claude-code'] });
+    const settings = JSON.parse(read(root, '.claude/settings.json'));
+    const hint = settings.hooks.PreToolUse.flatMap(g => g.hooks.map(h => h.command));
+    expect(hint).toHaveLength(5);
+    expect(new Set(hint)).toEqual(new Set(['musubi-code hint --hook --advisory']));
+    const fresh = mergeHookSettings({}, 'musubi-code');
+    expect(fresh.hooks.PreToolUse[0].hooks[0].command).toBe('musubi-code hint --hook');
+  });
+
   test('the managed section maps symbol questions to commands (REQ-NAV-001, REQ-NAV-002)', () => {
     root = makeTempProject({ 'package.json': '{}' });
     setupCodeIndex(root, { agents: ['claude-code', 'copilot'] });

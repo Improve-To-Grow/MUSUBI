@@ -69,12 +69,14 @@ Widget (class) lib/widget.js:1
 
 1. Before renaming, moving or deleting a symbol, run `refs` (or `callers`) and read every listed site.
 2. Before deleting or moving a file, run `dependents <file>`.
-3. Then grep once for the name as a string, because the index cannot see dynamic lookups:
-   `require(variable)`, registries keyed by strings, `obj[name]()`, and text in Markdown, YAML or templates.
+3. Then grep once for the quoted name (`'Name'`), because the index cannot see dynamic lookups:
+   `require(variable)`, `importlib.import_module(name)`, registries keyed by strings, `obj[name]()`, and
+   text in Markdown, YAML or templates. A bare-name grep is blocked by the guard (below).
 4. After editing, the PostToolUse hook rebuilds the index in the background; the next query waits for it.
 
-A PreToolUse hook (`{{CODE_CMD}} hint --hook`) adds a note when a Grep or a shell grep searches for a
-name the index defines, with the definition and the `refs` command. It never blocks the search.
+A PreToolUse hook (`{{CODE_CMD}} hint --hook`) blocks a Grep or shell grep whose pattern is only names
+the index defines, and answers with the definitions and the `refs` command. It lets text searches,
+quoted names and searches limited to paths or file types outside the index through.
 
 ## Limits
 

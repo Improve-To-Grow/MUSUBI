@@ -1,16 +1,18 @@
 /**
- * Code index hint - a Claude Code PreToolUse hook that points grep searches for indexed names
- * to musubi-code
+ * Code index guard - a Claude Code PreToolUse hook that stops grep searches for indexed names
+ * and points them to musubi-code
  *
  * Before the Grep tool, or a shell command that runs grep, rg, git grep or Select-String, the
  * hook checks the search pattern. When it consists only of names that the index defines
- * (JavaScript, TypeScript or Python), the hook adds context listing those definitions and the
- * `refs` command for each. It never blocks or approves the call. It stays silent for text
- * searches, for searches limited to paths or file types outside the index, and when
- * `.scip/names.json` (written by ./indexer.js) is missing. It reads only that list, never the
- * index, so it answers in milliseconds.
+ * (JavaScript, TypeScript or Python), the hook denies the call with a reason that lists those
+ * definitions, the `refs` command for each, and how to search the name as text: quote it
+ * (`'Name'`), or limit the search to paths or file types outside the index. With `--advisory`
+ * it adds that list as context instead and lets the search run. It stays silent, and the search
+ * runs, for text searches, for searches limited to paths or file types outside the index, and
+ * when `.scip/names.json` (written by ./indexer.js) is missing; any internal error leaves the
+ * search allowed. It reads only that list, never the index, so it answers in milliseconds.
  *
- * CLI: bin/musubi-code.js (`musubi-code hint --hook`).
+ * CLI: bin/musubi-code.js (`musubi-code hint --hook [--advisory]`).
  *
  * @module code-index/hint
  */
@@ -417,12 +419,13 @@ function listNames(names) {
 }
 
 /**
- * The context text for a tool call, or null when there is nothing to point out.
+ * The indexed definitions that a tool call's searches look for, or null when the call is a
+ * text search, searches outside the index, or no names list exists.
  * @param {object} cfg
  * @param {object} input - PreToolUse hook input
- * @param {{command: string}} opts
+ * @returns {Array<{query: string, entries: Array<object>}>|null}
  */
-function hintText(cfg, input, { command }) {
+function findDefinitions(cfg, input) {
   const names = readNames(cfg);
   if (!names) return null;
   const base = typeof input.cwd === 'string' && input.cwd ? input.cwd : cfg.root;
@@ -441,11 +444,12 @@ function hintText(cfg, input, { command }) {
     );
     if (entries.length) found.push({ query, entries });
   }
-  if (!found.length) return null;
+  return found.length ? found : null;
+}
 
-  const lines = [
-    `${command}: ${listNames(found.map(f => f.query))} ${found.length === 1 ? 'is' : 'are'} defined in the code index:`,
-  ];
+/** The definitions (at most MAX_DEFINITIONS) with the `refs` command for each. */
+function definitionLines(found, command) {
+  const lines = [];
   const all = found.flatMap(f => f.entries);
   for (const e of all.slice(0, MAX_DEFINITIONS)) {
     lines.push(`  ${e.name} (${e.kind}) ${e.file}:${e.line}  ->  \`${command} refs ${e.name}\``);
@@ -454,11 +458,34 @@ function hintText(cfg, input, { command }) {
     const refs = found.map(f => `\`${command} refs ${f.query}\``).join(', ');
     lines.push(`  ... and ${all.length - MAX_DEFINITIONS} more: ${refs} lists them all`);
   }
-  lines.push(
+  return lines;
+}
+
+/** The advisory note (`--advisory`): the search runs, the index is pointed out. */
+function noteText(found, command) {
+  const names = listNames(found.map(f => f.query));
+  return [
+    `${command}: ${names} ${found.length === 1 ? 'is' : 'are'} defined in the code index:`,
+    ...definitionLines(found, command),
     `\`${command} refs\` gives the definition, exports and every reference, compiler-resolved.`,
-    'Keep grep for text: Markdown, templates, comments and string-keyed lookups.'
-  );
-  return lines.join('\n');
+    'Keep grep for text: Markdown, templates, comments and string-keyed lookups.',
+  ].join('\n');
+}
+
+/** The reason of a denied search: what the index knows and how to search the name as text. */
+function reasonText(found, command, tool) {
+  const names = listNames(found.map(f => f.query));
+  const first = found[0].query;
+  const head =
+    tool === 'Grep'
+      ? `${command}: grep for ${names} is blocked; the code index defines ${found.length === 1 ? 'it' : 'them'}:`
+      : `${command}: the command is blocked because its grep searches for ${names}, which the code index defines:`;
+  return [
+    head,
+    ...definitionLines(found, command),
+    `\`${command} refs\` gives the definition, exports and every reference, compiler-resolved.`,
+    `To search the name as text (strings, comments, Markdown, dynamic lookups), quote it (pattern '${first}') or limit the search to paths or file types outside the index.`,
+  ].join('\n');
 }
 
 /**
@@ -466,19 +493,24 @@ function hintText(cfg, input, { command }) {
  * @param {string} rawInput - hook JSON from stdin
  * @param {object} [opts]
  * @param {string} [opts.root] - project root (default: resolved from the hook input)
- * @param {string} [opts.command] - command named in the hint
- * @returns {string} hook output JSON, or '' to add nothing
+ * @param {string} [opts.command] - command named in the text
+ * @param {boolean} [opts.advisory] - add a note instead of denying the search
+ * @returns {string} hook output JSON, or '' to let the search run unremarked
  */
-function runHint(rawInput, { root, command = DEFAULT_COMMAND } = {}) {
+function runHint(rawInput, { root, command = DEFAULT_COMMAND, advisory = false } = {}) {
   try {
     const input = rawInput ? JSON.parse(rawInput) : null;
     if (!input || typeof input !== 'object') return '';
     const cfg = loadConfig(root || resolveHookRoot(input));
-    const text = hintText(cfg, input, { command });
-    if (!text) return '';
-    return JSON.stringify({
-      hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: text },
-    });
+    const found = findDefinitions(cfg, input);
+    if (!found) return '';
+    const output = advisory
+      ? { additionalContext: noteText(found, command) }
+      : {
+          permissionDecision: 'deny',
+          permissionDecisionReason: reasonText(found, command, input.tool_name),
+        };
+    return JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', ...output } });
   } catch {
     return '';
   }

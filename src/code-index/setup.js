@@ -7,8 +7,8 @@
  * with a reason. It writes:
  * - `.scip/` to .gitignore
  * - Claude Code: the `code-references` skill, async hooks in `.claude/settings.json` that keep
- *   the index fresh, and synchronous PreToolUse hooks that point grep searches for indexed
- *   names to `refs` (./hint.js)
+ *   the index fresh, and synchronous PreToolUse hooks that deny grep searches for indexed
+ *   names and point them to `refs` (./hint.js; `--advisory` turns the denial into a note)
  * - every selected agent: a marked "Code Navigation" section in its instruction file
  *   (CLAUDE.md, AGENTS.md, GEMINI.md, QWEN.md)
  *
@@ -116,14 +116,17 @@ function renderSkill(command) {
 /**
  * Hook groups for `.claude/settings.json`, per event.
  * @param {string} command
+ * @param {{advisory?: boolean}} [opts] - `advisory`: the grep guard adds a note instead of
+ *   denying (`hint --hook --advisory`)
  */
-function hookGroups(command) {
+function hookGroups(command, { advisory = false } = {}) {
   const index = () => ({ type: 'command', command: `${command} index --hook`, async: true });
   const hintCommand =
-    command === DEFAULT_COMMAND
+    (command === DEFAULT_COMMAND
       ? `${command} hint --hook`
-      : `${command} hint --hook --command ${JSON.stringify(command)}`;
-  // Synchronous: Claude Code discards the output of async hooks, and the hint is that output.
+      : `${command} hint --hook --command ${JSON.stringify(command)}`) +
+    (advisory ? ' --advisory' : '');
+  // Synchronous: Claude Code discards the output of async hooks, and the decision is that output.
   const hint = condition => ({
     type: 'command',
     command: hintCommand,
@@ -143,9 +146,19 @@ function hookGroups(command) {
   };
 }
 
+/** Every hook command in a settings object that this setup wrote. */
+function ownHookCommands(hooks) {
+  return Object.values(hooks)
+    .filter(Array.isArray)
+    .flatMap(groups => groups.flatMap(g => (g && Array.isArray(g.hooks) ? g.hooks : [])))
+    .map(h => h && h.command)
+    .filter(c => typeof c === 'string' && OWN_HOOK_PATTERN.test(c));
+}
+
 /**
  * Merge the code index hooks into Claude Code settings, replacing earlier versions of them
- * and keeping every other setting and hook.
+ * and keeping every other setting and hook. A project that switched the grep guard to
+ * `--advisory` keeps that choice.
  * @param {object} settings - parsed settings.json (may be empty)
  * @param {string} command
  * @returns {object} new settings object
@@ -153,7 +166,8 @@ function hookGroups(command) {
 function mergeHookSettings(settings, command) {
   const next = JSON.parse(JSON.stringify(settings || {}));
   if (!next.hooks || typeof next.hooks !== 'object' || Array.isArray(next.hooks)) next.hooks = {};
-  for (const [event, ownGroups] of Object.entries(hookGroups(command))) {
+  const advisory = ownHookCommands(next.hooks).some(c => /\bhint\b.*--advisory\b/.test(c));
+  for (const [event, ownGroups] of Object.entries(hookGroups(command, { advisory }))) {
     const groups = Array.isArray(next.hooks[event]) ? next.hooks[event] : [];
     const kept = [];
     for (const existing of groups) {

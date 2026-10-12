@@ -15,8 +15,8 @@
  *   musubi-code symbols <file>               definitions in a file
  *   musubi-code status                       index freshness per language
  *   musubi-code index [--if-stale | --hook]  build the indexes (--hook: Claude Code hook mode)
- *   musubi-code hint --hook                  Claude Code PreToolUse hook: point a grep for an
- *                                            indexed name to refs
+ *   musubi-code hint --hook [--advisory]     Claude Code PreToolUse hook: deny a grep for an
+ *                                            indexed name and point to refs (--advisory: note)
  *   musubi-code setup                        configure the project: skill, hooks, instructions
  */
 
@@ -192,14 +192,19 @@ function createProgram() {
 
   program
     .command('hint')
-    .description('Claude Code PreToolUse hook: point a grep for an indexed name to refs')
-    .option('--hook', 'read the hook JSON from stdin; print context or nothing, never fail')
-    .option('--command <command>', 'command named in the hint', 'musubi-code')
+    .description('Claude Code PreToolUse hook: deny a grep for an indexed name and point to refs')
+    .option('--hook', 'read the hook JSON from stdin; print a decision or nothing, never fail')
+    .option('--advisory', 'add a note instead of denying the search')
+    .option('--command <command>', 'command named in the text', 'musubi-code')
     .option('--root <dir>', 'project directory (default: from the hook input)')
     .action(async opts => {
       if (!opts.hook) throw new Error('hint runs as a Claude Code hook: musubi-code hint --hook');
       print(
-        hint.runHint(await indexer.readStdin(1000), { root: opts.root, command: opts.command })
+        hint.runHint(await indexer.readStdin(1000), {
+          root: opts.root,
+          command: opts.command,
+          advisory: Boolean(opts.advisory),
+        })
       );
       process.exitCode = 0;
     });

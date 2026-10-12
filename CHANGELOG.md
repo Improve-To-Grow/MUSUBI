@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **The grep reminder is now a grep guard** (CHANGE-006): the `PreToolUse` hook `musubi-code hint --hook` denies a Grep or shell grep whose pattern is only names the code index defines (`permissionDecision: "deny"`), with a reason that lists the definitions, the `musubi-code refs` command and how to search the name as text. A quoted name (`'Name'`) counts as text and runs, as do searches limited to paths or file types outside the index; any hook error leaves the search allowed. `hint --hook --advisory` restores the note, and `musubi-code setup` keeps that option once a project has it. Projects already set up get the guard with this version; the hook command is unchanged
 - **Per-language index files** (CHANGE-006): `.scip/index.scip` is replaced by `.scip/index.<language>.scip`, and `.scip/meta.json` becomes version 2 with one entry per language. An existing index is rebuilt once
 - scip-python always receives `.scip/python-environment.json` (`[]` unless the project maintains it), so builds never run pip and work without a Python interpreter; references into installed packages stay unresolved
 - For src-layout Python projects without a pyright configuration, the build writes `pyrightconfig.json` with `extraPaths: ["src"]` next to `pyproject.toml` for the duration of the Python build and removes it afterwards; without it pyright drops the references from `tests/`

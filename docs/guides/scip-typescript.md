@@ -2,7 +2,7 @@
 
 `musubi-code` answers questions such as "where is `ErrorHandler` defined?", "does `EARSValidator` exist?", "who instantiates `ConstitutionValidator`?", "which functions call `make_user`?" and "which files depend on `src/validators/constitution.js`?" for JavaScript, TypeScript and Python projects, mixed ones included, with compiler accuracy.
 
-It ships with MUSUBI. `musubi init` and `musubi upgrade` set it up in every project with a supported language, so AI coding agents use it before grep. In Claude Code a skill tells the agent when to use it, hooks keep its index fresh without anyone running a command, and a reminder hook points grep searches for indexed names to it.
+It ships with MUSUBI. `musubi init` and `musubi upgrade` set it up in every project with a supported language, so AI coding agents use it before grep. In Claude Code a skill tells the agent when to use it, hooks keep its index fresh without anyone running a command, and a guard hook blocks grep searches for indexed names and points them to it.
 
 ## Why scip-typescript and scip-python
 
@@ -53,7 +53,7 @@ What setup writes. Every step is idempotent, so running it again reports each fi
 | --- | --- |
 | `.gitignore` | Adds `.scip/` |
 | `.claude/skills/code-references/SKILL.md` | Claude Code only. Tells Claude when and how to query; managed by MUSUBI, so setup overwrites local edits |
-| `.claude/settings.json` | Claude Code only. Adds async `SessionStart` and `PostToolUse` hooks running `musubi-code index --hook`, and synchronous `PreToolUse` hooks running `musubi-code hint --hook` ([Grep reminder](#grep-reminder)); keeps every other setting and hook, and replaces earlier versions of its own hooks |
+| `.claude/settings.json` | Claude Code only. Adds async `SessionStart` and `PostToolUse` hooks running `musubi-code index --hook`, and synchronous `PreToolUse` hooks running `musubi-code hint --hook` ([Grep guard](#grep-guard)); keeps every other setting and hook, replaces earlier versions of its own hooks, and keeps `--advisory` when the project chose it |
 | `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` or `QWEN.md` | Adds or replaces a "Code Navigation" section between `<!-- musubi-code:start -->` and `<!-- musubi-code:end -->`. It maps symbol questions (does it exist, where is it defined, what does a file export, who uses it, what depends on a file) to commands and tells the agent to ask the index before grep, also where an SDD command or skill says to grep |
 
 Setup does not build the index. The first session-start hook or the first query builds it; `musubi-code index` builds it immediately.
@@ -102,25 +102,34 @@ In Claude Code you can simply ask, for example "where is ErrorHandler defined?",
 2. The command ignores edits to files outside the index. Otherwise it fingerprints the indexed source files (path, size, modification time) per language and compares each result with `.scip/meta.json`.
 3. For every language whose fingerprint changed, it runs that language's indexer under a lock and swaps the new index file in atomically. An edit to a `.py` file leaves the JavaScript index untouched. Triggers that arrive during a build queue one follow-up build instead of starting another.
 4. Queries wait for a running build and rebuild the stale languages before answering, so results are correct even without hooks.
-5. After each build, the names that both indexes define are written to `.scip/names.json` for the grep reminder. An index without that file counts as stale, so existing indexes get it on their next hook run.
+5. After each build, the names that both indexes define are written to `.scip/names.json` for the grep guard. An index without that file counts as stale, so existing indexes get it on their next hook run.
 6. If one indexer fails, the other language's index stays in place and usable; the error is in `.scip/index.log`.
 
-### Grep reminder
+### Grep guard
 
 Instructions alone do not stop an agent from reaching for grep, which is its general-purpose search. So setup also adds synchronous `PreToolUse` hooks that run `musubi-code hint --hook` before the Grep tool and before shell commands that start with `grep`, `rg`, `git grep` (Bash) or `Select-String` (PowerShell). The shell entries use Claude Code's `if` filter, so other commands do not start the hook.
 
-When the search pattern consists only of names that the index defines (word boundaries, `class`, `function`, `new`, `exports.` and a trailing `(` are ignored; `A|B` is allowed), the hook adds a note for Claude:
+When the search pattern consists only of names that the index defines (word boundaries, `class`, `function`, `def`, `new`, `exports.` and a trailing `(` are ignored; `A|B` is allowed), the hook denies the call. Claude reads the reason:
 
 ```text
-musubi-code: ErrorHandler and PatternRegistry are defined in the code index:
+musubi-code: grep for ErrorHandler is blocked; the code index defines it:
   ErrorHandler (class) src/orchestration/error-handler.js:613  ->  `musubi-code refs ErrorHandler`
-  PatternRegistry (property) src/orchestration/index.js:304  ->  `musubi-code refs PatternRegistry`
-  PatternRegistry (class) src/orchestration/pattern-registry.js:106  ->  `musubi-code refs PatternRegistry`
+`musubi-code refs` gives the definition, exports and every reference, compiler-resolved.
+To search the name as text (strings, comments, Markdown, dynamic lookups), quote it (pattern 'ErrorHandler') or limit the search to paths or file types outside the index.
+```
+
+For a Bash or PowerShell call the first line says that the command is blocked because its grep searches for the name; the whole command is denied, so Claude re-runs its other parts.
+
+The search runs, and the hook adds nothing, for text patterns, for a quoted name (`'ErrorHandler'` or `"ErrorHandler"`, which is how to search a name as a string), for searches limited to paths or file types outside the index (for example `docs/` or `*.md`), for greps that filter piped output, and when `.scip/names.json` is missing. Any internal error leaves the search allowed. The names list holds classes, functions, methods, module-level variables and exported properties; class fields, other object properties and Python `__init__` methods are left out, so common words such as `name` or `path` do not trigger it. It reads only that list, not the index: on this repository a call takes about 0.2 seconds, mostly Node.js start-up.
+
+To get a note instead of a denial, add `--advisory` to the four `musubi-code hint --hook` entries in `.claude/settings.json`; `musubi-code setup` and `musubi upgrade` keep the option on later runs. The note lists the same definitions and lets the search run:
+
+```text
+musubi-code: ErrorHandler is defined in the code index:
+  ErrorHandler (class) src/orchestration/error-handler.js:613  ->  `musubi-code refs ErrorHandler`
 `musubi-code refs` gives the definition, exports and every reference, compiler-resolved.
 Keep grep for text: Markdown, templates, comments and string-keyed lookups.
 ```
-
-The hook never blocks or approves the search. It stays silent for text patterns, for searches limited to paths or file types outside the index (for example `docs/` or `*.md`), for greps that filter piped output, and when `.scip/names.json` is missing. The names list holds classes, functions, methods, module-level variables and exported properties; class fields and other object properties are left out, so common words such as `name` or `path` do not trigger it. It reads only that list, not the index: on this repository a call takes about 0.2 seconds, mostly Node.js start-up.
 
 Nothing is written outside `.scip/`, with one transient exception for src-layout Python projects (below). Projects without a `tsconfig.json` get a generated one in `.scip/tsconfig.json`. The indexer's own `--infer-tsconfig` option is avoided because it creates `./tsconfig.json`. scip-python always receives `.scip/python-environment.json`, so it never runs pip.
 
@@ -156,7 +165,7 @@ Optional, in the project's `package.json` (a Python-only project can add a `pack
 
 ### Other AI coding agents
 
-GitHub Copilot, Cursor, Codex, Gemini CLI, Qwen Code and Windsurf have no Claude Code skills or hooks. Setup gives them the "Code Navigation" section in their instruction file, and each query refreshes a stale index itself, so no hook is required. They get no grep reminder.
+GitHub Copilot, Cursor, Codex, Gemini CLI, Qwen Code and Windsurf have no Claude Code skills or hooks. Setup gives them the "Code Navigation" section in their instruction file, and each query refreshes a stale index itself, so no hook is required. They get no grep guard.
 
 ### TypeScript projects and monorepos
 
@@ -183,7 +192,8 @@ GitHub Copilot, Cursor, Codex, Gemini CLI, Qwen Code and Windsurf have no Claude
 | `scip-python exited with status 1` in `.scip/index.log` | The last lines of its output follow the message. A `pyproject.toml` without a `[tool.pyright]` section only produces a warning. Check `"scip"."pythonArgs"`; the JavaScript index keeps working meanwhile |
 | A Python definition exists but `refs` finds no uses from `tests/` | src layout with your own pyright configuration: add `"extraPaths": ["src"]` to it |
 | A name returns several results | Add `--file <path>` |
-| No grep reminder appears | Check that `.scip/names.json` exists (`musubi-code index` writes it) and that `.claude/settings.json` has the `PreToolUse` entries (`musubi-code setup`). The hook runs only for the Grep tool and for shell commands that start with a grep tool |
+| A grep for an indexed name is not blocked | Check that `.scip/names.json` exists (`musubi-code index` writes it) and that `.claude/settings.json` has the `PreToolUse` entries (`musubi-code setup`). The hook runs only for the Grep tool and for shell commands that start with a grep tool |
+| A grep is blocked that should run | Quote the name (`'Name'`) to search it as text, or limit the search to paths or file types outside the index. To turn the guard into a note for the whole project, add `--advisory` to the hint hooks |
 
 ## Developing MUSUBI itself
 
