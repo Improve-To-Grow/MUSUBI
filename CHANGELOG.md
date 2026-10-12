@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.1-itg.3] - 2026-10-12
+
 ### Added
 
 - **Python code navigation** (CHANGE-006): `musubi-code` indexes `.py` and `.pyi` files with `@sourcegraph/scip-python` (runtime dependency pinned to 0.6.6) and answers `refs`, `callers`, `deps`, `dependents` and `symbols` for Python with the same commands. Imports, calls on inferred types, `self.method()`, `super()`, base classes and decorators resolve across files. Python references are tagged `import`, `call`, `extends`, `decorator`, `super` or `ref`; `__init__` is the constructor; the standard library appears as `python (standard library)` in `deps`
