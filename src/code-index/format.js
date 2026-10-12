@@ -129,15 +129,25 @@ function formatSymbols(result) {
 function formatStatus(report) {
   const excluded = report.exclude.length ? ` (excluding ${report.exclude.join(', ')})` : '';
   const lines = [
-    `index:   ${report.index} (${report.state})`,
+    `state:   ${report.state}`,
     `roots:   ${report.roots.join(', ')}${excluded}`,
     `files:   ${report.files} source files now`,
   ];
-  if (report.meta) {
+  const languages = Object.values(report.languages || {});
+  if (languages.length === 0) {
+    lines.push('languages: none (no JavaScript, TypeScript or Python sources under the roots)');
+  }
+  for (const language of languages) {
     lines.push(
-      `built:   ${report.meta.builtAt} in ${report.meta.durationMs} ms, ${report.meta.files} files`
+      `${language.label}: ${language.index} (${language.state}), ${plural(language.files, 'file')}`
     );
-    lines.push(`indexer: scip-typescript ${report.meta.indexer}, ${report.meta.tsconfig}`);
+    if (language.meta) {
+      const { builtAt, durationMs, files, indexer, tsconfig } = language.meta;
+      const config = tsconfig ? `, ${tsconfig}` : '';
+      lines.push(
+        `  built: ${builtAt} in ${durationMs} ms, ${plural(files, 'file')}, ${language.tool} ${indexer}${config}`
+      );
+    }
   }
   if (report.building) lines.push('build:   running');
   return lines.join('\n');

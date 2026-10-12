@@ -3,11 +3,12 @@
  * to musubi-code
  *
  * Before the Grep tool, or a shell command that runs grep, rg, git grep or Select-String, the
- * hook checks the search pattern. When it consists only of names that the index defines, the
- * hook adds context listing those definitions and the `refs` command for each. It never blocks
- * or approves the call. It stays silent for text searches, for searches limited to paths or
- * file types outside the index, and when `.scip/names.json` (written by ./indexer.js) is
- * missing. It reads only that list, never the index, so it answers in milliseconds.
+ * hook checks the search pattern. When it consists only of names that the index defines
+ * (JavaScript, TypeScript or Python), the hook adds context listing those definitions and the
+ * `refs` command for each. It never blocks or approves the call. It stays silent for text
+ * searches, for searches limited to paths or file types outside the index, and when
+ * `.scip/names.json` (written by ./indexer.js) is missing. It reads only that list, never the
+ * index, so it answers in milliseconds.
  *
  * CLI: bin/musubi-code.js (`musubi-code hint --hook`).
  *
@@ -31,11 +32,21 @@ const DEFAULT_COMMAND = 'musubi-code';
 const MAX_DEFINITIONS = 5;
 const IDENTIFIER = /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)?$/;
 // ripgrep and Grep tool `type` values that select indexed source files.
-const SOURCE_TYPES = new Set(['js', 'ts', 'javascript', 'typescript', 'jsx', 'tsx']);
+const SOURCE_TYPES = new Set([
+  'js',
+  'ts',
+  'javascript',
+  'typescript',
+  'jsx',
+  'tsx',
+  'py',
+  'python',
+]);
 const REDIRECTION = /^(?:\d*|&)(?:>>?|<)/;
 const BARE_REDIRECTION = /^(?:\d*|&)(?:>>?|<)$/;
+// JavaScript and Python keywords that precede a name in a definition search.
 const LEADING_KEYWORDS =
-  /^(?:(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:class|function\*?|const|let|var|new|extends)\s+|(?:module\.)?exports\.)/;
+  /^(?:(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:class|function\*?|const|let|var|new|extends|def)\s+|(?:module\.)?exports\.)/;
 
 // Options that take a value, per tool. Short options are single letters.
 const OPTIONS = {

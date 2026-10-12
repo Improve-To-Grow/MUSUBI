@@ -56,6 +56,19 @@ describe('code-index query: SCIP symbol grammar', () => {
     expect(describe_('lib/`a.js`/')).toMatchObject({ kind: 'module', display: 'lib/a.js' });
   });
 
+  test('describes scip-python modules, constructors and methods (REQ-IDX-009)', () => {
+    const py = s => describeSymbol(parseSymbol(`scip-python python demo 1 ${s}`));
+    expect(py('`pkg.models`/__init__:')).toMatchObject({ kind: 'module', display: 'pkg.models' });
+    expect(py('pkg/__init__:')).toMatchObject({ kind: 'module', display: 'pkg' });
+    expect(py('`pkg.models`/User#__init__().')).toMatchObject({
+      kind: 'constructor',
+      display: 'User.__init__',
+    });
+    expect(py('`pkg.models`/User#save().')).toMatchObject({ kind: 'method', display: 'User.save' });
+    expect(py('`pkg.models`/make_user().')).toMatchObject({ kind: 'function' });
+    expect(py('`pkg.models`/User#email.')).toMatchObject({ kind: 'property' });
+  });
+
   test('splits queries and matches counter-suffixed property names', () => {
     expect(splitQuery('Foo.constructor')).toEqual(['Foo', '<constructor>']);
     expect(splitQuery('Foo#bar')).toEqual(['Foo', 'bar']);
@@ -88,6 +101,27 @@ describe('code-index query: reference tags', () => {
     ['const copy = Widget;', 'Widget', 'ref'],
   ])('%s -> %s is "%s"', (source, token, expected) => {
     expect(tag(source, token)).toBe(expected);
+  });
+
+  const pyTag = (source, token, kind = 'class') => {
+    const col = source.indexOf(token);
+    return classifyReference([source], 0, col, col + token.length, kind, 'python');
+  };
+
+  test.each([
+    ['from pkg.models import User, make_user', 'User', 'class', 'import'],
+    ['import pkg.models as models', 'pkg.models', 'module', 'import'],
+    ['from . import models as rel_models', 'models', 'module', 'import'],
+    ['class User(Base):', 'Base', 'class', 'extends'],
+    ['    @timed', 'timed', 'function', 'decorator'],
+    ['    @app.route("/")', 'route', 'method', 'decorator'],
+    ['        super().__init__(name)', '__init__', 'constructor', 'super'],
+    ['    user = User(name, "x")', 'User', 'class', 'call'],
+    ['CONFIG = models.Config()', 'Config', 'class', 'call'],
+    ['    assert isinstance(x, models.User)', 'User', 'class', 'ref'],
+    ['    rel_models.make_user("a")', 'rel_models', 'module', 'ref'],
+  ])('python: %s -> %s is "%s"', (source, token, kind, expected) => {
+    expect(pyTag(source, token, kind)).toBe(expected);
   });
 
   test('tags module strings and multi-line destructuring', () => {

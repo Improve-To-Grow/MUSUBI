@@ -7,8 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Python code navigation** (CHANGE-006): `musubi-code` indexes `.py` and `.pyi` files with `@sourcegraph/scip-python` (runtime dependency pinned to 0.6.6) and answers `refs`, `callers`, `deps`, `dependents` and `symbols` for Python with the same commands. Imports, calls on inferred types, `self.method()`, `super()`, base classes and decorators resolve across files. Python references are tagged `import`, `call`, `extends`, `decorator`, `super` or `ref`; `__init__` is the constructor; the standard library appears as `python (standard library)` in `deps`
+- **Mixed projects** (CHANGE-006): a project with JavaScript/TypeScript and Python is indexed by both tools into `.scip/index.typescript.scip` and `.scip/index.python.scip`, each with its own fingerprint, so an edit rebuilds only its language. Queries, `names.json` and `musubi-code status` cover both; `status` lists files and freshness per language, `index --if-stale` rebuilds only the stale ones, and a failing indexer leaves the other language's index usable
+- Default roots now include every top-level directory that holds Python files, and the project root itself when a top-level `.py` file exists (`manage.py`, `conftest.py`). `.venv`, `venv`, `__pycache__`, `.tox`, `.mypy_cache`, `.pytest_cache`, `.ruff_cache`, `.eggs` and `*.egg-info` are never indexed or fingerprinted, by either tool
+- `"scip": { "pythonArgs": [] }` in `package.json` passes extra arguments to scip-python
+- On Windows, scip-python runs with a preload module (`src/code-index/scip-python-shim.js`) that works around its start-up crash (sourcegraph/scip-python issue #210)
+- `docs/guides/scip-typescript.md` gains a "Python projects" section (roots, environment, src layout, Windows, syntax limits)
+
 ### Changed
 
+- **Per-language index files** (CHANGE-006): `.scip/index.scip` is replaced by `.scip/index.<language>.scip`, and `.scip/meta.json` becomes version 2 with one entry per language. An existing index is rebuilt once
+- scip-python always receives `.scip/python-environment.json` (`[]` unless the project maintains it), so builds never run pip and work without a Python interpreter; references into installed packages stay unresolved
+- For src-layout Python projects without a pyright configuration, the build writes `pyrightconfig.json` with `extraPaths: ["src"]` next to `pyproject.toml` for the duration of the Python build and removes it afterwards; without it pyright drops the references from `tests/`
 - **Code navigation is set up without asking** (CHANGE-006): `musubi init`, `musubi upgrade` and `musubi-code setup` configure it in every project with JavaScript, TypeScript or Python sources or project markers (`package.json`, `tsconfig.json`, `jsconfig.json`, `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements.txt`, `Pipfile`) and report other projects as unsupported. `musubi init` also counts the languages chosen in its questionnaire. `musubi-code setup` prints the languages it found; `musubi upgrade --dry-run` still previews
 
 ### Removed

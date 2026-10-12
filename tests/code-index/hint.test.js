@@ -120,6 +120,9 @@ describe('symbolNames', () => {
     ['class (ErrorHandler|PatternRegistry)', ['ErrorHandler', 'PatternRegistry']],
     ['UserService\\.save', ['UserService.save']],
     ['checkEarsFormat\\s*\\(', ['checkEarsFormat']],
+    ['def make_user\\(', ['make_user']],
+    ['async def fetch_all', ['fetch_all']],
+    ['class User\\(', ['User']],
   ])('%s names %j', (pattern, names) => {
     expect(symbolNames(pattern)).toEqual(names);
   });
@@ -207,6 +210,9 @@ describe('runHint', () => {
       { path: 'src/a.js' },
       { glob: '*.js' },
       { type: 'js' },
+      { glob: '*.py' },
+      { type: 'py' },
+      { type: 'python' },
     ]) {
       expect(context(grep('ErrorHandler', extra))).toContain('ErrorHandler (class)');
     }

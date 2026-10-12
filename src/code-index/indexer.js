@@ -1,22 +1,32 @@
 /**
- * Code index builder - compiler-accurate SCIP index of a JavaScript/TypeScript project
+ * Code index builder - compiler-accurate SCIP indexes of a JavaScript/TypeScript and/or Python
+ * project
  *
- * Wraps @sourcegraph/scip-typescript, which resolves CommonJS `require()`, ES imports,
- * `new X()`, `extends` and method calls across files with the TypeScript compiler.
- * The index is written to `<project>/.scip/index.scip` and read by ./query.js; the names it
- * defines go to `.scip/names.json`, read by ./hint.js.
+ * One indexer per language, both npm packages pinned to exact versions:
+ * - @sourcegraph/scip-typescript resolves CommonJS `require()`, ES imports, `new X()`,
+ *   `extends` and method calls across files with the TypeScript compiler.
+ * - @sourcegraph/scip-python resolves imports, calls, `self.method()`, `super()` and base
+ *   classes with pyright.
+ * Each language is indexed into its own file (`.scip/index.<language>.scip`) under its own
+ * fingerprint, so an edit rebuilds only the language it touches; ./query.js loads every file
+ * that exists as one model. The names that model defines go to `.scip/names.json`, read by
+ * ./hint.js.
  * Nothing is written outside `.scip/`: projects without a tsconfig.json get a generated
  * `.scip/tsconfig.json` instead of scip-typescript's `--infer-tsconfig`, which would create
- * `./tsconfig.json`.
+ * `./tsconfig.json`, and scip-python always receives `.scip/python-environment.json`, so it
+ * never runs pip.
  *
  * Optional configuration in the project's package.json:
  *   "scip": {
  *     "roots": ["src", "tests"],      directories to index (default: the existing ones of
- *                                     bin, src, lib, app, scripts, tests, test)
+ *                                     bin, src, lib, app, scripts, tests, test, plus every
+ *                                     top-level directory holding Python files; the project
+ *                                     root itself when a top-level .py file exists)
  *     "exclude": ["src/templates"],   paths under the roots to skip
  *     "tsconfig": "auto",             "auto" uses ./tsconfig.json when present, "generated"
  *                                     always uses .scip/tsconfig.json
- *     "indexerArgs": []               extra scip-typescript arguments, e.g. ["--yarn-workspaces"]
+ *     "indexerArgs": [],              extra scip-typescript arguments, e.g. ["--yarn-workspaces"]
+ *     "pythonArgs": []                extra scip-python arguments
  *   }
  *
  * CLI: bin/musubi-code.js (`musubi-code index`).
@@ -31,8 +41,8 @@ const path = require('path');
 const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
-const INDEXER_MODULE = '@sourcegraph/scip-typescript/dist/src/main.js';
 const DEFAULT_ROOTS = ['bin', 'src', 'lib', 'app', 'scripts', 'tests', 'test'];
+// Build output, dependencies and language environments: never indexed, never fingerprinted.
 const ALWAYS_EXCLUDED_DIRS = new Set([
   'node_modules',
   '.git',
@@ -41,7 +51,16 @@ const ALWAYS_EXCLUDED_DIRS = new Set([
   'dist',
   'build',
   'out',
+  '.venv',
+  'venv',
+  '__pycache__',
+  '.tox',
+  '.mypy_cache',
+  '.pytest_cache',
+  '.ruff_cache',
+  '.eggs',
 ]);
+
 /**
  * Languages that code navigation supports. `markers` identify a project of the language and
  * `extensions` its source files; either makes a project eligible for setup.
@@ -49,22 +68,43 @@ const ALWAYS_EXCLUDED_DIRS = new Set([
 const LANGUAGES = {
   typescript: {
     label: 'JavaScript/TypeScript',
+    tool: 'scip-typescript',
     extensions: ['.js', '.cjs', '.mjs', '.jsx', '.ts', '.cts', '.mts', '.tsx'],
     markers: ['package.json', 'tsconfig.json', 'jsconfig.json'],
+    indexerPackage: '@sourcegraph/scip-typescript',
+    indexerModule: '@sourcegraph/scip-typescript/dist/src/main.js',
+    indexFile: 'index.typescript.scip',
   },
   python: {
     label: 'Python',
+    tool: 'scip-python',
     extensions: ['.py', '.pyi'],
     markers: ['pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', 'Pipfile'],
+    indexerPackage: '@sourcegraph/scip-python',
+    indexerModule: '@sourcegraph/scip-python/index.js',
+    indexFile: 'index.python.scip',
   },
 };
 const LANGUAGE_KEYS = Object.keys(LANGUAGES);
-// Source files the index is built from.
-const SOURCE_EXTENSIONS = new Set(LANGUAGES.typescript.extensions);
+const EXTENSION_LANGUAGE = new Map(
+  LANGUAGE_KEYS.flatMap(key => LANGUAGES[key].extensions.map(ext => [ext, key]))
+);
+// Source files the indexes are built from.
+const SOURCE_EXTENSIONS = new Set(EXTENSION_LANGUAGE.keys());
+const PROJECT_MARKERS = LANGUAGE_KEYS.flatMap(key => LANGUAGES[key].markers);
+const PYTHON_SHIM = path.join(__dirname, 'scip-python-shim.js');
+// pyright configuration written next to pyproject.toml for the duration of a Python build of a
+// src-layout project (sourcegraph/scip-python issue #221: without `extraPaths`, imports of the
+// package from tests/ do not resolve and the references are dropped from the index).
+const SRC_LAYOUT_PYRIGHT_CONFIG = `${JSON.stringify({ extraPaths: ['src'] }, null, 2)}\n`;
+// The single-file layout of versions before per-language indexes.
+const LEGACY_INDEX_FILE = 'index.scip';
 const LOCK_TTL_MS = 15 * 60 * 1000;
 const WAIT_FOR_BUILD_MS = 5 * 60 * 1000;
 const MAX_LOG_BYTES = 256 * 1024;
 const MAX_FOLLOW_UP_BUILDS = 3;
+// Format of .scip/meta.json.
+const META_VERSION = 2;
 // Format of .scip/names.json, read by ./hint.js.
 const NAMES_VERSION = 1;
 
@@ -76,7 +116,18 @@ function toPosix(p) {
   return p.split(path.sep).join('/');
 }
 
-const PROJECT_MARKERS = LANGUAGE_KEYS.flatMap(key => LANGUAGES[key].markers);
+function isExcludedDirName(name) {
+  return ALWAYS_EXCLUDED_DIRS.has(name) || name.endsWith('.egg-info');
+}
+
+/**
+ * The language a source file belongs to, by extension.
+ * @param {string} filePath
+ * @returns {string|null} `typescript`, `python` or null
+ */
+function languageOf(filePath) {
+  return EXTENSION_LANGUAGE.get(path.extname(filePath).toLowerCase()) || null;
+}
 
 /**
  * Find the project root for a directory: the nearest ancestor that already has an index
@@ -121,7 +172,7 @@ function hasSourceFiles(cfg, extensions) {
       const rel = relDir ? `${relDir}/${entry.name}` : entry.name;
       if (isExcluded(cfg, rel)) continue;
       if (entry.isDirectory()) {
-        if (!ALWAYS_EXCLUDED_DIRS.has(entry.name)) stack.push(rel);
+        if (!isExcludedDirName(entry.name)) stack.push(rel);
       } else if (entry.isFile() && extensions.has(path.extname(entry.name).toLowerCase())) {
         return true;
       }
@@ -143,6 +194,47 @@ function detectLanguages(root) {
     if (markers.some(m => fs.existsSync(path.join(cfg.root, m)))) return true;
     return hasSourceFiles(cfg, new Set(extensions));
   });
+}
+
+function holdsSourceFiles(dir, extensions) {
+  try {
+    return fs.readdirSync(dir).some(name => extensions.has(path.extname(name).toLowerCase()));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Default roots: the standard directories that exist, plus every other top-level directory that
+ * holds Python files directly (a package or a scripts directory). A Python file at the top level
+ * (manage.py, conftest.py, a script) makes the project root itself the root.
+ * @param {string} root
+ * @returns {string[]}
+ */
+function defaultRoots(root) {
+  let entries;
+  try {
+    entries = fs.readdirSync(root, { withFileTypes: true });
+  } catch {
+    return ['.'];
+  }
+  const python = new Set(LANGUAGES.python.extensions);
+  if (entries.some(e => e.isFile() && python.has(path.extname(e.name).toLowerCase()))) {
+    return ['.'];
+  }
+  const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+  const standard = DEFAULT_ROOTS.filter(name => dirs.includes(name));
+  const pythonDirs = dirs
+    .filter(
+      name =>
+        !standard.includes(name) &&
+        !name.startsWith('.') &&
+        !isExcludedDirName(name) &&
+        holdsSourceFiles(path.join(root, name), python)
+    )
+    .sort();
+  const roots = [...standard, ...pythonDirs];
+  return roots.length ? roots : ['.'];
 }
 
 /**
@@ -167,8 +259,7 @@ function loadConfig(root = findProjectRoot()) {
     }
   };
   let roots = Array.isArray(settings.roots) ? settings.roots.filter(isDir) : null;
-  if (!roots || roots.length === 0) roots = DEFAULT_ROOTS.filter(isDir);
-  if (roots.length === 0) roots = ['.'];
+  if (!roots || roots.length === 0) roots = defaultRoots(root);
   roots = roots.map(r => toPosix(path.normalize(r)).replace(/\/$/, ''));
 
   const exclude = (Array.isArray(settings.exclude) ? settings.exclude : []).map(e =>
@@ -177,21 +268,26 @@ function loadConfig(root = findProjectRoot()) {
   const hasProjectTsconfig = fs.existsSync(path.join(root, 'tsconfig.json'));
   const useProjectTsconfig = settings.tsconfig !== 'generated' && hasProjectTsconfig;
   const dir = path.join(root, '.scip');
+  const stringList = value => (Array.isArray(value) ? value.map(String) : []);
 
   return {
     root,
     roots,
     exclude,
     useProjectTsconfig,
-    indexerArgs: Array.isArray(settings.indexerArgs) ? settings.indexerArgs.map(String) : [],
+    indexerArgs: stringList(settings.indexerArgs),
+    pythonArgs: stringList(settings.pythonArgs),
     dir,
-    indexPath: path.join(dir, 'index.scip'),
+    indexPaths: Object.fromEntries(
+      LANGUAGE_KEYS.map(key => [key, path.join(dir, LANGUAGES[key].indexFile)])
+    ),
     metaPath: path.join(dir, 'meta.json'),
     namesPath: path.join(dir, 'names.json'),
     lockPath: path.join(dir, 'build.lock'),
     dirtyPath: path.join(dir, 'dirty'),
     logPath: path.join(dir, 'index.log'),
     tsconfigPath: path.join(dir, 'tsconfig.json'),
+    pythonEnvironmentPath: path.join(dir, 'python-environment.json'),
   };
 }
 
@@ -209,7 +305,7 @@ function isIndexedPath(cfg, filePath) {
   const rel = toPosix(path.relative(cfg.root, path.resolve(cfg.root, filePath)));
   if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return false;
   if (!SOURCE_EXTENSIONS.has(path.extname(rel).toLowerCase())) return false;
-  if (rel.split('/').some(part => ALWAYS_EXCLUDED_DIRS.has(part))) return false;
+  if (rel.split('/').slice(0, -1).some(isExcludedDirName)) return false;
   if (isExcluded(cfg, rel)) return false;
   return cfg.roots.some(r => r === '.' || rel === r || rel.startsWith(r + '/'));
 }
@@ -224,18 +320,16 @@ function coversDirectory(cfg, dirPath) {
   const rel = toPosix(path.relative(cfg.root, path.resolve(cfg.root, dirPath)));
   if (rel.startsWith('..') || path.isAbsolute(rel)) return false;
   if (!rel) return true;
-  if (rel.split('/').some(part => ALWAYS_EXCLUDED_DIRS.has(part)) || isExcluded(cfg, rel)) {
-    return false;
-  }
+  if (rel.split('/').some(isExcludedDirName) || isExcluded(cfg, rel)) return false;
   return cfg.roots.some(
     r => r === '.' || rel === r || rel.startsWith(`${r}/`) || r.startsWith(`${rel}/`)
   );
 }
 
 /**
- * List the source files the index covers, with size and modification time.
+ * List the source files the index covers, with language, size and modification time.
  * @param {object} cfg
- * @returns {Array<{rel: string, size: number, mtimeMs: number}>}
+ * @returns {Array<{rel: string, language: string, size: number, mtimeMs: number}>}
  */
 function listSourceFiles(cfg) {
   const files = [];
@@ -249,11 +343,12 @@ function listSourceFiles(cfg) {
     for (const entry of entries) {
       const rel = relDir === '.' ? entry.name : `${relDir}/${entry.name}`;
       if (entry.isDirectory()) {
-        if (!ALWAYS_EXCLUDED_DIRS.has(entry.name) && !isExcluded(cfg, rel)) walk(rel);
-      } else if (entry.isFile() && SOURCE_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
-        if (isExcluded(cfg, rel)) continue;
+        if (!isExcludedDirName(entry.name) && !isExcluded(cfg, rel)) walk(rel);
+      } else if (entry.isFile()) {
+        const language = languageOf(entry.name);
+        if (!language || isExcluded(cfg, rel)) continue;
         const stat = fs.statSync(path.join(cfg.root, rel));
-        files.push({ rel, size: stat.size, mtimeMs: Math.floor(stat.mtimeMs) });
+        files.push({ rel, language, size: stat.size, mtimeMs: Math.floor(stat.mtimeMs) });
       }
     }
   };
@@ -261,9 +356,9 @@ function listSourceFiles(cfg) {
   return files.sort((a, b) => (a.rel < b.rel ? -1 : a.rel > b.rel ? 1 : 0));
 }
 
-function indexerVersion(cfg) {
+function indexerVersion(cfg, language) {
   try {
-    const pkgPath = require.resolve('@sourcegraph/scip-typescript/package.json', {
+    const pkgPath = require.resolve(`${LANGUAGES[language].indexerPackage}/package.json`, {
       paths: [__dirname, cfg.root],
     });
     return JSON.parse(fs.readFileSync(pkgPath, 'utf8')).version;
@@ -273,25 +368,35 @@ function indexerVersion(cfg) {
 }
 
 /**
- * Fingerprint of everything that should trigger a rebuild: the indexed files, the
- * configuration and the indexer version.
+ * Fingerprints of everything that should trigger a rebuild, per language with source files:
+ * the indexed files, the configuration and the indexer version.
  * @param {object} cfg
- * @returns {{hash: string, files: number}}
+ * @returns {{languages: Object<string, {hash: string, files: number}>, files: number}}
  */
 function computeFingerprint(cfg) {
   const files = listSourceFiles(cfg);
-  const hash = crypto.createHash('sha1');
-  hash.update(
-    JSON.stringify({
-      roots: cfg.roots,
-      exclude: cfg.exclude,
-      useProjectTsconfig: cfg.useProjectTsconfig,
-      indexerArgs: cfg.indexerArgs,
-      indexer: indexerVersion(cfg),
-    })
-  );
-  for (const f of files) hash.update(`\n${f.rel}|${f.size}|${f.mtimeMs}`);
-  return { hash: hash.digest('hex'), files: files.length };
+  const languages = {};
+  for (const key of LANGUAGE_KEYS) {
+    const own = files.filter(f => f.language === key);
+    if (own.length === 0) continue;
+    const settings =
+      key === 'typescript'
+        ? { useProjectTsconfig: cfg.useProjectTsconfig, indexerArgs: cfg.indexerArgs }
+        : { pythonArgs: cfg.pythonArgs };
+    const hash = crypto.createHash('sha1');
+    hash.update(
+      JSON.stringify({
+        language: key,
+        roots: cfg.roots,
+        exclude: cfg.exclude,
+        ...settings,
+        indexer: indexerVersion(cfg, key),
+      })
+    );
+    for (const f of own) hash.update(`\n${f.rel}|${f.size}|${f.mtimeMs}`);
+    languages[key] = { hash: hash.digest('hex'), files: own.length };
+  }
+  return { languages, files: files.length };
 }
 
 function readMeta(cfg) {
@@ -302,17 +407,49 @@ function readMeta(cfg) {
   }
 }
 
+/** The per-language entries of a meta.json in the current format, else none. */
+function metaLanguages(meta) {
+  const valid =
+    meta && meta.version === META_VERSION && meta.languages && typeof meta.languages === 'object';
+  return valid ? { ...meta.languages } : {};
+}
+
+/** Index files that no longer belong to a language with sources, or the single-file layout. */
+function hasLeftoverIndexes(cfg, current) {
+  if (fs.existsSync(path.join(cfg.dir, LEGACY_INDEX_FILE))) return true;
+  return LANGUAGE_KEYS.some(key => !current.languages[key] && fs.existsSync(cfg.indexPaths[key]));
+}
+
 /**
  * @param {object} cfg
- * @returns {{state: 'missing'|'stale'|'fresh', meta: object|null, current: object}}
+ * @returns {{state: 'missing'|'stale'|'fresh', languages: Object<string, string>,
+ *   meta: object|null, current: object}} `languages` holds the state of every language with
+ *   source files; `state` is the worst of them
  */
 function getFreshness(cfg) {
   const current = computeFingerprint(cfg);
-  const meta = readMeta(cfg);
-  if (!meta || !fs.existsSync(cfg.indexPath)) return { state: 'missing', meta, current };
-  // Indexes built before names.json existed get it on their next build.
-  if (!fs.existsSync(cfg.namesPath)) return { state: 'stale', meta, current };
-  return { state: meta.fingerprint === current.hash ? 'fresh' : 'stale', meta, current };
+  const entries = metaLanguages(readMeta(cfg));
+  const languages = {};
+  for (const [key, fingerprint] of Object.entries(current.languages)) {
+    const entry = entries[key];
+    if (!entry || !fs.existsSync(cfg.indexPaths[key])) languages[key] = 'missing';
+    else languages[key] = entry.fingerprint === fingerprint.hash ? 'fresh' : 'stale';
+  }
+  const states = Object.values(languages);
+  let state = 'fresh';
+  if (states.length === 0 || states.includes('missing')) state = 'missing';
+  else if (states.includes('stale')) state = 'stale';
+  // Indexes built before names.json existed get it on their next build; leftovers go too.
+  if (state === 'fresh' && (!fs.existsSync(cfg.namesPath) || hasLeftoverIndexes(cfg, current))) {
+    state = 'stale';
+  }
+  return { state, languages, meta: readMeta(cfg), current };
+}
+
+function staleLanguages(freshness) {
+  return Object.entries(freshness.languages)
+    .filter(([, state]) => state !== 'fresh')
+    .map(([key]) => key);
 }
 
 function log(cfg, message, { echo = false } = {}) {
@@ -357,7 +494,12 @@ function writeGeneratedTsconfig(cfg) {
       target: 'es2022',
     },
     include: cfg.roots.map(r => `${up(r)}/**/*`),
-    exclude: ['../**/node_modules', '../.scip', ...cfg.exclude.map(up)],
+    exclude: [
+      '../.scip',
+      ...[...ALWAYS_EXCLUDED_DIRS].filter(d => d !== '.scip').map(d => `../**/${d}`),
+      '../**/*.egg-info',
+      ...cfg.exclude.map(up),
+    ],
   };
   const content = `${JSON.stringify(tsconfig, null, 2)}\n`;
   let existing = null;
@@ -369,9 +511,9 @@ function writeGeneratedTsconfig(cfg) {
   if (existing !== content) fs.writeFileSync(cfg.tsconfigPath, content);
 }
 
-function resolveIndexer(cfg) {
+function resolveIndexer(cfg, language) {
   try {
-    return require.resolve(INDEXER_MODULE, { paths: [__dirname, cfg.root] });
+    return require.resolve(LANGUAGES[language].indexerModule, { paths: [__dirname, cfg.root] });
   } catch {
     return null;
   }
@@ -433,41 +575,136 @@ function replaceFile(from, to) {
 }
 
 /**
- * Run scip-typescript once and atomically replace .scip/index.scip.
- * @param {object} cfg
- * @param {object} opts
- * @param {boolean} opts.quiet - capture indexer output instead of printing it
+ * Name and version recorded in the Python index: package.json, else pyproject.toml, else the
+ * directory name.
+ * @param {string} root
  */
-function runIndexer(cfg, { quiet }) {
-  const indexer = resolveIndexer(cfg);
-  if (!indexer) {
-    throw new Error(
-      '@sourcegraph/scip-typescript is missing from the MUSUBI installation; reinstall MUSUBI'
-    );
+function projectIdentity(root) {
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+    if (pkg.name) return { name: String(pkg.name), version: String(pkg.version || '0') };
+  } catch {
+    // No package.json.
   }
-  if (!cfg.useProjectTsconfig) writeGeneratedTsconfig(cfg);
+  try {
+    const toml = fs.readFileSync(path.join(root, 'pyproject.toml'), 'utf8');
+    const name = /^\s*name\s*=\s*["']([^"']+)["']/m.exec(toml);
+    const version = /^\s*version\s*=\s*["']([^"']+)["']/m.exec(toml);
+    if (name) return { name: name[1], version: version ? version[1] : '0' };
+  } catch {
+    // No pyproject.toml.
+  }
+  return { name: path.basename(root) || 'project', version: '0' };
+}
 
-  const tmpPath = `${cfg.indexPath}.${process.pid}.tmp`;
+function typescriptArgs(cfg, indexer, tmpPath) {
+  if (!cfg.useProjectTsconfig) writeGeneratedTsconfig(cfg);
   const args = [indexer, 'index'];
   if (!cfg.useProjectTsconfig) args.push(toPosix(path.relative(cfg.root, cfg.dir)));
   args.push('--output', tmpPath, '--no-progress-bar', ...cfg.indexerArgs);
+  return args;
+}
 
-  const result = spawnSync(process.execPath, args, {
-    cwd: cfg.root,
-    encoding: 'utf8',
-    stdio: quiet ? ['ignore', 'pipe', 'pipe'] : ['ignore', 'inherit', 'inherit'],
-    maxBuffer: 64 * 1024 * 1024,
-    windowsHide: true,
-  });
+function pythonArgs(cfg, indexer, tmpPath) {
+  // Without an environment file scip-python runs pip and fails where Python is absent. An empty
+  // environment resolves the project's own code and the standard library.
+  if (!fs.existsSync(cfg.pythonEnvironmentPath)) {
+    fs.writeFileSync(cfg.pythonEnvironmentPath, '[]\n');
+  }
+  const { name, version } = projectIdentity(cfg.root);
+  const args = process.platform === 'win32' ? ['-r', PYTHON_SHIM] : [];
+  args.push(
+    indexer,
+    'index',
+    '--cwd',
+    cfg.root,
+    '--project-name',
+    name,
+    '--project-version',
+    version,
+    '--environment',
+    cfg.pythonEnvironmentPath,
+    '--quiet',
+    '--output',
+    tmpPath,
+    ...cfg.pythonArgs
+  );
+  return args;
+}
+
+function readText(file) {
+  try {
+    return fs.readFileSync(file, 'utf8');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Run `fn` with pyright's `extraPaths` pointing at `src/` when the project has a src layout
+ * and no pyright configuration of its own. The configuration file exists only while the
+ * indexer runs; scip-python reads pyright settings from the project root only.
+ * @param {object} cfg
+ * @param {() => T} fn
+ * @returns {T}
+ * @template T
+ */
+function withSrcLayoutConfig(cfg, fn) {
+  const configPath = path.join(cfg.root, 'pyrightconfig.json');
+  const existing = readText(configPath);
+  const pyproject = readText(path.join(cfg.root, 'pyproject.toml')) || '';
+  const ownConfig =
+    (existing !== null && existing !== SRC_LAYOUT_PYRIGHT_CONFIG) ||
+    /^\s*\[tool\.pyright\]/m.test(pyproject);
+  if (ownConfig || !fs.existsSync(path.join(cfg.root, 'src'))) return fn();
+  fs.writeFileSync(configPath, SRC_LAYOUT_PYRIGHT_CONFIG);
+  try {
+    return fn();
+  } finally {
+    if (readText(configPath) === SRC_LAYOUT_PYRIGHT_CONFIG) fs.rmSync(configPath, { force: true });
+  }
+}
+
+/**
+ * Run one language's indexer and atomically replace its index file.
+ * @param {object} cfg
+ * @param {string} language
+ * @param {object} opts
+ * @param {boolean} opts.quiet - capture indexer output instead of printing it
+ */
+function runIndexer(cfg, language, { quiet }) {
+  const spec = LANGUAGES[language];
+  const indexer = resolveIndexer(cfg, language);
+  if (!indexer) {
+    throw new Error(
+      `${spec.indexerPackage} is missing from the MUSUBI installation; reinstall MUSUBI`
+    );
+  }
+  const indexPath = cfg.indexPaths[language];
+  const tmpPath = `${indexPath}.${process.pid}.tmp`;
+  const args =
+    language === 'python'
+      ? pythonArgs(cfg, indexer, tmpPath)
+      : typescriptArgs(cfg, indexer, tmpPath);
+
+  const spawn = () =>
+    spawnSync(process.execPath, args, {
+      cwd: cfg.root,
+      encoding: 'utf8',
+      stdio: quiet ? ['ignore', 'pipe', 'pipe'] : ['ignore', 'inherit', 'inherit'],
+      maxBuffer: 64 * 1024 * 1024,
+      windowsHide: true,
+    });
+  const result = language === 'python' ? withSrcLayoutConfig(cfg, spawn) : spawn();
   if (result.error) throw result.error;
   if (result.status !== 0 || !fs.existsSync(tmpPath)) {
     fs.rmSync(tmpPath, { force: true });
     const output = `${result.stderr || ''}${result.stdout || ''}`.trim().slice(-2000);
     throw new Error(
-      `scip-typescript exited with status ${result.status}${output ? `: ${output}` : ''}`
+      `${spec.tool} exited with status ${result.status}${output ? `: ${output}` : ''}`
     );
   }
-  replaceFile(tmpPath, cfg.indexPath);
+  replaceFile(tmpPath, indexPath);
 }
 
 /**
@@ -491,15 +728,28 @@ function writeNames(cfg) {
   replaceFile(tmpPath, cfg.namesPath);
 }
 
+/** Remove index files of languages without sources and the single-file layout. */
+function removeLeftovers(cfg, present, entries) {
+  fs.rmSync(path.join(cfg.dir, LEGACY_INDEX_FILE), { force: true });
+  for (const key of LANGUAGE_KEYS) {
+    if (present.includes(key)) continue;
+    fs.rmSync(cfg.indexPaths[key], { force: true });
+    delete entries[key];
+  }
+}
+
 /**
- * Build the index under a lock. When another process is already building, mark the
+ * Build the indexes under a lock. When another process is already building, mark the
  * index dirty so that build runs once more after it finishes, and return.
  * @param {object} cfg
  * @param {object} [opts]
  * @param {boolean} [opts.quiet]
- * @returns {{built: boolean, queued: boolean, durationMs?: number, files?: number}}
+ * @param {string[]|null} [opts.languages] - languages to build (default: every language with
+ *   source files)
+ * @returns {{built: boolean, queued: boolean, durationMs?: number, files?: number,
+ *   languages?: string[]}}
  */
-function build(cfg, { quiet = false } = {}) {
+function build(cfg, { quiet = false, languages = null } = {}) {
   ensureIndexDir(cfg);
   if (!tryAcquireLock(cfg)) {
     fs.writeFileSync(cfg.dirtyPath, String(Date.now()));
@@ -508,25 +758,40 @@ function build(cfg, { quiet = false } = {}) {
   }
   try {
     let last = null;
+    let wanted = languages;
     for (let round = 0; round < MAX_FOLLOW_UP_BUILDS; round++) {
       fs.rmSync(cfg.dirtyPath, { force: true });
       // Fingerprint before indexing: edits made during the build make the index stale again.
       const fingerprint = computeFingerprint(cfg);
+      const present = Object.keys(fingerprint.languages);
+      const targets = (wanted || present).filter(key => present.includes(key));
+      const entries = metaLanguages(readMeta(cfg));
+      removeLeftovers(cfg, present, entries);
       const started = Date.now();
-      runIndexer(cfg, { quiet });
+      for (const key of targets) {
+        const startedLanguage = Date.now();
+        runIndexer(cfg, key, { quiet });
+        entries[key] = {
+          fingerprint: fingerprint.languages[key].hash,
+          files: fingerprint.languages[key].files,
+          builtAt: new Date().toISOString(),
+          durationMs: Date.now() - startedLanguage,
+          indexer: indexerVersion(cfg, key),
+          ...(key === 'typescript'
+            ? { tsconfig: cfg.useProjectTsconfig ? 'tsconfig.json' : '.scip/tsconfig.json' }
+            : {}),
+        };
+      }
       writeNames(cfg);
-      const meta = {
-        fingerprint: fingerprint.hash,
-        files: fingerprint.files,
-        builtAt: new Date().toISOString(),
-        durationMs: Date.now() - started,
-        indexer: indexerVersion(cfg),
-        tsconfig: cfg.useProjectTsconfig ? 'tsconfig.json' : '.scip/tsconfig.json',
-      };
+      const meta = { version: META_VERSION, builtAt: new Date().toISOString(), languages: entries };
       fs.writeFileSync(cfg.metaPath, `${JSON.stringify(meta, null, 2)}\n`);
-      log(cfg, `built index: ${meta.files} files in ${meta.durationMs} ms`);
-      last = { built: true, queued: false, durationMs: meta.durationMs, files: meta.files };
+      const durationMs = Date.now() - started;
+      const files = targets.reduce((n, key) => n + fingerprint.languages[key].files, 0);
+      const tools = targets.map(key => LANGUAGES[key].tool).join(', ') || 'no';
+      log(cfg, `built ${tools} index: ${files} files in ${durationMs} ms`);
+      last = { built: true, queued: false, durationMs, files, languages: targets };
       if (!fs.existsSync(cfg.dirtyPath)) break;
+      wanted = staleLanguages(getFreshness(cfg));
     }
     return last;
   } finally {
@@ -536,7 +801,7 @@ function build(cfg, { quiet = false } = {}) {
 
 /**
  * Make sure the index is fresh before reading it: wait for a running build, otherwise
- * rebuild when stale or missing.
+ * rebuild the languages that are stale or missing.
  * @param {object} cfg
  * @param {object} [opts]
  * @param {(msg: string) => void} [opts.notify] - progress messages for the user
@@ -555,12 +820,17 @@ function ensureFresh(cfg, { notify = () => {} } = {}, attempt = 0) {
   }
   const freshness = getFreshness(cfg);
   if (freshness.state === 'fresh') return { state: 'fresh', rebuilt: false };
+  if (freshness.current.files === 0) {
+    throw new Error(
+      `no JavaScript, TypeScript or Python sources under ${cfg.roots.join(', ')}; nothing to index`
+    );
+  }
   notify(
     freshness.state === 'missing'
       ? 'scip: no index yet, building it...'
       : 'scip: source files changed since the last index, rebuilding...'
   );
-  const result = build(cfg, { quiet: true });
+  const result = build(cfg, { quiet: true, languages: staleLanguages(freshness) });
   if (!result.built) {
     if (attempt >= 2) throw new Error('could not acquire the index build lock (.scip/build.lock)');
     return ensureFresh(cfg, { notify }, attempt + 1);
@@ -624,12 +894,18 @@ function runHook(rawInput, { root } = {}) {
     const freshness = getFreshness(cfg);
     if (freshness.state === 'fresh') return 'fresh';
     if (freshness.current.files === 0) return 'skipped';
-    if (!resolveIndexer(cfg)) {
-      log(cfg, `${event}${tool}: scip-typescript not available, skipping`);
-      return 'unavailable';
+    const stale = staleLanguages(freshness);
+    for (const key of stale) {
+      if (!resolveIndexer(cfg, key)) {
+        log(cfg, `${event}${tool}: ${LANGUAGES[key].tool} not available, skipping`);
+        return 'unavailable';
+      }
     }
-    log(cfg, `${event}${tool}: index ${freshness.state}, rebuilding`);
-    return build(cfg, { quiet: true }).built ? 'built' : 'queued';
+    log(
+      cfg,
+      `${event}${tool}: index ${freshness.state} (${stale.join(', ') || 'leftovers'}), rebuilding`
+    );
+    return build(cfg, { quiet: true, languages: stale }).built ? 'built' : 'queued';
   } catch (error) {
     if (cfg) log(cfg, `hook error: ${error.message}`);
     return 'error';
@@ -637,20 +913,33 @@ function runHook(rawInput, { root } = {}) {
 }
 
 /**
- * Freshness and build information for `musubi-code status`.
+ * Freshness and build information for `musubi-code status`, per language with source files.
  * @param {object} cfg
  */
 function statusReport(cfg) {
   const freshness = getFreshness(cfg);
+  const entries = metaLanguages(freshness.meta);
+  const languages = {};
+  for (const key of LANGUAGE_KEYS) {
+    const current = freshness.current.languages[key];
+    if (!current) continue;
+    languages[key] = {
+      label: LANGUAGES[key].label,
+      tool: LANGUAGES[key].tool,
+      index: toPosix(path.relative(cfg.root, cfg.indexPaths[key])),
+      state: freshness.languages[key],
+      files: current.files,
+      meta: entries[key] || null,
+    };
+  }
   return {
     state: freshness.state,
     root: cfg.root,
-    index: toPosix(path.relative(cfg.root, cfg.indexPath)),
     roots: cfg.roots,
     exclude: cfg.exclude,
     files: freshness.current.files,
-    meta: freshness.meta,
     building: isLockLive(readLock(cfg)),
+    languages,
   };
 }
 
@@ -658,6 +947,7 @@ module.exports = {
   NAMES_VERSION,
   SOURCE_EXTENSIONS,
   LANGUAGES,
+  languageOf,
   findProjectRoot,
   detectLanguages,
   loadConfig,

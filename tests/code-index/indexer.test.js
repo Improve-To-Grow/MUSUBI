@@ -11,6 +11,7 @@ const {
   detectLanguages,
   loadConfig,
   isIndexedPath,
+  listSourceFiles,
   computeFingerprint,
   getFreshness,
   runHook,
@@ -101,23 +102,79 @@ describe('code-index indexer', () => {
     const cfg = loadConfig(root);
     const before = computeFingerprint(cfg);
     expect(before.files).toBe(3);
+    expect(Object.keys(before.languages)).toEqual(['typescript']);
     fs.writeFileSync(path.join(root, 'README.md'), 'changed');
-    expect(computeFingerprint(cfg).hash).toBe(before.hash);
+    expect(computeFingerprint(cfg).languages.typescript.hash).toBe(
+      before.languages.typescript.hash
+    );
     fs.writeFileSync(path.join(root, 'src', 'a.js'), 'module.exports = 42;\n');
-    expect(computeFingerprint(cfg).hash).not.toBe(before.hash);
+    expect(computeFingerprint(cfg).languages.typescript.hash).not.toBe(
+      before.languages.typescript.hash
+    );
   });
 
   test('reports a missing index without building one', () => {
     const cfg = loadConfig(root);
-    expect(getFreshness(cfg).state).toBe('missing');
-    expect(statusReport(cfg)).toMatchObject({
+    expect(getFreshness(cfg)).toMatchObject({
       state: 'missing',
-      index: '.scip/index.scip',
+      languages: { typescript: 'missing' },
+    });
+    const report = statusReport(cfg);
+    expect(report).toMatchObject({
+      state: 'missing',
       roots: ['src', 'tests'],
       files: 3,
       building: false,
+      languages: {
+        typescript: { state: 'missing', index: '.scip/index.typescript.scip', files: 3 },
+      },
     });
+    expect(report.languages.python).toBeUndefined();
     expect(fs.existsSync(path.join(root, '.scip'))).toBe(false);
+  });
+
+  test('default roots cover root-level Python packages and skip environments (REQ-IDX-015, REQ-IDX-016)', () => {
+    const py = makeTempProject({
+      'pyproject.toml': '[project]\nname = "x"\n',
+      'mypkg/__init__.py': '',
+      'mypkg/core.py': 'def run():\n    pass\n',
+      'tests/test_x.py': '',
+      'docs/notes.md': '',
+      '.venv/lib/x.py': '',
+      'venv/y.py': '',
+      '__pycache__/z.py': '',
+      'node_modules/a/b.js': '',
+      'build/c.py': '',
+      'mypkg.egg-info/d.py': '',
+    });
+    try {
+      let cfg = loadConfig(py);
+      expect(cfg.roots).toEqual(['tests', 'mypkg']);
+      expect(listSourceFiles(cfg).map(f => `${f.language} ${f.rel}`)).toEqual([
+        'python mypkg/__init__.py',
+        'python mypkg/core.py',
+        'python tests/test_x.py',
+      ]);
+      for (const outside of ['.venv/lib/x.py', 'venv/y.py', 'mypkg.egg-info/d.py', 'build/c.py']) {
+        expect(isIndexedPath(cfg, outside)).toBe(false);
+      }
+      // A top-level script makes the project root itself the root.
+      fs.writeFileSync(path.join(py, 'manage.py'), 'from mypkg.core import run\nrun()\n');
+      cfg = loadConfig(py);
+      expect(cfg.roots).toEqual(['.']);
+      expect(listSourceFiles(cfg).map(f => f.rel)).toEqual([
+        'manage.py',
+        'mypkg/__init__.py',
+        'mypkg/core.py',
+        'tests/test_x.py',
+      ]);
+      expect(isIndexedPath(cfg, 'manage.py')).toBe(true);
+      expect(computeFingerprint(cfg).languages).toEqual({
+        python: { hash: expect.any(String), files: 4 },
+      });
+    } finally {
+      fs.rmSync(py, { recursive: true, force: true });
+    }
   });
 
   test('the hook skips edits outside the index and projects without sources', () => {
