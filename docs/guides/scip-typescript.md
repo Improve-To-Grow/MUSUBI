@@ -139,7 +139,7 @@ Optional, in the project's `package.json` (a Python-only project can add a `pack
 
 | Key | Default | Meaning |
 | --- | --- | --- |
-| `roots` | Existing directories among `bin`, `src`, `lib`, `app`, `scripts`, `tests`, `test`, plus every other top-level directory that holds Python files directly (a package or a scripts directory); the project root itself when a top-level `.py` file exists (`manage.py`, `conftest.py`, `setup.py`); otherwise the project root | Directories to index |
+| `roots` | Existing directories among `bin`, `src`, `lib`, `app`, `scripts`, `tests`, `test`, plus every other top-level directory that holds Python files directly (a package or a scripts directory); otherwise the project root. Top-level Python files (`manage.py`, `conftest.py`, `setup.py`) are indexed as well without widening the roots | Directories to index |
 | `exclude` | none | Paths under the roots to skip. `node_modules`, `dist`, `build`, `out`, `coverage`, `.venv`, `venv`, `__pycache__`, `.tox`, `.mypy_cache`, `.pytest_cache`, `.ruff_cache`, `.eggs` and `*.egg-info` are always skipped, by both indexers and by the fingerprint |
 | `tsconfig` | `"auto"` | `"auto"` uses `./tsconfig.json` when it exists. `"generated"` always uses `.scip/tsconfig.json` built from `roots` |
 | `indexerArgs` | `[]` | Extra scip-typescript arguments, for example `["--yarn-workspaces"]` or `["--pnpm-workspaces"]` |

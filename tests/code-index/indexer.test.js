@@ -158,10 +158,11 @@ describe('code-index indexer', () => {
       for (const outside of ['.venv/lib/x.py', 'venv/y.py', 'mypkg.egg-info/d.py', 'build/c.py']) {
         expect(isIndexedPath(cfg, outside)).toBe(false);
       }
-      // A top-level script makes the project root itself the root.
+      // A top-level script is indexed as well, without widening the roots.
       fs.writeFileSync(path.join(py, 'manage.py'), 'from mypkg.core import run\nrun()\n');
       cfg = loadConfig(py);
-      expect(cfg.roots).toEqual(['.']);
+      expect(cfg.roots).toEqual(['tests', 'mypkg']);
+      expect(cfg.rootFiles).toEqual(['manage.py']);
       expect(listSourceFiles(cfg).map(f => f.rel)).toEqual([
         'manage.py',
         'mypkg/__init__.py',
@@ -169,6 +170,11 @@ describe('code-index indexer', () => {
         'tests/test_x.py',
       ]);
       expect(isIndexedPath(cfg, 'manage.py')).toBe(true);
+      expect(isIndexedPath(cfg, 'docs/notes.md')).toBe(false);
+      expect(statusReport(cfg)).toMatchObject({
+        roots: ['tests', 'mypkg'],
+        rootFiles: ['manage.py'],
+      });
       expect(computeFingerprint(cfg).languages).toEqual({
         python: { hash: expect.any(String), files: 4 },
       });

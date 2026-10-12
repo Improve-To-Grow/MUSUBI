@@ -128,9 +128,11 @@ function formatSymbols(result) {
  */
 function formatStatus(report) {
   const excluded = report.exclude.length ? ` (excluding ${report.exclude.join(', ')})` : '';
+  const rootFiles =
+    report.rootFiles && report.rootFiles.length ? ` + ${report.rootFiles.join(', ')}` : '';
   const lines = [
     `state:   ${report.state}`,
-    `roots:   ${report.roots.join(', ')}${excluded}`,
+    `roots:   ${report.roots.join(', ')}${rootFiles}${excluded}`,
     `files:   ${report.files} source files now`,
   ];
   const languages = Object.values(report.languages || {});

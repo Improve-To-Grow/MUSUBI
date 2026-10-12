@@ -20,8 +20,8 @@
  *   "scip": {
  *     "roots": ["src", "tests"],      directories to index (default: the existing ones of
  *                                     bin, src, lib, app, scripts, tests, test, plus every
- *                                     top-level directory holding Python files; the project
- *                                     root itself when a top-level .py file exists)
+ *                                     top-level directory holding Python files; top-level
+ *                                     Python files are indexed too)
  *     "exclude": ["src/templates"],   paths under the roots to skip
  *     "tsconfig": "auto",             "auto" uses ./tsconfig.json when present, "generated"
  *                                     always uses .scip/tsconfig.json
@@ -206,22 +206,23 @@ function holdsSourceFiles(dir, extensions) {
 
 /**
  * Default roots: the standard directories that exist, plus every other top-level directory that
- * holds Python files directly (a package or a scripts directory). A Python file at the top level
- * (manage.py, conftest.py, a script) makes the project root itself the root.
+ * holds Python files directly (a package or a scripts directory). Python files at the top level
+ * (manage.py, conftest.py, a script) are indexed as root files without widening the roots.
  * @param {string} root
- * @returns {string[]}
+ * @returns {{roots: string[], files: string[]}}
  */
 function defaultRoots(root) {
   let entries;
   try {
     entries = fs.readdirSync(root, { withFileTypes: true });
   } catch {
-    return ['.'];
+    return { roots: ['.'], files: [] };
   }
   const python = new Set(LANGUAGES.python.extensions);
-  if (entries.some(e => e.isFile() && python.has(path.extname(e.name).toLowerCase()))) {
-    return ['.'];
-  }
+  const files = entries
+    .filter(e => e.isFile() && python.has(path.extname(e.name).toLowerCase()))
+    .map(e => e.name)
+    .sort();
   const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
   const standard = DEFAULT_ROOTS.filter(name => dirs.includes(name));
   const pythonDirs = dirs
@@ -234,7 +235,7 @@ function defaultRoots(root) {
     )
     .sort();
   const roots = [...standard, ...pythonDirs];
-  return roots.length ? roots : ['.'];
+  return roots.length ? { roots, files } : { roots: ['.'], files: [] };
 }
 
 /**
@@ -259,7 +260,8 @@ function loadConfig(root = findProjectRoot()) {
     }
   };
   let roots = Array.isArray(settings.roots) ? settings.roots.filter(isDir) : null;
-  if (!roots || roots.length === 0) roots = defaultRoots(root);
+  let rootFiles = [];
+  if (!roots || roots.length === 0) ({ roots, files: rootFiles } = defaultRoots(root));
   roots = roots.map(r => toPosix(path.normalize(r)).replace(/\/$/, ''));
 
   const exclude = (Array.isArray(settings.exclude) ? settings.exclude : []).map(e =>
@@ -273,6 +275,7 @@ function loadConfig(root = findProjectRoot()) {
   return {
     root,
     roots,
+    rootFiles,
     exclude,
     useProjectTsconfig,
     indexerArgs: stringList(settings.indexerArgs),
@@ -307,6 +310,7 @@ function isIndexedPath(cfg, filePath) {
   if (!SOURCE_EXTENSIONS.has(path.extname(rel).toLowerCase())) return false;
   if (rel.split('/').slice(0, -1).some(isExcludedDirName)) return false;
   if (isExcluded(cfg, rel)) return false;
+  if (cfg.rootFiles.includes(rel)) return true;
   return cfg.roots.some(r => r === '.' || rel === r || rel.startsWith(r + '/'));
 }
 
@@ -353,6 +357,16 @@ function listSourceFiles(cfg) {
     }
   };
   for (const r of cfg.roots) walk(r);
+  for (const rel of cfg.rootFiles) {
+    const language = languageOf(rel);
+    if (!language || isExcluded(cfg, rel)) continue;
+    try {
+      const stat = fs.statSync(path.join(cfg.root, rel));
+      files.push({ rel, language, size: stat.size, mtimeMs: Math.floor(stat.mtimeMs) });
+    } catch {
+      // Deleted since the configuration was loaded.
+    }
+  }
   return files.sort((a, b) => (a.rel < b.rel ? -1 : a.rel > b.rel ? 1 : 0));
 }
 
@@ -936,6 +950,7 @@ function statusReport(cfg) {
     state: freshness.state,
     root: cfg.root,
     roots: cfg.roots,
+    rootFiles: cfg.rootFiles,
     exclude: cfg.exclude,
     files: freshness.current.files,
     building: isLockLive(readLock(cfg)),
