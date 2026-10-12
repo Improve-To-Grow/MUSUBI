@@ -1,7 +1,10 @@
 /**
- * Code index setup - configures a JavaScript/TypeScript project for musubi-code
+ * Code index setup - configures a project with JavaScript, TypeScript or Python sources for
+ * musubi-code
  *
- * Shared by `musubi init`, `musubi-upgrade` and `musubi-code setup`. It writes:
+ * Shared by `musubi init`, `musubi-upgrade` and `musubi-code setup`. Projects without a
+ * supported language (./indexer.js LANGUAGES: a project marker or source files) are skipped
+ * with a reason. It writes:
  * - `.scip/` to .gitignore
  * - Claude Code: the `code-references` skill, async hooks in `.claude/settings.json` that keep
  *   the index fresh, and synchronous PreToolUse hooks that point grep searches for indexed
@@ -20,7 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const { agentDefinitions } = require('../agents/registry');
-const { isJavaScriptProject } = require('./indexer');
+const { LANGUAGES, detectLanguages } = require('./indexer');
 
 const TEMPLATE_DIR = path.join(__dirname, '..', 'templates', 'code-index');
 const SKILL_NAME = 'code-references';
@@ -241,31 +244,38 @@ function upsertSection(existing, section) {
  * @param {string[]} [opts.agents] - agent keys or aliases (default: detected from the project)
  * @param {string} [opts.command] - command the hooks, skill and instructions call
  * @param {boolean} [opts.dryRun] - report what would change without writing
- * @param {boolean} [opts.force] - also set up a directory without package.json/tsconfig.json
+ * @param {string[]} [opts.languages] - languages the project will use (`typescript`, `python`),
+ *   counted in addition to the detected ones; `musubi init` passes the chosen ones
  * @returns {{root: string, agents: string[], command: string, dryRun: boolean,
- *   skippedReason: string|null, changes: Array<{file: string, status: string}>, warnings: string[]}}
+ *   languages: string[], skippedReason: string|null,
+ *   changes: Array<{file: string, status: string}>, warnings: string[]}}
  */
 function setupCodeIndex(
   root,
-  { agents, command = DEFAULT_COMMAND, dryRun = false, force = false } = {}
+  { agents, command = DEFAULT_COMMAND, dryRun = false, languages = [] } = {}
 ) {
   const projectRoot = path.resolve(root);
   const agentKeys = [
     ...new Set((agents && agents.length ? agents : detectAgents(projectRoot)).map(resolveAgentKey)),
   ];
+  const wanted = new Set([...languages, ...detectLanguages(projectRoot)]);
+  const languageKeys = Object.keys(LANGUAGES).filter(key => wanted.has(key));
   const result = {
     root: projectRoot,
     agents: agentKeys,
     command,
     dryRun,
+    languages: languageKeys,
     skippedReason: null,
     changes: [],
     warnings: [],
   };
 
-  if (!force && !isJavaScriptProject(projectRoot)) {
-    result.skippedReason =
-      'no package.json, tsconfig.json or jsconfig.json (use --force to set up anyway)';
+  if (languageKeys.length === 0) {
+    const markers = Object.values(LANGUAGES)
+      .flatMap(language => language.markers)
+      .join(', ');
+    result.skippedReason = `no JavaScript, TypeScript or Python sources or project markers (${markers})`;
     return result;
   }
   const record = (rel, status) => result.changes.push({ file: rel, status });

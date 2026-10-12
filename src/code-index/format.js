@@ -6,6 +6,8 @@
 
 'use strict';
 
+const { LANGUAGES } = require('./indexer');
+
 const DEFAULT_LIMIT = 100;
 
 function plural(n, word) {
@@ -148,7 +150,13 @@ function formatStatus(report) {
 function formatSetup(result) {
   if (result.skippedReason) return `Code navigation not set up: ${result.skippedReason}`;
   const verb = result.dryRun ? 'would be' : '';
-  const lines = [`Code navigation for ${result.agents.join(', ')} (command: ${result.command})`];
+  const languages = (result.languages || []).map(key =>
+    LANGUAGES[key] ? LANGUAGES[key].label : key
+  );
+  const detected = languages.length ? `; ${languages.join(', ')}` : '';
+  const lines = [
+    `Code navigation for ${result.agents.join(', ')} (command: ${result.command}${detected})`,
+  ];
   for (const change of result.changes) {
     const status =
       verb && change.status !== 'unchanged' ? `${verb} ${change.status}` : change.status;

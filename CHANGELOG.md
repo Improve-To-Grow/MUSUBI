@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Code navigation is set up without asking** (CHANGE-006): `musubi init`, `musubi upgrade` and `musubi-code setup` configure it in every project with JavaScript, TypeScript or Python sources or project markers (`package.json`, `tsconfig.json`, `jsconfig.json`, `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements.txt`, `Pipfile`) and report other projects as unsupported. `musubi init` also counts the languages chosen in its questionnaire. `musubi-code setup` prints the languages it found; `musubi upgrade --dry-run` still previews
+
+### Removed
+
+- The `musubi init` question "Set up compiler-accurate code navigation for AI agents?", the options `musubi init --code-index`, `musubi init --no-code-index` and `musubi upgrade --no-code-index`, and `musubi-code setup --force` (CHANGE-006). Passing one of the options now fails with "unknown option"
+
 ## [6.3.1-itg.2] - 2026-10-08
 
 ### Added

@@ -204,7 +204,6 @@ function createProgram() {
     )
     .option('--command <command>', 'command the hooks and instructions call', 'musubi-code')
     .option('--dry-run', 'show what would change without writing')
-    .option('--force', 'also set up a directory without package.json or tsconfig.json')
     .option('--root <dir>', 'project directory (default: found from the current directory)')
     .action(opts => {
       const root = indexer.findProjectRoot(opts.root || process.cwd());
@@ -212,7 +211,6 @@ function createProgram() {
         agents: opts.agent,
         command: opts.command,
         dryRun: opts.dryRun,
-        force: opts.force,
       });
       print(format.formatSetup(result));
       if (result.skippedReason) {

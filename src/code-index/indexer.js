@@ -42,7 +42,25 @@ const ALWAYS_EXCLUDED_DIRS = new Set([
   'build',
   'out',
 ]);
-const SOURCE_EXTENSIONS = new Set(['.js', '.cjs', '.mjs', '.jsx', '.ts', '.cts', '.mts', '.tsx']);
+/**
+ * Languages that code navigation supports. `markers` identify a project of the language and
+ * `extensions` its source files; either makes a project eligible for setup.
+ */
+const LANGUAGES = {
+  typescript: {
+    label: 'JavaScript/TypeScript',
+    extensions: ['.js', '.cjs', '.mjs', '.jsx', '.ts', '.cts', '.mts', '.tsx'],
+    markers: ['package.json', 'tsconfig.json', 'jsconfig.json'],
+  },
+  python: {
+    label: 'Python',
+    extensions: ['.py', '.pyi'],
+    markers: ['pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', 'Pipfile'],
+  },
+};
+const LANGUAGE_KEYS = Object.keys(LANGUAGES);
+// Source files the index is built from.
+const SOURCE_EXTENSIONS = new Set(LANGUAGES.typescript.extensions);
 const LOCK_TTL_MS = 15 * 60 * 1000;
 const WAIT_FOR_BUILD_MS = 5 * 60 * 1000;
 const MAX_LOG_BYTES = 256 * 1024;
@@ -58,12 +76,13 @@ function toPosix(p) {
   return p.split(path.sep).join('/');
 }
 
-const PROJECT_MARKERS = ['package.json', 'tsconfig.json', 'jsconfig.json'];
+const PROJECT_MARKERS = LANGUAGE_KEYS.flatMap(key => LANGUAGES[key].markers);
 
 /**
  * Find the project root for a directory: the nearest ancestor that already has an index
- * (`.scip/meta.json`), otherwise the nearest one with a package.json, tsconfig.json or
- * jsconfig.json, otherwise the directory itself.
+ * (`.scip/meta.json`), otherwise the nearest one with a project marker of a supported language
+ * (package.json, tsconfig.json, jsconfig.json, pyproject.toml, setup.py, setup.cfg,
+ * requirements.txt, Pipfile), otherwise the directory itself.
  * @param {string} [startDir]
  * @returns {string}
  */
@@ -83,12 +102,47 @@ function findProjectRoot(startDir = process.cwd()) {
 }
 
 /**
- * Does a directory look like a JavaScript or TypeScript project?
- * @param {string} root
+ * Does a file with one of the extensions exist under the configured roots?
+ * @param {object} cfg
+ * @param {Set<string>} extensions
  * @returns {boolean}
  */
-function isJavaScriptProject(root) {
-  return PROJECT_MARKERS.some(m => fs.existsSync(path.join(root, m)));
+function hasSourceFiles(cfg, extensions) {
+  const stack = cfg.roots.map(r => (r === '.' ? '' : r));
+  while (stack.length) {
+    const relDir = stack.pop();
+    let entries;
+    try {
+      entries = fs.readdirSync(path.join(cfg.root, relDir || '.'), { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const rel = relDir ? `${relDir}/${entry.name}` : entry.name;
+      if (isExcluded(cfg, rel)) continue;
+      if (entry.isDirectory()) {
+        if (!ALWAYS_EXCLUDED_DIRS.has(entry.name)) stack.push(rel);
+      } else if (entry.isFile() && extensions.has(path.extname(entry.name).toLowerCase())) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * The supported languages a project uses: those with a project marker in `root` or with source
+ * files under the configured roots, in the order of LANGUAGES.
+ * @param {string} root
+ * @returns {string[]} language keys (`typescript`, `python`)
+ */
+function detectLanguages(root) {
+  const cfg = loadConfig(path.resolve(root));
+  return LANGUAGE_KEYS.filter(key => {
+    const { markers, extensions } = LANGUAGES[key];
+    if (markers.some(m => fs.existsSync(path.join(cfg.root, m)))) return true;
+    return hasSourceFiles(cfg, new Set(extensions));
+  });
 }
 
 /**
@@ -603,8 +657,9 @@ function statusReport(cfg) {
 module.exports = {
   NAMES_VERSION,
   SOURCE_EXTENSIONS,
+  LANGUAGES,
   findProjectRoot,
-  isJavaScriptProject,
+  detectLanguages,
   loadConfig,
   isIndexedPath,
   coversDirectory,

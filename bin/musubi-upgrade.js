@@ -14,21 +14,20 @@ const fs = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
 const { Command } = require('commander');
-const { isJavaScriptProject } = require('../src/code-index/indexer');
 const { setupCodeIndex, hasChanges } = require('../src/code-index/setup');
 
 const program = new Command();
 const packageJson = require('../package.json');
 
 /**
- * Set up code navigation (musubi-code) in JavaScript/TypeScript projects that lack it.
- * Runs on every upgrade, independent of the version, and changes nothing once in place.
+ * Set up code navigation (musubi-code) in projects with JavaScript, TypeScript or Python that
+ * lack it. Runs on every upgrade, independent of the version, and changes nothing once in place.
  * @param {string} projectDir
- * @param {object} options - upgrade CLI options (dryRun, codeIndex)
+ * @param {object} options - upgrade CLI options (dryRun)
  */
 function applyCodeIndexSetup(projectDir, options) {
-  if (options.codeIndex === false || !isJavaScriptProject(projectDir)) return;
   const result = setupCodeIndex(projectDir, { dryRun: Boolean(options.dryRun) });
+  if (result.skippedReason) return;
   if (!hasChanges(result) && result.warnings.length === 0) return;
   const heading = options.dryRun ? 'would be set up' : 'set up';
   console.log(
@@ -38,7 +37,6 @@ function applyCodeIndexSetup(projectDir, options) {
     console.log(chalk.gray(`   - ${change.status} ${change.file}`));
   }
   for (const warning of result.warnings) console.log(chalk.yellow(`   ⚠️  ${warning}`));
-  console.log(chalk.gray('   Skip with --no-code-index.'));
 }
 
 // Version migration definitions
@@ -263,7 +261,6 @@ program
   .option('--to <version>', 'Target version to upgrade to', 'latest')
   .option('--dry-run', 'Preview changes without applying')
   .option('--force', 'Force upgrade even if already at target version')
-  .option('--no-code-index', 'Do not set up code navigation (musubi-code)')
   .action(async options => {
     const projectDir = process.cwd();
 

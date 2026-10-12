@@ -267,9 +267,26 @@ describe('musubi-code setup command', () => {
       const skipped = cli(empty, ['setup']);
       expect(skipped.status).toBe(1);
       expect(skipped.stdout).toContain('not set up');
+      expect(skipped.stdout).toContain('no JavaScript, TypeScript or Python');
+      const forced = cli(empty, ['setup', '--force']);
+      expect(forced.status).toBe(1);
+      expect(forced.stderr).toContain("unknown option '--force'");
       fs.rmSync(empty, { recursive: true, force: true });
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
+  });
+});
+
+describe('musubi init and upgrade set up code navigation without asking (REQ-IDX-001, REQ-IDX-002)', () => {
+  const MUSUBI = path.join(__dirname, '..', '..', 'bin', 'musubi.js');
+
+  test.each(['init', 'upgrade'])('%s --help offers no code-index option', command => {
+    const help = spawnSync(process.execPath, [MUSUBI, command, '--help'], {
+      encoding: 'utf8',
+      timeout: 60000,
+    });
+    expect(help.status).toBe(0);
+    expect(help.stdout).not.toContain('code-index');
   });
 });

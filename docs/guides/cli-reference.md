@@ -50,15 +50,13 @@ musubi init --windsurf     # Windsurf IDE
 musubi init --force        # Overwrite existing files
 musubi init --minimal      # Initialize with minimal configuration
 musubi init --output ./dir # Specify output directory
-musubi init --code-index      # Set up code navigation without asking
-musubi init --no-code-index   # Skip code navigation without asking
 ```
 
 **Generated files:**
 - `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` / `QWEN.md`
 - Full set of `steering/` directories
 - Full set of `storage/` directories
-- JavaScript/TypeScript projects that accept code navigation: `.claude/skills/code-references/`, hooks in `.claude/settings.json`, `.scip/` in `.gitignore` (see [`musubi code`](#musubi-code--musubi-code))
+- Projects with JavaScript, TypeScript or Python sources or project markers, or that chose one of these languages: `.claude/skills/code-references/`, hooks in `.claude/settings.json`, `.scip/` in `.gitignore`, without asking (see [`musubi code`](#musubi-code--musubi-code))
 
 ### `musubi onboard`
 

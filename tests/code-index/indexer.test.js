@@ -8,7 +8,7 @@ const path = require('path');
 
 const {
   findProjectRoot,
-  isJavaScriptProject,
+  detectLanguages,
   loadConfig,
   isIndexedPath,
   computeFingerprint,
@@ -79,8 +79,22 @@ describe('code-index indexer', () => {
     fs.mkdirSync(path.join(root, '.scip'));
     fs.writeFileSync(path.join(root, '.scip', 'meta.json'), '{}');
     expect(findProjectRoot(nested)).toBe(root);
-    expect(isJavaScriptProject(root)).toBe(true);
-    expect(isJavaScriptProject(path.join(root, 'tests'))).toBe(false);
+  });
+
+  test('detects the languages of a project from markers or sources (REQ-IDX-001)', () => {
+    expect(detectLanguages(root)).toEqual(['typescript']);
+    fs.writeFileSync(path.join(root, 'pyproject.toml'), '[project]\nname = "x"\n');
+    expect(detectLanguages(root)).toEqual(['typescript', 'python']);
+    const python = makeTempProject({ 'scripts/tool.py': 'print(1)\n' });
+    const rust = makeTempProject({ 'Cargo.toml': '', 'src/main.rs': 'fn main() {}\n' });
+    const empty = makeTempProject({ 'README.md': '' });
+    try {
+      expect(detectLanguages(python)).toEqual(['python']);
+      expect(detectLanguages(rust)).toEqual([]);
+      expect(detectLanguages(empty)).toEqual([]);
+    } finally {
+      for (const dir of [python, rust, empty]) fs.rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   test('fingerprint changes when an indexed file changes, not when others do', () => {

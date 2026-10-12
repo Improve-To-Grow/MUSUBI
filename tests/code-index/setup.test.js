@@ -220,12 +220,29 @@ describe('code-index setup', () => {
     expect(fs.existsSync(path.join(root, '.claude'))).toBe(false);
   });
 
-  test('skips non-JavaScript projects unless forced, and dry runs write nothing', () => {
-    root = makeTempProject({ 'pyproject.toml': '' });
-    expect(setupCodeIndex(root).skippedReason).toMatch(/package\.json/);
-    const dry = setupCodeIndex(root, { force: true, dryRun: true });
-    expect(hasChanges(dry)).toBe(true);
-    expect(fs.readdirSync(root)).toEqual(['pyproject.toml']);
+  test('sets up every project with a supported language and skips the others (REQ-IDX-001, REQ-IDX-003)', () => {
+    root = makeTempProject({ 'pyproject.toml': '[project]\nname = "x"\n' });
+    const python = setupCodeIndex(root, { agents: ['claude-code'] });
+    expect(python.skippedReason).toBeNull();
+    expect(python.languages).toEqual(['python']);
+    expect(statuses(python)['.claude/skills/code-references/SKILL.md']).toBe('created');
+
+    const rust = makeTempProject({ 'Cargo.toml': '', 'src/main.rs': '' });
+    try {
+      const skipped = setupCodeIndex(rust);
+      expect(skipped.skippedReason).toMatch(/no JavaScript, TypeScript or Python/);
+      expect(skipped.changes).toEqual([]);
+      // `force` is gone: a project without a supported language is never set up.
+      expect(setupCodeIndex(rust, { force: true }).skippedReason).not.toBeNull();
+      // The languages chosen in `musubi init` count as detected, and a dry run writes nothing.
+      const selected = setupCodeIndex(rust, { languages: ['python'], dryRun: true });
+      expect(selected.skippedReason).toBeNull();
+      expect(selected.languages).toEqual(['python']);
+      expect(hasChanges(selected)).toBe(true);
+      expect(fs.readdirSync(rust).sort()).toEqual(['Cargo.toml', 'src']);
+    } finally {
+      fs.rmSync(rust, { recursive: true, force: true });
+    }
   });
 
   test('leaves invalid settings.json untouched and warns', () => {

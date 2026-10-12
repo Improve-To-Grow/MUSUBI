@@ -28,9 +28,9 @@ npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 
 | Situation | How |
 | --- | --- |
-| New project | `musubi init` asks "Set up compiler-accurate code navigation for AI agents?" when the project uses JavaScript/TypeScript or already has a `package.json`/`tsconfig.json`. `--code-index` and `--no-code-index` answer it in advance |
-| Existing MUSUBI project | `musubi upgrade` adds it to JavaScript/TypeScript projects that lack it, even when the project is already at the current version. `--dry-run` previews, `--no-code-index` skips |
-| Any JavaScript/TypeScript project | `musubi-code setup` in the project directory |
+| New project | `musubi init` sets it up when the chosen languages or the files present include JavaScript, TypeScript or Python: a project marker (`package.json`, `tsconfig.json`, `jsconfig.json`, `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements.txt`, `Pipfile`) or source files under the roots. There is no question and no option |
+| Existing MUSUBI project | `musubi upgrade` adds it to every project with a supported language that lacks it, even when the project is already at the current version. `--dry-run` previews |
+| Any project with a supported language | `musubi-code setup` in the project directory. Other projects are reported as unsupported and left alone |
 
 `musubi-code setup` options:
 
@@ -38,7 +38,6 @@ npm install -g 'github:Improve-To-Grow/MUSUBI#ITG-adjustments'
 | --- | --- |
 | `--agent <agent...>` | Agents to configure: `claude-code`, `github-copilot`, `cursor`, `gemini-cli`, `codex`, `qwen-code`, `windsurf`, or their short aliases. Default: the agents whose files the project already has, else Claude Code |
 | `--dry-run` | Show what would change without writing |
-| `--force` | Also set up a directory without `package.json`, `tsconfig.json` or `jsconfig.json` |
 | `--command <command>` | Command the hooks, skill and instructions call (default `musubi-code`) |
 | `--root <dir>` | Project directory (default: found from the current directory) |
 

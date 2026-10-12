@@ -42,6 +42,13 @@ const {
 
 const { setupCodeIndex } = require('../src/code-index/setup');
 
+// Languages of the questionnaire that code navigation covers, by indexer language.
+const CODE_INDEX_LANGUAGES = {
+  javascript: 'typescript',
+  typescript: 'typescript',
+  python: 'python',
+};
+
 const TEMPLATE_DIR = path.join(__dirname, '..', 'src', 'templates');
 const SHARED_TEMPLATE_DIR = path.join(TEMPLATE_DIR, 'shared');
 const AGENTS_TEMPLATE_DIR = path.join(TEMPLATE_DIR, 'agents');
@@ -336,27 +343,6 @@ async function main(agent, agentKey, options = {}) {
     answers.languages = ['undecided'];
   }
 
-  // Code navigation (musubi-code): offered for JavaScript/TypeScript projects
-  answers.codeIndex = options.codeIndex;
-  if (answers.codeIndex === undefined) {
-    const isJsProject =
-      (answers.languages || []).includes('javascript') ||
-      ['package.json', 'tsconfig.json', 'jsconfig.json'].some(file => fs.existsSync(file));
-    answers.codeIndex = false;
-    if (isJsProject) {
-      const codeIndexAnswer = await inquirer.default.prompt([
-        {
-          type: 'confirm',
-          name: 'codeIndex',
-          message:
-            'Set up compiler-accurate code navigation for AI agents (references, callers, dependencies)?',
-          default: true,
-        },
-      ]);
-      answers.codeIndex = codeIndexAnswer.codeIndex;
-    }
-  }
-
   // Ask template questions if workspace or microservices
   if (answers.projectStructure === 'workspace' || answers.projectStructure === 'microservices') {
     const templateAnswer = await inquirer.default.prompt(templatePrompts);
@@ -562,18 +548,17 @@ async function main(agent, agentKey, options = {}) {
   await createReadme(answers, agent, agentKey);
   console.log(chalk.green(`  Created ${agent.layout.docFile || 'MUSUBI.md'} guide`));
 
-  // Set up code navigation after the guide exists, so its section is appended to it
-  if (answers.codeIndex) {
-    const codeIndex = setupCodeIndex(process.cwd(), {
-      agents: [agentKey],
-      force: options.codeIndex === true,
-    });
-    if (codeIndex.skippedReason) {
-      console.log(chalk.yellow(`  Code navigation not set up: ${codeIndex.skippedReason}`));
-    } else {
-      console.log(chalk.green('  Set up code navigation (musubi-code)'));
-      for (const warning of codeIndex.warnings) console.log(chalk.yellow(`  ⚠️  ${warning}`));
-    }
+  // Set up code navigation after the guide exists, so its section is appended to it. It is
+  // set up for every project with JavaScript, TypeScript or Python; there is no question.
+  const codeIndex = setupCodeIndex(process.cwd(), {
+    agents: [agentKey],
+    languages: (answers.languages || []).map(l => CODE_INDEX_LANGUAGES[l]).filter(Boolean),
+  });
+  if (codeIndex.skippedReason) {
+    console.log(chalk.gray(`  Code navigation not set up: ${codeIndex.skippedReason}`));
+  } else {
+    console.log(chalk.green('  Set up code navigation (musubi-code)'));
+    for (const warning of codeIndex.warnings) console.log(chalk.yellow(`  ⚠️  ${warning}`));
   }
 
   // Success message
@@ -590,7 +575,7 @@ async function main(agent, agentKey, options = {}) {
 
   const cmdExample = agent.commands.requirements.replace(' <feature>', ' authentication');
   console.log(chalk.gray(`  4. Try commands: ${cmdExample}`));
-  if (answers.codeIndex) {
+  if (!codeIndex.skippedReason) {
     console.log(chalk.gray('  5. Find where code is used: musubi-code refs <Name>'));
   }
   console.log('');
