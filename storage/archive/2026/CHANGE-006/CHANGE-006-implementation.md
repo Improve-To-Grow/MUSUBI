@@ -29,8 +29,8 @@ which turns the guard back into the CHANGE-005 note (proposal, Rollback Plan).
 
 Four planned commits plus one fix, all on `feat/code-index-python`, fork-only (`musubi-code` does
 not exist upstream). Commits 1 to 4 were made during `/sdd-change-apply`, as the first commit of
-CHANGE-005 was; `git reset --soft` turns any of them back into staged changes if the maintainer
-prefers their own message. The last set is **staged, awaiting the maintainer**.
+CHANGE-005 was. The last set was staged, and the maintainer committed it as `15e8b27` with their
+own message (recorded at archive time).
 
 1. `29c6c1b` `feat(code-index): set up code navigation by default for supported languages (CHANGE-006)`
    — 13 files. `detectLanguages()` replaces `isJavaScriptProject()`; the init question, the
@@ -46,8 +46,9 @@ prefers their own message. The last set is **staged, awaiting the maintainer**.
 4. `55113ec` `feat(code-index): grep guard denies searches for indexed names (CHANGE-006)` — 9
    files. Deny decision with reason, quoted-name escape, `--advisory`, setup keeps the option,
    guide "Grep guard" section, CHANGELOG.
-5. **Staged**: `docs(code-index): language-neutral skill, section and guides (CHANGE-006)` —
-   managed section and skill template wording (both languages, quoted name, guard), this
+5. `15e8b27` `docs(code-index): describe Python and the grep guard, record CHANGE-006` (the
+   maintainer's message; suggested was `docs(code-index): language-neutral skill, section and
+   guides (CHANGE-006)`) — 20 files. Managed section and skill template wording (both languages, quoted name, guard), this
    repository refreshed with `musubi-code setup` (`CLAUDE.md`, `AGENTS.md`,
    `.claude/skills/code-references/SKILL.md`; `.claude/settings.json` unchanged), steering
    (`tech.md`, `structure.md`), `docs/USER-GUIDE.md`, `docs/guides/cli-reference.md`, `README.md`
@@ -200,8 +201,8 @@ prefers their own message. The last set is **staged, awaiting the maintainer**.
 
 ## Next Steps
 
-1. Maintainer: review and commit the staged set (suggested message above), then merge
-   `feat/code-index-python` into `ITG-adjustments`.
+1. Merge `feat/code-index-python` into `ITG-adjustments` (the staged set was committed as
+   `15e8b27`).
 2. Release: the entries sit under `[Unreleased]` in `CHANGELOG.md`; the next version removes two
    CLI options (`### Removed`).
 3. Archive: `/sdd-change-archive CHANGE-006` (by hand into `storage/archive/2026/CHANGE-006/`, as

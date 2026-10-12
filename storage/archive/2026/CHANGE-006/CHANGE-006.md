@@ -2,12 +2,13 @@
 
 **Change ID**: CHANGE-006  
 **Date**: 2026-10-09 (revised 2026-10-12: mixed-project guarantees, grep guard)  
-**Status**: ~~Proposed~~ → ~~Approved~~ → **Implemented**  
-**Approved**: 2026-10-12 (maintainer, `musubi-change approve CHANGE-006`; delta record in
-`storage/changes/CHANGE-006/`)  
-**Implemented**: 2026-10-12 (commits `29c6c1b`, `6f534a6`, `0d846f7`, `55113ec` and the staged
-documentation commit on `feat/code-index-python`; see
-[CHANGE-006-implementation.md](CHANGE-006-implementation.md))  
+**Status**: ~~Proposed~~ → ~~Approved~~ → ~~Implemented~~ → **Archived**  
+**Approved**: 2026-10-12 (maintainer, `musubi-change approve CHANGE-006`; delta record created in
+`storage/changes/CHANGE-006/`, archived as [CHANGE-006-delta.json](CHANGE-006-delta.json))  
+**Implemented**: 2026-10-12 (commits `29c6c1b`, `6f534a6`, `0d846f7`, `55113ec` and `15e8b27` on
+`feat/code-index-python`; see [CHANGE-006-implementation.md](CHANGE-006-implementation.md))  
+**Archived**: 2026-10-12 (`storage/archive/2026/CHANGE-006/`, see
+[CHANGE-006-archive.md](CHANGE-006-archive.md))  
 **Type**: Feature (code index: Python indexer, mixed projects, mandatory setup)  
 **Priority**: P1  
 **Baseline**: commit `9b9a2f4` on `ITG-adjustments` (6.3.1-itg.2); work branch
