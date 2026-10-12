@@ -37,6 +37,7 @@ You are executing the `/sdd-requirements [feature-name]` command to create a req
 steering/product.md      # Business context, users, goals
 steering/structure.md    # Architecture patterns
 steering/tech.md         # Technology stack
+steering/rules/itg/README.md  # ITG delivery policies: read the files mapped to your task
 ```
 
 **Extract**:
@@ -191,7 +192,9 @@ Is this understanding correct?
 
 **If modifying existing functionality**:
 
-- Search for existing implementation: `grep -r "{{feature}}" src/`
+- Search for existing implementation: with a code index (CLAUDE.md "Code Navigation"),
+  `musubi-code refs <Symbol>` and `musubi-code symbols <file>` for classes, functions and modules;
+  `grep -rn "{{feature}}" src/` for the feature's words and in projects without an index
 - Read related code
 - Identify current behavior
 - Document what needs to change (delta spec)
@@ -560,8 +563,9 @@ Present summary to user:
 
 1. **Read Steering**:
    - `steering/product.md` → Target users: B2B SaaS companies
-   - `steering/tech.md` → Stack: Next.js, PostgreSQL, Prisma
-   - `steering/structure.md` → Pattern: Library-first (profile `library` in `steering/project.yml`)
+   - `steering/tech.md` → Stack: ITG default (Next.js on Cloudflare Workers, Firebase Authentication, Firestore)
+   - `steering/structure.md` → Pattern: feature folders (profile `application` in `steering/project.yml`)
+   - `steering/rules/itg/` → ITG-SEC (claims-only roles, admin MFA), ITG-LOG (audit events), ITG-TST (required flows)
 
 2. **Interactive Dialogue (1-on-1)**:
 
@@ -631,7 +635,8 @@ Present summary to user:
 - **Read**: Read steering files, existing specs
 - **Write**: Create requirements document
 - **AskUserQuestion**: Gather stakeholder input (if needed)
-- **Grep**: Search for existing implementations (brownfield)
+- **Bash (`musubi-code`)**: Find existing classes, functions and their uses (brownfield, projects with a code index)
+- **Grep**: Search for text, and for existing implementations in projects without a code index (brownfield)
 
 ### Optional Tools:
 

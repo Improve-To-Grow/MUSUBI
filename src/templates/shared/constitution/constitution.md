@@ -286,6 +286,8 @@ Under the `library` profile, Article II defaults to advisory because internal li
 - **VI-5** WHEN the architecture, technology stack or business context changes, the project SHALL update the affected steering files.
 - **VI-6** WHEN a change to a steering file is proposed, the project SHALL obtain stakeholder approval before applying it.
 
+Project memory also includes the delivery policies a project adopts under `steering/rules/`. In ITG projects these are `steering/rules/itg/` (ITG Software Delivery Playbook). VI-4 covers them: a skill reads the index `steering/rules/itg/README.md` and the policies it maps to the skill's role.
+
 ### Rationale
 
 - Ensures consistency across skills

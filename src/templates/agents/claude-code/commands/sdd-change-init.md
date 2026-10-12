@@ -33,6 +33,7 @@ Generate a change proposal specification that documents what will be added, modi
 steering/product.md      # Current product context
 steering/structure.md    # Existing architecture
 steering/tech.md         # Current technology stack
+steering/rules/itg/README.md  # ITG delivery policies: read the files mapped to your task
 ```
 
 **Extract**:
@@ -204,8 +205,8 @@ Use template from `templates/change-proposal.md`:
 
 ### Dependencies
 
-- [ ] Requires library upgrade: prisma@5.0 → 6.0
-- [ ] Requires new service: Redis for session storage
+- [ ] Requires library upgrade: next@15 → 16 (check OpenNext support)
+- [ ] Requires new binding: Cloudflare KV for shared state (ITG-PLT-17)
 - [ ] Affects: mobile app (API changes)
 - [ ] Affects: partner integrations (webhook schema)
 
@@ -540,7 +541,7 @@ Present summary to user:
 
 1. **Read Steering**:
    - `steering/structure.md` → Current auth in `lib/auth/`
-   - `steering/tech.md` → Using Prisma, PostgreSQL
+   - `steering/tech.md` → ITG default stack: Firebase Authentication, Firestore over REST
    - `steering/product.md` → B2B SaaS, security critical
 
 2. **Analyze Existing**:

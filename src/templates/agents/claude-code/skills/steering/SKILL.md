@@ -516,6 +516,12 @@ steering/
 ├── tech.md           # Technology stack
 ├── product.md        # Product context
 ├── project.yml       # Project configuration (machine-readable)
+├── rules/
+│   ├── constitution.md          # 9 Constitutional Articles
+│   ├── constitution-levels.yml  # Enforcement levels per article and profile
+│   ├── ears-format.md           # EARS requirement patterns
+│   ├── workflow.md              # SDD workflow guide
+│   └── itg/                     # ITG delivery policies (read-only, from the ITG fork)
 └── memories/         # Memory system
     ├── README.md                    # Memory system documentation
     ├── architecture_decisions.md    # ADR-style decision records
@@ -526,6 +532,16 @@ steering/
 ```
 
 ---
+
+## ITG Steering Rules
+
+ITG projects start from the ITG defaults that `musubi init` writes into `structure.md`, `tech.md` and `product.md`, and from the policies in `steering/rules/itg/` (ITG Software Delivery Playbook).
+
+- Never remove or overwrite an ITG default when you bootstrap or sync. Record a project-specific choice in the `## Deviations from the ITG Playbook` table of `tech.md` (stack, platform, data) or `structure.md` (layout, naming), with the rule id, the decision, the reason, the date and who approved it.
+- WHEN the code contradicts an ITG rule and no deviation is recorded, report it as drift with the rule id (e.g. "ITG-PLT-14: `firebase-admin` imported in `src/app/api/`"). Do not rewrite the steering file to match the code.
+- Never edit the files in `steering/rules/itg/`. They come from the ITG MUSUBI fork.
+- Draw architecture as Mermaid C4 (`C4Context`, `C4Container`) and decision logic as Mermaid `flowchart` (ITG-DEL-12).
+- Keep `tech.md`'s Database Decision, Environments and Integrations sections current. Before Sprint 0 closes they must cover the topics of ITG-DEL-13.
 
 ## Best Practices
 

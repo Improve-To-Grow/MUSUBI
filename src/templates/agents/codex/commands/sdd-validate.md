@@ -41,6 +41,7 @@ storage/tasks/{{feature-name}}-tasks.md
 # Steering Context
 steering/structure.md
 steering/tech.md
+steering/rules/itg/README.md  # ITG delivery policies: read the files mapped to your task
 steering/product.md
 steering/project.yml          # constitution.profile, core_paths, delivery_paths
 steering/rules/constitution.md
@@ -517,7 +518,7 @@ AND the system SHALL create a session.
 
 **Technology Stack (steering/tech.md)**:
 
-- Expected: TypeScript, Next.js, PostgreSQL, Prisma
+- Expected: the ITG default stack (TypeScript, Next.js on Cloudflare Workers, Firebase REST, Firestore) plus the recorded deviations
 - Actual: ✅ All technologies used correctly
 
 **Product Context (steering/product.md)**:
@@ -618,10 +619,10 @@ AND the system SHALL create a session.
 
 **Framework Usage Analysis**:
 
-- **ORM**: Uses Prisma directly ✅ (no custom wrapper)
-- **Password Hashing**: Uses bcrypt directly ✅
-- **HTTP**: Uses Next.js API routes directly ✅
-- **Validation**: Uses Zod directly ✅
+- **Vendor SDKs**: Called directly from `src/features/<domain>/api/` ✅ (no custom wrapper)
+- **Firebase**: `src/lib/firebase-rest/` is a runtime-constraint client, documented in design.md ✅ (VIII-4, VIII-5)
+- **HTTP**: Next.js Route Handlers through withApiRoute ✅
+- **Validation**: Uses zod directly ✅
 
 **Custom Abstractions**: None detected ✅
 ```
@@ -635,14 +636,14 @@ AND the system SHALL create a session.
 
 **Custom Abstractions Detected**:
 
-1. `lib/database/wrapper.ts` - Custom Prisma wrapper
+1. `src/lib/crm/client-wrapper.ts` - Custom wrapper over the CRM SDK
 
 **Phase -1 Gate Approval**: ❌ Not found in design.md
 
 **Required Actions**:
 
 - Justify abstraction in a Phase -1 Gate request: multi-framework support need, team expertise and migration path (VIII-3); or document a runtime constraint in design.md (VIII-4, VIII-5)
-- OR remove abstraction and use Prisma directly
+- OR remove the abstraction and call the SDK directly (ITG-INT-02)
 - Document in design.md ADR
 - Get approval from @system-architect + @software-developer
 ```
@@ -662,8 +663,8 @@ AND the system SHALL create a session.
 **Validation Steps**:
 
 1. Check integration tests use real services (IX-1, III-7):
-   - Real database, isolated (Docker, test schema) (IX-2)
-   - Real cache (Redis test instance)
+   - Real database, isolated: the staging Firebase project under a test tenant or prefix, no emulator (IX-2, ITG-TST-06, ITG-TST-08)
+   - Real log-ingest: the staging endpoint
    - Real external APIs (sandbox environments) (IX-3)
 2. Verify that each mock covers a service that is unavailable in the test environment, has usage limits or costs, or has no test environment (IX-4), and that the test documentation justifies it (IX-5)
 
@@ -678,23 +679,19 @@ AND the system SHALL create a session.
 
 **Database Tests**:
 
-- Uses: Real PostgreSQL (Docker Compose)
-- Evidence: `lib/auth/tests/integration.test.ts:12`
+- Uses: Real Firestore in the staging Firebase project, test tenant `test-<run id>`
+- Evidence: `src/features/rsvp/api/rsvp-repository.test.ts:8`
 
 ```typescript
-beforeAll(async () => {
-  prisma = new PrismaClient({
-    datasourceUrl: process.env.TEST_DATABASE_URL, // Real DB
-  });
-});
+const TEST_ORG = `test-${Date.now()}`; // cleaned up in afterAll
 ```
 
 - ✅ Real database confirmed
 
-**Cache Tests**:
+**Log-ingest Tests**:
 
-- Uses: Real Redis (Docker Compose)
-- ✅ Real cache confirmed
+- Uses: the staging log-ingest endpoint
+- ✅ Real service confirmed
 
 **External API Tests**:
 
@@ -767,8 +764,8 @@ npx tsc --noEmit
 **OWASP Top 10 Check**:
 
 - ✅ A01: Broken Access Control - Auth middleware enforced
-- ✅ A02: Cryptographic Failures - bcrypt used (cost 12)
-- ✅ A03: Injection - Parameterized queries (Prisma ORM)
+- ✅ A02: Cryptographic Failures - Firebase Authentication; session cookies server-signed (ITG-SEC-11)
+- ✅ A03: Injection - zod schemas on every route (ITG-PLT-06)
 - ✅ A04: Insecure Design - Security by design principles
 - ✅ A05: Security Misconfiguration - Proper config
 - ✅ A06: Vulnerable Components - npm audit passed
@@ -803,11 +800,11 @@ npx tsc --noEmit
 
 - N+1 queries: None detected ✅
 - Indexes: ✅ Properly indexed
-- Connection pooling: ✅ Configured (20 connections)
+- Firestore composite indexes: ✅ Present in `firestore.indexes.json`
 
 **Caching**:
 
-- Redis cache: ✅ Implemented
+- TanStack Query on the client, Cloudflare KV for shared server state: ✅ Implemented
 - Hit rate: 85%
 - TTL: 5 minutes
 ```

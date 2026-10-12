@@ -26,6 +26,7 @@ Check `.claude/skills/` directory for all installed skills.
 - `steering/tech.md` - Technology stack
 - `steering/product.md` - Product context
 - `steering/rules/constitution.md` - 9 Constitutional Articles
+- `steering/rules/itg-fork.md` - Rules for changing this ITG fork (templates follow `docs/itg/ITG_Software_Delivery_Playbook.md`)
 
 ### Learn More
 

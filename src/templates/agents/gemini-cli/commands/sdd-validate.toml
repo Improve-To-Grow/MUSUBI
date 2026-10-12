@@ -26,6 +26,7 @@ Validate that the implementation follows all Constitutional Articles and meets r
 2. **Steering Context**:
    - `steering/structure.md` - Architecture patterns
    - `steering/tech.md` - Technology stack
+   - `steering/rules/itg/README.md` - ITG delivery policies: read the files mapped to your task
    - `steering/project.yml` - Constitution profile (`constitution.profile`, core and delivery paths)
 
 3. **Feature Documentation**:
@@ -286,7 +287,7 @@ musubi-validate project
 
 **Validation**:
 - [ ] Framework APIs called directly (VIII-1)
-- [ ] No custom ORM wrapper (use Prisma directly) (VIII-2)
+- [ ] No custom wrapper over a vendor SDK (ITG-INT-02, VIII-2); `src/lib/firebase-rest/` is the documented runtime-constraint client (VIII-4)
 - [ ] No custom React wrapper (VIII-2)
 - [ ] No custom Next.js wrapper (VIII-2)
 - [ ] Each abstraction over a framework has Phase -1 Gate approval, with a multi-framework support justification, a team expertise analysis and a migration path (VIII-2, VIII-3)
@@ -320,8 +321,7 @@ grep -r "class.*Adapter" lib/{{feature-name}}/
 **Evidence to Check**:
 ```bash
 # Check for mocks
-grep -r "jest.mock" lib/{{feature-name}}/__tests__/
-grep -r "vi.mock" lib/{{feature-name}}/__tests__/
+grep -rn "vi.mock" src/features/{{feature-name}}/ lib/{{feature-name}}/
 
 # Count integration tests
 find tests/integration -name "*{{feature-name}}*.test.ts"
@@ -337,12 +337,12 @@ find tests/integration -name "*{{feature-name}}*.test.ts"
 - [ ] No direct object references
 
 ## A02: Cryptographic Failures
-- [ ] Passwords hashed (bcrypt/argon2)
+- [ ] Firebase Authentication; server-signed session cookies (ITG-SEC-11)
 - [ ] Sensitive data encrypted
 - [ ] TLS/HTTPS enforced
 
 ## A03: Injection
-- [ ] Parameterized queries (Prisma ORM)
+- [ ] zod schema on every route (ITG-PLT-06); parameterized queries if PostgreSQL is used
 - [ ] Input validation
 - [ ] No string concatenation in SQL
 
@@ -530,7 +530,7 @@ Generate comprehensive report:
 **Status**: ✅ PASS
 
 - ✅ Follows structure.md patterns
-- ✅ Uses tech.md stack (TypeScript, Prisma, bcrypt)
+- ✅ Uses tech.md stack (ITG default: Next.js on Workers, Firebase REST, Firestore)
 - ✅ Aligns with product.md goals
 
 **Evidence**: [steering files]
@@ -545,8 +545,8 @@ Generate comprehensive report:
 ### Article VIII: Anti-Abstraction Gate
 **Status**: ✅ PASS
 
-- ✅ Uses Prisma directly (no ORM wrapper)
-- ✅ Uses bcrypt directly (no crypto wrapper)
+- ✅ Vendor SDKs called directly (no wrapper)
+- ✅ Firebase REST client documented as a runtime-constraint client (VIII-4, VIII-5)
 - ✅ No unnecessary abstractions
 
 **Evidence**: [code review]
@@ -554,7 +554,7 @@ Generate comprehensive report:
 ### Article IX: Integration-First Testing
 **Status**: ✅ PASS
 
-- ✅ Tests use real PostgreSQL (test DB)
+- ✅ Tests use the staging Firebase project under a test tenant (no emulator)
 - ✅ No unjustified mocks (0 mocks found, IX-4)
 - ✅ Integration tests present
 
@@ -573,8 +573,8 @@ Generate comprehensive report:
 ## Security Validation (OWASP Top 10)
 
 - ✅ A01: Authorization checks present
-- ✅ A02: Passwords hashed with bcrypt
-- ✅ A03: Parameterized queries (Prisma)
+- ✅ A02: Firebase Authentication, server-signed session cookies
+- ✅ A03: zod schemas on every route
 - ✅ A05: Secrets in env variables
 - ✅ A07: Rate limiting implemented
 

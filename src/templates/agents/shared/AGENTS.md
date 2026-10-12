@@ -568,6 +568,18 @@ Use `@constitution-enforcer` to validate compliance.
 
 ---
 
+## ITG Delivery Policies
+
+This project follows the **ITG Software Delivery Playbook**. Its policies are installed in `steering/rules/itg/` and apply to every agent:
+
+- Before starting a task, read `steering/rules/itg/README.md` and the policy files it maps to your role.
+- Apply the rules without being asked, and cite their ids (e.g. `ITG-SEC-13`) in designs, tasks, PR descriptions and reviews.
+- Draw architecture as Mermaid C4 and decision logic as Mermaid `flowchart` (ITG-DEL-12).
+- Record any deviation in the Deviations table of `steering/tech.md` or `steering/structure.md`. Silent deviation is not allowed. Never edit `steering/rules/itg/`.
+- Where an agent definition below and an ITG policy disagree, the ITG policy wins.
+
+---
+
 ## Workflow Integration
 
 ### Greenfield Projects (New Development)

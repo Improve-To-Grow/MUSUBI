@@ -45,118 +45,104 @@ This design implements requirements from: [requirements.md](requirements.md)
 - **Architecture Patterns**: [steering/structure.md](../../steering/structure.md)
 - **Technology Stack**: [steering/tech.md](../../steering/tech.md)
 - **Product Context**: [steering/product.md](../../steering/product.md)
+- **ITG Delivery Policies**: [steering/rules/itg/README.md](../../steering/rules/itg/README.md)
 
 **Key Alignments**:
 
-- Architecture pattern: [e.g., microservices, monolith, library-first]
-- Constitution profile: [library | cli | application] (`constitution.profile` in `steering/project.yml`; `library` when absent)
-- Primary language: [e.g., TypeScript, Python, Go]
-- Framework: [e.g., Next.js, FastAPI, Express]
-- Database: [e.g., PostgreSQL, MongoDB, MySQL]
+- Architecture pattern: [one Next.js application, feature folders (ITG-GIT-01)]
+- Constitution profile: [application] (`constitution.profile` in `steering/project.yml`; `library` when absent)
+- Primary language: [TypeScript]
+- Framework: [Next.js on Cloudflare Workers via OpenNext (ITG-PLT-13)]
+- Database: [Firestore, or PostgreSQL when ITG-DAT-02 applies]
 
 ---
 
 ## Architecture Design
 
+All diagrams are Mermaid: C4 for architecture, `flowchart` for decision logic (ITG-DEL-12). Start from the views in `steering/tech.md` and keep their element ids.
+
 ### C4 Model: Context Diagram
 
-```
-[Diagram showing system in context with external systems and users]
-
-+------------------+
-|                  |
-|  External User   |
-|                  |
-+--------+---------+
-         |
-         | HTTPS
-         v
-+------------------+     +------------------+
-|                  |     |                  |
-|  {{SYSTEM}}      +---->+ External API     |
-|                  |     |                  |
-+--------+---------+     +------------------+
-         |
-         | SQL
-         v
-+------------------+
-|                  |
-|    Database      |
-|                  |
-+------------------+
+```mermaid
+C4Context
+    title {{FEATURE_NAME}}: system context
+    Person(user, "Client user", "[role]")
+    System(app, "{{SYSTEM}}", "Next.js application on Cloudflare Workers")
+    System_Ext(firebase, "Firebase", "Authentication, Firestore, App Check")
+    System_Ext(logs, "ITG log-ingest", "Audit and app events")
+    System_Ext(ext, "[External system]", "[Purpose]")
+    Rel(user, app, "Uses", "HTTPS")
+    Rel(app, firebase, "REST")
+    Rel(app, logs, "Events", "HTTPS, HMAC-signed")
+    Rel(app, ext, "[Calls]", "HTTPS")
 ```
 
 **External Dependencies**:
 
-- [External System 1]: [Purpose]
-- [External System 2]: [Purpose]
+- [External System 1]: [Purpose] (section in `documentation/INTEGRATIONS.md`, ITG-INT-08)
 
 ---
 
 ### C4 Model: Container Diagram
 
-```
-[Diagram showing major containers/deployable units]
-
-+--------------------------------------+
-|          {{SYSTEM}}                  |
-|                                      |
-|  +-------------+   +-------------+   |
-|  |             |   |             |   |
-|  |  Web App    +-->+  API Server |   |
-|  |  (Next.js)  |   |  (Node.js)  |   |
-|  |             |   |             |   |
-|  +-------------+   +------+------+   |
-|                           |          |
-+---------------------------+----------+
-                            |
-                            | SQL
-                            v
-                   +--------+--------+
-                   |                 |
-                   |   PostgreSQL    |
-                   |                 |
-                   +-----------------+
+```mermaid
+C4Container
+    title {{FEATURE_NAME}}: containers
+    Person(user, "Client user")
+    System_Boundary(sys, "{{SYSTEM}}") {
+        Container(web, "Web application", "Next.js on a Cloudflare Worker", "Pages and route handlers through withApiRoute")
+        Container(fn, "Firebase Functions", "Node 22", "[Scheduled job, if any]")
+        ContainerDb(fs, "Firestore", "Firebase", "[Collections of this feature]")
+    }
+    System_Ext(logs, "ITG log-ingest", "Central log store")
+    Rel(user, web, "HTTPS", "Turnstile, App Check")
+    Rel(web, fs, "Read and write", "REST via src/lib/firebase-rest")
+    Rel(web, logs, "Events", "ctx.waitUntil")
+    Rel(fn, fs, "[Export]", "firebase-admin")
 ```
 
 **Containers**:
 
 1. **Web Application**: [Technology, purpose]
-2. **API Server**: [Technology, purpose]
-3. **Database**: [Technology, purpose]
+2. **Firebase Functions**: [Only if the feature has scheduled work (ITG-INT-06)]
+3. **Database**: [Firestore collections, or PostgreSQL tables when ITG-DAT-02 applies]
 
 ---
 
 ### C4 Model: Component Diagram
 
-```
-[Diagram showing internal components of a container]
-
-+-------------------------------------------+
-|          API Server Container             |
-|                                           |
-|  +---------------+   +----------------+   |
-|  |               |   |                |   |
-|  | Auth          |   | {{COMPONENT}}  |   |
-|  | Controller    +-->+ Service        |   |
-|  |               |   |                |   |
-|  +-------+-------+   +-------+--------+   |
-|          |                   |            |
-|          v                   v            |
-|  +-------+-------------------+--------+   |
-|  |                                    |   |
-|  |     Database Repository Layer     |   |
-|  |                                    |   |
-|  +------------------------------------+   |
-|                                           |
-+-------------------------------------------+
+```mermaid
+C4Component
+    title {{FEATURE_NAME}}: components of the web application
+    Container_Boundary(web, "Web application") {
+        Component(route, "POST /api/{{resource}}", "route.ts", "withApiRoute + guard + zod schema")
+        Component(svc, "{{COMPONENT}} service", "src/features/{{component}}/api/", "Feature logic")
+        Component(rest, "Firestore REST client", "src/lib/firebase-rest/", "Runtime-constraint client, VIII-4")
+        Component(rec, "Audit recorder", "src/lib/audit/", "Redactor, fire-and-forget")
+    }
+    Rel(route, svc, "calls")
+    Rel(svc, rest, "reads and writes")
+    Rel(route, rec, "audit event, .denied, .failed")
 ```
 
 **Components**:
 
-1. **{{COMPONENT}} Controller**: REST API endpoints
-2. **{{COMPONENT}} Service**: Business logic
-3. **{{COMPONENT}} Repository**: Data access
+1. **Route handler**: `src/app/api/{{resource}}/route.ts`, exported through `withApiRoute` (ITG-SEC-13)
+2. **{{COMPONENT}} service**: feature logic in `src/features/{{component}}/api/`
+3. **Shared modules**: `src/lib/firebase-rest/`, `src/lib/audit/`, `src/lib/email/`
+
+### Decision Logic
+
+Draw every decision tree of the feature (who may do what, which path a request takes) as a Mermaid `flowchart`:
+
+```mermaid
+flowchart TD
+    R([Request]) --> A{Authenticated?}
+    A -- no --> U[unauthorized]
+    A -- yes --> P{Required role in the claims?}
+    P -- no --> F[forbidden, action.denied]
+    P -- yes --> OK[Handler]
+```
 
 ---
 
@@ -182,6 +168,8 @@ This design implements requirements from: [requirements.md](requirements.md)
 
 ## API Design
 
+Every endpoint is a `src/app/api/**/route.ts` exported through `withApiRoute('<route-id>', guard(handler), { rateLimit, schema })`, with a zod schema, typed `ApiRouteError`s and the response envelope `{ success: true, data }` / `{ success: false, error: { code, message } }` (ITG-SEC-13, ITG-SEC-14).
+
 ### RESTful API Endpoints
 
 #### POST /api/{{resource}}
@@ -203,13 +191,17 @@ Authorization: Bearer {token}
 }
 ```
 
-**Request Schema**:
+**Route**: `withApiRoute('api-{{resource}}-create', withRole('[role]', handler), { rateLimit: 'write', schema: create{{COMPONENT}}Schema })`
+
+**Request Schema** (zod):
 
 ```typescript
-interface CreateResourceRequest {
-  field1: string; // Required, max 255 chars
-  field2: number; // Required, positive integer
-}
+const create{{COMPONENT}}Schema = z.object({
+  body: z.object({
+    field1: z.string().min(1).max(255),
+    field2: z.number().int().positive(),
+  }),
+});
 ```
 
 **Response (Success)**:
@@ -219,10 +211,13 @@ HTTP/1.1 201 Created
 Content-Type: application/json
 
 {
-  "id": "uuid",
-  "field1": "value1",
-  "field2": "value2",
-  "createdAt": "2025-11-16T10:00:00Z"
+  "success": true,
+  "data": {
+    "id": "res_123",
+    "field1": "value1",
+    "field2": 2,
+    "createdAt": "2026-10-08T10:00:00Z"
+  }
 }
 ```
 
@@ -233,13 +228,8 @@ HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
-  "error": "Validation failed",
-  "details": [
-    {
-      "field": "field1",
-      "message": "Field1 is required"
-    }
-  ]
+  "success": false,
+  "error": { "code": "VALIDATION_FAILED", "message": "field1 is required" }
 }
 ```
 
@@ -254,6 +244,7 @@ Content-Type: application/json
 **Acceptance Criteria** (from REQ-{{COMPONENT}}-001):
 
 - ✅ Validates request schema
+- ✅ Emits `{{component}}.{{resource}}.create` (and `.denied` / `.failed`) (ITG-LOG-02)
 - ✅ Returns 201 on success
 - ✅ Returns resource ID
 - ✅ Persists to database
@@ -322,92 +313,64 @@ See [openapi.yaml](./openapi.yaml) for complete API specification.
 
 ---
 
-## Database Design
+## Data Design
 
-### Entity-Relationship Diagram
+### Database Choice
 
-```
-+-------------------+          +-------------------+
-|      users        |          |   {{resource}}    |
-+-------------------+          +-------------------+
-| id (PK)           |          | id (PK)           |
-| email             |          | user_id (FK)      |
-| password_hash     |          | field1            |
-| created_at        |          | field2            |
-| updated_at        |          | created_at        |
-+-------------------+          | updated_at        |
-         |                     +-------------------+
-         |                              |
-         +------------------------------+
-                    1:N
-```
+**Decision**: [Firestore / PostgreSQL] — decided with `steering/rules/itg/data.md` (ITG-DAT-02) and recorded in `steering/tech.md`.
 
----
-
-### Schema Definition
-
-#### Table: {{resource}}
+### Data Model
 
 **Maps to Requirements**: REQ-{{COMPONENT}}-004
 
-**Columns**:
-
-| Column     | Type         | Constraints                      | Description        |
-| ---------- | ------------ | -------------------------------- | ------------------ |
-| id         | UUID         | PRIMARY KEY                      | Unique identifier  |
-| user_id    | UUID         | FOREIGN KEY (users.id), NOT NULL | Owner reference    |
-| field1     | VARCHAR(255) | NOT NULL                         | [Description]      |
-| field2     | INTEGER      | NOT NULL, CHECK (field2 > 0)     | [Description]      |
-| created_at | TIMESTAMP    | NOT NULL, DEFAULT NOW()          | Creation timestamp |
-| updated_at | TIMESTAMP    | NOT NULL, DEFAULT NOW()          | Update timestamp   |
-
-**Indexes**:
-
-- PRIMARY KEY: `id`
-- INDEX: `user_id` (for lookups by user)
-- INDEX: `created_at` (for sorting)
-- UNIQUE: `user_id, field1` (business constraint)
-
-**DDL**:
-
-```sql
-CREATE TABLE {{resource}} (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  field1 VARCHAR(255) NOT NULL,
-  field2 INTEGER NOT NULL CHECK (field2 > 0),
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_{{resource}}_user_id ON {{resource}}(user_id);
-CREATE INDEX idx_{{resource}}_created_at ON {{resource}}(created_at);
-CREATE UNIQUE INDEX idx_{{resource}}_user_field1 ON {{resource}}(user_id, field1);
+```mermaid
+erDiagram
+    ORGANIZATION ||--o{ RESOURCE : owns
+    RESOURCE {
+        string id
+        string organizationId
+        string field1
+        number field2
+        timestamp createdAt
+        timestamp updatedAt
+    }
 ```
 
----
+| Field | Type | Classification (ITG-DAT-11) | Retention | Reason it is stored (ITG-DAT-10) |
+| ----- | ---- | --------------------------- | --------- | -------------------------------- |
+| field1 | string | [Confidential] | [period] | [reason] |
+
+- Every record carries its tenant field when the system is multi-tenant (ITG-SEC-10). No record holds a role (ITG-SEC-06).
+
+### Firestore (default)
+
+- **Collections**: `{{resource}}` ([document id scheme])
+- **Indexes**: [composite indexes in `firestore.indexes.json`]
+- **Rules**: deny-by-default, server-write-only, reads scoped by the tenant claim (ITG-SEC-15)
+
+### PostgreSQL (only when ITG-DAT-02 applies)
+
+```sql
+-- database/migrations/NNNN_create_{{resource}}.sql
+BEGIN;
+CREATE TABLE IF NOT EXISTS {{resource}} (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id TEXT NOT NULL,
+  field1 VARCHAR(255) NOT NULL,
+  field2 INTEGER NOT NULL CHECK (field2 > 0),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_{{resource}}_org ON {{resource}}(organization_id);
+COMMIT;
+```
 
 ### Migration Strategy
 
 **Maps to Requirements**: REQ-MAINT-001
 
-**Initial Migration** (Greenfield):
-
-```sql
--- migrations/001_create_{{resource}}_table.sql
-[DDL from above]
-```
-
-**Migration Tools**:
-
-- [e.g., Prisma Migrate, TypeORM migrations, Alembic]
-
-**Rollback Strategy**:
-
-```sql
--- migrations/001_create_{{resource}}_table.down.sql
-DROP TABLE {{resource}};
-```
+- Firestore: rules, indexes and backfills versioned in git, applied to staging first, deployed to both projects in the same change (ITG-DAT-09)
+- PostgreSQL: numbered, idempotent migrations; `database/schema.sql` updated; applied to staging before the merge to `staging` and to production before the merge to `master` (ITG-DAT-05 to ITG-DAT-08)
 
 ---
 
@@ -437,7 +400,7 @@ interface {{COMPONENT}}Service {
 **Implementation**:
 
 ```typescript
-// src/services/{{component}}.service.ts
+// src/features/{{component}}/api/{{component}}-service.ts
 
 export class {{COMPONENT}}Service implements {{COMPONENT}}Service {
   constructor(private repository: {{COMPONENT}}Repository) {}
@@ -498,21 +461,23 @@ interface {{COMPONENT}}Repository {
 **Maps to Requirements**: REQ-{{COMPONENT}}-005
 
 **Endpoint**: `https://api.external.com/v1/endpoint`
-**Authentication**: API Key in header
+**Authentication**: API key, server-side only (ITG-INT-01); stored as a GitHub Environment Secret
 **Rate Limit**: 1000 requests/hour
 
 **Request**:
 
 ```http
 GET /v1/endpoint
-X-API-Key: {api_key}
+X-API-Key: <secret from runtime-config>
 ```
 
-**Error Handling**:
+**Called from**: `src/features/{{component}}/api/` or `src/lib/<vendor>/`, through the vendor SDK or REST API directly (ITG-INT-02)
 
-- Retry with exponential backoff (3 attempts)
-- Circuit breaker after 5 consecutive failures
-- Fallback to cached data if available
+**Error Handling** (ITG-INT-09, ITG-INT-10):
+
+- Retry network errors, 5xx and 429 with exponential backoff and jitter; never retry other 4xx
+- Idempotency key when the API supports it
+- Repeated failures recorded as `integration.<vendor>.<op>.failed`
 
 ---
 
@@ -520,32 +485,31 @@ X-API-Key: {api_key}
 
 **Maps to Requirements**: REQ-SEC-001
 
+Follow `steering/rules/itg/security.md`; run its release checklist when the feature touches auth, data access or integrations.
+
 ### Authentication
 
-- **Method**: JWT (JSON Web Tokens)
-- **Token Expiry**: 24 hours
-- **Refresh Token**: 7 days
-- **Storage**: HTTP-only cookies
+- **Method**: Firebase Authentication; ID token in `Authorization: Bearer` for APIs, server-signed session cookie for pages (ITG-SEC-11)
+- **Public forms**: Turnstile; App Check on every API call (ITG-SEC-01)
+- **Admins**: TOTP MFA enforced server-side (ITG-SEC-02)
 
 ### Authorization
 
-- **Method**: Role-Based Access Control (RBAC)
-- **Roles**: admin, user, guest
-- **Permissions**: read, write, delete
+- **Roles**: [roles this feature checks], read only from custom claims (ITG-SEC-05, ITG-SEC-06)
+- **Tenant**: [tenant field], scoped server-side and in the rules (ITG-SEC-10)
+- **Guards**: [withAuth / withRole('<role>') / withTenant] per route (ITG-SEC-13)
 
 ### Data Protection
 
-- **Encryption at Rest**: AES-256
-- **Encryption in Transit**: TLS 1.3
-- **Password Hashing**: bcrypt (cost factor 12)
-- **Sensitive Data**: PII encrypted in database
+- **Rules**: server-write-only Firestore and Storage rules (ITG-SEC-15)
+- **Logs**: ids only; no names, emails or bodies (ITG-LOG-03)
+- **AI** (if used): Vertex AI only; prompt-injection review; prompts fingerprinted (ITG-SEC-19, ITG-SEC-20)
 
 ### Input Validation
 
-- **XSS Prevention**: Output encoding
-- **SQL Injection Prevention**: Parameterized queries (ORM)
-- **CSRF Protection**: CSRF tokens
-- **Rate Limiting**: 100 requests/minute per IP
+- **Schemas**: zod for body and query of every route (ITG-PLT-06)
+- **Rate Limiting**: [auth / read / write / admin / ai] profile per route (ITG-SEC-14)
+- **Webhooks** (if any): signed outbound, verified inbound (ITG-SEC-17, ITG-SEC-18)
 
 ---
 
@@ -553,93 +517,71 @@ X-API-Key: {api_key}
 
 **Maps to Requirements**: REQ-PERF-001
 
-### Caching Strategy
+### Runtime
 
-- **Layer**: Redis
-- **TTL**: 5 minutes
-- **Invalidation**: On write operations
+- **Worker bundle**: no heavy SDKs in the Worker (ITG-PLT-18)
+- **Shared state**: Cloudflare KV, Durable Objects or Rate Limiting bindings, never isolate memory (ITG-PLT-17)
+- **Client caching**: TanStack Query
 
-### Database Optimization
+### Data
 
-- **Indexes**: See database schema section
-- **Connection Pooling**: 20 connections max
-- **Query Optimization**: N+1 prevention with eager loading
+- **Indexes**: see Data Design
+- **Pagination**: [limit per page]
 
 ### API Performance
 
 - **Response Time Target**: < 200ms (95th percentile)
-- **Pagination**: Limit 100 items per page
-- **Compression**: gzip for responses > 1KB
 
 ---
 
-## Deployment Architecture
+## Deployment
 
 **Maps to Requirements**: REQ-AVAIL-001
 
-### Infrastructure
+- **Environments**: local, staging, production (ITG-PLT-21); deployed by `.github/workflows/deploy.yml` (ITG-CI-03)
+- **New bindings**: [KV / R2 / Rate Limiting] per environment in `wrangler.jsonc` (ITG-PLT-19)
+- **Rules and indexes**: deployed to both Firebase projects in the same change (ITG-PLT-23)
 
-```
-[Load Balancer] --> [App Server 1]
-                --> [App Server 2]
-                --> [App Server 3]
-                        |
-                        v
-                  [Database Primary]
-                        |
-                        v
-                  [Database Replica]
-```
+### Configuration
 
-### Containers
+New keys go in `.env.example`, both GitHub Environments and `src/lib/runtime-config.ts` (ITG-PLT-08 to ITG-PLT-10).
 
-**Docker Image**: `{{org}}/{{project}}:{{version}}`
-
-**Dockerfile**:
-
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --production
-COPY . .
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-### Environment Variables
-
-| Variable     | Description                  | Example                             |
-| ------------ | ---------------------------- | ----------------------------------- |
-| DATABASE_URL | PostgreSQL connection string | postgresql://user:pass@host:5432/db |
-| REDIS_URL    | Redis connection string      | redis://host:6379                   |
-| JWT_SECRET   | JWT signing secret           | [secret]                            |
-| API_KEY      | External API key             | [key]                               |
+| Key | Variable or Secret | Description |
+| --- | ------------------ | ----------- |
+| [KEY_NAME] | [Secret] | [Description] |
 
 ---
 
-## Monitoring and Observability
+## Logging and Observability
 
 **Maps to Requirements**: REQ-AVAIL-001
 
-### Metrics
+### Events (ITG-LOG-02, ITG-LOG-07)
 
-- **Response Time**: 95th/99th percentile
-- **Error Rate**: 4xx/5xx responses
-- **Throughput**: Requests per second
-- **Database Query Time**: Slow query log
+| Action | Category | When | Metadata (allowlisted, no PII) |
+| ------ | -------- | ---- | ------------------------------ |
+| `{{component}}.{{resource}}.create` | audit | [when] | [keys] |
+| `{{component}}.{{resource}}.create.denied` | audit | guard failed | [reason code] |
+| `{{component}}.{{resource}}.create.failed` | audit | exception | [error code] |
 
-### Logging
+Add new actions to `documentation/AUDIT_LOGGING.md`.
 
-- **Format**: JSON
-- **Level**: INFO (production), DEBUG (development)
-- **Fields**: timestamp, level, message, context, trace_id
+### Runtime Logs
 
-### Alerting
+- `createLogger('<module-id>')` in every module; no `console.*` under `src/app/api` and `src/lib` (ITG-LOG-14)
+- 5xx errors go to `error_events`
 
-- **Response Time**: Alert if 95th percentile > 500ms
-- **Error Rate**: Alert if error rate > 1%
-- **Database**: Alert if connection pool exhausted
+---
+
+## ITG Policy Compliance
+
+| Rule | How this design meets it, or the recorded deviation |
+| ---- | --------------------------------------------------- |
+| ITG-SEC-13 | [Every route through withApiRoute with a guard and a schema] |
+| ITG-SEC-05 | [Roles and tenant from claims only] |
+| ITG-LOG-02 | [Events listed above] |
+| ITG-DAT-02 | [Database decision] |
+| ITG-TST-09 | [Required flows covered by the test plan] |
 
 ---
 
@@ -713,58 +655,49 @@ This design complies with:
 
 | Service          | Vendor SDK              | Target runtime            | Constraint                     | Project-owned client                 |
 | ---------------- | ----------------------- | ------------------------- | ------------------------------ | ------------------------------------ |
-| [e.g. Firestore] | [e.g. `firebase-admin`] | [e.g. Cloudflare Workers] | [Why the SDK cannot run there] | [e.g. `src/lib/firestore/client.ts`] |
+| Firestore, Auth  | `firebase-admin`        | Cloudflare Workers        | Needs gRPC and Node-only modules (ITG-PLT-14) | `src/lib/firebase-rest/` |
 
 ---
 
 ## Architecture Decision Records (ADR)
 
-### ADR-001: Use PostgreSQL for Database
+### ADR-001: [Database choice for {{resource}}]
 
 **Status**: Accepted
 **Date**: {{DATE}}
 
 **Context**:
-We need a database for storing {{resource}} data with ACID guarantees.
+[Volume, query shape and reporting needs of {{resource}} data.]
 
 **Decision**:
-Use PostgreSQL 15+ as the primary database.
+[Firestore (ITG-DAT-01), or PostgreSQL on the shared ITG instance because the data is large, relational or reporting-heavy (ITG-DAT-02).]
 
 **Consequences**:
 
-- ✅ ACID transactions
-- ✅ Rich data types (JSONB, UUID)
-- ✅ Strong ecosystem
-- ❌ Requires relational schema design
+- ✅ [Benefit]
+- ❌ [Trade-off]
 
 **Alternatives Considered**:
 
-- MongoDB: Rejected (ACID guarantees less strict)
-- MySQL: Rejected (less feature-rich than PostgreSQL)
+- [Alternative]: [Why rejected]
 
 ---
 
-### ADR-002: Use JWT for Authentication
+### ADR-002: [Deviation from ITG-XXX-NN, if any]
 
-**Status**: Accepted
+**Status**: Proposed
 **Date**: {{DATE}}
 
 **Context**:
-We need stateless authentication for API.
+[Why the project's domain justifies departing from the rule.]
 
 **Decision**:
-Use JWT tokens stored in HTTP-only cookies.
+[What the project does instead. Also record it in the Deviations table of `steering/tech.md` or `steering/structure.md`.]
 
 **Consequences**:
 
-- ✅ Stateless authentication
-- ✅ Scalable (no session storage)
-- ❌ Token revocation requires blocklist
-
-**Alternatives Considered**:
-
-- Session-based auth: Rejected (requires session storage)
-- OAuth 2.0: Deferred to future iteration
+- ✅ [Benefit]
+- ❌ [Risk, and how it is mitigated]
 
 ---
 
@@ -772,8 +705,8 @@ Use JWT tokens stored in HTTP-only cookies.
 
 | Risk                             | Probability | Impact   | Mitigation                              |
 | -------------------------------- | ----------- | -------- | --------------------------------------- |
-| Database performance degradation | Medium      | High     | Implement caching, indexing, monitoring |
-| External API unavailability      | High        | Medium   | Circuit breaker, fallback to cache      |
+| Database performance degradation | Medium      | High     | Indexes, TanStack Query caching, monitoring |
+| External API unavailability      | High        | Medium   | Retry policy ITG-INT-10, `.failed` events |
 | Security vulnerability           | Low         | Critical | Regular security audits, OWASP Top 10   |
 
 ---

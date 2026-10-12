@@ -56,6 +56,7 @@ storage/changes/{{change-name}}-proposal.md
 steering/product.md      # Product context
 steering/structure.md    # Architecture patterns
 steering/tech.md         # Technology stack
+steering/rules/itg/README.md  # ITG delivery policies: read the files mapped to your task
 steering/project.yml     # Constitution profile (library | cli | application)
 ```
 
@@ -280,8 +281,12 @@ export async function POST(req: NextRequest) {
 #### Step 5.1: Read Current Implementation
 
 ```bash
-# Find current code
-grep -r "{{existing-function}}" lib/
+# Find current code: definition and callers (code index, when the project has one)
+musubi-code refs {{ExistingFunction}}
+musubi-code callers {{ExistingFunction}}
+
+# The name in strings, docs and templates, or projects without a code index
+grep -rn "{{existing-function}}" lib/
 ```
 
 #### Step 5.2: Write Tests for New Behavior
@@ -410,17 +415,15 @@ if (process.env.NODE_ENV !== 'production') {
 
 **If Schema Changes Required**:
 
-#### Step 7.1: Create Migration
+#### Step 7.1: Choose the Migration Path
 
-```bash
-# Prisma example
-npx prisma migrate dev --name {{change-name}}
-```
+- **Firestore** (default): change `firestore.rules`, `firestore.indexes.json` or add a backfill script under `scripts/` with `--dry-run`; apply to the staging project first and deploy to both projects in the same change (ITG-DAT-09, ITG-PLT-23)
+- **PostgreSQL** (only when ITG-DAT-02 applies): add the next numbered migration `database/migrations/NNNN_{{change-name}}.sql` and update `database/schema.sql` (ITG-DAT-05 to ITG-DAT-07)
 
 #### Step 7.2: Write Migration Script
 
 ```sql
--- migrations/{{timestamp}}_{{change-name}}.sql
+-- database/migrations/NNNN_{{change-name}}.sql  (BEGIN; ... COMMIT;, IF NOT EXISTS: ITG-DAT-06)
 
 -- Backup existing data
 CREATE TABLE {{table}}_backup AS SELECT * FROM {{table}};
@@ -441,7 +444,7 @@ CREATE INDEX idx_{{table}}_{{column}} ON {{table}}({{column}});
 #### Step 7.3: Write Rollback Script
 
 ```sql
--- migrations/{{timestamp}}_{{change-name}}_rollback.sql
+-- database/migrations/NNNN_{{change-name}}_rollback.sql (kept with the migration, run only during a rollback)
 
 -- Restore from backup
 DROP TABLE {{table}};
@@ -498,42 +501,32 @@ describe('{{FeatureName}}', () => {
 #### Integration Tests (Article IX: Integration-First)
 
 ```typescript
-// lib/{{feature}}/{{feature}}.integration.test.ts
+// src/features/{{feature}}/api/{{feature}}.integration.test.ts
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { PrismaClient } from '@prisma/client';
+import { describe, it, expect, afterAll } from 'vitest';
+import { createDocument, deleteDocument } from '@/lib/firebase-rest/firestore';
+import { {{method}} } from './{{feature}}-service';
 
-describe('{{FeatureName}} Integration Tests', () => {
-  let prisma: PrismaClient;
+// Real staging Firebase project under a test tenant, no emulator (ITG-TST-06, ITG-TST-08)
+const TEST_ORG = `test-${Date.now()}`;
 
-  beforeAll(async () => {
-    // Use REAL database (test database)
-    prisma = new PrismaClient({
-      datasources: {
-        db: { url: process.env.TEST_DATABASE_URL }
-      }
-    });
-  });
+describe('REQ-{{AREA}}-{{NNN}}: {{FeatureName}} against staging Firestore', () => {
+  const created: string[] = [];
 
   afterAll(async () => {
-    await prisma.$disconnect();
+    await Promise.all(created.map(id => deleteDocument('{{collection}}', id)));
   });
 
-  it('should {{requirement}} with real database', async () => {
+  it('should {{requirement}} with real data', async () => {
     // Arrange: Set up test data
-    const testData = await prisma.{{model}}.create({
-      data: {{test-data}}
-    });
+    const testData = await createDocument('{{collection}}', { organizationId: TEST_ORG, ...{{test-data}} });
+    created.push(testData.id);
 
     // Act: Execute feature
-    const feature = new {{FeatureName}}(prisma);
-    const result = await feature.{{method}}(testData.id);
+    const result = await {{method}}(TEST_ORG, testData.id);
 
     // Assert: Verify result
     expect(result).toBeDefined();
-
-    // Cleanup
-    await prisma.{{model}}.delete({ where: { id: testData.id } });
   });
 });
 ```

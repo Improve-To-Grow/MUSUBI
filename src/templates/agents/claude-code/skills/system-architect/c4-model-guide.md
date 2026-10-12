@@ -332,10 +332,11 @@ See ADR-XXX for rationale.
 
 ## Tools for C4 Diagrams
 
-| Tool        | Format   | Notes                         |
-| ----------- | -------- | ----------------------------- |
-| Mermaid     | Markdown | Recommended - works in GitHub |
-| PlantUML    | Text     | Rich features                 |
-| Structurizr | DSL      | Official C4 tooling           |
-| Draw.io     | Visual   | Easy for non-technical        |
-| Lucidchart  | Visual   | Collaboration features        |
+**ITG rule (ITG-DEL-12)**: steering and design files use **Mermaid only**: `C4Context`, `C4Container`, `C4Component` and `C4Deployment` for architecture, `flowchart` for decision logic, `sequenceDiagram` for interactions, `erDiagram` for data models. Agents and reviewers read the same text-based diagram, GitHub renders it, and it is reviewed in the PR like code. Do not use ASCII boxes, PlantUML, Structurizr or image exports in `steering/` or `storage/`.
+
+| Tool        | Format   | ITG use                                      |
+| ----------- | -------- | -------------------------------------------- |
+| Mermaid     | Markdown | Required in `steering/` and `storage/design/` |
+| PlantUML    | Text     | Not used                                     |
+| Structurizr | DSL      | Not used                                     |
+| Draw.io     | Visual   | Workshops only, never the source of truth     |

@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.1-itg.3] - 2026-10-12
+
+Implements **ITG Software Delivery Playbook v2.1** (CHANGE-006). The playbook and its changelog are in `docs/itg/`.
+
+### Added
+
+- **ITG delivery policies** (`src/templates/shared/steering/rules/itg/`): the playbook as agent rules in ten policy files plus an index: delivery lifecycle, platform, data, integrations, security, logging, testing, git and code quality, CI/CD and release, operations. Each rule has an id (`ITG-SEC-13`), cites its playbook section and states its decision logic as Mermaid diagrams (C4 for architecture, `flowchart` for decision trees). `musubi init` and `musubi-onboard` install them in `steering/rules/itg/`.
+- `docs/itg/ITG_Software_Delivery_Playbook.md` and `docs/itg/PLAYBOOK_CHANGELOG.md`: the fork's copy of the playbook (identical to the canonical source)
+- `src/cli/init-steering.js`: writes the steering templates, the ITG policies and the constitution rules
+- Tests (`tests/itg/`): policy files match the playbook version, cite existing sections and define every rule id they reference; Mermaid blocks in the templates are well formed; init output; command copies stay identical across platforms
+- `npm run sync:commands` (`scripts/sync-commands.js`): copies the claude-code slash commands to the codex, cursor, qwen-code, windsurf and github-copilot templates
+
+### Changed
+
+- **Steering templates start from the ITG defaults**: `tech.md` (default stack, Mermaid C4 context and container views, database decision, Workers runtime constraints, environments, integrations), `structure.md` (repository layout, "where does this code go" flowchart, Article I mapping, naming) and `product.md` (Discovery and scope). `tech.md` and `structure.md` have a "Deviations from the ITG Playbook" table.
+- `musubi init`: `tech.md` comes from the shared template instead of the language generator; the default constitution profile is `application` with ITG paths (`core_paths: [src/lib]`, `delivery_paths: [src/app, src/components, src/features, src/middleware]`, `adapter_paths: [src/lib/auth]`); a new prompt asks for adapter paths; the generated agent file (CLAUDE.md, AGENTS.md, …) points to the ITG policies
+- `musubi init` also copies `ears-format.md` and `workflow.md` to `steering/rules/`; agents referenced them but they were never installed
+- **Agents read the ITG policies**: every skill, the shared `AGENTS.md` and every slash command on all seven platforms point to `steering/rules/itg/README.md`; the steering skill and `/sdd-steering` keep ITG defaults, record deviations and report ITG drift by rule id
+- **Design output is Mermaid C4**: `/sdd-design` (all platforms), the design document template and the system-architect skill draw architecture as Mermaid `C4Context` / `C4Container` / `C4Component` and decisions as `flowchart` instead of ASCII boxes, and add an ITG policy compliance table
+- Command and template examples use the ITG stack (Firebase Authentication and Firestore over REST, `withApiRoute`, Vitest, staging Firebase for integration tests) instead of Prisma, JWT, bcrypt and Redis
+- Constitution template, Article VI: project memory includes the adopted delivery policies (`steering/rules/itg/`)
+- **Index-first code lookups on every platform**: the `musubi-code` steps of `/sdd-change-init`, `/sdd-change-apply`, `/sdd-change-archive` and `/sdd-requirements` (CHANGE-005, Claude Code only) are now in the codex, cursor, qwen-code, windsurf, github-copilot and gemini-cli commands too
+- **This repository's own `.claude/` files** get the framework changes of the templates but not the ITG project policies (`steering/rules/itg-fork.md`, FORK-08). `tests/code-navigation-guidance.test.js` checks the index-first steps in `.claude/` and in the templates, and that `.claude/` points to no ITG policy, instead of requiring `.claude/` to be byte-identical to the templates
+- `package-lock.json` lists the `musubi-code` bin
 ## [6.3.1-itg.2] - 2026-10-08
 
 ### Added
@@ -58,6 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The CI/CD guide downloads the GitLab and Jenkins templates from the fork and calls the fork's reusable GitHub Actions workflow, instead of copying from `node_modules/musubi-sdd`, which never contained them
   - Existing projects keep their copies of the agent templates: replace the package name by hand, or re-run `musubi-sdd init` for the agent and confirm the overwrite prompt (this replaces local changes to the agent files)
   - `tests/package-name.test.js` guards the package name and the install instructions
+
 
 ## [6.3.1-itg.1] - 2026-10-07
 

@@ -23,6 +23,7 @@ Create a detailed implementation task breakdown following test-first development
 1. **Steering Context**:
    - `steering/structure.md` - Architecture patterns
    - `steering/tech.md` - Technology stack
+   - `steering/rules/itg/README.md` - ITG delivery policies: read the files mapped to your task
    - `steering/project.yml` - `constitution.profile` (library | cli | application; `library` when absent)
 
 2. **Requirements**:
@@ -107,7 +108,7 @@ For each task:
 - **Description**: Create users and sessions tables
 - **Test-First Steps**:
   1. RED: Write migration test that checks table structure
-  2. GREEN: Create Prisma schema and generate migration
+  2. GREEN: Add Firestore rules and indexes (or, only if ITG-DAT-02 applies, a numbered SQL migration)
   3. BLUE: Add indexes and constraints
 - **Requirements**: REQ-AUTH-001, REQ-AUTH-003
 - **Design Reference**: Section 6 (Data Model)

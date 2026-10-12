@@ -25,6 +25,7 @@ Generate a change proposal specification that documents what will be added, modi
 
 - Read `steering/structure.md` - Current architecture
 - Read `steering/tech.md` - Current technology stack
+- Read `steering/rules/itg/README.md` - ITG delivery policies: read the files mapped to the change
 - Read `steering/product.md` - Current product context
 
 Extract:
@@ -36,7 +37,7 @@ Extract:
 # Step 2: Analyze Existing System
 
 Research current implementation by:
-- Searching for related code
+- Searching for related code: for classes, functions and modules ask the code index first when the project has one (`musubi-code refs <Symbol>`, `musubi-code symbols <file>`, `musubi-code dependents <file>`); use `grep -rn` for text and in projects without an index, and record in the proposal which facts came from which
 - Finding existing requirements
 - Checking existing design documents
 - Identifying affected components

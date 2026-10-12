@@ -22,6 +22,7 @@ Create a comprehensive requirements specification for the given feature using EA
 
 - Read `steering/structure.md` - Architecture patterns
 - Read `steering/tech.md` - Technology stack
+- Read `steering/rules/itg/README.md` - ITG delivery policies: read the files mapped to your task
 - Read `steering/product.md` - Product context
 - Read `steering/project.yml` - Constitution profile (library | cli | application, default `library`)
 

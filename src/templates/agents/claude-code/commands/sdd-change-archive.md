@@ -320,6 +320,8 @@ git checkout archive/{{deprecated-feature}} -- lib/{{deprecated-feature}}/
 
 ### 7. Update Steering Files
 
+Keep the ITG defaults (`steering/rules/itg/README.md`). IF the change departs from an ITG rule, THEN add a row to the `## Deviations from the ITG Playbook` table of `steering/tech.md` or `steering/structure.md` with the rule id. Never edit `steering/rules/itg/`.
+
 **Update Architecture**:
 
 ```markdown

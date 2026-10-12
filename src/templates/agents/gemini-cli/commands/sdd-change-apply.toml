@@ -38,6 +38,7 @@ Verify proposal status is "Approved" (not "Proposed" or "Rejected")
 Read steering files:
 - `steering/structure.md` - Architecture patterns
 - `steering/tech.md` - Technology stack
+- `steering/rules/itg/README.md` - ITG delivery policies: read the files mapped to your task
 - `steering/product.md` - Product context
 - `steering/project.yml` - Constitution profile (library | cli | application)
 
@@ -97,7 +98,7 @@ For each new requirement:
 
 For each MODIFIED requirement:
 
-1. Find current implementation
+1. Find current implementation: `musubi-code refs <Function>` and `musubi-code callers <Function>` when the project has a code index, `grep -rn` for text and otherwise
 2. Write tests for new behavior
 3. Update implementation
 4. Maintain backward compatibility (if needed)
@@ -131,17 +132,14 @@ Required tests:
 
 Integration test example:
 ```typescript
+import { describe, it } from 'vitest';
+
+// Real staging Firebase project under a test tenant, no emulator (ITG-TST-06, ITG-TST-08)
+const TEST_ORG = `test-${Date.now()}`;
+
 describe('<Feature> Integration', () => {
-  let prisma: PrismaClient;
-  
-  beforeAll(() => {
-    prisma = new PrismaClient({
-      datasources: { db: { url: process.env.TEST_DATABASE_URL } }
-    });
-  });
-  
-  it('should work with real database', async () => {
-    // Use REAL services, not mocks
+  it('should work with real data', async () => {
+    // Use REAL services through src/lib/firebase-rest, not mocks; clean up TEST_ORG data
   });
 });
 ```

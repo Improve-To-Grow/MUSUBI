@@ -34,16 +34,15 @@ const {
 
 const {
   generateDependencyFiles,
-  generateTechMd,
   CONSTITUTION_PROFILE_CHOICES,
   defaultApplicationPaths,
   buildConstitutionYml,
 } = require('../src/cli/init-generators');
 
+const { writeSteeringTemplates, copyConstitutionRules } = require('../src/cli/init-steering');
 const { setupCodeIndex } = require('../src/code-index/setup');
 
 const TEMPLATE_DIR = path.join(__dirname, '..', 'src', 'templates');
-const SHARED_TEMPLATE_DIR = path.join(TEMPLATE_DIR, 'shared');
 const AGENTS_TEMPLATE_DIR = path.join(TEMPLATE_DIR, 'agents');
 
 /**
@@ -174,7 +173,7 @@ async function main(agent, agentKey, options = {}) {
       name: 'constitutionProfile',
       message: 'What are you building? (decides how constitutional Articles I and II apply)',
       choices: CONSTITUTION_PROFILE_CHOICES,
-      default: 'library',
+      default: 'application', // ITG projects are applications (ITG playbook §3.3)
     },
     {
       type: 'input',
@@ -188,6 +187,13 @@ async function main(agent, agentKey, options = {}) {
       name: 'deliveryPaths',
       message: 'Delivery paths: pages, routes, UI (comma-separated):',
       default: () => defaultApplicationPaths().deliveryPaths,
+      when: answers => answers.constitutionProfile === 'application',
+    },
+    {
+      type: 'input',
+      name: 'adapterPaths',
+      message: 'Adapter paths: request-context code such as sessions (comma-separated):',
+      default: () => defaultApplicationPaths().adapterPaths,
       when: answers => answers.constitutionProfile === 'application',
     },
     {
@@ -652,32 +658,11 @@ async function copyAgentsFile(agent) {
 }
 
 async function generateSteering(answers, externalSpec = null) {
-  const steeringTemplates = path.join(SHARED_TEMPLATE_DIR, 'steering');
   const languages = answers.languages || ['undecided'];
 
-  // Copy and customize steering files (English only, REQ-LANG-001)
-  const files = ['structure.md', 'product.md'];
-  for (const file of files) {
-    const templatePath = path.join(steeringTemplates, file);
-
-    if (!fs.existsSync(templatePath)) {
-      // If template doesn't exist, skip (don't fail)
-      continue;
-    }
-
-    let content = await fs.readFile(templatePath, 'utf8');
-
-    // Replace placeholders
-    content = content.replace(/\{\{PROJECT_NAME\}\}/g, answers.projectName);
-    content = content.replace(/\{\{DESCRIPTION\}\}/g, answers.description);
-    content = content.replace(/\{\{DATE\}\}/g, new Date().toISOString().split('T')[0]);
-
-    await fs.writeFile(path.join('steering', file), content);
-  }
-
-  // Generate tech.md based on selected languages
-  const techContent = generateTechMd(languages, answers);
-  await fs.writeFile(path.join('steering', 'tech.md'), techContent);
+  // structure.md, tech.md and product.md start from the ITG defaults; the ITG delivery
+  // policies go to steering/rules/itg/ (English only, REQ-LANG-001)
+  await writeSteeringTemplates(answers);
 
   // Build external specification section for project.yml
   let externalSpecYml = '';
@@ -710,6 +695,7 @@ ${buildConstitutionYml({
   profile: answers.constitutionProfile,
   corePaths: answers.corePaths,
   deliveryPaths: answers.deliveryPaths,
+  adapterPaths: answers.adapterPaths,
 })}${externalSpecYml}`;
   await fs.writeFile(path.join('steering', 'project.yml'), projectYml);
 
@@ -1077,13 +1063,8 @@ if __name__ == "__main__":
 }
 
 async function createConstitution() {
-  const constitutionDir = path.join(SHARED_TEMPLATE_DIR, 'constitution');
-  await fs.copy(path.join(constitutionDir, 'constitution.md'), 'steering/rules/constitution.md');
-  // Default levels per article and per project profile, read by the validators
-  await fs.copy(
-    path.join(constitutionDir, 'constitution-levels.yml'),
-    'steering/rules/constitution-levels.yml'
-  );
+  // Constitution, default levels per article and profile, EARS format and workflow guides
+  await copyConstitutionRules();
 }
 
 async function createReadme(answers, agent, agentKey) {
@@ -1129,9 +1110,18 @@ ${skillsSection}
 - \`steering/tech.md\` - Technology stack
 - \`steering/product.md\` - Product context
 - \`steering/rules/constitution.md\` - 9 Constitutional Articles
+- \`steering/rules/itg/\` - ITG delivery policies (ITG Software Delivery Playbook)
+
+### ITG Delivery Policies
+
+Before starting a task, read \`steering/rules/itg/README.md\` and the policies it maps to your role.
+Apply the rules without being asked, and cite their ids (e.g. \`ITG-SEC-13\`) in designs, tasks,
+PR descriptions and reviews. Record any deviation in the Deviations table of \`steering/tech.md\`
+or \`steering/structure.md\`; silent deviation is not allowed.
 
 ### Learn More
 
+- [ITG Software Delivery Playbook](https://github.com/Improve-To-Grow/MUSUBI/blob/ITG-adjustments/docs/itg/ITG_Software_Delivery_Playbook.md)
 - [MUSUBI Documentation](https://github.com/nahisaho/MUSUBI)
 - [Constitutional Governance](steering/rules/constitution.md)
 - [8-Stage SDD Workflow](steering/rules/workflow.md)
