@@ -6,6 +6,9 @@ The recommended order of MUSUBI commands for the two ways work enters a project:
 - **Part 2, Brownfield**: a change to an existing codebase, from `/sdd-change-init` through human
   review, `/sdd-change-apply` and `/sdd-change-archive`.
 
+Which part applies is decided by what the work touches, not by the age of the project. When in
+doubt, [Choosing the SDD Flow](choosing-the-sdd-flow.md) is the decision tree.
+
 Each step gives the command, its argument format, what it reads and writes, and where a human
 decides before the next command may run. Written for the ITG fork (`@improve-to-grow/musubi-sdd`
 6.3.1-itg.2) with Claude Code as the agent.
@@ -435,6 +438,7 @@ take a task in plain words after the name.
 
 ## Related guides
 
+- [Choosing the SDD Flow](choosing-the-sdd-flow.md): decision tree for Part 1 versus Part 2
 - [Change Management Workflow](change-management-workflow.md): the delta-spec side of brownfield changes
 - [Delta Specification Guide](delta-spec-guide.md): ADDED, MODIFIED, REMOVED, RENAMED format
 - [Brownfield Tutorial](brownfield-tutorial.md) and [Brownfield Project Tutorial](brownfield.md)
