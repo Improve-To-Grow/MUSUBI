@@ -35,7 +35,8 @@ class RequirementsGenerator {
     const outputDir = path.join(this.rootDir, options.output || 'storage/specs');
     await fs.ensureDir(outputDir);
 
-    const fileName = `${this.slugify(feature)}.md`;
+    // The file names the slash commands and the ITG playbook use (§3.3)
+    const fileName = `${this.slugify(feature)}-requirements.md`;
     const filePath = path.join(outputDir, fileName);
 
     // Check if file exists

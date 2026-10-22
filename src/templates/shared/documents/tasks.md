@@ -380,7 +380,7 @@ npm run lint lib/{{component}}/src/service.ts
 
 ---
 
-### TASK-005: Implement Database Repository
+### TASK-005: Implement Data Access (Firestore)
 
 **Priority**: P0
 **Story Points**: 5
@@ -389,62 +389,42 @@ npm run lint lib/{{component}}/src/service.ts
 **Status**: Not Started
 
 **Description**:
-Implement database repository with Prisma/TypeORM.
+Store {{resource}} in Firestore through the project-owned REST client (`src/lib/firebase-rest/firestore.ts`), scoped to the tenant. PostgreSQL only when the decision of `steering/tech.md` requires it (ITG-DAT-02).
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-004: Database schema
+- REQ-{{COMPONENT}}-004: Data storage
 
 **Acceptance Criteria**:
 
-- [ ] Repository interface defined
-- [ ] Prisma schema created
-- [ ] CRUD operations implemented
-- [ ] Database indexes created
-- [ ] Migration files created
-- [ ] Integration tests pass (real database)
+- [ ] Every query goes through the tenant-scoped helper with `tenantId` from the claim (ITG-SEC-10)
+- [ ] Only the fields the product needs are stored (ITG-DAT-10)
+- [ ] Composite indexes in `firestore.indexes.json`; Firestore rules still deny all client access (ITG-SEC-15)
+- [ ] Rules and indexes deployed to both Firebase projects in the same change (ITG-PLT-23)
+- [ ] PostgreSQL only: next numbered migration in `database/migrations/` with `IF NOT EXISTS` and row-level security (ITG-DAT-05, ITG-DAT-06)
+- [ ] Integration tests pass against the staging project (ITG-TST-06)
 
 **Constitutional Compliance**:
 
-- ✅ **Article IX**: Integration tests use a real, isolated database in a Docker container (IX-1, IX-2)
+- ✅ **Article VIII**: The Firestore REST client is a runtime-constraint client (VIII-4), documented in the design (VIII-5)
+- ✅ **Article IX**: Integration tests use the real staging project under the run prefix `ci-<run-id>`, no emulator (IX-1, IX-2, ITG-TST-08)
 
 **Implementation Notes**:
 
 ```typescript
-// lib/{{component}}/src/repository.ts
+// src/lib/{{component}}/repository.ts
+import { createDocument, getDocument } from '@/lib/firebase-rest/firestore';
 
-export class {{COMPONENT}}Repository {
-  constructor(private prisma: PrismaClient) {}
+const COLLECTION = '{{resources}}';
 
-  async create(data: CreateResourceDTO): Promise<Resource> {
-    return this.prisma.{{resource}}.create({
-      data: {
-        userId: data.userId,
-        field1: data.field1,
-        field2: data.field2
-      }
-    });
-  }
-
-  async findById(id: string): Promise<Resource | null> {
-    return this.prisma.{{resource}}.findUnique({
-      where: { id }
-    });
-  }
+export async function create{{Resource}}(tenantId: string, data: Create{{Resource}}Input) {
+  return createDocument<{{Resource}}>(COLLECTION, { ...data, tenantId });
 }
-```
 
-**Test Setup** (Docker Compose):
-
-```yaml
-services:
-  test-db:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_PASSWORD: test
-      POSTGRES_DB: test
-    ports:
-      - '5432:5432'
+export async function get{{Resource}}(tenantId: string, id: string) {
+  const found = await getDocument<{{Resource}}>(COLLECTION, id);
+  return found?.tenantId === tenantId ? found : null;
+}
 ```
 
 **Dependencies**:
@@ -454,9 +434,8 @@ services:
 **Validation**:
 
 ```bash
-docker-compose up -d test-db
-npm test lib/{{component}}/tests/repository.test.ts
-# Uses a REAL, isolated database (Article IX, IX-1, IX-2)
+npx vitest run src/lib/{{component}}/repository.test.ts
+# Runs against the staging Firebase project under ci-<run-id> (Article IX, ITG-TST-08)
 ```
 
 ---
@@ -547,7 +526,7 @@ npm run [task] -- --env=production --dry-run
 
 ---
 
-### TASK-007: Implement REST API Endpoints
+### TASK-007: Implement API Route Handlers
 
 **Priority**: P0
 **Story Points**: 5
@@ -556,22 +535,21 @@ npm run [task] -- --env=production --dry-run
 **Status**: Not Started
 
 **Description**:
-Implement REST API endpoints for {{component}}.
+Expose {{component}} through Route Handlers under `src/app/api/`, each through `withApiRoute` (ITG-SEC-13).
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-001: Create endpoint
-- REQ-{{COMPONENT}}-002: Get endpoint
-- REQ-{{COMPONENT}}-003: List endpoint
+- REQ-{{COMPONENT}}-001: Create
+- REQ-{{COMPONENT}}-002: Get
+- REQ-{{COMPONENT}}-003: List
 
 **Acceptance Criteria**:
 
-- [ ] POST /api/{{resource}} implemented
-- [ ] GET /api/{{resource}}/:id implemented
-- [ ] GET /api/{{resource}} implemented
-- [ ] Input validation middleware
-- [ ] Error handling middleware
-- [ ] API tests pass
+- [ ] `POST /api/{{resource}}`, `GET /api/{{resource}}/[id]` and `GET /api/{{resource}}` through `withApiRoute` with a guard, a rate-limit profile, a zod schema and the feature name (ITG-SEC-13, ITG-SEC-14)
+- [ ] Identity and tenant only from the verified claims (ITG-SEC-05, ITG-SEC-06)
+- [ ] Typed `ApiRouteError`s and the `{ success, data }` envelope (ITG-SEC-14)
+- [ ] Every route emits its audit or app event (ITG-LOG-02)
+- [ ] `check-route-guards` and `check-route-logging` green (ITG-CI-01)
 
 **Constitutional Compliance**:
 
@@ -581,49 +559,29 @@ Implement REST API endpoints for {{component}}.
 **Implementation Notes**:
 
 ```typescript
-// app/api/{{resource}}/route.ts
+// src/app/api/{{resource}}/route.ts
+import { withApiRoute } from '@/lib/api/with-api-route';
+import { withRole } from '@/lib/api/guards';
+import { create{{Resource}} } from '@/lib/{{component}}/repository';
+import { create{{Resource}}Schema } from '@/features/{{component}}/types';
 
-import { {{COMPONENT}}Service } from '@/lib/{{component}}';
-
-export async function POST(request: Request) {
-  const body = await request.json();
-
-  const service = new {{COMPONENT}}Service(repository);
-  const result = await service.create(body);
-
-  return Response.json(result, { status: 201 });
-}
-
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-
-  const service = new {{COMPONENT}}Service(repository);
-  const result = await service.findById(id);
-
-  if (!result) {
-    return Response.json(
-      { error: 'Not found' },
-      { status: 404 }
-    );
-  }
-
-  return Response.json(result);
-}
+export const POST = withApiRoute(
+  'api-{{resource}}-create',
+  withRole('member', async ({ body, claims }) => create{{Resource}}(claims.tenantId, body)),
+  { rateLimit: 'write', schema: create{{Resource}}Schema, feature: '{{component}}' }
+);
 ```
 
 **Dependencies**:
 
 - TASK-003: Service implementation
-- TASK-005: Repository implementation
+- TASK-005: Data access
 
 **Validation**:
 
 ```bash
-npm run dev
-curl -X POST http://localhost:3000/api/{{resource}} \
-  -H "Content-Type: application/json" \
-  -d '{"field1":"test","field2":42}'
+node scripts/checks/check-route-guards.mjs && node scripts/checks/check-route-logging.mjs
+npx vitest run src/app/api/{{resource}}
 ```
 
 ---
@@ -639,7 +597,7 @@ curl -X POST http://localhost:3000/api/{{resource}} \
 **Status**: Not Started
 
 **Description**:
-Write integration tests using real database and services.
+Write integration tests against the real staging services (ITG-TST-06).
 
 **Requirements Coverage**:
 
@@ -647,12 +605,11 @@ Write integration tests using real database and services.
 
 **Acceptance Criteria**:
 
-- [ ] Integration tests for all API endpoints
-- [ ] Tests use real PostgreSQL (Docker container)
-- [ ] Tests use real Redis cache
-- [ ] No mocks for database/cache (Article IX, IX-4)
-- [ ] Any remaining mock justified in the test documentation (IX-5)
-- [ ] Coverage ≥ configured threshold, default 80% (III-6)
+- [ ] Integration tests for all API routes, signed in as the fixed test users (ITG-TST-12)
+- [ ] Tests write only under `ci-<run-id>` and clean up after themselves (ITG-TST-08)
+- [ ] A user of a second tenant is denied on every collection (ITG-TST-09)
+- [ ] No mocks for Firebase, log-ingest or the database (Article IX, IX-4); mocks only for LLM providers and paid APIs, justified in the test file (ITG-TST-07)
+- [ ] Coverage ≥ the `application` threshold of `constitution-levels.yml` (III-6, ITG-TST-03)
 
 **Constitutional Compliance**:
 
@@ -664,7 +621,7 @@ Write integration tests using real database and services.
 
 ---
 
-### TASK-009: Implement Caching Layer
+### TASK-009: Live Updates by Polling
 
 **Priority**: P1
 **Story Points**: 3
@@ -673,19 +630,17 @@ Write integration tests using real database and services.
 **Status**: Not Started
 
 **Description**:
-Add Redis caching for read operations.
+Keep the {{resource}} list current without client reads of Firestore: the page polls the list route, so every read passes the account-state check (ITG-SEC-15).
 
 **Requirements Coverage**:
 
-- REQ-PERF-001: Performance optimization
+- REQ-PERF-001: Fresh data within [interval]
 
 **Acceptance Criteria**:
 
-- [ ] Redis client configured
-- [ ] Cache-aside pattern implemented
-- [ ] TTL = 5 minutes
-- [ ] Cache invalidation on writes
-- [ ] Cache hit/miss metrics
+- [ ] TanStack Query polls `GET /api/{{resource}}` every [interval] while the page is visible (ITG-PLT-05)
+- [ ] The list route uses the `read` rate-limit profile and a Firestore composite index
+- [ ] No `onSnapshot` listener and no client Firestore read (ITG-SEC-15)
 
 ---
 
@@ -794,9 +749,9 @@ TASK-001 (Project Structure)
     │               ├── TASK-006 (Automation Interface)
     │               └── TASK-007 (API)
     │                       └── TASK-008 (Integration Tests)
-    │                               ├── TASK-009 (Caching)
+    │                               ├── TASK-009 (Polling)
     │                               └── TASK-010 (Security)
-    └── TASK-005 (Repository)
+    └── TASK-005 (Data access)
             └── TASK-007 (API)
 ```
 
