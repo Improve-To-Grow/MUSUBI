@@ -42,36 +42,36 @@ Each requirement SHALL use one of the 5 EARS patterns (IV-1):
 Format: The [system] SHALL [requirement]
 
 Example:
-- The system SHALL authenticate users via email and password
-- The authentication service SHALL hash passwords using bcrypt
+- The system SHALL store each RSVP with the tenant of the meeting
+- The RSVP service SHALL record one response per member and meeting
 
 ## 2. Event-Driven Requirements
 Format: WHEN [event], the [system] SHALL [response]
 
 Example:
-- WHEN user submits valid credentials, the system SHALL create a session
-- WHEN login fails 5 times, the system SHALL lock the account for 30 minutes
+- WHEN a member submits an RSVP, the system SHALL store the response and emit `rsvp.response.set`
+- WHEN the RSVP deadline passes, the system SHALL send the organizer a summary email
 
 ## 3. State-Driven Requirements
 Format: WHILE [state], the [system] SHALL [response]
 
 Example:
-- WHILE user is authenticated, the system SHALL display user profile
-- WHILE session is active, the system SHALL refresh token every 15 minutes
+- WHILE the meeting page is open, the system SHALL refresh the RSVP list every 30 seconds
+- WHILE a meeting is cancelled, the system SHALL reject new RSVPs
 
 ## 4. Unwanted Behavior
 Format: IF [condition], THEN the [system] SHALL [response]
 
 Example:
-- IF password is invalid, THEN the system SHALL return 401 error
-- IF session expires, THEN the system SHALL redirect to login
+- IF the member belongs to another tenant, THEN the system SHALL return 403 and emit `rsvp.response.set.denied`
+- IF the RSVP deadline has passed, THEN the system SHALL return 409 `RSVP_CLOSED`
 
 ## 5. Optional Features
 Format: WHERE [feature enabled], the [system] SHALL [requirement]
 
 Example:
-- WHERE 2FA is enabled, the system SHALL require OTP code
-- WHERE social login is configured, the system SHALL offer OAuth options
+- WHERE the reminders feature is switched on, the system SHALL email members who have not responded
+- WHERE the meeting has a guest limit, the system SHALL reject a "yes" beyond the limit
 
 # Step 4: Requirement Structure
 
@@ -166,77 +166,69 @@ Save to: `storage/specs/{{feature-name}}-requirements.md`
 # Example Output
 
 ```markdown
-# Feature Requirements: User Authentication
+# Feature Requirements: Meeting RSVP
 
 **Version**: 1.0
-**Date**: 2025-11-17
+**Date**: 2026-10-22
 **Status**: Draft
 
 ## 1. Overview
 
-This feature provides secure user authentication for the application.
+Members tell the organizer whether they attend a meeting.
 
-**Business Value**: Enable users to securely access the platform
-**Affected Components**: lib/auth/, app/api/auth/
+**Business Value**: Organizers plan rooms and catering from real numbers
+**Affected Components**: src/lib/rsvp/, src/app/api/rsvp/, src/features/rsvp/
 
 ## 2. Functional Requirements
 
-### User Registration
-
-#### REQ-AUTH-001: Email Registration
-**EARS**: The system SHALL allow users to register using email and password.
+#### REQ-RSVP-001: Record an RSVP
+**EARS**: WHEN a member submits an RSVP for a meeting of their tenant, the system SHALL store the response (yes, no, maybe) and emit `rsvp.response.set`.
 
 **Acceptance Criteria**:
-- GIVEN user provides valid email and password
-- WHEN user submits registration form
-- THEN system SHALL create user account
-- AND system SHALL send verification email
+- GIVEN a signed-in member and an open meeting of their tenant
+- WHEN the member submits "yes"
+- THEN the system SHALL store one RSVP for that member and meeting
+- AND a second submission SHALL replace the first
 
 **Priority**: Must-Have
 **Dependencies**: None
 
-#### REQ-AUTH-002: Password Validation
-**EARS**: The system SHALL enforce password requirements.
+#### REQ-RSVP-002: RSVP deadline
+**EARS**: IF the RSVP deadline of the meeting has passed, THEN the system SHALL reject the RSVP with 409 `RSVP_CLOSED`.
 
 **Acceptance Criteria**:
-- GIVEN user provides password
-- WHEN password is validated
-- THEN system SHALL reject if length < 8 characters
-- AND system SHALL reject if no special characters
+- GIVEN a meeting whose deadline has passed
+- WHEN a member submits an RSVP
+- THEN the system SHALL return 409 with code `RSVP_CLOSED`
 
 **Priority**: Must-Have
-**Dependencies**: REQ-AUTH-001
+**Dependencies**: REQ-RSVP-001
 
-### User Login
-
-#### REQ-AUTH-003: Email Login
-**EARS**: WHEN user provides valid credentials, the system SHALL authenticate the user AND create a session.
+#### REQ-RSVP-003: Tenant isolation
+**EARS**: IF the member's tenant differs from the meeting's tenant, THEN the system SHALL return 403 and emit `rsvp.response.set.denied`.
 
 **Acceptance Criteria**:
-- GIVEN user has registered account
-- WHEN user submits correct email and password
-- THEN system SHALL verify credentials
-- AND system SHALL create session token
-- AND system SHALL return JWT token
+- GIVEN a member of tenant B and a meeting of tenant A
+- WHEN the member submits an RSVP
+- THEN the system SHALL return 403
+- AND no RSVP SHALL be stored
 
 **Priority**: Must-Have
-**Dependencies**: REQ-AUTH-001
+**Dependencies**: REQ-RSVP-001
 
 ## 3. Non-Functional Requirements
 
 ### Security
-- Passwords SHALL be hashed using bcrypt (cost factor 10)
-- Sessions SHALL expire after 24 hours
-- JWT tokens SHALL use RS256 algorithm
+- Identity and tenant SHALL come from the verified ID token claims (ITG-SEC-05)
+- The route SHALL go through `withApiRoute` with `withRole('member')`, the `write` rate limit and a zod schema (ITG-SEC-13, ITG-SEC-14)
 
 ### Performance
-- Login response time SHALL be < 500ms
-- Registration SHALL complete < 1 second
+- Recording an RSVP SHALL respond in < 500 ms at the 95th percentile
 
 ## 4. Constitutional Compliance
 
-- ✅ Article I: Implemented as lib/auth/ (library profile)
-- ✅ Article II: CLI interface for user management (library profile)
+- ✅ Article I: Feature logic in the core module `src/lib/rsvp/` (application profile)
+- ✅ Article II: The HTTP API is the automation interface (application profile)
 - ✅ Article III: Test scenarios defined
 - ✅ Article IV: All requirements in EARS format
 - ✅ Article V: Traceability matrix included

@@ -28,7 +28,7 @@ describe('TasksGenerator', () => {
       });
 
       expect(result.feature).toBe('User Authentication');
-      expect(result.path).toContain('user-authentication.md');
+      expect(result.path).toContain('user-authentication-tasks.md');
 
       const exists = await fs.pathExists(result.path);
       expect(exists).toBe(true);
@@ -44,7 +44,7 @@ describe('TasksGenerator', () => {
         author: 'Test',
       });
 
-      expect(result.path).toContain('payment-checkout-system.md');
+      expect(result.path).toContain('payment-checkout-system-tasks.md');
     });
   });
 

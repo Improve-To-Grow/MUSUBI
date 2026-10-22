@@ -154,10 +154,10 @@ Read `constitution.profile` from `steering/project.yml` first (`library` when ab
    - SOLID principles
    - Tests still pass
 
-5. **TASK-005: Implement Database Repository**
-   - Create schema
-   - Migrations
-   - Integration tests (real database, Article IX)
+5. **TASK-005: Implement Data Access**
+   - Firestore through the REST client, tenant-scoped (ITG-DAT-01, ITG-SEC-10); PostgreSQL migrations only when ITG-DAT-02 applies
+   - Indexes and rules for both Firebase projects (ITG-PLT-23)
+   - Integration tests against the staging project (real services, Article IX, ITG-TST-06)
 
 6. **TASK-006: Implement Automation Interface (Article II)**
    - `library` / `cli`: Implement CLI Interface

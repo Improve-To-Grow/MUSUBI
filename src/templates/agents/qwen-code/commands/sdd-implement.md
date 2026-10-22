@@ -85,7 +85,7 @@ Create todos for P0 tasks:
 2. TASK-002: Write Tests for REQ-XXX-001 (RED)
 3. TASK-003: Implement [Component] (GREEN)
 4. TASK-004: Refactor [Component] (BLUE)
-5. TASK-005: Implement Database Repository
+5. TASK-005: Implement Data Access (Firestore, tenant-scoped)
 6. TASK-006: Implement CLI Interface (library, cli) or Route Handlers (application)
 7. TASK-007: Implement API Endpoints
 ```

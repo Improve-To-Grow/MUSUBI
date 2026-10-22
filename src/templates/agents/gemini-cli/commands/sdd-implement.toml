@@ -38,7 +38,7 @@ Implement the feature by executing tasks in the task breakdown document, followi
 
 # ITG Implementation Rules
 
-Read `steering/rules/itg/README.md` and the policies for this task before writing code. In particular: every API route through `withApiRoute` with a guard and a zod schema (ITG-SEC-13); roles and tenant only from custom claims (ITG-SEC-05); Firebase only through `src/lib/firebase-rest/` on the Worker (ITG-PLT-14); every route emits its audit or app event (ITG-LOG-02); Vitest tests written first (ITG-TST-01); integration tests against the staging Firebase project (ITG-TST-06). The password-hashing examples below only illustrate the Red-Green-Blue loop: ITG projects use Firebase Authentication and never hash passwords themselves.
+Read `steering/rules/itg/README.md` and the policies for this task before writing code. In particular: every API route through `withApiRoute` with a guard and a zod schema (ITG-SEC-13); roles and tenant only from custom claims (ITG-SEC-05); Firebase only through `src/lib/firebase-rest/` on the Worker (ITG-PLT-14); every route emits its audit or app event (ITG-LOG-02); Vitest tests written first (ITG-TST-01); integration tests against the staging Firebase project (ITG-TST-06). The examples below implement the meeting RSVP feature of `/sdd-requirements` and `/sdd-tasks`.
 
 # Step 2: Task Execution Strategy
 
@@ -105,7 +105,7 @@ Read `constitution.profile` from `steering/project.yml` (`library` when absent) 
 - All profiles: core logic in a core module with tests that run without the app, a browser or a CLI (I-1, I-2); core never imports from delivery paths (I-3); direct framework or SDK use in core is fine (I-4)
 - All profiles: each exported function and class of a core module SHALL have a doc comment (`/** … */`) directly above its declaration (I-5, advisory)
 - `library` / `cli`: Implement core logic in `lib/{{feature-name}}/` with its own tests and public API; no application imports (I-L1–I-L3, I-L6)
-- `application`: Implement core logic in a core module folder such as `src/lib/{{feature-name}}/` with co-located `*.test.ts`, no own `package.json`; route handlers and server actions delegate to it; no UI-only code (components, hooks, providers) in core paths (I-A1–I-A4)
+- `application`: Implement core logic in a core module folder such as `src/lib/{{feature-name}}/` with co-located `*.test.ts`, no own `package.json`; route handlers delegate to it; no UI-only code (components, hooks, providers) in core paths (I-A1–I-A4)
 
 ### Article II: Automation Interface Mandate
 - `library` / `cli`: Create `lib/{{feature-name}}/cli.ts`, expose all major functions via CLI with `--help`, use commander.js or similar (II-L1, II-L2)
@@ -114,28 +114,23 @@ Read `constitution.profile` from `steering/project.yml` (`library` when absent) 
 Example route handler (`application`):
 
 ```typescript
-// src/app/api/auth/login/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+// src/app/api/rsvp/route.ts
 import { z } from 'zod';
-import { authService, InvalidCredentialsError } from '@/lib/auth'; // core module
+import { withApiRoute } from '@/lib/api/with-api-route';
+import { withRole } from '@/lib/api/guards';
+import { recordRsvp } from '@/lib/rsvp/rsvp-service'; // core module
 
-const LoginSchema = z.object({ email: z.string().email(), password: z.string().min(1) });
+const RsvpSchema = z.object({
+  body: z.object({ meetingId: z.string().min(1), response: z.enum(['yes', 'no', 'maybe']) }),
+});
 
-export async function POST(request: NextRequest) {
-  const parsed = LoginSchema.safeParse(await request.json()); // II-A4
-  if (!parsed.success) {
-    return NextResponse.json({ error: { code: 'VALIDATION_FAILED' } }, { status: 400 });
-  }
-  try {
-    const token = await authService.login(parsed.data.email, parsed.data.password); // I-A3
-    return NextResponse.json(token, { status: 200 });
-  } catch (error) {
-    if (error instanceof InvalidCredentialsError) {
-      return NextResponse.json({ error: { code: 'INVALID_CREDENTIALS' } }, { status: 401 });
-    }
-    return NextResponse.json({ error: { code: 'INTERNAL_ERROR' } }, { status: 500 });
-  }
-}
+// The wrapper verifies App Check, the ID token and the account state, applies the guard, the rate
+// limit and the schema (II-A4), maps ApiRouteErrors to status codes (II-A5) and emits the events
+export const POST = withApiRoute(
+  'api-rsvp-create',
+  withRole('member', ({ body, claims }) => recordRsvp(claims.tenantId, claims.uid, body)), // I-A3
+  { rateLimit: 'write', schema: RsvpSchema, feature: 'rsvp' }
+);
 ```
 
 ### Article III: Test-First Imperative
@@ -187,159 +182,74 @@ export async function POST(request: NextRequest) {
 
 ### 2. RED Phase - Write Failing Test
 
-Example for TASK-003 (PasswordValidator):
+Example for TASK-003 (RSVP service):
 
 ```typescript
-// lib/auth/__tests__/password-validator.test.ts
+// src/lib/rsvp/rsvp-service.test.ts
+import { describe, expect, it, vi } from 'vitest';
+import { recordRsvp } from './rsvp-service';
+import * as meetings from './meetings';
+import * as store from './rsvp-store';
 
-import { PasswordValidator } from '../password-validator';
+const OPEN = { id: 'm1', tenantId: 't1', rsvpDeadline: new Date(Date.now() + 3_600_000) };
 
-describe('PasswordValidator', () => {
-  let validator: PasswordValidator;
-
-  beforeEach(() => {
-    validator = new PasswordValidator();
+describe('recordRsvp', () => {
+  // REQ-RSVP-001
+  it('stores one RSVP per member and meeting', async () => {
+    vi.spyOn(meetings, 'getMeeting').mockResolvedValue(OPEN);
+    const upsert = vi.spyOn(store, 'upsertRsvp').mockResolvedValue({ id: 'm1_u1' });
+    await recordRsvp('t1', 'u1', { meetingId: 'm1', response: 'yes' });
+    expect(upsert).toHaveBeenCalledWith('t1', { id: 'm1_u1', meetingId: 'm1', userId: 'u1', response: 'yes' });
   });
 
-  // REQ-AUTH-002: Password validation
-  describe('validate', () => {
-    it('should reject passwords shorter than 8 characters', () => {
-      const result = validator.validate('short');
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('Password must be at least 8 characters');
-    });
-
-    it('should reject passwords without special characters', () => {
-      const result = validator.validate('password123');
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('Password must contain special characters');
-    });
-
-    it('should accept valid passwords', () => {
-      const result = validator.validate('SecureP@ss123');
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
+  // REQ-RSVP-002
+  it('rejects an RSVP after the deadline', async () => {
+    vi.spyOn(meetings, 'getMeeting').mockResolvedValue({ ...OPEN, rsvpDeadline: new Date(0) });
+    await expect(recordRsvp('t1', 'u1', { meetingId: 'm1', response: 'yes' })).rejects.toMatchObject({ code: 'RSVP_CLOSED', status: 409 });
   });
 
-  // REQ-AUTH-001: Password hashing
-  describe('hash and verify', () => {
-    it('should hash password with bcrypt', async () => {
-      const password = 'MySecureP@ss123';
-      const hash = await validator.hash(password);
-
-      expect(hash).toBeDefined();
-      expect(hash).not.toBe(password);
-      expect(hash.startsWith('$2b$')).toBe(true); // bcrypt prefix
-    });
-
-    it('should verify correct password', async () => {
-      const password = 'MySecureP@ss123';
-      const hash = await validator.hash(password);
-
-      const isValid = await validator.verify(password, hash);
-      expect(isValid).toBe(true);
-    });
-
-    it('should reject incorrect password', async () => {
-      const password = 'MySecureP@ss123';
-      const hash = await validator.hash(password);
-
-      const isValid = await validator.verify('WrongP@ss123', hash);
-      expect(isValid).toBe(false);
-    });
+  // REQ-RSVP-003
+  it('rejects a member of another tenant', async () => {
+    vi.spyOn(meetings, 'getMeeting').mockResolvedValue(OPEN);
+    await expect(recordRsvp('t2', 'u9', { meetingId: 'm1', response: 'yes' })).rejects.toMatchObject({ status: 403 });
   });
 });
 ```
 
-Run test: `npm test` → Should FAIL (test is red)
+The unit test isolates the service from Firestore; the integration test of TASK-005 runs the same cases against the staging project (ITG-TST-06).
 
-Commit: `git commit -m "test: add password validator tests (REQ-AUTH-001, REQ-AUTH-002)"`
+Run test: `npx vitest run src/lib/rsvp` → Should FAIL (red)
+
+Commit: `git commit -m "test(rsvp): record, deadline and tenant cases (REQ-RSVP-001 to REQ-RSVP-003)"`
 
 ### 3. GREEN Phase - Implement Code
 
+Write the minimal code that makes the tests pass:
+
 ```typescript
-// lib/auth/password-validator.ts
-
-import bcrypt from 'bcrypt';
-
-export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-}
+// src/lib/rsvp/rsvp-service.ts
+import { conflict, forbidden, notFound } from '@/lib/api/api-errors';
+import { getMeeting } from './meetings';
+import { upsertRsvp } from './rsvp-store';
+import type { Rsvp, RsvpInput } from './types';
 
 /**
- * Password validation and hashing service
- *
- * Requirements:
- * - REQ-AUTH-001: Password hashing with bcrypt
- * - REQ-AUTH-002: Password validation rules
+ * Records a member's RSVP for a meeting of their tenant
+ * REQ-RSVP-001, REQ-RSVP-002, REQ-RSVP-003
  */
-export class PasswordValidator {
-  private readonly MIN_LENGTH = 8;
-  private readonly BCRYPT_ROUNDS = 10;
-
-  /**
-   * Validate password against requirements
-   * @param password - Password to validate
-   * @returns Validation result
-   * @requirement REQ-AUTH-002
-   */
-  validate(password: string): ValidationResult {
-    const errors: string[] = [];
-
-    if (password.length < this.MIN_LENGTH) {
-      errors.push(`Password must be at least ${this.MIN_LENGTH} characters`);
-    }
-
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      errors.push('Password must contain special characters');
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      errors.push('Password must contain uppercase letters');
-    }
-
-    if (!/[a-z]/.test(password)) {
-      errors.push('Password must contain lowercase letters');
-    }
-
-    if (!/[0-9]/.test(password)) {
-      errors.push('Password must contain numbers');
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
-  }
-
-  /**
-   * Hash password using bcrypt
-   * @param password - Plain text password
-   * @returns Hashed password
-   * @requirement REQ-AUTH-001
-   */
-  async hash(password: string): Promise<string> {
-    return bcrypt.hash(password, this.BCRYPT_ROUNDS);
-  }
-
-  /**
-   * Verify password against hash
-   * @param password - Plain text password
-   * @param hash - Hashed password
-   * @returns True if password matches
-   * @requirement REQ-AUTH-001
-   */
-  async verify(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash);
-  }
+export async function recordRsvp(tenantId: string, userId: string, input: RsvpInput): Promise<Rsvp> {
+  const meeting = await getMeeting(input.meetingId);
+  if (!meeting) throw notFound('MEETING_NOT_FOUND');
+  if (meeting.tenantId !== tenantId) throw forbidden();
+  if (meeting.rsvpDeadline.getTime() < Date.now()) throw conflict('RSVP_CLOSED');
+  const id = `${meeting.id}_${userId}`; // one RSVP per member and meeting
+  return upsertRsvp(tenantId, { id, meetingId: meeting.id, userId, response: input.response });
 }
 ```
 
 Run test: `npm test` → Should PASS (test is green)
 
-Commit: `git commit -m "feat: implement password validator (REQ-AUTH-001, REQ-AUTH-002)"`
+Commit: `git commit -m "feat(rsvp): record RSVPs with deadline and tenant checks (REQ-RSVP-001 to REQ-RSVP-003)"`
 
 ### 4. BLUE Phase - Refactor
 
@@ -351,7 +261,7 @@ Improve code quality:
 
 Run test: `npm test` → Should still PASS
 
-Commit: `git commit -m "refactor: improve password validator error messages"`
+Commit: `git commit -m "refactor(rsvp): extract the deadline check"`
 
 ### 5. Update Progress
 
@@ -384,7 +294,7 @@ npm test
 npm test -- --coverage
 
 # Run specific test file
-npm test password-validator.test.ts
+npx vitest run src/lib/rsvp
 
 # Run in watch mode
 npm test -- --watch
@@ -409,9 +319,9 @@ Types:
 - `chore`: Maintenance
 
 Examples:
-- `test: add password validator tests (REQ-AUTH-001, REQ-AUTH-002)`
-- `feat: implement password validator (REQ-AUTH-001, REQ-AUTH-002)`
-- `refactor: extract validation rules to constants`
+- `test(rsvp): record, deadline and tenant cases (REQ-RSVP-001 to REQ-RSVP-003)`
+- `feat(rsvp): record RSVPs with deadline and tenant checks (REQ-RSVP-001 to REQ-RSVP-003)`
+- `refactor(rsvp): extract the deadline check`
 
 ## Branch Strategy
 
@@ -473,42 +383,37 @@ After completing all tasks, create summary:
 ## ✅ Implementation Complete: {{feature-name}}
 
 ### Tasks Completed
-- ✅ TASK-001: Database schema migration
-- ✅ TASK-002: Environment configuration
-- ✅ TASK-003: PasswordValidator library
-- ✅ TASK-004: AuthService library
-- ✅ TASK-005: CLI interface (`library`, `cli` only)
-- ✅ TASK-006: Register API endpoint
-- ✅ TASK-007: Login API endpoint
-- ✅ TASK-008: Integration tests
-- ✅ TASK-009: Security audit
-- ✅ TASK-010: API documentation
+- ✅ TASK-001: Firestore indexes and rules for RSVPs
+- ✅ TASK-002: Feature registration
+- ✅ TASK-003: RSVP service
+- ✅ TASK-004: RSVP route handler
+- ✅ TASK-005: Integration and E2E tests
+- ✅ TASK-006: Security checklist
 
 ### Requirements Fulfilled
-- ✅ REQ-AUTH-001: User registration
-- ✅ REQ-AUTH-002: Password validation
-- ✅ REQ-AUTH-003: User login
+- ✅ REQ-RSVP-001: Record an RSVP
+- ✅ REQ-RSVP-002: RSVP deadline
+- ✅ REQ-RSVP-003: Tenant isolation
 
 ### Test Coverage
-- Unit Tests: 85%
-- Integration Tests: 100%
-- E2E Tests: Critical flows covered
+- Unit Tests: 92%
+- Integration Tests: against the staging project under ci-<run-id>
+- E2E Tests: member RSVPs and sees the list
 
 ### Constitutional Compliance
-- ✅ Article I: Testable core (lib/auth/, or src/lib/auth/ for `application`)
-- ✅ Article II: Automation interface (lib/auth/cli.ts, or the HTTP API for `application`)
+- ✅ Article I: Testable core (src/lib/rsvp/)
+- ✅ Article II: Automation interface (the HTTP API, application profile)
 - ✅ Article III: Test-first (RED-GREEN-BLUE followed)
 - ✅ Article IV: EARS requirements mapped
 - ✅ Article V: Traceability maintained
 - ✅ Article VII: Code within the size limits (VII-4 to VII-6)
 
 ### Files Created/Modified
-- lib/auth/password-validator.ts
-- lib/auth/auth-service.ts
-- lib/auth/cli.ts (`library`, `cli`)
-- app/api/auth/register/route.ts
-- app/api/auth/login/route.ts
-- (+ 15 test files)
+- src/lib/rsvp/rsvp-service.ts
+- src/app/api/rsvp/route.ts
+- src/lib/features/registry.ts, src/lib/logs/route-events.ts, src/lib/logs/allowlist.ts
+- firestore.indexes.json
+- (+ 4 test files)
 
 ### Next Steps
 1. Review implementation

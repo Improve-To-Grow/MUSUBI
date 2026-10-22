@@ -100,259 +100,136 @@ For each task:
 
 # Step 4: Example Task Breakdown
 
-## Phase 1: Setup & Infrastructure
+The example is the meeting RSVP feature (REQ-RSVP-001 to REQ-RSVP-003) of an ITG application (profile `application`).
 
-### TASK-001: Database Schema Migration
+## Phase 1: Setup
+
+### TASK-001: Firestore Indexes and Rules for RSVPs
 - **Phase**: Setup
 - **Type**: Database
-- **Description**: Create users and sessions tables
+- **Description**: Add the `rsvps` collection's composite index and keep the rules denying all client access
 - **Test-First Steps**:
-  1. RED: Write migration test that checks table structure
-  2. GREEN: Add Firestore rules and indexes (or, only if ITG-DAT-02 applies, a numbered SQL migration)
-  3. BLUE: Add indexes and constraints
-- **Requirements**: REQ-AUTH-001, REQ-AUTH-003
+  1. RED: Add the RSVP cases to the rules test (client read and write denied, ITG-SEC-16)
+  2. GREEN: Add the index to `firestore.indexes.json`; `firestore.rules` stays deny-all
+  3. BLUE: Remove indexes no query uses
+- **Requirements**: REQ-RSVP-001
 - **Design Reference**: Section 6 (Data Model)
-- **Estimated Effort**: M
-- **Dependencies**: None
-- **Acceptance Criteria**:
-  - Tables created successfully
-  - Indexes present on email, user_id
-  - Constraints enforce data integrity
-- **Files**:
-  - `prisma/schema.prisma` (modify)
-  - `prisma/migrations/` (create)
-
-### TASK-002: Environment Configuration
-- **Phase**: Setup
-- **Type**: DevOps
-- **Description**: Configure environment variables
-- **Test-First Steps**:
-  1. RED: Write test that validates env vars
-  2. GREEN: Create .env.example
-  3. BLUE: Add validation logic
-- **Requirements**: All
-- **Design Reference**: Section 13 (Deployment)
 - **Estimated Effort**: S
 - **Dependencies**: None
 - **Acceptance Criteria**:
-  - .env.example complete
-  - Environment validation works
-  - Documentation updated
+  - Index deployed to both Firebase projects in the same change (ITG-PLT-23)
+  - `check-rules` green on the PR (ITG-CI-01)
 - **Files**:
-  - `.env.example` (create)
-  - `lib/auth/config.ts` (create)
+  - `firestore.indexes.json` (modify)
 
-## Phase 2: Core Modules
+### TASK-002: Feature Registration
+- **Phase**: Setup
+- **Type**: Backend
+- **Description**: Declare the `rsvp` feature, so it can be switched off (ITG-SEC-23)
+- **Test-First Steps**:
+  1. RED: `check-feature-registry` fails on the new `src/features/rsvp/` folder
+  2. GREEN: Add `rsvp` and its page paths to `src/lib/features/registry.ts`
+  3. BLUE: —
+- **Requirements**: All
+- **Estimated Effort**: S
+- **Dependencies**: None
+- **Files**:
+  - `src/lib/features/registry.ts` (modify)
 
-The examples use the `library` paths. For `application`, use `src/lib/auth/` instead of `lib/auth/` (I-A1).
+## Phase 2: Core Module
 
-### TASK-003: PasswordValidator Library (RED-GREEN-BLUE)
+### TASK-003: RSVP Service (RED-GREEN-BLUE)
 - **Phase**: Implementation
 - **Type**: Backend
-- **Description**: Implement password validation and hashing
+- **Description**: Record an RSVP with the deadline and tenant rules, in the core module `src/lib/rsvp/` (I-A1)
 - **Test-First Steps**:
-  1. RED: Write tests for PasswordValidator class
+  1. RED: Write tests for `recordRsvp`
      ```typescript
-     // lib/auth/__tests__/password-validator.test.ts
-     describe('PasswordValidator', () => {
-       it('should reject passwords < 8 characters', () => {
-         // REQ-AUTH-002
+     // src/lib/rsvp/rsvp-service.test.ts
+     describe('recordRsvp', () => {
+       it('stores one RSVP per member and meeting', () => {
+         // REQ-RSVP-001
        });
-       it('should hash passwords with bcrypt', () => {
-         // REQ-AUTH-001
+       it('rejects an RSVP after the deadline with RSVP_CLOSED', () => {
+         // REQ-RSVP-002
+       });
+       it('rejects a member of another tenant', () => {
+         // REQ-RSVP-003
        });
      });
      ```
-  2. GREEN: Implement PasswordValidator
+  2. GREEN: Implement the service
      ```typescript
-     // lib/auth/password-validator.ts
-     export class PasswordValidator {
-       validate(password: string): ValidationResult
-       hash(password: string): Promise<string>
-       verify(password: string, hash: string): Promise<boolean>
-     }
+     // src/lib/rsvp/rsvp-service.ts
+     export async function recordRsvp(tenantId: string, userId: string, input: RsvpInput): Promise<Rsvp>
      ```
-  3. BLUE: Add edge case handling, improve error messages
-- **Requirements**: REQ-AUTH-001, REQ-AUTH-002
+  3. BLUE: Extract the deadline check, keep functions under 50 lines (VII-5)
+- **Requirements**: REQ-RSVP-001, REQ-RSVP-002, REQ-RSVP-003
 - **Design Reference**: Section 7 (Component Design)
 - **Estimated Effort**: M
 - **Dependencies**: TASK-001
 - **Acceptance Criteria**:
-  - All tests pass (100% coverage)
-  - Password validation enforces requirements
-  - Hashing uses bcrypt cost factor 10
-  - Requirement REQ-AUTH-002 fully implemented
+  - Tests written first and passing; each names its REQ id (ITG-TST-01, ITG-TST-02)
+  - Firestore through `src/lib/firebase-rest/firestore.ts`, tenant-scoped (ITG-PLT-14, ITG-SEC-10)
+  - Errors are typed `ApiRouteError` helpers (`conflict('RSVP_CLOSED')`, `forbidden()`)
 - **Files**:
-  - `lib/auth/password-validator.ts` (create)
-  - `lib/auth/__tests__/password-validator.test.ts` (create)
+  - `src/lib/rsvp/rsvp-service.ts` (create)
+  - `src/lib/rsvp/rsvp-service.test.ts` (create)
+- **`library` / `cli` profiles**: put the module in `lib/rsvp/` with its own tests and add a CLI task (II-L1); the `application` profile has no CLI (II-A3).
 
-### TASK-004: AuthService Library (RED-GREEN-BLUE)
+## Phase 3: API
+
+### TASK-004: RSVP Route Handler (RED-GREEN-BLUE)
 - **Phase**: Implementation
 - **Type**: Backend
-- **Description**: Implement authentication service
+- **Description**: `POST /api/rsvp` through `withApiRoute` (ITG-SEC-13)
 - **Test-First Steps**:
-  1. RED: Write tests for AuthService
-     ```typescript
-     // lib/auth/__tests__/auth-service.test.ts
-     describe('AuthService', () => {
-       describe('register', () => {
-         it('should create user account', () => {
-           // REQ-AUTH-001
-         });
-       });
-       describe('login', () => {
-         it('should authenticate valid credentials', () => {
-           // REQ-AUTH-003
-         });
-         it('should reject invalid credentials', () => {
-           // Error handling
-         });
-       });
-     });
-     ```
-  2. GREEN: Implement AuthService
-     ```typescript
-     // lib/auth/auth-service.ts
-     export class AuthService {
-       async register(email: string, password: string): Promise<User>
-       async login(email: string, password: string): Promise<AuthToken>
-       async logout(userId: string): Promise<void>
-     }
-     ```
-  3. BLUE: Add error handling, logging, metrics
-- **Requirements**: REQ-AUTH-001, REQ-AUTH-003
-- **Design Reference**: Section 7 (Component Design)
-- **Estimated Effort**: L
+  1. RED: Route test: 401 without a token, 403 for another tenant, 409 after the deadline, 200 with the envelope
+  2. GREEN: `withApiRoute('api-rsvp-create', withRole('member', handler), { rateLimit: 'write', schema, feature: 'rsvp' })`
+  3. BLUE: Register the route id in `src/lib/logs/route-events.ts` (ITG-LOG-02)
+- **Requirements**: REQ-RSVP-001, REQ-RSVP-002, REQ-RSVP-003
+- **Design Reference**: Section 5 (API Design)
+- **Estimated Effort**: M
 - **Dependencies**: TASK-003
 - **Acceptance Criteria**:
-  - All tests pass (80%+ coverage)
-  - Registration creates user and sends email
-  - Login returns JWT token
-  - Error cases handled properly
-  - Requirements REQ-AUTH-001, REQ-AUTH-003 fully implemented
+  - Identity and tenant only from the claims (ITG-SEC-06)
+  - `rsvp.response.set`, `.denied` and `.failed` emitted; metadata keys registered in the allowlist (ITG-LOG-07, ITG-LOG-09)
+  - `check-route-guards` and `check-route-logging` green
 - **Files**:
-  - `lib/auth/auth-service.ts` (create)
-  - `lib/auth/__tests__/auth-service.test.ts` (create)
-  - `lib/auth/types.ts` (create)
-
-### TASK-005: CLI Interface (Article II, `library` / `cli` only)
-- **Phase**: Implementation
-- **Type**: Backend
-- **Description**: Create CLI interface for auth library
-- **Test-First Steps**:
-  1. RED: Write CLI integration tests
-  2. GREEN: Implement CLI commands
-  3. BLUE: Add help text, improve UX
-- **Requirements**: Article II (Automation Interface Mandate, II-L1, II-L2)
-- **Design Reference**: Constitutional compliance
-- **Estimated Effort**: M
-- **Dependencies**: TASK-004
-- **Acceptance Criteria**:
-  - CLI can create users
-  - CLI can list users
-  - CLI can reset passwords
-  - Help text complete
-- **Files**:
-  - `lib/auth/cli.ts` (create)
-  - `lib/auth/__tests__/cli.test.ts` (create)
-- **`application` profile**: No CLI task (II-A3). The route handlers in TASK-006 and TASK-007 are the automation interface (II-A1): they validate input against a schema, call AuthService in `src/lib/auth/` and return documented status and error codes (I-A3, II-A4, II-A5). Add a `scripts/` task with `--help` and `--dry-run` only for operational tasks such as user creation (II-A6–II-A9, advisory).
-
-## Phase 3: API Integration
-
-### TASK-006: Register API Endpoint (RED-GREEN-BLUE)
-- **Phase**: Implementation
-- **Type**: Backend
-- **Description**: Create /api/auth/register endpoint
-- **Test-First Steps**:
-  1. RED: Write API integration test
-  2. GREEN: Implement route handler
-  3. BLUE: Add validation, error handling
-- **Requirements**: REQ-AUTH-001, REQ-AUTH-002
-- **Design Reference**: Section 5 (API Design)
-- **Estimated Effort**: M
-- **Dependencies**: TASK-004
-- **Acceptance Criteria**:
-  - POST /api/auth/register works
-  - Returns 201 on success
-  - Returns 400 on validation error
-  - Returns 409 on duplicate email
-- **Files**:
-  - `app/api/auth/register/route.ts` (create)
-  - `app/api/auth/register/route.test.ts` (create)
-
-### TASK-007: Login API Endpoint (RED-GREEN-BLUE)
-- **Phase**: Implementation
-- **Type**: Backend
-- **Description**: Create /api/auth/login endpoint
-- **Test-First Steps**:
-  1. RED: Write API integration test
-  2. GREEN: Implement route handler
-  3. BLUE: Add rate limiting, logging
-- **Requirements**: REQ-AUTH-003
-- **Design Reference**: Section 5 (API Design)
-- **Estimated Effort**: M
-- **Dependencies**: TASK-004
-- **Acceptance Criteria**:
-  - POST /api/auth/login works
-  - Returns JWT token on success
-  - Returns 401 on invalid credentials
-  - Rate limiting enforced
-- **Files**:
-  - `app/api/auth/login/route.ts` (create)
-  - `app/api/auth/login/route.test.ts` (create)
+  - `src/app/api/rsvp/route.ts` (create)
+  - `src/app/api/rsvp/route.test.ts` (create)
 
 ## Phase 4: Testing & Quality
 
-### TASK-008: Integration Tests
+### TASK-005: Integration and E2E Tests
 - **Phase**: Testing
 - **Type**: Testing
-- **Description**: Write integration tests for complete flow
-- **Test-First Steps**: Already test-first from previous tasks
-- **Requirements**: All REQ-AUTH-*
+- **Description**: Run the flow against the staging project as the fixed test users (ITG-TST-06, ITG-TST-12)
+- **Requirements**: All REQ-RSVP-*
 - **Design Reference**: Section 12 (Testing Strategy)
-- **Estimated Effort**: L
-- **Dependencies**: TASK-007
+- **Estimated Effort**: M
+- **Dependencies**: TASK-004
 - **Acceptance Criteria**:
-  - Complete registration → login flow tested
-  - Error cases covered
-  - Real database and services, not mocks (IX-1)
-  - Coverage at or above the configured threshold, default 80% (III-6)
-  - All EARS requirements tested (III-5)
+  - Data only under `ci-<run-id>`, cleaned up (ITG-TST-08)
+  - A member of the second tenant is blocked (ITG-TST-09)
+  - Playwright: a member RSVPs and sees the updated list (ITG-TST-10)
+  - Coverage at or above the `application` threshold (III-6)
 - **Files**:
-  - `tests/integration/auth.test.ts` (create)
+  - `src/lib/rsvp/rsvp.integration.test.ts` (create)
+  - `tests/e2e/rsvp.spec.ts` (create)
 
-### TASK-009: Security Audit
+### TASK-006: Security Checklist
 - **Phase**: Testing
 - **Type**: Security
-- **Description**: Verify OWASP Top 10 compliance
+- **Description**: Run the security release checklist for the new route (ITG-SEC)
 - **Requirements**: Security requirements
 - **Design Reference**: Section 9 (Security Design)
-- **Estimated Effort**: M
-- **Dependencies**: TASK-008
-- **Acceptance Criteria**:
-  - No SQL injection vulnerabilities
-  - Passwords properly hashed
-  - JWT tokens properly signed
-  - Rate limiting works
-- **Files**:
-  - `tests/security/auth-security.test.ts` (create)
-
-## Phase 5: Documentation & Deployment
-
-### TASK-010: API Documentation
-- **Phase**: Documentation
-- **Type**: Documentation
-- **Description**: Create OpenAPI/Swagger documentation
-- **Requirements**: All API requirements
-- **Design Reference**: Section 5 (API Design)
 - **Estimated Effort**: S
-- **Dependencies**: TASK-007
+- **Dependencies**: TASK-005
 - **Acceptance Criteria**:
-  - All endpoints documented
-  - Request/response examples provided
-  - Error codes documented
-- **Files**:
-  - `docs/api/auth.yaml` (create)
+  - Guard, rate limit and zod schema on the route
+  - No names or emails in the RSVP events
+  - Kill switch: with `rsvp` switched off, page and route answer 404 (ITG-SEC-24)
 
 ## 4. Requirements Coverage Matrix
 
@@ -360,24 +237,20 @@ Map tasks to requirements (V-6):
 
 | Requirement | Tasks | Status |
 |-------------|-------|--------|
-| REQ-AUTH-001 | TASK-003, TASK-004, TASK-006 | Pending |
-| REQ-AUTH-002 | TASK-003, TASK-006 | Pending |
-| REQ-AUTH-003 | TASK-004, TASK-007 | Pending |
+| REQ-RSVP-001 | TASK-001, TASK-003, TASK-004, TASK-005 | Pending |
+| REQ-RSVP-002 | TASK-003, TASK-004 | Pending |
+| REQ-RSVP-003 | TASK-003, TASK-004, TASK-005 | Pending |
 
 ## 5. Dependency Graph
 
 ```
-TASK-001 (DB Schema)
-  └─> TASK-003 (PasswordValidator)
-      └─> TASK-004 (AuthService)
-          ├─> TASK-005 (CLI, library/cli only)
-          ├─> TASK-006 (Register API)
-          └─> TASK-007 (Login API)
-              └─> TASK-008 (Integration Tests)
-                  └─> TASK-009 (Security Audit)
-                      └─> TASK-010 (Documentation)
+TASK-001 (Indexes and rules)
+  └─> TASK-003 (RSVP service)
+      └─> TASK-004 (Route handler)
+          └─> TASK-005 (Integration and E2E tests)
+              └─> TASK-006 (Security checklist)
 
-TASK-002 (Env Config) ──> All tasks
+TASK-002 (Feature registration) ──> TASK-004
 ```
 
 ## 6. Estimation Summary
@@ -387,7 +260,7 @@ TASK-002 (Env Config) ──> All tasks
 - **Large (L)**: 1-2 days
 - **Extra Large (XL)**: 2-5 days
 
-**Total Estimate**: 3-5 days
+**Total Estimate**: 2-3 days
 
 # Step 5: Save Task Breakdown
 

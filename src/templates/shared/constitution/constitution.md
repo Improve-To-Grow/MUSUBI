@@ -421,13 +421,13 @@ An `index` file collects a module's public API, so its imports grow with the API
 
 ### Validation Checklist
 
-- [ ] Integration tests use real databases: Docker, test schema (IX-1, IX-2)
+- [ ] Integration tests use real databases: Docker, test schema (IX-1, IX-2); in ITG projects the staging Firebase project, isolated by the run prefix `ci-<run-id>`, no emulator (ITG-TST-06, ITG-TST-08)
 - [ ] External APIs use test/sandbox environments (IX-3)
 - [ ] Mocks justified with unavailability/cost reasons (IX-4, IX-5)
 - [ ] Test data cleanup automated
 - [ ] Tests pass against real services (IX-1)
 
-**Tools**: Docker Compose, Testcontainers, test database schemas
+**Tools**: Docker Compose, Testcontainers, test database schemas; in ITG projects the staging Firebase project, the Neon `<app>-test` database and vendor sandboxes (`steering/rules/itg/testing.md`)
 
 ---
 
