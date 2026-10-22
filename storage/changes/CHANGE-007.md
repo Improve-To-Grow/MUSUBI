@@ -54,7 +54,7 @@ The work started on `bcc435d`. Meanwhile `ITG-adjustments` gained CHANGE-003 to 
 
 - REQ-ITG-001: WHEN `musubi init` generates steering, the system SHALL write `steering/structure.md`, `steering/tech.md` and `steering/product.md` from the shared ITG templates, and SHALL copy the ITG policy files to `steering/rules/itg/`.
 - REQ-ITG-002: WHEN `musubi init` creates constitutional governance, the system SHALL copy `constitution.md`, `constitution-levels.yml`, `ears-format.md` and `workflow.md` to `steering/rules/`.
-- REQ-ITG-003: The `musubi init` profile prompt SHALL default to `application`, with core path `src/lib`, delivery paths `src/app, src/components, src/features, src/middleware` and adapter path `src/lib/auth`.
+- REQ-ITG-003: The `musubi init` profile prompt SHALL default to `application`, with core path `src/lib`, delivery paths `src/app, src/components, src/features, src/middleware` and adapter paths `src/lib/auth, src/lib/api`.
 - REQ-ITG-004: Each ITG policy file SHALL:
   - name the playbook version it implements;
   - cite an existing playbook section for its rules;
