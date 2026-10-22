@@ -25,7 +25,7 @@ Playbook v2.2 §3.3 says a new project is initialized with the ITG profile, whic
 |---|---|
 | Scope | Appendix C, the PR template and the `scripts/ci/` helpers the deploy workflow calls. Not the application code of §12 of the setup guide (route wrapper, recorders, REST clients): that is project code. |
 | When | `musubi init` writes the scaffold when the constitution profile is `application` (every ITG project). `musubi-onboard` writes it into existing projects (maintainer decision, 2026-10-22). Existing files are never overwritten; both report them as kept. |
-| Branch | Its own branch on top of `feat/itg-playbook-steering`, so the two changes can be reviewed apart. |
+| Branch | `feat/itg-playbook-steering`, together with CHANGE-007, so that every change is on one branch (maintainer decision, 2026-10-22). |
 
 ## Implementation decisions (playbook gaps, to report back)
 
