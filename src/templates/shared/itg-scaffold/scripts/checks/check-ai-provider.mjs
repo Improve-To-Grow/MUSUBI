@@ -3,7 +3,9 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, exists, finish, lineOf, read, walk } from './lib.mjs';
+import { exists, finish, lineOf, printHelp, read, ROOT, walk } from './lib.mjs';
+
+if (process.argv.includes('--help')) printHelp(import.meta.url);
 
 const SOURCE_DIRS = ['src', 'functions', 'workers'];
 const PACKAGES = ['@google/genai', '@google/generative-ai', '@ai-sdk/google'];

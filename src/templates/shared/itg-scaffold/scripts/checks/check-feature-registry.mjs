@@ -1,7 +1,9 @@
 // Every folder under src/features/ is declared in src/lib/features/registry.ts, and the registry names
 // no folder that does not exist, so every feature can be switched off
 // (ITG Software Delivery Playbook §11.11, Appendix C.3).
-import { exists, finish, read, stripComments, subdirectories } from './lib.mjs';
+import { exists, finish, printHelp, read, stripComments, subdirectories } from './lib.mjs';
+
+if (process.argv.includes('--help')) printHelp(import.meta.url);
 
 const REGISTRY = 'src/lib/features/registry.ts';
 

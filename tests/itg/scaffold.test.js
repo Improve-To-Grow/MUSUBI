@@ -147,6 +147,29 @@ describe('musubi-onboard (REQ-ITG-011)', () => {
   });
 });
 
+describe('--help (II-A7)', () => {
+  it('every script prints its header comment and exits 0 without doing its work', () => {
+    const scripts = ['checks', 'ci'].flatMap(dir =>
+      fs
+        .readdirSync(path.join(root, 'scripts', dir))
+        .filter(name => name.endsWith('.mjs') && name !== 'lib.mjs')
+        .map(name => `scripts/${dir}/${name}`)
+    );
+    expect(scripts.length).toBeGreaterThanOrEqual(11);
+
+    for (const script of scripts) {
+      // deploy-worker and migrate would fail without arguments or MIGRATION_DATABASE_URL
+      const result = run(script, ['--help'], { BASE_REF: '' });
+      const firstLine = fs
+        .readFileSync(path.join(root, script), 'utf8')
+        .split('\n')[0]
+        .replace(/^\/\/ /, '');
+      expect({ script, status: result.status }).toEqual({ script, status: 0 });
+      expect(result.output.startsWith(firstLine)).toBe(true);
+    }
+  });
+});
+
 describe('check-route-guards', () => {
   it('accepts a wrapped, guarded route and a public one', () => {
     write(

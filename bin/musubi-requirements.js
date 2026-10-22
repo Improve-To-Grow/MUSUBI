@@ -8,7 +8,7 @@
  *
  * Usage:
  *   musubi-requirements init <feature>          # Initialize requirements document
- *   musubi-requirements add <pattern> <title>   # Add requirement with EARS pattern
+ *   musubi-requirements add [-p <pattern> -t <title> ...]  # Add requirement with EARS pattern
  *   musubi-requirements list                    # List all requirements
  *   musubi-requirements validate                # Validate EARS format compliance
  *   musubi-requirements trace                   # Show traceability matrix
@@ -16,8 +16,20 @@
 
 const { Command } = require('commander');
 const chalk = require('chalk');
-const inquirer = require('inquirer');
+const path = require('path');
 const RequirementsGenerator = require('../src/generators/requirements');
+
+let inquirer;
+
+/**
+ * Initialize inquirer (ESM module in v9+)
+ */
+async function getInquirer() {
+  if (!inquirer) {
+    inquirer = (await import('inquirer')).default;
+  }
+  return inquirer;
+}
 
 const program = new Command();
 
@@ -68,7 +80,9 @@ program
         console.log();
         console.log(chalk.bold('Next steps:'));
         console.log(chalk.dim(`  1. Edit ${result.path}`));
-        console.log(chalk.dim('  2. Add requirements: musubi-requirements add <pattern> <title>'));
+        console.log(
+          chalk.dim('  2. Add requirements: musubi-requirements add -p <pattern> -t <title>')
+        );
         console.log(chalk.dim('  3. Validate: musubi-requirements validate'));
         console.log();
       }
@@ -94,6 +108,10 @@ program
   .option('-f, --file <path>', 'Requirements file path')
   .option('-p, --pattern <type>', 'EARS pattern (ubiquitous|event|state|unwanted|optional)')
   .option('-t, --title <text>', 'Requirement title')
+  .option('--system <name>', 'System or component that SHALL respond')
+  .option('-s, --statement <text>', 'Condition: the event, state, error or feature')
+  .option('-r, --response <text>', 'What the system SHALL do')
+  .option('-c, --criteria <list>', 'Acceptance criteria, comma-separated')
   .action(async options => {
     try {
       console.log(chalk.bold('\n📝 Add EARS Requirement\n'));
@@ -113,7 +131,9 @@ program
         if (files.length === 1) {
           reqFile = files[0];
         } else {
-          const answer = await inquirer.prompt([
+          const answer = await (
+            await getInquirer()
+          ).prompt([
             {
               type: 'list',
               name: 'file',
@@ -125,102 +145,103 @@ program
         }
       }
 
-      // Interactive prompts if not provided
-      let pattern = options.pattern;
-      let title = options.title;
-
-      if (!pattern || !title) {
-        const answers = await inquirer.prompt([
-          {
-            type: 'list',
-            name: 'pattern',
-            message: 'Select EARS pattern:',
-            choices: [
-              { name: 'Ubiquitous - The [system] SHALL [requirement]', value: 'ubiquitous' },
-              {
-                name: 'Event-Driven - WHEN [event], THEN [system] SHALL [response]',
-                value: 'event',
-              },
-              { name: 'State-Driven - WHILE [state], [system] SHALL [response]', value: 'state' },
-              {
-                name: 'Unwanted Behavior - IF [error], THEN [system] SHALL [response]',
-                value: 'unwanted',
-              },
-              {
-                name: 'Optional Feature - WHERE [feature], [system] SHALL [response]',
-                value: 'optional',
-              },
-            ],
-            when: () => !pattern,
-          },
-          {
-            type: 'input',
-            name: 'title',
-            message: 'Requirement title:',
-            when: () => !title,
-            validate: input => input.length > 0 || 'Title is required',
-          },
-          {
-            type: 'input',
-            name: 'system',
-            message: 'System/component name:',
-            default: 'system',
-          },
-          {
-            type: 'input',
-            name: 'statement',
-            message: answers => {
-              const prompts = {
-                ubiquitous: 'What SHALL the system do?',
-                event: 'What event triggers this? (WHEN...)',
-                state: 'What state/condition? (WHILE...)',
-                unwanted: 'What error/unwanted condition? (IF...)',
-                optional: 'What optional feature? (WHERE...)',
-              };
-              return prompts[answers.pattern || pattern];
+      // Ask only for what the options do not give; with every option the command runs unattended
+      const answers = await (
+        await getInquirer()
+      ).prompt([
+        {
+          type: 'list',
+          name: 'pattern',
+          message: 'Select EARS pattern:',
+          choices: [
+            { name: 'Ubiquitous - The [system] SHALL [requirement]', value: 'ubiquitous' },
+            {
+              name: 'Event-Driven - WHEN [event], THEN [system] SHALL [response]',
+              value: 'event',
             },
-            validate: input => input.length > 0 || 'Statement is required',
+            { name: 'State-Driven - WHILE [state], [system] SHALL [response]', value: 'state' },
+            {
+              name: 'Unwanted Behavior - IF [error], THEN [system] SHALL [response]',
+              value: 'unwanted',
+            },
+            {
+              name: 'Optional Feature - WHERE [feature], [system] SHALL [response]',
+              value: 'optional',
+            },
+          ],
+          when: () => !options.pattern,
+        },
+        {
+          type: 'input',
+          name: 'title',
+          message: 'Requirement title:',
+          when: () => !options.title,
+          validate: input => input.length > 0 || 'Title is required',
+        },
+        {
+          type: 'input',
+          name: 'system',
+          message: 'System/component name:',
+          default: 'system',
+          when: () => !options.system,
+        },
+        {
+          type: 'input',
+          name: 'statement',
+          message: answers => {
+            const prompts = {
+              event: 'What event triggers this? (WHEN...)',
+              state: 'What state/condition? (WHILE...)',
+              unwanted: 'What error/unwanted condition? (IF...)',
+              optional: 'What optional feature? (WHERE...)',
+            };
+            return prompts[answers.pattern || options.pattern];
           },
-          {
-            type: 'input',
-            name: 'response',
-            message: 'What SHALL the system do? (response)',
-            validate: input => input.length > 0 || 'Response is required',
-          },
-          {
-            type: 'input',
-            name: 'criteria',
-            message: 'Acceptance criteria (comma-separated):',
-            filter: input =>
-              input
-                .split(',')
-                .map(s => s.trim())
-                .filter(s => s.length > 0),
-          },
-        ]);
+          // The ubiquitous pattern has no condition
+          when: answers =>
+            !options.statement && (answers.pattern || options.pattern) !== 'ubiquitous',
+          validate: input => input.length > 0 || 'Statement is required',
+        },
+        {
+          type: 'input',
+          name: 'response',
+          message: 'What SHALL the system do? (response)',
+          when: () => !options.response,
+          validate: input => input.length > 0 || 'Response is required',
+        },
+        {
+          type: 'input',
+          name: 'criteria',
+          message: 'Acceptance criteria (comma-separated):',
+          when: () => options.criteria === undefined,
+        },
+      ]);
 
-        pattern = pattern || answers.pattern;
-        title = title || answers.title;
+      const title = options.title || answers.title;
+      const criteria = options.criteria ?? answers.criteria ?? '';
+      const requirement = {
+        pattern: options.pattern || answers.pattern,
+        // The id area is the feature of the file: rsvp-requirements.md gives REQ-RSVP-NNN
+        component: path.basename(reqFile).replace(/-requirements\.md$|\.md$/, ''),
+        title,
+        system: options.system || answers.system,
+        statement: options.statement || answers.statement,
+        response: options.response || answers.response,
+        criteria: criteria
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s.length > 0),
+      };
 
-        const requirement = {
-          pattern,
-          title,
-          system: answers.system,
-          statement: answers.statement,
-          response: answers.response,
-          criteria: answers.criteria,
-        };
+      const result = await generator.addRequirement(reqFile, requirement);
 
-        const result = await generator.addRequirement(reqFile, requirement);
+      console.log(chalk.green('\n✓ Requirement added:'));
+      console.log(chalk.dim(`  ${result.id}: ${title}`));
+      console.log(chalk.bold('\n📄 EARS Statement:'));
+      console.log(chalk.cyan(result.statement));
+      console.log();
 
-        console.log(chalk.green('\n✓ Requirement added:'));
-        console.log(chalk.dim(`  ${result.id}: ${title}`));
-        console.log(chalk.bold('\n📄 EARS Statement:'));
-        console.log(chalk.cyan(result.statement));
-        console.log();
-
-        process.exit(0);
-      }
+      process.exit(0);
     } catch (error) {
       console.error(chalk.red('✗ Error:'), error.message);
       process.exit(1);

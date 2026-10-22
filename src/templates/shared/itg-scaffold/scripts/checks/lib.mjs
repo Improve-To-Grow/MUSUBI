@@ -90,3 +90,11 @@ export function finish(check, problems) {
   for (const problem of problems) console.error(`  ${problem}`);
   process.exit(1);
 }
+
+/** --help: print the script's leading comment block, which documents it, and exit */
+export function printHelp(scriptUrl) {
+  const lines = fs.readFileSync(new URL(scriptUrl), 'utf8').split('\n');
+  const header = lines.slice(0, lines.findIndex(line => !line.startsWith('//')));
+  console.log(header.map(line => line.replace(/^\/\/ ?/, '')).join('\n'));
+  process.exit(0);
+}

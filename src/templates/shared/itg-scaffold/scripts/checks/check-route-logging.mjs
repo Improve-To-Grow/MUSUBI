@@ -1,7 +1,9 @@
 // Every route emits at least one audit or app event: the wrapper's automatic event, whose route id is
 // registered in the event catalogue, or an explicit recordAuditEvent / recordAppEvent call
 // (ITG Software Delivery Playbook §9.1, Appendix C.3).
-import { exists, finish, read, stripComments, walk } from './lib.mjs';
+import { exists, finish, printHelp, read, stripComments, walk } from './lib.mjs';
+
+if (process.argv.includes('--help')) printHelp(import.meta.url);
 
 // The playbook does not name the catalogue file; this is the ITG MUSUBI scaffold's convention.
 const CATALOGUE = 'src/lib/logs/route-events.ts';

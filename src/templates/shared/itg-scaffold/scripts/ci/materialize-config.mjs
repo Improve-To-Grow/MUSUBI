@@ -10,6 +10,9 @@
 // Input: VARS_JSON = toJSON(vars), SECRETS_JSON = toJSON(secrets). CI-only credentials never reach
 // a deployable.
 import fs from 'node:fs';
+import { printHelp } from '../checks/lib.mjs';
+
+if (process.argv.includes('--help')) printHelp(import.meta.url);
 
 const HEADER = /^# ---- (.+?) ----\s+(.*)$/;
 const KEY = /^([A-Z][A-Z0-9_]*)=/;

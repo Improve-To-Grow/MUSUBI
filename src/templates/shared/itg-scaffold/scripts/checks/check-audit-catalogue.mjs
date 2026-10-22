@@ -3,7 +3,9 @@
 // audit:catalogue) writes it (ITG Software Delivery Playbook §9.4, §9.6, Appendix C.3).
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, exists, finish, read, stripComments } from './lib.mjs';
+import { exists, finish, printHelp, read, ROOT, stripComments } from './lib.mjs';
+
+if (process.argv.includes('--help')) printHelp(import.meta.url);
 
 const ALLOWLIST = 'src/lib/logs/allowlist.ts';
 const CATALOGUE = 'documentation/AUDIT_LOGGING.md';

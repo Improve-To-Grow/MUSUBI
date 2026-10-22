@@ -54,6 +54,31 @@ describe('ConstitutionalValidator', () => {
     });
   });
 
+  describe('Article IX in an ITG project (ITG-TST-06)', () => {
+    beforeEach(async () => {
+      await write('steering/rules/itg/testing.md', '# Testing');
+      await write('src/lib/rsvp.test.ts', "test('x', () => {});");
+    });
+
+    it('does not recommend docker-compose', async () => {
+      const articleIX = findingsFor(await validate(), 'CONST-009');
+      const all = [...articleIX.warnings, ...articleIX.violations];
+      expect(all.map(f => `${f.message} ${f.recommendation}`).join('\n')).not.toMatch(/docker/i);
+      expect(messages(articleIX.passes)).toMatch(/staging environment/);
+    });
+
+    it('reports scripts that start the Firebase Emulator', async () => {
+      await write(
+        'package.json',
+        JSON.stringify({ scripts: { 'test:int': 'firebase emulators:exec "vitest run"' } })
+      );
+      const articleIX = findingsFor(await validate(), 'CONST-009');
+      const findings = [...articleIX.warnings, ...articleIX.violations];
+      expect(messages(findings)).toMatch(/Firebase Emulator/);
+      expect(findings[0].recommendation).toMatch(/staging Firebase project/);
+    });
+  });
+
   describe('library profile (default, P-2)', () => {
     it('applies the library profile and warns that none is declared (P-1)', async () => {
       await write('lib/auth/index.js', 'module.exports = {};');

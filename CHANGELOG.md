@@ -18,6 +18,9 @@ The fork is now developed independently of upstream `nahisaho/MUSUBI` (CHANGE-00
 - **`musubi-trace` counts tests next to the code** (`src/**/*.test.ts`) as tests and no longer as code; `musubi-validate project` finds the matrix in `storage/traceability/`
 - **`musubi-onboard`** declares the `application` profile with the ITG paths
 - **Article VII code limits fail CI**: the `application` profile that `musubi init` and `musubi-onboard` write sets `CONST-007: critical`, so a long function or file is a CRITICAL finding of `musubi-validate project` instead of a warning (ITG-GIT-13)
+- **Article IX in ITG projects**: `musubi-validate project` no longer recommends docker-compose to a project with `steering/rules/itg/`; it reports package.json scripts that start the Firebase Emulator instead (ITG-TST-06). Mocks of Vertex AI and Gemini count as allowed LLM mocks
+- **`musubi-requirements add`** loads the ESM `inquirer` (it failed with "inquirer.prompt is not a function"), adds the requirement when `-p` and `-t` are given (it did nothing), runs unattended with the new `--system`, `-s`, `-r` and `-c` options, and takes the id area from the file (`meeting-rsvp-requirements.md` gives `REQ-MEETING-RSVP-NNN`, not `REQ-FEATURE-NNN`)
+- **Scaffold scripts answer `--help`** with their header comment and exit 0 without doing their work (II-A7)
 
 ### Changed
 

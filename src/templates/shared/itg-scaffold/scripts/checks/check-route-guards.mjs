@@ -1,6 +1,8 @@
 // Every route.ts exports its handlers through withApiRoute(...) with withAuth / withRole /
 // withTenant or an explicit `public: true` (ITG Software Delivery Playbook §11.5, Appendix C.3).
-import { finish, lineOf, read, stripComments, walk } from './lib.mjs';
+import { finish, lineOf, printHelp, read, stripComments, walk } from './lib.mjs';
+
+if (process.argv.includes('--help')) printHelp(import.meta.url);
 
 const METHODS = 'GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS';
 const GUARD = /\bwith(?:Auth|Role|Tenant)\s*\(|\bpublic\s*:\s*true\b/;

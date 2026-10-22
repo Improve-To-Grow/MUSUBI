@@ -4,6 +4,9 @@
 // Needs MIGRATION_DATABASE_URL and the `pg` package (a devDependency of PostgreSQL projects).
 import fs from 'node:fs';
 import path from 'node:path';
+import { printHelp } from '../checks/lib.mjs';
+
+if (process.argv.includes('--help')) printHelp(import.meta.url);
 
 const DIR = 'database/migrations';
 const FILE = /^\d{4}_[a-z0-9_]+\.sql$/;

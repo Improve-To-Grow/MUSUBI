@@ -6,6 +6,9 @@
 //   node scripts/ci/deploy-worker.mjs relay <environment>   reads .relay-vars.json, workers/log-relay/
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
+import { printHelp } from '../checks/lib.mjs';
+
+if (process.argv.includes('--help')) printHelp(import.meta.url);
 
 const TARGETS = {
   app: { vars: '.app-vars.json', config: [] },

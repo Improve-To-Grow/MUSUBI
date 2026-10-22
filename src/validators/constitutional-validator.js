@@ -510,7 +510,16 @@ class ConstitutionalValidator {
 
     let mockCount = 0;
     let allowedMocks = 0;
-    const allowedMockPatterns = ['llm', 'openai', 'anthropic', 'github', 'azure', 'api'];
+    const allowedMockPatterns = [
+      'llm',
+      'openai',
+      'anthropic',
+      'vertex',
+      'gemini',
+      'github',
+      'azure',
+      'api',
+    ];
 
     for (const file of testFiles) {
       const content = fs.readFileSync(file, 'utf-8');
@@ -529,7 +538,24 @@ class ConstitutionalValidator {
       }
     }
 
-    if (!hasDockerCompose && testFiles.length > 0) {
+    // ITG projects test against the staging Firebase project, never an emulator (ITG-TST-06)
+    const itgProject = fs.existsSync(path.join(this.projectRoot, 'steering', 'rules', 'itg'));
+    const scripts = Object.values(this.readPackageJson()?.scripts || {}).join('\n');
+
+    if (itgProject) {
+      const usesEmulator = /firebase\s+emulators:/.test(scripts);
+      this._recordFinding(
+        articleId,
+        articleName,
+        !usesEmulator,
+        usesEmulator
+          ? 'package.json scripts start the Firebase Emulator'
+          : 'Integration tests run against the staging environment (ITG-TST-06)',
+        usesEmulator
+          ? 'Test against the staging Firebase project under the ci-<run-id> prefix, without an emulator (ITG-TST-06, ITG-TST-08)'
+          : null
+      );
+    } else if (!hasDockerCompose && testFiles.length > 0) {
       this._recordFinding(
         articleId,
         articleName,

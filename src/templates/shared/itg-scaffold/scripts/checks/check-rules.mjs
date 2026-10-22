@@ -5,7 +5,9 @@
 // The paths, content types and size limit of the cases come from scripts/checks/rules-cases.json.
 // (new) The Security Rules API call has not run in an ITG project yet (playbook §2.1).
 import crypto from 'node:crypto';
-import { changedFiles, finish, read } from './lib.mjs';
+import { changedFiles, finish, printHelp, read } from './lib.mjs';
+
+if (process.argv.includes('--help')) printHelp(import.meta.url);
 
 const RULES_FILES = ['firestore.rules', 'storage.rules'];
 
