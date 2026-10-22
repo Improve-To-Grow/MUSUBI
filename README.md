@@ -9,7 +9,7 @@
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-[Documentation](docs/) | [Changelog](CHANGELOG.md) | [Upstream project](https://github.com/nahisaho/MUSUBI)
+[Documentation](docs/) | [Changelog](CHANGELOG.md) | [Original project](https://github.com/nahisaho/MUSUBI)
 
 </div>
 

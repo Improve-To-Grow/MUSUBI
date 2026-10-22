@@ -38,10 +38,12 @@ GitHub Action and a reusable workflow.
 ### The ITG Fork
 
 Improve To Grow (ITG) maintains this fork of [nahisaho/MUSUBI](https://github.com/nahisaho/MUSUBI)
-for its own projects. It differs from upstream in:
+for its own projects and develops it independently: upstream has not changed since its v6.3.1
+release in January 2026, so the fork merges no upstream releases and sends no pull requests
+(CHANGE-009). It differs from the original in:
 
 - **Distribution**: installed from GitHub as the private package `@improve-to-grow/musubi-sdd`,
-  versioned `<upstream>-itg.N`; never `npx`, never the npm registry (6.3.1-itg.1)
+  versioned `6.3.1-itg.N`; never `npx`, never the npm registry (6.3.1-itg.1)
 - **ITG delivery standard**: `musubi init` installs the ITG Software Delivery Playbook
   (`docs/itg/`) as steering: ITG steering templates with a Deviations table, one policy file per
   playbook area with `ITG-*` rule ids and Mermaid diagrams (`steering/rules/itg/`), the
@@ -56,8 +58,6 @@ for its own projects. It differs from upstream in:
   corrected (CHANGE-004), Jest 30 and a release audit limited to shipped dependencies
 - **Records**: change proposals, implementation reports and archive reports under
   `storage/changes/` and `storage/archive/`, archived by hand
-
-Fixes that are not fork-specific are offered upstream as per-theme pull requests.
 
 ### Problem Statement
 
@@ -144,7 +144,6 @@ Fixes that are not fork-specific are offered upstream as per-theme pull requests
 - **Library consumers**: scripts and tools that `require('@improve-to-grow/musubi-sdd')` for the
   analyzers, generators, validators and orchestration modules
 - **CI maintainers**: wire `action.yml`, `musubi-reusable.yml`, the GitLab and Jenkins templates
-- **Upstream project**: receives fork fixes as pull requests
 
 ---
 
@@ -186,10 +185,7 @@ Fixes that are not fork-specific are offered upstream as per-theme pull requests
 
 - `CHANGELOG.md` "Unreleased" lists what is merged but not released; the next release tags
   `v6.3.1-itg.3`.
-- Offer fork fixes upstream as per-theme pull requests (CI fix, Jest 30 and release audit,
-  package entry point exports).
 - Follow-up from CHANGE-004: decide the future of `website/`.
-- Merge upstream releases as they appear and reset the version to `<upstream>-itg.1`.
 
 ---
 
@@ -317,7 +313,7 @@ Key concepts and terminology (see `steering/memories/domain_knowledge.md` for th
 
 - Node.js >= 18; runs on Windows and Linux (CI on Ubuntu; development on Windows with CRLF working copies)
 - No build step and no `exports` map: library consumers depend on file paths under `src/`
-- The fork must stay mergeable with upstream: fork-only changes are kept small and recorded, and generic fixes go upstream
+- Every change is recorded in `storage/changes/`; there is no upstream to stay mergeable with (CHANGE-009)
 - CommonJS throughout; `inquirer` 9 is the one ESM dependency and is loaded with dynamic `import()`
 
 ### Compliance Requirements
@@ -338,7 +334,7 @@ Key concepts and terminology (see `steering/memories/domain_knowledge.md` for th
 | Role                 | Who                                        | Responsibilities                                            |
 | -------------------- | ------------------------------------------ | ----------------------------------------------------------- |
 | **Maintainer**       | Improve To Grow (ITG)                      | Fork releases, change approvals, steering approval (VI-6)   |
-| **Upstream**         | nahisaho/MUSUBI                            | Base versions; receives per-theme pull requests             |
+| **Original project** | nahisaho/MUSUBI                            | Origin of the code (MIT, v6.3.1); no longer followed        |
 | **Users**            | ITG engineers and client project teams     | Run the workflow, propose changes, report issues            |
 | **AI agents**        | Claude Code first; Copilot, Cursor, others | Execute the commands and skills; read steering before acting |
 

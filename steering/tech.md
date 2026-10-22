@@ -135,7 +135,8 @@ does not run on a direct push to `ITG-adjustments`.
 - **Commands**: 25 `bin` entries in `package.json` (`musubi`, `musubi-sdd` and 23 `musubi-*`
   commands). `bin/musubi-checkpoint.js`, `bin/musubi-costs.js` and `bin/musubi-dashboard.js` exist
   but are not registered as commands.
-- **Version scheme**: `<upstream base>-itg.<N>`; bump with
+- **Version scheme**: `6.3.1-itg.<N>`: the base 6.3.1 (the upstream release the fork started from)
+  stays fixed and N counts ITG releases (CHANGE-009); bump with
   `npm version prerelease --preid itg --no-git-tag-version` for every merged change that affects
   installed users, add a `CHANGELOG.md` entry, tag `v<version>`. Tags so far: `v6.3.1-itg.1`,
   `v6.3.1-itg.2`; 6.3.1-itg.3 is in `package.json` and the changelog but not yet tagged.

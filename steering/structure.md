@@ -336,8 +336,8 @@ MUSUBI is English only (CHANGE-001, CHANGE-002).
 - `ITG-adjustments`: the fork's default and release branch (origin `Improve-To-Grow/MUSUBI`)
 - `feat/*`, `fix/*`, `chore/*`, `docs/*`, `refactor/*`, `test/*`: work branches, merged through
   pull requests into `ITG-adjustments` after CI passes
-- Upstream: `nahisaho/MUSUBI` `main`; new upstream releases are merged into `ITG-adjustments` and
-  the version resets to `<upstream>-itg.1`; fork fixes go back upstream as per-theme pull requests
+- Upstream: `nahisaho/MUSUBI` is not followed: no upstream merges, no upstream pull requests
+  (CHANGE-009)
 
 ### Commit Message Convention
 
