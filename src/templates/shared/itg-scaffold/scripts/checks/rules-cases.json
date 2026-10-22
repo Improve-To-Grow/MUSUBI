@@ -1,0 +1,13 @@
+{
+  "tenantId": "ci-rules-tenant",
+  "otherTenantId": "ci-rules-other-tenant",
+  "firestore": {
+    "documentPath": "tenants/ci-rules-tenant/projects/ci-rules-doc"
+  },
+  "storage": {
+    "uploadPath": "tenants/{tenantId}/uploads/ci-rules-file",
+    "allowedContentType": "image/png",
+    "deniedContentType": "text/html",
+    "maxBytes": 10485759
+  }
+}

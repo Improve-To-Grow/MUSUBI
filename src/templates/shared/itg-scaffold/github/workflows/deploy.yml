@@ -1,0 +1,138 @@
+# Deploy pipeline (ITG Software Delivery Playbook §8.2.1, Appendix C.2). A push to `staging` deploys
+# staging, a push to `master` deploys production, and a manual run deploys the head of the branch it is
+# run on. The workflow runs no checks of its own: the rulesets and the `production` environment's
+# branch policy are the production guard (§8).
+name: deploy
+
+on:
+  push:
+    branches: [staging, master]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # the release tag on master (§4.3)
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+    steps:
+      - id: env
+        run: |
+          case "${{ github.ref_name }}" in
+            staging) echo "environment=staging" >> "$GITHUB_OUTPUT" ;;
+            master) echo "environment=production" >> "$GITHUB_OUTPUT" ;;
+            *) echo "Deploys run from staging or master only, not ${{ github.ref_name }}"; exit 1 ;;
+          esac
+
+  deploy:
+    needs: [resolve]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.resolve.outputs.environment }}
+    env:
+      ENVIRONMENT: ${{ needs.resolve.outputs.environment }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - name: Materialize configuration from the GitHub Environment
+        # NEXT_PUBLIC_* → .env.production; server configuration → .app-vars.json / .relay-vars.json;
+        # credentials → .secrets.json / .relay-secrets.json. .env.example names the reader of every block.
+        run: node scripts/ci/materialize-config.mjs --deploy
+        env:
+          VARS_JSON: ${{ toJSON(vars) }}
+          SECRETS_JSON: ${{ toJSON(secrets) }}
+      - run: npx opennextjs-cloudflare build
+      - name: Apply PostgreSQL migrations (§3.5)
+        if: hashFiles('database/migrations/*.sql') != ''
+        run: node scripts/ci/migrate.mjs
+        env:
+          MIGRATION_DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+      - run: npx wrangler secret bulk .secrets.json --env "$ENVIRONMENT"
+      - run: node scripts/ci/deploy-worker.mjs app "$ENVIRONMENT"
+      - name: Log relay secrets (LOG_INGEST_SECRET only)
+        if: hashFiles('workers/log-relay/wrangler.jsonc') != ''
+        run: npx wrangler secret bulk .relay-secrets.json --env "$ENVIRONMENT" --config workers/log-relay/wrangler.jsonc
+      - name: Log relay deploy (the queue consumer, §9.3)
+        if: hashFiles('workers/log-relay/wrangler.jsonc') != ''
+        run: node scripts/ci/deploy-worker.mjs relay "$ENVIRONMENT"
+      - name: Tag the release
+        if: github.ref_name == 'master'
+        run: |
+          version="v$(node -p "require('./package.json').version")"
+          if git ls-remote --exit-code --tags origin "refs/tags/$version" > /dev/null; then
+            echo "Tag $version exists, skipped"
+          else
+            git tag "$version" && git push origin "$version"
+          fi
+      - name: Delete temporary files
+        if: always()
+        run: rm -f .secrets.json .relay-secrets.json .app-vars.json .relay-vars.json .env.production
+      - name: Job summary
+        run: echo "Deployed $(git rev-parse --short HEAD) to $ENVIRONMENT, ${{ vars.DEPLOY_URL }}" >> "$GITHUB_STEP_SUMMARY"
+
+  functions:
+    # Functions, Firestore rules and indexes, Storage rules, in the same GitHub Environment as deploy
+    needs: [resolve]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.resolve.outputs.environment }}
+    env:
+      PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - id: changes
+        name: Decide whether to run
+        run: |
+          if [ ! -f firebase.json ]; then echo "run=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" \
+            | grep -qE '^(functions/|firestore\.rules$|firestore\.indexes\.json$|storage\.rules$|firebase\.json$)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.changes.outputs.run == 'true'
+        with: { node-version-file: .nvmrc }
+      - if: steps.changes.outputs.run == 'true' && hashFiles('functions/package-lock.json') != ''
+        run: npm ci --prefix functions
+      - name: Write functions/.env.<project-id> and the Functions secrets file
+        if: steps.changes.outputs.run == 'true'
+        run: node scripts/ci/materialize-config.mjs --functions
+        env:
+          VARS_JSON: ${{ toJSON(vars) }}
+          SECRETS_JSON: ${{ toJSON(secrets) }}
+      - name: Authenticate
+        if: steps.changes.outputs.run == 'true'
+        run: |
+          printf '%s' "$DEPLOY_SA" > "$RUNNER_TEMP/deployer.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/deployer.json" >> "$GITHUB_ENV"
+        env:
+          DEPLOY_SA: ${{ secrets.FIREBASE_DEPLOY_SERVICE_ACCOUNT }}
+      - name: Set the Functions secrets (Google Secret Manager)
+        if: steps.changes.outputs.run == 'true'
+        run: |
+          for key in $(jq -r 'keys[]' .functions-secrets.json); do
+            jq -j --arg k "$key" '.[$k]' .functions-secrets.json \
+              | npx -y firebase-tools functions:secrets:set "$key" --data-file=- --project "$PROJECT_ID" --force --non-interactive
+          done
+      - name: firebase deploy
+        if: steps.changes.outputs.run == 'true'
+        run: |
+          targets="firestore:rules,firestore:indexes"
+          [ -d functions ] && targets="functions,$targets"
+          # A project without Firebase Storage has no storage block in firebase.json (§8.2.1)
+          node -e "process.exit(require('./firebase.json').storage ? 0 : 1)" && targets="$targets,storage"
+          npx -y firebase-tools deploy --only "$targets" --project "$PROJECT_ID" --force --non-interactive
+      - name: Delete temporary files
+        if: always()
+        run: rm -f .functions-secrets.json "$RUNNER_TEMP/deployer.json" functions/.env.*

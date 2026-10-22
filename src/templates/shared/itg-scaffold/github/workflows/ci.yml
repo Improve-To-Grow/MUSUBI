@@ -1,0 +1,190 @@
+# Required CI checks (ITG Software Delivery Playbook §8.1). One job per check, so that each can be
+# a required status check in the rulesets of `master` and `staging` (add them after the first run).
+name: ci
+
+on:
+  pull_request:
+    branches: [staging, master]
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - run: npx tsc --noEmit
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - run: npx eslint . # includes eslint-plugin-security over src/, functions/ and workers/ (§11.9)
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - run: npx prettier --check .
+
+  test:
+    # Unit and integration tests; integration tests run against the staging project (§7.3)
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - name: Load the staging configuration
+        run: node scripts/ci/materialize-config.mjs --github-env
+        env:
+          VARS_JSON: ${{ toJSON(vars) }}
+          SECRETS_JSON: ${{ toJSON(secrets) }}
+      - run: npx vitest run
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - run: npx opennextjs-cloudflare build
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm audit --omit=dev --audit-level=high
+      - name: Audit functions/
+        if: hashFiles('functions/package-lock.json') != ''
+        run: npm audit --omit=dev --audit-level=high --prefix functions
+
+  route-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc }
+      - run: node scripts/checks/check-route-guards.mjs
+
+  route-logging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc }
+      - run: node scripts/checks/check-route-logging.mjs
+
+  function-triggers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc }
+      - run: node scripts/checks/check-function-triggers.mjs
+
+  audit-catalogue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc }
+      - run: node scripts/checks/check-audit-catalogue.mjs
+
+  knip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - run: npx knip
+
+  constitution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc }
+      # The ITG fork at the tag the project was initialized with; move it with `musubi upgrade` (§19.4)
+      - run: npm install -g 'github:Improve-To-Grow/MUSUBI#{{MUSUBI_TAG}}'
+      - run: musubi validate
+
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc }
+      - run: node scripts/checks/check-changelog.mjs
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+
+  feature-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc }
+      - run: node scripts/checks/check-feature-registry.mjs
+
+  ai-provider:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc }
+      - run: node scripts/checks/check-ai-provider.mjs
+
+  rules:
+    # Runs the Security Rules API test only when a rules file changed in the PR (§7.3)
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc }
+      - run: node scripts/checks/check-rules.mjs
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+  e2e:
+    # Required on PRs into master, skipped on hotfix/* (§8.1); recommended on PRs into staging
+    if: github.base_ref == 'master' && !startsWith(github.head_ref, 'hotfix/')
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - name: Load the staging configuration
+        run: node scripts/ci/materialize-config.mjs --github-env
+        env:
+          VARS_JSON: ${{ toJSON(vars) }}
+          SECRETS_JSON: ${{ toJSON(secrets) }}
+      - run: npx playwright test

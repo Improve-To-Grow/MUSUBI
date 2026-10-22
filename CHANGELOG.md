@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.1-itg.5] - 2026-10-22
+
+Implements Appendix C of **ITG Software Delivery Playbook v2.2** (CHANGE-008).
+
+### Added
+
+- **ITG project scaffold** (`src/templates/shared/itg-scaffold/`, `src/cli/init-scaffold.js`): `musubi init` with the `application` profile writes `.env.example` (Appendix C.1), `.github/pull_request_template.md` (§4.4), `.github/workflows/ci.yml` (one job per §8.1 check), `deploy.yml` (§8.2.1) and `ci-cleanup.yml` (§7.3), the eight CI gate scripts of C.3 in `scripts/checks/` and `scripts/ci/materialize-config.mjs`, `deploy-worker.mjs` and `migrate.mjs`. Existing files are kept and reported. `ci.yml` installs MUSUBI at the tag of the version that wrote it
+- `materialize-config.mjs` reads the class and readers of every key from the block headers of `.env.example`, so the deploy workflow needs no second key list; CI-only credentials reach no deployable
+- Tests (`tests/itg/scaffold.test.js`): init output, every check script passing and failing in a real temporary project, configuration routing, `--var` arguments with spaces, migration file names
+
+### Changed
+
+- ITG policies: ITG-DEL-03 names the scaffold, ITG-LOG-02 the route event catalogue `src/lib/logs/route-events.ts`, and ITG-CI-01 the scaffold's workflows
+
 ## [6.3.1-itg.4] - 2026-10-22
 
 Implements **ITG Software Delivery Playbook v2.2** (CHANGE-007). The playbook and its changelog are in `docs/itg/`. The policies follow v2.2: Required and Recommended stack classes; Identity Platform with App Check and reCAPTCHA Enterprise (no Turnstile); bearer-only sessions with an account-state check on every request; Firestore rules that deny all client access and tenant-scoped Storage uploads read through signed URLs; Firebase Storage instead of R2; Functions for triggers and schedules only; PostgreSQL on Neon through Hyperdrive; three configuration classes in GitHub Environments; log delivery through a Cloudflare Queue and a log-relay Worker; per-table retention; nonce-based CSP; a feature registry and kill switch; GitHub Team rulesets as the production guard; `release/X.Y.Z` branches; CI-applied migrations; restore tests in `itg-restore`; `europe-west4` for every Google service. MUSUBI's artifact paths stay; the playbook's §3.3 and §5.4 are corrected to them.

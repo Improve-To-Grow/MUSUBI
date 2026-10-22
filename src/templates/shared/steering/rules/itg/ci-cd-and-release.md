@@ -78,6 +78,8 @@ flowchart TD
 | AI provider | `scripts/checks/check-ai-provider.mjs` | The AI properties of ITG-SEC-20 |
 | Rules | `scripts/checks/check-rules.mjs` | When a rules file changed: the branch's rules against the cases of ITG-SEC-16 through the Security Rules API (ITG-TST-14) |
 
+- The scaffold's `.github/workflows/ci.yml` runs one job per check, so each can be a required status check; `deploy.yml` reads the class and readers of every key from the block headers of `.env.example` (`scripts/ci/materialize-config.mjs`) and deploys each Worker with `scripts/ci/deploy-worker.mjs`.
+
 - **ITG-CI-02** Playwright E2E SHALL be a required check on PRs into `master` and SHALL be skipped on `hotfix/*` branches; on PRs into `staging` it is recommended, not gating. A Lighthouse budget is recommended (§8.1).
 
 ### Deploy pipeline (§8.2.1)

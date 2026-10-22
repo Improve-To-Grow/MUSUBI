@@ -40,6 +40,7 @@ const {
 } = require('../src/cli/init-generators');
 
 const { writeSteeringTemplates, copyConstitutionRules } = require('../src/cli/init-steering');
+const { writeItgScaffold } = require('../src/cli/init-scaffold');
 const { setupCodeIndex } = require('../src/code-index/setup');
 
 // Languages of the questionnaire that code navigation covers, by indexer language.
@@ -532,6 +533,16 @@ async function main(agent, agentKey, options = {}) {
   if (answers.createConstitution) {
     await createConstitution();
     console.log(chalk.green('  Created constitutional governance'));
+  }
+
+  // ITG applications start with the files of the playbook's Appendix C: .env.example, the PR
+  // template, the CI, deploy and cleanup workflows, and scripts/checks/ and scripts/ci/
+  if (answers.constitutionProfile === 'application') {
+    const scaffold = await writeItgScaffold();
+    console.log(chalk.green(`  Wrote the ITG project scaffold (${scaffold.written.length} files)`));
+    if (scaffold.skipped.length > 0) {
+      console.log(chalk.yellow(`  Kept existing files: ${scaffold.skipped.join(', ')}`));
+    }
   }
 
   // Generate language-specific dependency files (for single-package projects)

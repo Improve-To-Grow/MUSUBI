@@ -1,0 +1,30 @@
+# Deletes ci-* test data older than 24 hours that crashed runs left on staging
+# (ITG Software Delivery Playbook §7.3, Appendix C.2). Where a project keeps its ci-<run-id> data
+# (tenant, collection prefix or field) is project knowledge, so the deletion is the project's
+# operator script `npm run ops:cleanup-ci`, written in Sprint 0 next to scripts/ops/seed-test-users.
+name: ci-cleanup
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # nightly
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - name: Load the staging configuration
+        run: node scripts/ci/materialize-config.mjs --github-env
+        env:
+          VARS_JSON: ${{ toJSON(vars) }}
+          SECRETS_JSON: ${{ toJSON(secrets) }}
+      # Firestore, Storage and Auth users under ci-*, and the Neon test database when used
+      - run: npm run ops:cleanup-ci -- --older-than-hours 24
