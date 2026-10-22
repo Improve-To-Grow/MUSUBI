@@ -2,7 +2,7 @@
 
 **Change ID**: CHANGE-008  
 **Date**: 2026-10-22  
-**Status**: ~~Proposed~~ → ~~Approved~~ → **Implemented** (branch `feat/itg-scaffolding`, on top of `feat/itg-playbook-steering`, not merged)  
+**Status**: ~~Proposed~~ → ~~Approved~~ → **Implemented** (branch `feat/itg-playbook-steering`, with CHANGE-007, not merged)  
 **Approved**: 2026-10-22 (maintainer, in chat: scaffolding as its own change after CHANGE-007)  
 **Type**: Feature / Template change  
 **Priority**: P1  
