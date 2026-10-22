@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [6.3.1-itg.3] - 2026-10-12
+## [6.3.1-itg.4] - 2026-10-22
 
-Implements **ITG Software Delivery Playbook v2.1** (CHANGE-006). The playbook and its changelog are in `docs/itg/`.
+Implements **ITG Software Delivery Playbook v2.2** (CHANGE-007). The playbook and its changelog are in `docs/itg/`.
 
 ### Added
 
@@ -31,6 +31,30 @@ Implements **ITG Software Delivery Playbook v2.1** (CHANGE-006). The playbook an
 - **Index-first code lookups on every platform**: the `musubi-code` steps of `/sdd-change-init`, `/sdd-change-apply`, `/sdd-change-archive` and `/sdd-requirements` (CHANGE-005, Claude Code only) are now in the codex, cursor, qwen-code, windsurf, github-copilot and gemini-cli commands too
 - **This repository's own `.claude/` files** get the framework changes of the templates but not the ITG project policies (`steering/rules/itg-fork.md`, FORK-08). `tests/code-navigation-guidance.test.js` checks the index-first steps in `.claude/` and in the templates, and that `.claude/` points to no ITG policy, instead of requiring `.claude/` to be byte-identical to the templates
 - `package-lock.json` lists the `musubi-code` bin
+
+## [6.3.1-itg.3] - 2026-10-12
+
+### Added
+
+- **Python code navigation** (CHANGE-006): `musubi-code` indexes `.py` and `.pyi` files with `@sourcegraph/scip-python` (runtime dependency pinned to 0.6.6) and answers `refs`, `callers`, `deps`, `dependents` and `symbols` for Python with the same commands. Imports, calls on inferred types, `self.method()`, `super()`, base classes and decorators resolve across files. Python references are tagged `import`, `call`, `extends`, `decorator`, `super` or `ref`; `__init__` is the constructor; the standard library appears as `python (standard library)` in `deps`
+- **Mixed projects** (CHANGE-006): a project with JavaScript/TypeScript and Python is indexed by both tools into `.scip/index.typescript.scip` and `.scip/index.python.scip`, each with its own fingerprint, so an edit rebuilds only its language. Queries, `names.json` and `musubi-code status` cover both; `status` lists files and freshness per language, `index --if-stale` rebuilds only the stale ones, and a failing indexer leaves the other language's index usable
+- Default roots now include every top-level directory that holds Python files, and top-level `.py` files (`manage.py`, `conftest.py`) are indexed without widening the roots. `.venv`, `venv`, `__pycache__`, `.tox`, `.mypy_cache`, `.pytest_cache`, `.ruff_cache`, `.eggs` and `*.egg-info` are never indexed or fingerprinted, by either tool
+- `"scip": { "pythonArgs": [] }` in `package.json` passes extra arguments to scip-python
+- On Windows, scip-python runs with a preload module (`src/code-index/scip-python-shim.js`) that works around its start-up crash (sourcegraph/scip-python issue #210)
+- `docs/guides/scip-typescript.md` gains a "Python projects" section (roots, environment, src layout, Windows, syntax limits)
+
+### Changed
+
+- **The grep reminder is now a grep guard** (CHANGE-006): the `PreToolUse` hook `musubi-code hint --hook` denies a Grep or shell grep whose pattern is only names the code index defines (`permissionDecision: "deny"`), with a reason that lists the definitions, the `musubi-code refs` command and how to search the name as text. A quoted name (`'Name'`) counts as text and runs, as do searches limited to paths or file types outside the index; any hook error leaves the search allowed. `hint --hook --advisory` restores the note, and `musubi-code setup` keeps that option once a project has it. Projects already set up get the guard with this version; the hook command is unchanged
+- **Per-language index files** (CHANGE-006): `.scip/index.scip` is replaced by `.scip/index.<language>.scip`, and `.scip/meta.json` becomes version 2 with one entry per language. An existing index is rebuilt once
+- scip-python always receives `.scip/python-environment.json` (`[]` unless the project maintains it), so builds never run pip and work without a Python interpreter; references into installed packages stay unresolved
+- For src-layout Python projects without a pyright configuration, the build writes `pyrightconfig.json` with `extraPaths: ["src"]` next to `pyproject.toml` for the duration of the Python build and removes it afterwards; without it pyright drops the references from `tests/`
+- **Code navigation is set up without asking** (CHANGE-006): `musubi init`, `musubi upgrade` and `musubi-code setup` configure it in every project with JavaScript, TypeScript or Python sources or project markers (`package.json`, `tsconfig.json`, `jsconfig.json`, `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements.txt`, `Pipfile`) and report other projects as unsupported. `musubi init` also counts the languages chosen in its questionnaire. `musubi-code setup` prints the languages it found; `musubi upgrade --dry-run` still previews
+
+### Removed
+
+- The `musubi init` question "Set up compiler-accurate code navigation for AI agents?", the options `musubi init --code-index`, `musubi init --no-code-index` and `musubi upgrade --no-code-index`, and `musubi-code setup --force` (CHANGE-006). Passing one of the options now fails with "unknown option"
+
 ## [6.3.1-itg.2] - 2026-10-08
 
 ### Added

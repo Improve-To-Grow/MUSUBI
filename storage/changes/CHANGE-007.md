@@ -1,6 +1,6 @@
 # ITG Software Delivery Playbook as steering templates
 
-**Change ID**: CHANGE-006  
+**Change ID**: CHANGE-007  
 **Date**: 2026-10-12  
 **Status**: ~~Proposed~~ → ~~Approved~~ → **Implemented** (branch `feat/itg-playbook-steering`, not merged)  
 **Approved**: 2026-10-08 (maintainer, in chat; plan approved before implementation)  

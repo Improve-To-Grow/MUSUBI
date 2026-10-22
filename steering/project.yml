@@ -1,15 +1,17 @@
 # MUSUBI Project Configuration
 name: musubi
 description: Ultimate Specification Driven Development Tool with Review Gate Engine
-version: '6.3.1'
+version: '6.3.1-itg.3'
 created: 2025-12-12
-updated: 2026-10-02
+updated: 2026-10-14
 
 # Technology Stack
 tech_stack:
   approach: single
   languages:
     - javascript
+    - typescript # packages/vscode-extension only
+    - python # convert-agents-to-skills.py only
 
 # Constitution profile: decides how Articles I and II apply
 # (see "Project Profiles" in steering/rules/constitution.md)

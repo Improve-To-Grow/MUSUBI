@@ -53,26 +53,57 @@ describe('code-index format', () => {
     ).toBe('lib/widget.js:\n      1  class        Widget');
   });
 
-  test('renders index status with build details', () => {
+  test('renders index status per language with build details', () => {
     const text = formatStatus({
       state: 'stale',
-      index: '.scip/index.scip',
       roots: ['src'],
       exclude: ['src/templates'],
       files: 10,
-      meta: {
-        builtAt: '2026-10-08T00:00:00.000Z',
-        durationMs: 1200,
-        files: 9,
-        indexer: '0.4.0',
-        tsconfig: '.scip/tsconfig.json',
-      },
       building: true,
+      languages: {
+        typescript: {
+          label: 'JavaScript/TypeScript',
+          tool: 'scip-typescript',
+          index: '.scip/index.typescript.scip',
+          state: 'stale',
+          files: 10,
+          meta: {
+            builtAt: '2026-10-08T00:00:00.000Z',
+            durationMs: 1200,
+            files: 9,
+            indexer: '0.4.0',
+            tsconfig: '.scip/tsconfig.json',
+          },
+        },
+        python: {
+          label: 'Python',
+          tool: 'scip-python',
+          index: '.scip/index.python.scip',
+          state: 'missing',
+          files: 0,
+          meta: null,
+        },
+      },
     });
-    expect(text).toContain('index:   .scip/index.scip (stale)');
+    expect(text).toContain('state:   stale');
     expect(text).toContain('roots:   src (excluding src/templates)');
-    expect(text).toContain('built:   2026-10-08T00:00:00.000Z in 1200 ms, 9 files');
+    expect(text).toContain('files:   10 source files now');
+    expect(text).toContain('JavaScript/TypeScript: .scip/index.typescript.scip (stale), 10 files');
+    expect(text).toContain(
+      '  built: 2026-10-08T00:00:00.000Z in 1200 ms, 9 files, scip-typescript 0.4.0, .scip/tsconfig.json'
+    );
+    expect(text).toContain('Python: .scip/index.python.scip (missing), 0 files');
     expect(text).toContain('build:   running');
+    expect(
+      formatStatus({
+        state: 'missing',
+        roots: ['.'],
+        exclude: [],
+        files: 0,
+        building: false,
+        languages: {},
+      })
+    ).toContain('languages: none');
   });
 
   test('renders setup results for real runs, dry runs and skipped projects', () => {

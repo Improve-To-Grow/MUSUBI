@@ -225,9 +225,20 @@ describe('code index of a CommonJS project', () => {
       })
     );
     expect(hint.status).toBe(0);
-    const context = JSON.parse(hint.stdout).hookSpecificOutput.additionalContext;
-    expect(context).toContain('makeWidget (function) lib/widget.js:9');
-    expect(context).toContain('`musubi-code refs makeWidget`');
+    const guard = JSON.parse(hint.stdout).hookSpecificOutput;
+    expect(guard.permissionDecision).toBe('deny');
+    expect(guard.permissionDecisionReason).toContain('makeWidget (function) lib/widget.js:9');
+    expect(guard.permissionDecisionReason).toContain('`musubi-code refs makeWidget`');
+
+    const advisory = cli(
+      root,
+      ['hint', '--hook', '--advisory'],
+      JSON.stringify({ tool_name: 'Grep', tool_input: { pattern: 'makeWidget' } })
+    );
+    expect(advisory.status).toBe(0);
+    const note = JSON.parse(advisory.stdout).hookSpecificOutput;
+    expect(note.permissionDecision).toBeUndefined();
+    expect(note.additionalContext).toContain('makeWidget (function) lib/widget.js:9');
 
     const silent = cli(
       root,
@@ -267,9 +278,26 @@ describe('musubi-code setup command', () => {
       const skipped = cli(empty, ['setup']);
       expect(skipped.status).toBe(1);
       expect(skipped.stdout).toContain('not set up');
+      expect(skipped.stdout).toContain('no JavaScript, TypeScript or Python');
+      const forced = cli(empty, ['setup', '--force']);
+      expect(forced.status).toBe(1);
+      expect(forced.stderr).toContain("unknown option '--force'");
       fs.rmSync(empty, { recursive: true, force: true });
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
+  });
+});
+
+describe('musubi init and upgrade set up code navigation without asking (REQ-IDX-001, REQ-IDX-002)', () => {
+  const MUSUBI = path.join(__dirname, '..', '..', 'bin', 'musubi.js');
+
+  test.each(['init', 'upgrade'])('%s --help offers no code-index option', command => {
+    const help = spawnSync(process.execPath, [MUSUBI, command, '--help'], {
+      encoding: 'utf8',
+      timeout: 60000,
+    });
+    expect(help.status).toBe(0);
+    expect(help.stdout).not.toContain('code-index');
   });
 });

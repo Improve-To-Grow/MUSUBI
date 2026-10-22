@@ -1,11 +1,14 @@
 /**
- * Code index setup - configures a JavaScript/TypeScript project for musubi-code
+ * Code index setup - configures a project with JavaScript, TypeScript or Python sources for
+ * musubi-code
  *
- * Shared by `musubi init`, `musubi-upgrade` and `musubi-code setup`. It writes:
+ * Shared by `musubi init`, `musubi-upgrade` and `musubi-code setup`. Projects without a
+ * supported language (./indexer.js LANGUAGES: a project marker or source files) are skipped
+ * with a reason. It writes:
  * - `.scip/` to .gitignore
  * - Claude Code: the `code-references` skill, async hooks in `.claude/settings.json` that keep
- *   the index fresh, and synchronous PreToolUse hooks that point grep searches for indexed
- *   names to `refs` (./hint.js)
+ *   the index fresh, and synchronous PreToolUse hooks that deny grep searches for indexed
+ *   names and point them to `refs` (./hint.js; `--advisory` turns the denial into a note)
  * - every selected agent: a marked "Code Navigation" section in its instruction file
  *   (CLAUDE.md, AGENTS.md, GEMINI.md, QWEN.md)
  *
@@ -20,7 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const { agentDefinitions } = require('../agents/registry');
-const { isJavaScriptProject } = require('./indexer');
+const { LANGUAGES, detectLanguages } = require('./indexer');
 
 const TEMPLATE_DIR = path.join(__dirname, '..', 'templates', 'code-index');
 const SKILL_NAME = 'code-references';
@@ -113,14 +116,17 @@ function renderSkill(command) {
 /**
  * Hook groups for `.claude/settings.json`, per event.
  * @param {string} command
+ * @param {{advisory?: boolean}} [opts] - `advisory`: the grep guard adds a note instead of
+ *   denying (`hint --hook --advisory`)
  */
-function hookGroups(command) {
+function hookGroups(command, { advisory = false } = {}) {
   const index = () => ({ type: 'command', command: `${command} index --hook`, async: true });
   const hintCommand =
-    command === DEFAULT_COMMAND
+    (command === DEFAULT_COMMAND
       ? `${command} hint --hook`
-      : `${command} hint --hook --command ${JSON.stringify(command)}`;
-  // Synchronous: Claude Code discards the output of async hooks, and the hint is that output.
+      : `${command} hint --hook --command ${JSON.stringify(command)}`) +
+    (advisory ? ' --advisory' : '');
+  // Synchronous: Claude Code discards the output of async hooks, and the decision is that output.
   const hint = condition => ({
     type: 'command',
     command: hintCommand,
@@ -140,9 +146,19 @@ function hookGroups(command) {
   };
 }
 
+/** Every hook command in a settings object that this setup wrote. */
+function ownHookCommands(hooks) {
+  return Object.values(hooks)
+    .filter(Array.isArray)
+    .flatMap(groups => groups.flatMap(g => (g && Array.isArray(g.hooks) ? g.hooks : [])))
+    .map(h => h && h.command)
+    .filter(c => typeof c === 'string' && OWN_HOOK_PATTERN.test(c));
+}
+
 /**
  * Merge the code index hooks into Claude Code settings, replacing earlier versions of them
- * and keeping every other setting and hook.
+ * and keeping every other setting and hook. A project that switched the grep guard to
+ * `--advisory` keeps that choice.
  * @param {object} settings - parsed settings.json (may be empty)
  * @param {string} command
  * @returns {object} new settings object
@@ -150,7 +166,8 @@ function hookGroups(command) {
 function mergeHookSettings(settings, command) {
   const next = JSON.parse(JSON.stringify(settings || {}));
   if (!next.hooks || typeof next.hooks !== 'object' || Array.isArray(next.hooks)) next.hooks = {};
-  for (const [event, ownGroups] of Object.entries(hookGroups(command))) {
+  const advisory = ownHookCommands(next.hooks).some(c => /\bhint\b.*--advisory\b/.test(c));
+  for (const [event, ownGroups] of Object.entries(hookGroups(command, { advisory }))) {
     const groups = Array.isArray(next.hooks[event]) ? next.hooks[event] : [];
     const kept = [];
     for (const existing of groups) {
@@ -208,15 +225,17 @@ function instructionSection(command, forClaude) {
     '',
     'This also applies where an SDD command, prompt or skill says to grep for code. Use grep for',
     'text the index does not cover: Markdown, templates, configuration, comments, string-keyed registries',
-    'and dynamic `require()` paths, and once for the name as a string before a rename or deletion.',
-    `${code('status')} lists the indexed directories. The index is compiler-accurate (scip-typescript,`,
-    '`.scip/`) and is rebuilt first when source files changed.',
+    "and dynamic `require()` or `importlib` paths, and once for the quoted name (`'Name'`) before a",
+    `rename or deletion. ${code('status')} lists the indexed directories and languages. The index is`,
+    'compiler-accurate (scip-typescript for JavaScript/TypeScript, scip-python for Python; `.scip/`) and',
+    'is rebuilt first when source files changed.',
   ];
   if (forClaude) {
     lines.push(
       '',
       'The `code-references` skill lists all options. Hooks in `.claude/settings.json` keep the index',
-      'fresh and add a note when a grep searches for an indexed name.'
+      'fresh and block a grep that searches only for indexed names, pointing to `refs`; quote the name',
+      'to search it as text.'
     );
   }
   lines.push(SECTION_END);
@@ -241,31 +260,38 @@ function upsertSection(existing, section) {
  * @param {string[]} [opts.agents] - agent keys or aliases (default: detected from the project)
  * @param {string} [opts.command] - command the hooks, skill and instructions call
  * @param {boolean} [opts.dryRun] - report what would change without writing
- * @param {boolean} [opts.force] - also set up a directory without package.json/tsconfig.json
+ * @param {string[]} [opts.languages] - languages the project will use (`typescript`, `python`),
+ *   counted in addition to the detected ones; `musubi init` passes the chosen ones
  * @returns {{root: string, agents: string[], command: string, dryRun: boolean,
- *   skippedReason: string|null, changes: Array<{file: string, status: string}>, warnings: string[]}}
+ *   languages: string[], skippedReason: string|null,
+ *   changes: Array<{file: string, status: string}>, warnings: string[]}}
  */
 function setupCodeIndex(
   root,
-  { agents, command = DEFAULT_COMMAND, dryRun = false, force = false } = {}
+  { agents, command = DEFAULT_COMMAND, dryRun = false, languages = [] } = {}
 ) {
   const projectRoot = path.resolve(root);
   const agentKeys = [
     ...new Set((agents && agents.length ? agents : detectAgents(projectRoot)).map(resolveAgentKey)),
   ];
+  const wanted = new Set([...languages, ...detectLanguages(projectRoot)]);
+  const languageKeys = Object.keys(LANGUAGES).filter(key => wanted.has(key));
   const result = {
     root: projectRoot,
     agents: agentKeys,
     command,
     dryRun,
+    languages: languageKeys,
     skippedReason: null,
     changes: [],
     warnings: [],
   };
 
-  if (!force && !isJavaScriptProject(projectRoot)) {
-    result.skippedReason =
-      'no package.json, tsconfig.json or jsconfig.json (use --force to set up anyway)';
+  if (languageKeys.length === 0) {
+    const markers = Object.values(LANGUAGES)
+      .flatMap(language => language.markers)
+      .join(', ');
+    result.skippedReason = `no JavaScript, TypeScript or Python sources or project markers (${markers})`;
     return result;
   }
   const record = (rel, status) => result.changes.push({ file: rel, status });

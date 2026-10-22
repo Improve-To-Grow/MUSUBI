@@ -170,6 +170,31 @@ describe('code-index setup', () => {
     );
   });
 
+  test('keeps --advisory on the hint hooks when a project chose it (REQ-NAV-006)', () => {
+    root = makeTempProject({
+      'package.json': '{}',
+      '.claude/settings.json': JSON.stringify({
+        hooks: {
+          PreToolUse: [
+            {
+              matcher: 'Grep',
+              hooks: [
+                { type: 'command', command: 'musubi-code hint --hook --advisory', timeout: 10 },
+              ],
+            },
+          ],
+        },
+      }),
+    });
+    setupCodeIndex(root, { agents: ['claude-code'] });
+    const settings = JSON.parse(read(root, '.claude/settings.json'));
+    const hint = settings.hooks.PreToolUse.flatMap(g => g.hooks.map(h => h.command));
+    expect(hint).toHaveLength(5);
+    expect(new Set(hint)).toEqual(new Set(['musubi-code hint --hook --advisory']));
+    const fresh = mergeHookSettings({}, 'musubi-code');
+    expect(fresh.hooks.PreToolUse[0].hooks[0].command).toBe('musubi-code hint --hook');
+  });
+
   test('the managed section maps symbol questions to commands (REQ-NAV-001, REQ-NAV-002)', () => {
     root = makeTempProject({ 'package.json': '{}' });
     setupCodeIndex(root, { agents: ['claude-code', 'copilot'] });
@@ -189,8 +214,14 @@ describe('code-index setup', () => {
       expect(section).toContain(
         'Markdown, templates, configuration, comments, string-keyed registries'
       );
+      // REQ-NAV-001/002 (modified) and REQ-IDX-012: the quoted name, both languages.
+      expect(section).toContain("once for the quoted name (`'Name'`)");
+      expect(section).toContain(
+        'scip-typescript for JavaScript/TypeScript, scip-python for Python'
+      );
     }
-    expect(read(root, 'CLAUDE.md')).toContain('when a grep searches for an indexed name');
+    expect(read(root, 'CLAUDE.md')).toContain('block a grep that searches only for indexed names');
+    expect(read(root, 'CLAUDE.md')).toContain('quote the name');
     expect(read(root, 'AGENTS.md')).not.toContain('.claude/settings.json');
   });
 
@@ -204,8 +235,11 @@ describe('code-index setup', () => {
     for (const term of ['where is X defined', 'does X exist', 'is X exported', 'find definition']) {
       expect(description).toContain(term);
     }
+    expect(description).toContain('Python');
     expect(description.length).toBeLessThanOrEqual(1536);
     expect(skill).toContain('`musubi-code symbols user.js`');
+    expect(skill).toContain('`musubi-code refs User.save`');
+    expect(skill).toContain("grep once for the quoted name (`'Name'`)");
   });
 
   test('writes one section per instruction file for other agents, without Claude files', () => {
@@ -220,12 +254,29 @@ describe('code-index setup', () => {
     expect(fs.existsSync(path.join(root, '.claude'))).toBe(false);
   });
 
-  test('skips non-JavaScript projects unless forced, and dry runs write nothing', () => {
-    root = makeTempProject({ 'pyproject.toml': '' });
-    expect(setupCodeIndex(root).skippedReason).toMatch(/package\.json/);
-    const dry = setupCodeIndex(root, { force: true, dryRun: true });
-    expect(hasChanges(dry)).toBe(true);
-    expect(fs.readdirSync(root)).toEqual(['pyproject.toml']);
+  test('sets up every project with a supported language and skips the others (REQ-IDX-001, REQ-IDX-003)', () => {
+    root = makeTempProject({ 'pyproject.toml': '[project]\nname = "x"\n' });
+    const python = setupCodeIndex(root, { agents: ['claude-code'] });
+    expect(python.skippedReason).toBeNull();
+    expect(python.languages).toEqual(['python']);
+    expect(statuses(python)['.claude/skills/code-references/SKILL.md']).toBe('created');
+
+    const rust = makeTempProject({ 'Cargo.toml': '', 'src/main.rs': '' });
+    try {
+      const skipped = setupCodeIndex(rust);
+      expect(skipped.skippedReason).toMatch(/no JavaScript, TypeScript or Python/);
+      expect(skipped.changes).toEqual([]);
+      // `force` is gone: a project without a supported language is never set up.
+      expect(setupCodeIndex(rust, { force: true }).skippedReason).not.toBeNull();
+      // The languages chosen in `musubi init` count as detected, and a dry run writes nothing.
+      const selected = setupCodeIndex(rust, { languages: ['python'], dryRun: true });
+      expect(selected.skippedReason).toBeNull();
+      expect(selected.languages).toEqual(['python']);
+      expect(hasChanges(selected)).toBe(true);
+      expect(fs.readdirSync(rust).sort()).toEqual(['Cargo.toml', 'src']);
+    } finally {
+      fs.rmSync(rust, { recursive: true, force: true });
+    }
   });
 
   test('leaves invalid settings.json untouched and warns', () => {

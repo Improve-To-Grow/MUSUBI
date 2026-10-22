@@ -1,9 +1,10 @@
 ---
 name: code-references
 description: |
-  Compiler-accurate code navigation for this JavaScript/TypeScript project using a scip-typescript index:
-  definitions, exports, references, callers, `new X()` instantiations, `extends`, `require()`/import sites,
-  and file dependencies/dependents, resolved across files (including CommonJS `module.exports = { X }`).
+  Compiler-accurate code navigation for this project's JavaScript/TypeScript and Python code, from
+  scip-typescript and scip-python indexes: definitions, exports, references, callers, `new X()` and
+  `Class()` instantiations, `extends` / base classes, `require()` / import sites, decorators, and file
+  dependencies/dependents, resolved across files (including CommonJS `module.exports = { X }`).
 
   Trigger terms: where is X defined, does X exist, is X exported, what does this file export, find definition,
   who calls, who uses, who instantiates, who requires, who imports, find references, find usages, callers,
@@ -17,12 +18,13 @@ description: |
 allowed-tools: [Read, Grep, Glob, 'Bash({{CODE_CMD}} *)', 'PowerShell({{CODE_CMD}} *)']
 ---
 
-# Code References (scip-typescript)
+# Code References (scip-typescript, scip-python)
 
-`{{CODE_CMD}}` answers definition and usage questions from `.scip/index.scip`, a SCIP index built by
-`@sourcegraph/scip-typescript` with the TypeScript compiler. Unlike grep it resolves aliases,
-destructured `require()` bindings and method calls on typed receivers; unlike editor "find references"
-it follows `module.exports = { X }` across files.
+`{{CODE_CMD}}` answers definition and usage questions from the SCIP indexes in `.scip/`, built by
+`@sourcegraph/scip-typescript` with the TypeScript compiler and by `@sourcegraph/scip-python` with
+pyright, read as one model. Unlike grep it resolves aliases, destructured `require()` bindings, Python
+imports and method calls on typed or inferred receivers (`self.save()`, `user.save()`); unlike editor
+"find references" it follows `module.exports = { X }` across files.
 
 ## Commands
 
@@ -33,7 +35,7 @@ Run from the project root. Each query rebuilds the index first when source files
 | ------------------------------------------- | ------------------------------------------------ |
 | Does it exist? Where is it defined?         | `{{CODE_CMD}} refs UserService` (first line of each result; "No definition named" means absent) |
 | Every use of a class, function or method    | `{{CODE_CMD}} refs UserService`                  |
-| A method                                    | `{{CODE_CMD}} refs UserService.save`             |
+| A method (JavaScript or Python)             | `{{CODE_CMD}} refs UserService.save`, `{{CODE_CMD}} refs User.save` |
 | Which functions call or instantiate it      | `{{CODE_CMD}} callers createOrder`               |
 | What a file defines or exports              | `{{CODE_CMD}} symbols user.js`                   |
 | What a file depends on (files, packages)    | `{{CODE_CMD}} deps src/app.js`                   |
@@ -69,19 +71,24 @@ Widget (class) lib/widget.js:1
 
 1. Before renaming, moving or deleting a symbol, run `refs` (or `callers`) and read every listed site.
 2. Before deleting or moving a file, run `dependents <file>`.
-3. Then grep once for the name as a string, because the index cannot see dynamic lookups:
-   `require(variable)`, registries keyed by strings, `obj[name]()`, and text in Markdown, YAML or templates.
+3. Then grep once for the quoted name (`'Name'`), because the index cannot see dynamic lookups:
+   `require(variable)`, `importlib.import_module(name)`, registries keyed by strings, `obj[name]()`, and
+   text in Markdown, YAML or templates. A bare-name grep is blocked by the guard (below).
 4. After editing, the PostToolUse hook rebuilds the index in the background; the next query waits for it.
 
-A PreToolUse hook (`{{CODE_CMD}} hint --hook`) adds a note when a Grep or a shell grep searches for a
-name the index defines, with the definition and the `refs` command. It never blocks the search.
+A PreToolUse hook (`{{CODE_CMD}} hint --hook`) blocks a Grep or shell grep whose pattern is only names
+the index defines, and answers with the definitions and the `refs` command. It lets text searches,
+quoted names and searches limited to paths or file types outside the index through.
 
 ## Limits
 
 - Only the directories in `package.json` `"scip"."roots"` are indexed (default: whichever of `bin`, `src`,
-  `lib`, `app`, `scripts`, `tests`, `test` exist). `{{CODE_CMD}} status` shows the roots.
-- Calls on values whose type TypeScript cannot infer (untyped parameters, `any`) are not resolved to a
-  definition. JSDoc types improve this.
-- If the index cannot be built, `{{CODE_CMD}} index` prints the reason.
+  `lib`, `app`, `scripts`, `tests`, `test` exist, plus top-level directories holding Python files and
+  top-level `.py` files). `{{CODE_CMD}} status` shows the roots and the files per language.
+- Calls on values whose type cannot be inferred (untyped parameters, `any`) are not resolved to a
+  definition. JSDoc types and Python type hints improve this. Python references into installed
+  third-party packages are not linked.
+- If an index cannot be built, `{{CODE_CMD}} index` prints the reason; the other language's index keeps
+  working.
 
 This skill is managed by MUSUBI (`musubi-code setup`); running setup again overwrites local edits.

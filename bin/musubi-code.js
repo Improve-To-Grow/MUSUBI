@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * MUSUBI Code - compiler-accurate code navigation for JavaScript/TypeScript projects
+ * MUSUBI Code - compiler-accurate code navigation for JavaScript/TypeScript and Python projects
  *
- * Builds a SCIP index with @sourcegraph/scip-typescript in `<project>/.scip/` and answers
- * "who references / calls / instantiates / requires X" and file dependency questions.
+ * Builds SCIP indexes with @sourcegraph/scip-typescript and @sourcegraph/scip-python in
+ * `<project>/.scip/` and answers "who references / calls / instantiates / requires / imports X"
+ * and file dependency questions from both as one model.
  *
  * Usage:
  *   musubi-code refs <Name|Owner.member>     every reference, tagged, with the enclosing function
@@ -12,10 +13,10 @@
  *   musubi-code deps <file>                  files and packages a file depends on
  *   musubi-code dependents <file>            files that depend on a file
  *   musubi-code symbols <file>               definitions in a file
- *   musubi-code status                       index freshness
- *   musubi-code index [--if-stale | --hook]  build the index (--hook: Claude Code hook mode)
- *   musubi-code hint --hook                  Claude Code PreToolUse hook: point a grep for an
- *                                            indexed name to refs
+ *   musubi-code status                       index freshness per language
+ *   musubi-code index [--if-stale | --hook]  build the indexes (--hook: Claude Code hook mode)
+ *   musubi-code hint --hook [--advisory]     Claude Code PreToolUse hook: deny a grep for an
+ *                                            indexed name and point to refs (--advisory: note)
  *   musubi-code setup                        configure the project: skill, hooks, instructions
  */
 
@@ -104,7 +105,7 @@ function createProgram() {
   program
     .name('musubi-code')
     .description(
-      'Compiler-accurate code navigation for JavaScript/TypeScript projects (scip-typescript)'
+      'Compiler-accurate code navigation for JavaScript/TypeScript and Python projects (scip-typescript, scip-python)'
     )
     .version(packageJson.version);
 
@@ -141,7 +142,9 @@ function createProgram() {
 
   program
     .command('status')
-    .description('index location, roots and freshness (exit code 1 when missing or stale)')
+    .description(
+      'roots, and index files and freshness per language (exit code 1 when missing or stale)'
+    )
     .option('--json', 'machine-readable output')
     .option('--root <dir>', 'project directory (default: found from the current directory)')
     .action(opts => {
@@ -152,8 +155,8 @@ function createProgram() {
 
   program
     .command('index')
-    .description('build the index in .scip/ (always rebuilds unless --if-stale)')
-    .option('--if-stale', 'rebuild only when indexed source files changed')
+    .description('build the indexes in .scip/ (every language unless --if-stale)')
+    .option('--if-stale', 'rebuild only the languages whose source files changed')
     .option('--hook', 'Claude Code hook mode: read the hook JSON from stdin, never fail')
     .option('--root <dir>', 'project directory (default: found from the current directory)')
     .action(async opts => {
@@ -163,32 +166,45 @@ function createProgram() {
         return;
       }
       const cfg = projectConfig(opts);
-      if (opts.ifStale && indexer.getFreshness(cfg).state === 'fresh') {
-        console.error('musubi-code: index is up to date');
-        return;
+      let languages = null;
+      if (opts.ifStale) {
+        const freshness = indexer.getFreshness(cfg);
+        if (freshness.state === 'fresh') {
+          console.error('musubi-code: index is up to date');
+          return;
+        }
+        languages = Object.entries(freshness.languages)
+          .filter(([, state]) => state !== 'fresh')
+          .map(([key]) => key);
       }
-      const result = indexer.build(cfg, { quiet: false });
+      const result = indexer.build(cfg, { quiet: false, languages });
       if (result.queued) {
         console.error(
           'musubi-code: another build is running; it will rebuild again when it finishes'
         );
       } else {
+        const labels = result.languages.map(key => indexer.LANGUAGES[key].label).join(', ');
         console.error(
-          `musubi-code: indexed ${result.files} files in ${(result.durationMs / 1000).toFixed(1)} s`
+          `musubi-code: indexed ${result.files} files in ${(result.durationMs / 1000).toFixed(1)} s (${labels || 'no supported sources'})`
         );
       }
     });
 
   program
     .command('hint')
-    .description('Claude Code PreToolUse hook: point a grep for an indexed name to refs')
-    .option('--hook', 'read the hook JSON from stdin; print context or nothing, never fail')
-    .option('--command <command>', 'command named in the hint', 'musubi-code')
+    .description('Claude Code PreToolUse hook: deny a grep for an indexed name and point to refs')
+    .option('--hook', 'read the hook JSON from stdin; print a decision or nothing, never fail')
+    .option('--advisory', 'add a note instead of denying the search')
+    .option('--command <command>', 'command named in the text', 'musubi-code')
     .option('--root <dir>', 'project directory (default: from the hook input)')
     .action(async opts => {
       if (!opts.hook) throw new Error('hint runs as a Claude Code hook: musubi-code hint --hook');
       print(
-        hint.runHint(await indexer.readStdin(1000), { root: opts.root, command: opts.command })
+        hint.runHint(await indexer.readStdin(1000), {
+          root: opts.root,
+          command: opts.command,
+          advisory: Boolean(opts.advisory),
+        })
       );
       process.exitCode = 0;
     });
@@ -204,7 +220,6 @@ function createProgram() {
     )
     .option('--command <command>', 'command the hooks and instructions call', 'musubi-code')
     .option('--dry-run', 'show what would change without writing')
-    .option('--force', 'also set up a directory without package.json or tsconfig.json')
     .option('--root <dir>', 'project directory (default: found from the current directory)')
     .action(opts => {
       const root = indexer.findProjectRoot(opts.root || process.cwd());
@@ -212,7 +227,6 @@ function createProgram() {
         agents: opts.agent,
         command: opts.command,
         dryRun: opts.dryRun,
-        force: opts.force,
       });
       print(format.formatSetup(result));
       if (result.skippedReason) {

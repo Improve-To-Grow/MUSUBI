@@ -1,9 +1,10 @@
 /**
- * Code index queries - references, callers and file dependencies from a SCIP index
+ * Code index queries - references, callers and file dependencies from the SCIP indexes
  *
- * Reads `<project>/.scip/index.scip` (built by ./indexer.js) and answers "who references /
- * calls / instantiates / requires X" and file dependency questions with compiler-accurate
- * cross-file resolution, including CommonJS `module.exports = { X }`.
+ * Reads the per-language indexes in `<project>/.scip/` (built by ./indexer.js) as one model and
+ * answers "who references / calls / instantiates / requires / imports X" and file dependency
+ * questions with compiler-accurate cross-file resolution, including CommonJS
+ * `module.exports = { X }` and Python `self.method()`, `super()` and base classes.
  *
  * CLI: bin/musubi-code.js (`musubi-code refs|callers|deps|dependents|symbols`).
  *
@@ -14,12 +15,19 @@
 
 const fs = require('fs');
 const path = require('path');
-const { ensureFresh, toPosix } = require('./indexer');
+const { LANGUAGES, ensureFresh, isIndexedPath, languageOf, toPosix } = require('./indexer');
 
+// The protobuf bindings of either indexer decode both indexes; scip-typescript's are used.
 const BINDINGS_MODULE = '@sourcegraph/scip-typescript/dist/src/scip.js';
 const DEFINITION_ROLE = 1;
 const NON_ENTITY_KINDS = new Set(['module', 'parameter', 'type-parameter']);
-const CALL_LIKE_TAGS = new Set(['new', 'extends', 'call', 'ref', 'super']);
+const CALL_LIKE_TAGS = new Set(['new', 'extends', 'call', 'ref', 'super', 'decorator']);
+const PYTHON_SCHEME = 'scip-python';
+// Display names of the packages the indexers use for built-ins.
+const EXTERNAL_PACKAGE_NAMES = {
+  '@types/node': 'node (built-ins)',
+  'python-stdlib': 'python (standard library)',
+};
 
 // ---------------------------------------------------------------------------
 // SCIP symbol grammar: <scheme> ' ' <manager> ' ' <package> ' ' <version> ' ' <descriptors>
@@ -151,6 +159,7 @@ function stripMetaCounter(metaName) {
  */
 function describeSymbol(parsed) {
   const descriptors = parsed.descriptors;
+  const python = parsed.scheme === PYTHON_SCHEME;
   let k = 0;
   const namespaces = [];
   while (k < descriptors.length && descriptors[k].kind === 'namespace') {
@@ -166,13 +175,18 @@ function describeSymbol(parsed) {
   else if (last.kind === 'typeParameter') kind = 'type-parameter';
   else if (last.kind === 'type') kind = 'class';
   else if (last.kind === 'method') {
-    if (last.name === '<constructor>') kind = 'constructor';
+    // scip-python has no constructor descriptor; `__init__` is the constructor.
+    const constructor =
+      last.name === '<constructor>' || (python && last.name === '__init__' && named.length > 1);
+    if (constructor) kind = 'constructor';
     else kind = named.length > 1 ? 'method' : 'function';
   } else if (last.kind === 'term') kind = named.length > 1 ? 'property' : 'variable';
-  else if (last.kind === 'meta') kind = 'property';
-  else kind = last.kind;
+  else if (last.kind === 'meta') {
+    // scip-python names a module `<module>/__init__:`.
+    kind = python && last.name === '__init__' && named.length === 1 ? 'module' : 'property';
+  } else kind = last.kind;
 
-  const names = named.map(d => d.name);
+  const names = kind === 'module' ? [] : named.map(d => d.name);
   const shown = named.map(d =>
     d.kind === 'meta'
       ? stripMetaCounter(d.name)
@@ -180,12 +194,13 @@ function describeSymbol(parsed) {
         ? 'constructor'
         : d.name
   );
+  const moduleName = namespaces.join(python ? '.' : '/');
   return {
     file: namespaces.join('/'),
     names,
     kind,
     lastKind: last ? last.kind : null,
-    display: shown.join('.') || namespaces.join('/'),
+    display: kind === 'module' ? moduleName : shown.join('.') || moduleName,
   };
 }
 
@@ -220,14 +235,16 @@ function namesMatch(info, parts) {
  * @param {number} startCol
  * @param {number} endCol
  * @param {string} kind - kind of the referenced symbol
+ * @param {string} [language] - `typescript` (default) or `python`
  * @returns {string}
  */
-function classifyReference(lines, line, startCol, endCol, kind) {
+function classifyReference(lines, line, startCol, endCol, kind, language = 'typescript') {
   const text = lines[line] || '';
   const before = text.slice(0, startCol);
   const after = text.slice(endCol);
   const token = text.slice(startCol, endCol);
 
+  if (language === 'python') return classifyPythonReference(text, before, after, kind);
   if (kind === 'module') {
     if (/\brequire\s*\(\s*$/.test(before)) return 'require';
     if (
@@ -263,6 +280,19 @@ function classifyReference(lines, line, startCol, endCol, kind) {
       if (/[{}]/.test(previous)) break;
     }
   }
+  return 'ref';
+}
+
+/**
+ * Python tags: `import` for `import x` and `from x import y` lines, `extends` for a base class,
+ * `decorator` after `@`, `super` for `super().x`, `call` for `name(`, else `ref`.
+ */
+function classifyPythonReference(text, before, after, kind) {
+  if (/^\s*(?:from\s+[\w.]*\s+)?import\b/.test(text)) return 'import';
+  if (/\bsuper\(\)\s*\.\s*$/.test(before)) return 'super';
+  if (/^\s*@(?:[\w.]+\.)?$/.test(before)) return 'decorator';
+  if (/^\s*class\s+\w+\s*\([^)]*$/.test(before)) return 'extends';
+  if (kind !== 'module' && /^\s*\(/.test(after)) return 'call';
   return 'ref';
 }
 
@@ -304,9 +334,14 @@ function loadBindings(root) {
   return bindings.scip;
 }
 
+/** Python modules are `<module>/__init__:`, JavaScript modules `<file>/`. */
+function isModuleSymbol(symbol) {
+  return symbol.endsWith('/') || symbol.endsWith('/__init__:');
+}
+
 /**
- * Build the in-memory model from a decoded SCIP index.
- * @param {object} index - scip.Index
+ * Build the in-memory model from decoded SCIP documents.
+ * @param {object} index - scip.Index, or any object with a `documents` array
  * @param {string} root - project root, used to read source lines
  */
 function buildModel(index, root) {
@@ -331,7 +366,7 @@ function buildModel(index, root) {
         };
         if (!definitions.has(symbol)) definitions.set(symbol, def);
         doc.defs.push(def);
-        if (symbol.endsWith('/') && !doc.moduleSymbol) doc.moduleSymbol = symbol;
+        if (!doc.moduleSymbol && isModuleSymbol(symbol)) doc.moduleSymbol = symbol;
       } else {
         const ref = { symbol, file, range };
         doc.refs.push(ref);
@@ -397,6 +432,10 @@ function enclosingDefinition(model, file, line, col) {
   return scope ? scope.def : null;
 }
 
+function fileLanguage(file) {
+  return languageOf(file) || 'typescript';
+}
+
 function isExportDefinition(model, def) {
   const text = sourceLines(model, def.file)[def.range.sl] || '';
   if (/(?:^|[^\w$.])(?:module\.)?exports\b/.test(text)) return true;
@@ -406,7 +445,8 @@ function isExportDefinition(model, def) {
       def.range.sl,
       def.range.sc,
       def.range.ec,
-      ''
+      '',
+      fileLanguage(def.file)
     ) === 'export'
   );
 }
@@ -489,7 +529,14 @@ function annotate(model, ref) {
     file: ref.file,
     line: ref.range.sl + 1,
     column: ref.range.sc + 1,
-    tag: classifyReference(lines, ref.range.sl, ref.range.sc, ref.range.ec, info ? info.kind : ''),
+    tag: classifyReference(
+      lines,
+      ref.range.sl,
+      ref.range.sc,
+      ref.range.ec,
+      info ? info.kind : '',
+      fileLanguage(ref.file)
+    ),
     caller: scopeInfo ? scopeInfo.display : null,
     text: (lines[ref.range.sl] || '').trim(),
   };
@@ -594,7 +641,8 @@ function depsQuery(model, fileArg) {
           ref.range.sl,
           ref.range.sc,
           ref.range.ec,
-          'module'
+          'module',
+          fileLanguage(file)
         );
         if (tag === 'require' || tag === 'import') entry.required = true;
       } else {
@@ -605,7 +653,7 @@ function depsQuery(model, fileArg) {
       if (!info || !info.package || info.package === '.') continue;
       // `typescript` holds the lib.d.ts globals (Object, JSON, ...), not a real dependency.
       if (model.projectPackages.has(info.package) || info.package === 'typescript') continue;
-      const name = info.package === '@types/node' ? 'node (built-ins)' : info.package;
+      const name = EXTERNAL_PACKAGE_NAMES[info.package] || info.package;
       external.set(name, (external.get(name) || 0) + 1);
     }
   }
@@ -729,19 +777,30 @@ function suggestNames(model, query) {
 }
 
 /**
- * Load a project's index as a query model, refreshing it first unless disabled.
+ * Load a project's indexes as one query model, refreshing them first unless disabled.
  * @param {object} cfg - from indexer.loadConfig
  * @param {object} [opts]
- * @param {boolean} [opts.refresh=true] - rebuild a missing or stale index first
+ * @param {boolean} [opts.refresh=true] - rebuild missing or stale indexes first
  * @param {(message: string) => void} [opts.notify] - progress messages
  */
 function loadModel(cfg, { refresh = true, notify } = {}) {
   const scip = loadBindings(cfg.root);
   if (refresh) ensureFresh(cfg, { notify });
-  if (!fs.existsSync(cfg.indexPath)) {
-    throw new Error('no index found; run: musubi-code index');
+  const documents = [];
+  let found = false;
+  for (const key of Object.keys(LANGUAGES)) {
+    const file = cfg.indexPaths[key];
+    if (!fs.existsSync(file)) continue;
+    found = true;
+    const index = scip.Index.deserializeBinary(fs.readFileSync(file));
+    for (const document of index.documents) {
+      // scip-python indexes the whole project root; keep the roots and exclusions.
+      if (key === 'python' && !isIndexedPath(cfg, document.relative_path)) continue;
+      documents.push(document);
+    }
   }
-  return buildModel(scip.Index.deserializeBinary(fs.readFileSync(cfg.indexPath)), cfg.root);
+  if (!found) throw new Error('no index found; run: musubi-code index');
+  return buildModel({ documents }, cfg.root);
 }
 
 module.exports = {
