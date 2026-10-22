@@ -126,7 +126,12 @@ jobs:
         with: { node-version-file: .nvmrc }
       # The ITG fork at the tag the project was initialized with; move it with `musubi upgrade` (§19.4)
       - run: npm install -g 'github:Improve-To-Grow/MUSUBI#{{MUSUBI_TAG}}'
-      - run: musubi validate
+      # Article V reads the matrix, so it is regenerated from the current requirements first
+      - run: musubi-trace matrix --format markdown --output storage/traceability/matrix.md
+      # Every article, Article VII code limits included; CRITICAL findings fail the job
+      - run: musubi-validate project
+      # Requirements linked to design, tasks, code and tests (co-located *.test.ts count)
+      - run: musubi-trace ci-check
 
   changelog:
     runs-on: ubuntu-latest

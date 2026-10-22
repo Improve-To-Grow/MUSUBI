@@ -215,11 +215,10 @@ class ConstitutionValidator {
 
     // Check for test files
     const testPatterns = [
-      'test/**/*.js',
-      'tests/**/*.js',
-      'src/**/*.test.js',
-      'src/**/*.spec.js',
-      '__tests__/**/*.js',
+      'test/**/*.{js,mjs,cjs,ts,tsx}',
+      'tests/**/*.{js,mjs,cjs,ts,tsx}',
+      'src/**/*.{test,spec}.{js,mjs,cjs,ts,tsx}',
+      '__tests__/**/*.{js,mjs,cjs,ts,tsx}',
     ];
 
     let testFileCount = 0;
@@ -257,6 +256,13 @@ class ConstitutionValidator {
       }
     }
 
+    // Vitest declares thresholds under test.coverage.thresholds
+    for (const file of await glob('vitest.config.{js,mjs,cjs,ts,mts}', { cwd: this.projectRoot })) {
+      if (hasCoverageThreshold) break;
+      const vitestConfig = await fs.readFile(path.join(this.projectRoot, file), 'utf-8');
+      hasCoverageThreshold = vitestConfig.includes('thresholds');
+    }
+
     if (hasCoverageThreshold) {
       result.warnings.push('Article III: Test coverage thresholds configured (80% minimum)');
     } else {
@@ -286,6 +292,9 @@ class ConstitutionValidator {
 
     // Check for requirements files
     const reqPaths = [
+      ...(await glob('storage/specs/**/*-requirements.md', { cwd: this.projectRoot })).map(file =>
+        path.join(this.projectRoot, file)
+      ),
       path.join(this.steeringPath, 'requirements.md'),
       path.join(this.projectRoot, 'docs', 'requirements.md'),
       path.join(this.projectRoot, 'specs', 'requirements.md'),
@@ -348,6 +357,9 @@ class ConstitutionValidator {
 
     // Check for traceability matrix
     const traceabilityPaths = [
+      ...(
+        await glob('storage/traceability/matrix.{md,yml,yaml,json}', { cwd: this.projectRoot })
+      ).map(file => path.join(this.projectRoot, file)),
       path.join(this.steeringPath, 'traceability.md'),
       path.join(this.projectRoot, 'docs', 'traceability.md'),
     ];

@@ -6,7 +6,7 @@
  *
  * EARS Patterns:
  * 1. Ubiquitous: The [system] SHALL [requirement]
- * 2. Event-Driven: WHEN [event], THEN [system] SHALL [response]
+ * 2. Event-Driven: WHEN [event], [THEN] [system] SHALL [response]
  * 3. State-Driven: WHILE [state], [system] SHALL [response]
  * 4. Unwanted Behavior: IF [error], THEN [system] SHALL [response]
  * 5. Optional Feature: WHERE [feature], [system] SHALL [response]
@@ -15,6 +15,51 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { glob } = require('glob');
+
+/** Requirement ids with one or more area segments: REQ-AUTH-001, REQ-MEETING-RSVP-001 */
+const REQ_ID = 'REQ-[A-Z0-9]+(?:-[A-Z0-9]+)*-\\d+';
+const AMBIGUOUS_WORDS = ['should', 'could', 'might', 'may', 'will', 'can', 'must'];
+const VAGUE_TERMS = [
+  'etc',
+  'and so on',
+  'as needed',
+  'appropriate',
+  'suitable',
+  'adequate',
+  'reasonable',
+];
+
+/**
+ * Terms that occur in the statement as whole words ("may" is not found in "maybe")
+ * @param {string} statement - EARS statement
+ * @param {string[]} terms - Lowercase words or phrases
+ * @returns {string[]} Terms found
+ */
+function findTerms(statement, terms) {
+  const lower = statement.toLowerCase();
+  return terms.filter(term => new RegExp(`\\b${term}\\b`).test(lower));
+}
+
+/**
+ * The EARS statement of a requirement section: its first paragraph, or the content of a leading
+ * code fence, joined into one line. Blank lines after the heading are skipped.
+ * @param {string} body - Section text after the heading line
+ * @returns {string} Statement
+ */
+function extractStatement(body) {
+  const lines = body.split('\n');
+  let i = lines.findIndex(line => line.trim() !== '');
+  if (i === -1) return '';
+  const fenced = lines[i].trim().startsWith('```');
+  if (fenced) i++;
+  const statement = [];
+  for (; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (fenced ? line.startsWith('```') : line === '' || /^(\*\*|[-|>#]|```)/.test(line)) break;
+    statement.push(line);
+  }
+  return statement.join(' ');
+}
 
 class RequirementsGenerator {
   constructor(rootDir) {
@@ -261,13 +306,12 @@ class RequirementsGenerator {
    */
   parseRequirements(content) {
     const requirements = [];
-    const reqRegex = /### (REQ-[A-Z]+-\d+): (.+?)\n(.+?)(?=\n###|\n##|$)/gs;
+    const reqRegex = new RegExp(`### (${REQ_ID}): (.+?)\\n(.*?)(?=\\n###|\\n##|$)`, 'gs');
 
     let match;
     while ((match = reqRegex.exec(content)) !== null) {
       const [, id, title, body] = match;
-      // Extract first line of body as statement
-      const statement = body.split('\n')[0].trim();
+      const statement = extractStatement(body);
       const pattern = this.detectEARSPattern(statement);
 
       requirements.push({
@@ -355,30 +399,12 @@ class RequirementsGenerator {
       errors.push('Missing SHALL keyword');
     }
 
-    // Check for ambiguous words
-    const ambiguousWords = ['should', 'could', 'might', 'may', 'will', 'can', 'must'];
-    const lowerStatement = statement.toLowerCase();
-    ambiguousWords.forEach(word => {
-      if (lowerStatement.includes(word) && word !== 'shall') {
-        warnings.push(`Ambiguous word detected: "${word}" - Use "SHALL" instead`);
-      }
-    });
-
-    // Check for vague terms
-    const vagueTerms = [
-      'etc',
-      'and so on',
-      'as needed',
-      'appropriate',
-      'suitable',
-      'adequate',
-      'reasonable',
-    ];
-    vagueTerms.forEach(term => {
-      if (lowerStatement.includes(term)) {
-        warnings.push(`Vague term detected: "${term}" - Be more specific`);
-      }
-    });
+    for (const word of findTerms(statement, AMBIGUOUS_WORDS)) {
+      warnings.push(`Ambiguous word detected: "${word}" - Use "SHALL" instead`);
+    }
+    for (const term of findTerms(statement, VAGUE_TERMS)) {
+      warnings.push(`Vague term detected: "${term}" - Be more specific`);
+    }
 
     // Check statement length (too short or too long)
     const words = statement.split(/\s+/).length;
@@ -391,11 +417,12 @@ class RequirementsGenerator {
     // Pattern-specific validation
     switch (pattern) {
       case 'event': {
-        if (!statement.startsWith('WHEN') || !statement.includes('THEN')) {
-          errors.push('Event-driven pattern must use WHEN...THEN');
+        // THEN is optional: "WHEN x, the system SHALL y" is the standard EARS form
+        if (!statement.startsWith('WHEN')) {
+          errors.push('Event-driven pattern must start with WHEN');
         }
         // Check for proper event description
-        const whenPart = statement.match(/WHEN (.+?), THEN/)?.[1];
+        const whenPart = statement.match(/WHEN (.+?), (?:THEN )?the/i)?.[1];
         if (whenPart && whenPart.split(/\s+/).length < 3) {
           warnings.push('Event description may be too brief');
         }
@@ -520,26 +547,8 @@ class RequirementsGenerator {
       if (words < 5) tooShort++;
       if (words > 50) tooLong++;
 
-      // Check for ambiguous words
-      const lowerStatement = req.statement.toLowerCase();
-      const ambiguousWords = ['should', 'could', 'might', 'may', 'will', 'can', 'must'];
-      if (ambiguousWords.some(word => lowerStatement.includes(word) && word !== 'shall')) {
-        ambiguousCount++;
-      }
-
-      // Check for vague terms
-      const vagueTerms = [
-        'etc',
-        'and so on',
-        'as needed',
-        'appropriate',
-        'suitable',
-        'adequate',
-        'reasonable',
-      ];
-      if (vagueTerms.some(term => lowerStatement.includes(term))) {
-        vagueCount++;
-      }
+      if (findTerms(req.statement, AMBIGUOUS_WORDS).length > 0) ambiguousCount++;
+      if (findTerms(req.statement, VAGUE_TERMS).length > 0) vagueCount++;
     });
 
     const avgWords = requirements.length > 0 ? Math.round(totalWords / requirements.length) : 0;

@@ -301,7 +301,11 @@ class ConstitutionalValidator {
     const articleName = 'Article V: Traceability';
 
     // Check for traceability matrix
-    const traceFiles = this.files.glob('**/*{trace,coverage-matrix}*.md');
+    const traceFiles = [
+      ...this.files.glob('**/*{trace,coverage-matrix}*.md'),
+      // musubi-trace matrix --format markdown --output storage/traceability/matrix.md
+      ...this.files.glob('storage/traceability/*.md'),
+    ];
 
     if (traceFiles.length === 0) {
       this._recordFinding(

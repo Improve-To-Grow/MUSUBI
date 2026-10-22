@@ -22,6 +22,7 @@ const chalk = require('chalk');
 const { glob } = require('glob');
 const { copyItgPolicies } = require('../src/cli/init-steering');
 const { writeItgScaffold } = require('../src/cli/init-scaffold');
+const { buildConstitutionYml, defaultApplicationPaths } = require('../src/cli/init-generators');
 
 /**
  * Analyze codebase and generate steering context
@@ -413,6 +414,7 @@ project_name: "${projectConfig.projectName}"
 description: "${projectConfig.description || 'Project onboarded to MUSUBI SDD'}"
 version: "${projectConfig.version || '0.1.0'}"
 
+${buildConstitutionYml({ profile: 'application', ...defaultApplicationPaths() })}
 # Detected languages
 languages:
 ${techStack.languages.map(lang => `  - ${lang}`).join('\n') || '  - javascript'}

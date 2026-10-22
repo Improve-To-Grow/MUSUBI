@@ -94,7 +94,7 @@ flowchart TD
 - **ITG-GIT-14** A second copy of the same logic SHALL be a review blocker; extract it to `src/lib` or the feature folder (§4.6).
 - **ITG-GIT-15** WHEN a behavior changes, the old code path, flag, migration helper, message key and test SHALL be removed in the same PR. A compatibility shim SHALL carry an expiry date in a code comment and a ClickUp task (§4.6).
 - **ITG-GIT-16** `knip` SHALL run in CI and fail on unused files, exports and dependencies; Prettier `format:check` SHALL run in CI (§4.6).
-- **ITG-GIT-17** `musubi validate` and `musubi gaps` SHALL run in CI, and requirements without tests or code without a requirement SHALL be reported on the PR (§4.6).
+- **ITG-GIT-17** `musubi-validate project` and `musubi-trace ci-check` SHALL run in CI, and requirements without tests or code without a requirement SHALL be reported on the PR (§4.6).
 
 ## Checklist
 

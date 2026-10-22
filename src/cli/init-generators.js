@@ -516,7 +516,12 @@ function buildConstitutionYml({ profile, corePaths, deliveryPaths, adapterPaths 
   } else {
     lines.push('  # core_paths default to [lib, packages] (P-3)');
   }
-  lines.push('  # levels: # optional per-article override (P-6), e.g. CONST-001: critical');
+  if (profile === 'application') {
+    // ITG-GIT-13: the Article VII code limits fail CI instead of being reported as warnings
+    lines.push('  levels: # per-article overrides (P-6)', '    CONST-007: critical');
+  } else {
+    lines.push('  # levels: # optional per-article override (P-6), e.g. CONST-001: critical');
+  }
   return `${lines.join('\n')}\n`;
 }
 

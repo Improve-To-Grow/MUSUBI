@@ -46,6 +46,14 @@ describe('ConstitutionalValidator', () => {
     await fs.remove(projectRoot);
   });
 
+  describe('Article V traceability matrix', () => {
+    it('finds the matrix that musubi-trace writes to storage/traceability/matrix.md', async () => {
+      await write('storage/traceability/matrix.md', '| REQ-RSVP-001 | ✓ |');
+      const articleV = findingsFor(await validate(), 'CONST-005');
+      expect(messages(articleV.violations)).not.toContain('No traceability matrix found');
+    });
+  });
+
   describe('library profile (default, P-2)', () => {
     it('applies the library profile and warns that none is declared (P-1)', async () => {
       await write('lib/auth/index.js', 'module.exports = {};');

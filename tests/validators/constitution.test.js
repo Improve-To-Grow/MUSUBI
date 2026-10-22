@@ -103,6 +103,53 @@ describe('ConstitutionValidator', () => {
     });
   });
 
+  describe('TypeScript projects with MUSUBI storage paths', () => {
+    const fs = require('fs-extra');
+    const os = require('os');
+    let tsRoot;
+
+    beforeEach(async () => {
+      tsRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'musubi-constitution-ts-'));
+      await fs.outputFile(
+        path.join(tsRoot, 'src/lib/rsvp/rsvp-service.test.ts'),
+        "it('x', () => {});"
+      );
+      await fs.outputFile(
+        path.join(tsRoot, 'vitest.config.ts'),
+        'export default { test: { coverage: { thresholds: { lines: 80 } } } };'
+      );
+      await fs.outputFile(
+        path.join(tsRoot, 'storage/specs/meeting-rsvp-requirements.md'),
+        '### REQ-RSVP-001: Record\nWHEN a member submits an RSVP, the RSVP service SHALL store it.\n'
+      );
+      await fs.outputFile(path.join(tsRoot, 'storage/traceability/matrix.md'), '| REQ-RSVP-001 |');
+    });
+
+    afterEach(async () => {
+      await fs.remove(tsRoot);
+    });
+
+    it('finds co-located .test.ts files and Vitest coverage thresholds (Article III)', async () => {
+      const result = await new ConstitutionValidator(tsRoot).validateArticle3();
+      expect(result.passed).toBe(true);
+      expect(result.summary).toBe('Article III: 1 test files found');
+      expect(result.warnings).toContain(
+        'Article III: Test coverage thresholds configured (80% minimum)'
+      );
+    });
+
+    it('reads requirements from storage/specs (Article IV)', async () => {
+      const result = await new ConstitutionValidator(tsRoot).validateArticle4();
+      expect(result.passed).toBe(true);
+      expect(result.summary).toBe('Article IV: Requirements file found');
+    });
+
+    it('finds the traceability matrix in storage/traceability (Article V)', async () => {
+      const result = await new ConstitutionValidator(tsRoot).validateArticle5();
+      expect(result.warnings).toContain('Article V: Traceability matrix found');
+    });
+  });
+
   describe('validateComplexity', () => {
     it('should detect files exceeding 1500 line limit', async () => {
       const result = await validator.validateComplexity();

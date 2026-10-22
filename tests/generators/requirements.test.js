@@ -203,6 +203,55 @@ describe('RequirementsGenerator', () => {
     });
   });
 
+  describe('parseRequirements (the format of the requirements template)', () => {
+    const doc = [
+      '### REQ-MEETING-RSVP-001: Record an RSVP',
+      '',
+      'WHEN a member submits an RSVP,',
+      'THEN the RSVP service SHALL store the response',
+      'AND the system SHALL emit rsvp.response.set.',
+      '',
+      '**Priority**: P0',
+      '',
+      '### REQ-RSVP-002: Deadline',
+      '',
+      '```',
+      'IF the RSVP deadline has passed,',
+      'THEN the RSVP service SHALL reject the RSVP.',
+      '```',
+      '',
+      '### REQ-RSVP-003: One line without THEN',
+      'WHEN a member submits a maybe answer, the RSVP service SHALL store it as tentative.',
+      '',
+      '## Non-Functional Requirements',
+    ].join('\n');
+
+    it('reads multi-segment ids, skips blank lines and joins multi-line and fenced statements', () => {
+      const parsed = generator.parseRequirements(doc);
+      expect(parsed.map(r => [r.id, r.pattern])).toEqual([
+        ['REQ-MEETING-RSVP-001', 'event'],
+        ['REQ-RSVP-002', 'unwanted'],
+        ['REQ-RSVP-003', 'event'],
+      ]);
+      expect(parsed[0].statement).toBe(
+        'WHEN a member submits an RSVP, THEN the RSVP service SHALL store the response AND the system SHALL emit rsvp.response.set.'
+      );
+    });
+
+    it('accepts all three without findings; "maybe" does not count as "may"', () => {
+      for (const requirement of generator.parseRequirements(doc)) {
+        expect(generator.validateEARSFormat(requirement)).toEqual([]);
+      }
+    });
+
+    it('still flags a whole ambiguous word', () => {
+      const [requirement] = generator.parseRequirements(
+        '### REQ-RSVP-009: Vague\nWHEN a member submits an RSVP, the RSVP service may store it.\n'
+      );
+      expect(generator.validateEARSFormat(requirement).join(' ')).toContain('"may"');
+    });
+  });
+
   describe('formatRequirementSection', () => {
     test('should format requirement without criteria', () => {
       const section = generator.formatRequirementSection(

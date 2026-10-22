@@ -640,7 +640,7 @@ Service --> Repository
    */
   parseRequirements(content) {
     const requirements = [];
-    const reqRegex = /### (REQ-[A-Z]+-\d+):/g;
+    const reqRegex = /### (REQ-[A-Z0-9]+(?:-[A-Z0-9]+)*-\d+):/g;
 
     let match;
     while ((match = reqRegex.exec(content)) !== null) {

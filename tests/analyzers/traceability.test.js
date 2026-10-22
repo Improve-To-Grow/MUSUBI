@@ -446,5 +446,23 @@ describe('TraceabilityAnalyzer', () => {
 
       expect(tests.length).toBe(2);
     });
+
+    test('counts co-located test files as tests, not as code', async () => {
+      await fs.mkdirp(path.join(tmpDir, 'src/lib/rsvp'));
+      await fs.writeFile(
+        path.join(tmpDir, 'src/lib/rsvp/service.ts'),
+        'export function record() {}'
+      );
+      await fs.writeFile(
+        path.join(tmpDir, 'src/lib/rsvp/service.test.ts'),
+        "it('REQ-RSVP-001: records', () => {})"
+      );
+
+      const code = await analyzer.findCode('src');
+      const tests = await analyzer.findTests('tests', 'src');
+
+      expect(code.map(c => c.file)).toEqual(['src/lib/rsvp/service.ts']);
+      expect(tests.map(t => t.file)).toEqual(['src/lib/rsvp/service.test.ts']);
+    });
   });
 });

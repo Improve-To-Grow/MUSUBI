@@ -179,7 +179,7 @@ npx tsc --noEmit
 npx vitest run
 npx playwright test
 npx opennextjs-cloudflare build
-musubi validate
+musubi-validate project && musubi-trace ci-check
 ```
 
 ---

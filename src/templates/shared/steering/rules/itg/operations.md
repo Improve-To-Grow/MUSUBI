@@ -85,7 +85,7 @@ flowchart LR
 **Minimum standard for every production project (§18)**
 
 - [ ] GitHub repository (private, GitHub Team or higher) with `master` / `staging` under branch protection, PR template, README, CHANGELOG; Dependabot on
-- [ ] MUSUBI initialized with the ITG profile; steering files current; `musubi validate` in CI
+- [ ] MUSUBI initialized with the ITG profile; steering files current; `musubi-validate project` and `musubi-trace ci-check` in CI
 - [ ] ClickUp project with an architecture index linking to the repository
 - [ ] Two Firebase projects (`-staging`, `-production`) in `europe-west4` and two Workers, both deployed from Sprint 0
 - [ ] Configuration in GitHub Environments in the three classes of ITG-PLT-09; the deploy workflow writes it; `production` limited to `master`

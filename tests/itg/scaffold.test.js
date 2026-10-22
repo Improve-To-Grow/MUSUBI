@@ -69,6 +69,10 @@ describe('writeItgScaffold (REQ-ITG-008)', () => {
     const ci = fs.readFileSync(path.join(root, '.github/workflows/ci.yml'), 'utf8');
     expect(ci).toContain(`MUSUBI#v${version}`);
     expect(ci).not.toContain('{{MUSUBI_TAG}}');
+    // The constitution job runs the checks that fail on findings, not the musubi validate checklist
+    expect(ci).toContain('- run: musubi-validate project');
+    expect(ci).toContain('- run: musubi-trace ci-check');
+    expect(ci).not.toMatch(/run: musubi validate\b/);
   });
 
   it('keeps files that exist', async () => {
@@ -127,6 +131,9 @@ describe('musubi-onboard (REQ-ITG-011)', () => {
       expect(result.status).toBe(0);
       expect(result.stdout).toContain('Kept existing files: .env.example');
       expect(fs.readFileSync(path.join(existing, '.env.example'), 'utf8')).toBe('LEGACY=1\n');
+      expect(fs.readFileSync(path.join(existing, 'steering/project.yml'), 'utf8')).toMatch(
+        /constitution:\n {2}profile: application/
+      );
       for (const rel of [
         '.github/workflows/deploy.yml',
         'scripts/checks/check-route-guards.mjs',

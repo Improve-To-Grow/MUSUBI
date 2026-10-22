@@ -54,7 +54,7 @@ flowchart TD
 
 - **ITG-TST-01** Tests SHALL be written before the code: a failing test (Red), the minimal code that passes (Green), then a refactor with all tests passing (Blue) (§7.1; constitution Article III).
 - **ITG-TST-02** Every EARS requirement SHALL map to at least one test that references its `REQ-*` id (§7.1).
-- **ITG-TST-03** Coverage thresholds SHALL come from `steering/rules/constitution-levels.yml` for the `application` profile and SHALL be enforced by `musubi validate` in CI (§7.1).
+- **ITG-TST-03** Coverage thresholds SHALL come from `steering/rules/constitution-levels.yml` for the `application` profile and SHALL be set as `test.coverage.thresholds` in `vitest.config.ts`, so that the test run fails below them; `musubi-validate project` checks that the configuration exists (§7.1).
 - **ITG-TST-04** The project SHALL use these test levels and tools (§7.2):
 
 | Level | Tool | Purpose |

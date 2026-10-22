@@ -22,7 +22,7 @@ class TraceabilityAnalyzer {
     const design = await this.findDesign(options.design || 'storage/design');
     const tasks = await this.findTasks(options.tasks || 'storage/tasks');
     const code = await this.findCode(options.code || 'src');
-    const tests = await this.findTests(options.tests || 'tests');
+    const tests = await this.findTests(options.tests || 'tests', options.code || 'src');
 
     const matrix = [];
 
@@ -88,7 +88,7 @@ class TraceabilityAnalyzer {
     const design = await this.findDesign(options.design || 'storage/design');
     const tasks = await this.findTasks(options.tasks || 'storage/tasks');
     const code = await this.findCode(options.code || 'src');
-    const tests = await this.findTests(options.tests || 'tests');
+    const tests = await this.findTests(options.tests || 'tests', options.code || 'src');
 
     const orphanedRequirements = [];
     const orphanedDesign = [];
@@ -153,7 +153,7 @@ class TraceabilityAnalyzer {
     const design = await this.findDesign(options.design || 'storage/design');
     const tasks = await this.findTasks(options.tasks || 'storage/tasks');
     const code = await this.findCode(options.code || 'src');
-    const tests = await this.findTests(options.tests || 'tests');
+    const tests = await this.findTests(options.tests || 'tests', options.code || 'src');
 
     const requirement = requirements.find(r => r.id === requirementId);
     if (!requirement) {
@@ -203,7 +203,7 @@ class TraceabilityAnalyzer {
     const design = await this.findDesign(options.design || 'storage/design');
     const tasks = await this.findTasks(options.tasks || 'storage/tasks');
     const code = await this.findCode(options.code || 'src');
-    const tests = await this.findTests(options.tests || 'tests');
+    const tests = await this.findTests(options.tests || 'tests', options.code || 'src');
 
     const forward = [];
     const backward = [];
@@ -305,7 +305,7 @@ class TraceabilityAnalyzer {
     const design = await this.findDesign(options.design || 'storage/design');
     const tasks = await this.findTasks(options.tasks || 'storage/tasks');
     const code = await this.findCode(options.code || 'src');
-    const tests = await this.findTests(options.tests || 'tests');
+    const tests = await this.findTests(options.tests || 'tests', options.code || 'src');
 
     const impactedDesign = design.filter(d => this.linksToRequirement(d, requirementId));
     const impactedTasks = tasks.filter(t => this.linksToRequirement(t, requirementId));
@@ -354,7 +354,7 @@ class TraceabilityAnalyzer {
     const design = await this.findDesign(options.design || 'storage/design');
     const tasks = await this.findTasks(options.tasks || 'storage/tasks');
     const code = await this.findCode(options.code || 'src');
-    const tests = await this.findTests(options.tests || 'tests');
+    const tests = await this.findTests(options.tests || 'tests', options.code || 'src');
 
     // Calculate various metrics
     const reqWithDesign = requirements.filter(r =>
@@ -722,9 +722,11 @@ class TraceabilityAnalyzer {
       return [];
     }
 
+    // Co-located test files belong to findTests
     const files = glob.sync('**/*.{js,ts,jsx,tsx,py,java,go,rs}', {
       cwd: codePath,
       absolute: true,
+      ignore: ['**/*.{test,spec}.*', '**/node_modules/**'],
     });
     const code = [];
 
@@ -751,16 +753,20 @@ class TraceabilityAnalyzer {
   /**
    * Find all test files
    */
-  async findTests(testsDir) {
-    const testsPath = path.join(this.workspaceRoot, testsDir);
-    if (!(await fs.pathExists(testsPath))) {
-      return [];
+  async findTests(testsDir, codeDir = null) {
+    // Tests live in the tests directory and next to the code (src/**/*.test.ts)
+    const files = new Set();
+    for (const dir of [testsDir, codeDir].filter(Boolean)) {
+      const dirPath = path.join(this.workspaceRoot, dir);
+      if (!(await fs.pathExists(dirPath))) continue;
+      glob
+        .sync('**/*.{test,spec}.{js,ts,jsx,tsx,py,java,go,rs}', {
+          cwd: dirPath,
+          absolute: true,
+          ignore: ['**/node_modules/**'],
+        })
+        .forEach(file => files.add(file));
     }
-
-    const files = glob.sync('**/*.{test,spec}.{js,ts,jsx,tsx,py,java,go,rs}', {
-      cwd: testsPath,
-      absolute: true,
-    });
     const tests = [];
 
     for (const file of files) {

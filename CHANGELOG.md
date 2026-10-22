@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.1-itg.6] - 2026-10-22
+
+The fork is now developed independently of upstream `nahisaho/MUSUBI` (CHANGE-009); the version scheme stays `6.3.1-itg.N`.
+
+### Fixed
+
+- **EARS validation reads the requirements template's own format**: requirement ids with several area segments (`REQ-MEETING-RSVP-001`), blank lines after the heading, and statements written over several lines or inside a code fence. Ambiguous words and vague terms are matched as whole words ("maybe" no longer counts as "may"), and `WHEN <event>, the <system> SHALL <response>` is accepted without `THEN`
+- **`musubi-validate constitution` works for TypeScript projects**: `.ts`, `.tsx`, `.mjs` and `.cjs` tests count, Vitest coverage thresholds are recognized, requirements are read from `storage/specs/*-requirements.md` and the matrix from `storage/traceability/`
+- **`musubi-trace` counts tests next to the code** (`src/**/*.test.ts`) as tests and no longer as code; `musubi-validate project` finds the matrix in `storage/traceability/`
+- **`musubi-onboard`** declares the `application` profile with the ITG paths
+- **Article VII code limits fail CI**: the `application` profile that `musubi init` and `musubi-onboard` write sets `CONST-007: critical`, so a long function or file is a CRITICAL finding of `musubi-validate project` instead of a warning (ITG-GIT-13)
+
+### Changed
+
+- **The scaffold's CI constitution job fails on findings**: it regenerates `storage/traceability/matrix.md`, then runs `musubi-validate project` (every article, Article VII code limits included) and `musubi-trace ci-check`, instead of the `musubi validate` checklist, which always exits 0. ITG-CI-01, ITG-GIT-17 and ITG-TST-03 name these checks
+- Steering: FORK-07 states the independent development; the upstream merge and pull-request rules are removed
+
 ## [6.3.1-itg.5] - 2026-10-22
 
 Implements Appendix C of **ITG Software Delivery Playbook v2.2** (CHANGE-008).

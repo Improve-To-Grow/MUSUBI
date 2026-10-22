@@ -72,7 +72,7 @@ flowchart TD
 | Function triggers | `scripts/checks/check-function-triggers.mjs` | Fails on any `onRequest` or `onCall` export under `functions/src/` |
 | Audit catalogue | `scripts/checks/check-audit-catalogue.mjs` | `documentation/AUDIT_LOGGING.md` matches `src/lib/logs/allowlist.ts` (ITG-LOG-17) |
 | Dead code | `knip` | Unused files, exports, dependencies |
-| Constitution | `musubi validate` | Article VII limits, traceability gaps |
+| Constitution | `musubi-trace matrix --format markdown --output storage/traceability/matrix.md`, `musubi-validate project`, `musubi-trace ci-check` | Every constitution article, Article VII code limits included; requirements linked to design, tasks, code and tests |
 | Changelog | `scripts/checks/check-changelog.mjs` | `CHANGELOG.md` changed when `src/` changed |
 | Feature registry | `scripts/checks/check-feature-registry.mjs` | Every folder under `src/features/` is in the registry (ITG-SEC-23) |
 | AI provider | `scripts/checks/check-ai-provider.mjs` | The AI properties of ITG-SEC-20 |

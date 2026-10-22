@@ -50,6 +50,7 @@ describe('init constitution profile', () => {
       core_paths: ['src/lib'],
       delivery_paths: ['src/app', 'src/components', 'src/hooks'],
       adapter_paths: [],
+      levels: { 'CONST-007': 'critical' }, // ITG-GIT-13: code limits fail CI
     });
   });
 
