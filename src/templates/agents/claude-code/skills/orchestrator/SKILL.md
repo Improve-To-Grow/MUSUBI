@@ -419,7 +419,6 @@ As the Orchestrator, you have a special responsibility regarding Project Memory:
 - **`steering/structure.md`** - Architecture patterns, directory organization, naming conventions
 - **`steering/tech.md`** - Technology stack, frameworks, development tools, technical constraints
 - **`steering/product.md`** - Business context, product purpose, target users, core features
-- **`steering/rules/itg/README.md`** - ITG delivery policies (ITG Software Delivery Playbook): read it, then the policy files it maps to your role. Apply those rules and cite their ids (e.g. `ITG-SEC-13`); where this skill and an ITG policy disagree, the ITG policy wins
 
 ### Your Responsibilities
 
