@@ -14,6 +14,7 @@ Implements Appendix C of **ITG Software Delivery Playbook v2.2** (CHANGE-008).
 ### Added
 
 - **ITG project scaffold** (`src/templates/shared/itg-scaffold/`, `src/cli/init-scaffold.js`): `musubi init` with the `application` profile writes `.env.example` (Appendix C.1), `.github/pull_request_template.md` (§4.4), `.github/workflows/ci.yml` (one job per §8.1 check), `deploy.yml` (§8.2.1) and `ci-cleanup.yml` (§7.3), the eight CI gate scripts of C.3 in `scripts/checks/` and `scripts/ci/materialize-config.mjs`, `deploy-worker.mjs` and `migrate.mjs`. Existing files are kept and reported. `ci.yml` installs MUSUBI at the tag of the version that wrote it
+- `musubi-onboard` writes the same scaffold into existing projects, keeping every file they already have
 - `materialize-config.mjs` reads the class and readers of every key from the block headers of `.env.example`, so the deploy workflow needs no second key list; CI-only credentials reach no deployable
 - Tests (`tests/itg/scaffold.test.js`): init output, every check script passing and failing in a real temporary project, configuration routing, `--var` arguments with spaces, migration file names
 

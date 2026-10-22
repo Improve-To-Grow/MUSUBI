@@ -9,6 +9,7 @@
  * - Generates steering/project.yml
  * - Generates steering/*.md documents (structure, tech, product)
  * - Initializes steering/memories/ with initial content
+ * - Writes the ITG project scaffold (Appendix C of the playbook), keeping existing files
  *
  * Usage:
  *   musubi-onboard [directory]
@@ -20,6 +21,7 @@ const path = require('path');
 const chalk = require('chalk');
 const { glob } = require('glob');
 const { copyItgPolicies } = require('../src/cli/init-steering');
+const { writeItgScaffold } = require('../src/cli/init-scaffold');
 
 /**
  * Analyze codebase and generate steering context
@@ -103,6 +105,13 @@ async function main() {
   await copyItgPolicies();
   console.log(chalk.gray('  Created steering/rules/itg/ (ITG delivery policies)'));
 
+  // The files of the playbook's Appendix C; an existing project keeps every file it already has
+  const scaffold = await writeItgScaffold();
+  console.log(chalk.gray(`  Wrote the ITG project scaffold (${scaffold.written.length} files)`));
+  if (scaffold.skipped.length > 0) {
+    console.log(chalk.yellow(`  Kept existing files: ${scaffold.skipped.join(', ')}`));
+  }
+
   // Step 7: Initialize memories (if not skipped)
   if (!skipMemories) {
     console.log(chalk.green('\n📝 Initializing memory system...\n'));
@@ -123,6 +132,9 @@ async function main() {
   console.log(chalk.gray('  steering/tech.md - Technology stack'));
   console.log(chalk.gray('  steering/product.md - Business context'));
   console.log(chalk.gray('  steering/rules/itg/ - ITG delivery policies'));
+  console.log(
+    chalk.gray('  .env.example, .github/, scripts/checks/, scripts/ci/ - ITG project scaffold')
+  );
   if (!skipMemories) {
     console.log(chalk.gray('  steering/memories/ - Memory system (6 files)'));
   }

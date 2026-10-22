@@ -110,6 +110,36 @@ describe('writeItgScaffold (REQ-ITG-008)', () => {
   });
 });
 
+describe('musubi-onboard (REQ-ITG-011)', () => {
+  it('writes the scaffold into an existing project and keeps its files', () => {
+    const existing = fs.mkdtempSync(path.join(os.tmpdir(), 'musubi-itg-onboard-'));
+    try {
+      fs.writeFileSync(path.join(existing, 'package.json'), JSON.stringify({ name: 'legacy-app' }));
+      fs.writeFileSync(path.join(existing, '.env.example'), 'LEGACY=1\n');
+      const onboard = path.join(__dirname, '..', '..', 'bin', 'musubi-onboard.js');
+      const result = spawnSync(
+        process.execPath,
+        [onboard, existing, '--auto-approve', '--skip-memories'],
+        {
+          encoding: 'utf8',
+        }
+      );
+      expect(result.status).toBe(0);
+      expect(result.stdout).toContain('Kept existing files: .env.example');
+      expect(fs.readFileSync(path.join(existing, '.env.example'), 'utf8')).toBe('LEGACY=1\n');
+      for (const rel of [
+        '.github/workflows/deploy.yml',
+        'scripts/checks/check-route-guards.mjs',
+        'steering/rules/itg/README.md',
+      ]) {
+        expect(fs.existsSync(path.join(existing, rel))).toBe(true);
+      }
+    } finally {
+      fs.rmSync(existing, { recursive: true, force: true });
+    }
+  });
+});
+
 describe('check-route-guards', () => {
   it('accepts a wrapped, guarded route and a public one', () => {
     write(
