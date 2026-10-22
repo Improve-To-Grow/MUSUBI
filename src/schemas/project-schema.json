@@ -51,7 +51,11 @@
           "yaml",
           "json",
           "cobol",
-          "shell"
+          "shell",
+          "csharp",
+          "cpp",
+          "swift",
+          "php"
         ]
       }
     },
@@ -199,6 +203,29 @@
       "type": "object",
       "description": "Constitutional governance overrides",
       "properties": {
+        "profile": {
+          "type": "string",
+          "description": "Project profile: decides how Articles I and II apply (P-1)",
+          "enum": ["library", "cli", "application"]
+        },
+        "core_paths": {
+          "description": "Where the feature logic lives (P-3)",
+          "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+        },
+        "delivery_paths": {
+          "description": "Pages, routes and UI (application profile)",
+          "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+        },
+        "adapter_paths": {
+          "description": "Request-context code (application profile)",
+          "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+        },
+        "levels": {
+          "type": "object",
+          "description": "Per-article level overrides, e.g. CONST-007: critical (P-6)",
+          "propertyNames": { "pattern": "^CONST-\\d{3}$" },
+          "additionalProperties": { "type": "string", "enum": ["critical", "advisory", "flexible"] }
+        },
         "level_config": {
           "type": "string",
           "description": "Path to constitution-levels.yml",
@@ -279,6 +306,21 @@
       "type": "array",
       "description": "Custom project rules",
       "items": { "type": "string" }
+    },
+    "external_specs": {
+      "type": "array",
+      "description": "External specifications referenced by musubi init",
+      "items": {
+        "type": "object",
+        "required": ["source"],
+        "properties": {
+          "source": { "type": "string" },
+          "type": { "type": "string" },
+          "format": { "type": "string" },
+          "title": { "type": "string" },
+          "fetched_at": { "type": "string" }
+        }
+      }
     },
     "metadata": {
       "type": "object",

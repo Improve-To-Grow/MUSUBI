@@ -36,7 +36,7 @@ const {
   generateDependencyFiles,
   CONSTITUTION_PROFILE_CHOICES,
   defaultApplicationPaths,
-  buildConstitutionYml,
+  buildProjectYml,
 } = require('../src/cli/init-generators');
 
 const { writeSteeringTemplates, copyConstitutionRules } = require('../src/cli/init-steering');
@@ -654,45 +654,11 @@ async function copyAgentsFile(agent) {
 }
 
 async function generateSteering(answers, externalSpec = null) {
-  const languages = answers.languages || ['undecided'];
-
   // structure.md, tech.md and product.md start from the ITG defaults; the ITG delivery
   // policies go to steering/rules/itg/ (English only, REQ-LANG-001)
   await writeSteeringTemplates(answers);
 
-  // Build external specification section for project.yml
-  let externalSpecYml = '';
-  if (externalSpec && !externalSpec.error) {
-    externalSpecYml = `
-# External Specification Reference
-external_specs:
-  - source: "${externalSpec.source}"
-    type: ${externalSpec.type}
-    format: ${externalSpec.metadata.format || 'unknown'}
-    title: "${externalSpec.metadata.summary?.title || 'External Specification'}"
-    fetched_at: ${externalSpec.metadata.fetchedAt || externalSpec.metadata.readAt || 'N/A'}
-`;
-  }
-
-  // Create project.yml with language settings and external spec
-  const projectYml = `# MUSUBI Project Configuration
-name: ${answers.projectName}
-description: ${answers.description}
-version: "0.1.0"
-created: ${new Date().toISOString().split('T')[0]}
-
-# Technology Stack
-tech_stack:
-  approach: ${answers.techStackApproach}
-  languages:
-${languages[0] === 'undecided' ? '    - undecided  # To be determined' : languages.map(l => `    - ${l}`).join('\n')}
-
-${buildConstitutionYml({
-  profile: answers.constitutionProfile,
-  corePaths: answers.corePaths,
-  deliveryPaths: answers.deliveryPaths,
-  adapterPaths: answers.adapterPaths,
-})}${externalSpecYml}`;
+  const projectYml = buildProjectYml(answers, externalSpec);
   await fs.writeFile(path.join('steering', 'project.yml'), projectYml);
 
   // Generate workspace structure if applicable

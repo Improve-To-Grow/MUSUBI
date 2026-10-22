@@ -134,6 +134,12 @@ describe('musubi-onboard (REQ-ITG-011)', () => {
       expect(fs.readFileSync(path.join(existing, 'steering/project.yml'), 'utf8')).toMatch(
         /constitution:\n {2}profile: application/
       );
+      const config = spawnSync(
+        process.execPath,
+        [path.join(__dirname, '..', '..', 'bin', 'musubi-config.js'), 'validate'],
+        { cwd: existing, encoding: 'utf8' }
+      );
+      expect(config.stdout).toContain('Valid: ✓ Yes');
       for (const rel of [
         '.github/workflows/deploy.yml',
         'scripts/checks/check-route-guards.mjs',

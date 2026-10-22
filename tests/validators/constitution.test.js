@@ -148,6 +148,16 @@ describe('ConstitutionValidator', () => {
       const result = await new ConstitutionValidator(tsRoot).validateArticle5();
       expect(result.warnings).toContain('Article V: Traceability matrix found');
     });
+
+    it('measures TypeScript files for the module size limit (complexity)', async () => {
+      await fs.outputFile(path.join(tsRoot, 'src/app/page.tsx'), 'x\n'.repeat(1600));
+      const result = await new ConstitutionValidator(tsRoot).validateComplexity();
+      expect(result.files.map(f => f.file).sort()).toEqual([
+        'src/app/page.tsx',
+        'src/lib/rsvp/rsvp-service.test.ts',
+      ]);
+      expect(result.violations).toEqual(['src/app/page.tsx: 1601 lines (limit: 1500)']);
+    });
   });
 
   describe('validateComplexity', () => {

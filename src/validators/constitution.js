@@ -18,7 +18,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const { glob } = require('glob');
 const { ConstitutionLevelManager, ProjectProfile } = require('./constitution-level-manager');
-const { ProjectFiles } = require('./project-files');
+const { ProjectFiles, CODE_EXTENSIONS } = require('./project-files');
 const { checkCodeSize } = require('./profile-checks');
 
 /**
@@ -649,8 +649,8 @@ class ConstitutionValidator {
       files: [],
     };
 
-    // Find all source files (excluding node_modules)
-    const sourcePatterns = ['src/**/*.js', 'lib/**/*.js', 'bin/**/*.js'];
+    // Find all JavaScript and TypeScript source files (excluding node_modules)
+    const sourcePatterns = ['src', 'lib', 'bin'].map(dir => `${dir}/**/*.${CODE_EXTENSIONS}`);
 
     const files = [];
     for (const pattern of sourcePatterns) {

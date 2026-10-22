@@ -204,14 +204,22 @@ class ProjectValidator {
       return { migrated: false, config, message: 'Already at v2.0' };
     }
 
+    // musubi init before 6.3.1-itg.6 wrote name, created and tech_stack instead of the schema fields
+    const { name, created, tech_stack: techStack, ...rest } = config;
     const migratedConfig = {
       schema_version: '2.0',
-      ...config,
+      ...(name !== undefined && !rest.project_name && { project_name: String(name) }),
+      ...rest,
     };
+    const oldLanguages = (techStack?.languages || []).filter(lang => lang !== 'undecided');
+    if (!migratedConfig.languages && oldLanguages.length > 0) {
+      migratedConfig.languages = oldLanguages;
+    }
 
-    // Add package_type if missing
+    // Add package_type if missing: the declared constitution profile, else detected
     if (!migratedConfig.package_type) {
-      migratedConfig.package_type = this._detectPackageType();
+      migratedConfig.package_type =
+        migratedConfig.constitution?.profile || this._detectPackageType();
     }
 
     // Add workflow mode if missing
@@ -235,6 +243,7 @@ class ProjectValidator {
 
     // Add metadata
     migratedConfig.metadata = {
+      ...(created && { created_at: new Date(created).toISOString() }),
       ...migratedConfig.metadata,
       updated_at: new Date().toISOString(),
       musubi_version: require('../../package.json').version,

@@ -124,7 +124,9 @@ program
 // Complexity validation
 program
   .command('complexity')
-  .description('Validate complexity limits (modules ≤1500 lines, functions ≤50 lines)')
+  .description(
+    'Validate module size (≤1500 lines); the Article VII function and import limits: musubi-validate project'
+  )
   .option('-v, --verbose', 'Show detailed validation results')
   .option('-f, --format <type>', 'Output format (console|json|markdown)', 'console')
   .action(async options => {

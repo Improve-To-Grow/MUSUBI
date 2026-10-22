@@ -248,7 +248,9 @@ class TasksGenerator {
   /**
    * Update task status
    */
-  async updateStatus(taskId, newStatus, filePath = null) {
+  async updateStatus(id, newStatus, filePath = null) {
+    // Accept both `003` and `TASK-003`, as list prints it
+    const taskId = String(id).replace(/^TASK-/i, '');
     const files = filePath ? [filePath] : await this.findTaskFiles();
 
     for (const file of files) {

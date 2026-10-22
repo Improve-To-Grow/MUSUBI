@@ -189,6 +189,28 @@ describe('ProjectValidator', () => {
       expect(result.config.constitution).toBeDefined();
     });
 
+    it('moves the fields of the old musubi init format to the schema (CHANGE-009)', async () => {
+      await fs.writeFile(
+        path.join(testDir, 'steering/project.yml'),
+        'name: app\ncreated: 2026-10-22\ntech_stack:\n  approach: single\n  languages:\n    - javascript\n' +
+          'constitution:\n  profile: application\n  core_paths: [src/lib]\n  levels:\n    CONST-007: critical\n'
+      );
+
+      const result = await validator.migrateToV2();
+      await validator.saveConfig(result.config);
+      validator._config = null;
+
+      expect(result.config).toMatchObject({
+        project_name: 'app',
+        languages: ['javascript'],
+        package_type: 'application',
+        metadata: { created_at: '2026-10-22T00:00:00.000Z' },
+      });
+      expect(result.config).not.toHaveProperty('name');
+      expect(result.config).not.toHaveProperty('tech_stack');
+      expect((await validator.validateConfig()).errors).toEqual([]);
+    });
+
     it('should not migrate if already v2.0', async () => {
       const config = {
         schema_version: '2.0',
@@ -300,5 +322,44 @@ describe('DEFAULT_PROJECT_CONFIG', () => {
     expect(DEFAULT_PROJECT_CONFIG).not.toHaveProperty('locale');
     expect(DEFAULT_PROJECT_CONFIG.agents).not.toHaveProperty('default_language');
     expect(DEFAULT_PROJECT_CONFIG.agents).not.toHaveProperty('bilingual_output');
+  });
+
+  describe('project.yml written by musubi init (CHANGE-009)', () => {
+    const { buildProjectYml } = require('../src/cli/init-generators');
+
+    it.each([
+      [
+        'application',
+        {
+          languages: ['javascript'],
+          corePaths: 'src/lib',
+          deliveryPaths: 'src/app',
+          adapterPaths: 'src/lib/auth',
+        },
+      ],
+      ['library', { languages: ['undecided'] }],
+    ])('passes the schema for the %s profile', async (profile, answers) => {
+      const yml = buildProjectYml(
+        {
+          projectName: 'app',
+          description: 'RSVP: meetings # app',
+          constitutionProfile: profile,
+          ...answers,
+        },
+        { source: 'https://example.com/spec.md', type: 'url', metadata: { format: 'markdown' } }
+      );
+      const dir = await fs.mkdtemp(path.join(require('os').tmpdir(), 'musubi-project-yml-'));
+      await fs.outputFile(path.join(dir, 'steering/project.yml'), yml);
+
+      const result = await new ProjectValidator(dir).validateConfig();
+      await fs.remove(dir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.valid).toBe(true);
+      expect(yaml.load(yml)).toMatchObject({
+        project_name: 'app',
+        description: 'RSVP: meetings # app',
+      });
+    });
   });
 });

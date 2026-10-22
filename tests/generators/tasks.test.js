@@ -348,5 +348,23 @@ describe('TasksGenerator', () => {
       const validation = await generator.validate(filePath);
       expect(validation.total).toBeGreaterThan(0);
     });
+
+    test('updateStatus accepts the id with or without TASK-', async () => {
+      const { path: filePath } = await generator.init('Payment System');
+      const { id } = await generator.addTask(filePath, {
+        title: 'Database Schema',
+        priority: 'P0',
+        storyPoints: 3,
+        estimatedHours: 8,
+        assignee: 'Dev A',
+        status: 'Not Started',
+        description: 'Design database schema',
+      });
+
+      const prefixed = await generator.updateStatus(`TASK-${id}`, 'In Progress', filePath);
+      expect(prefixed).toMatchObject({ id, oldStatus: 'Not Started', newStatus: 'In Progress' });
+      const bare = await generator.updateStatus(id, 'Done', filePath);
+      expect(bare).toMatchObject({ oldStatus: 'In Progress', newStatus: 'Done' });
+    });
   });
 });

@@ -21,6 +21,11 @@ The fork is now developed independently of upstream `nahisaho/MUSUBI` (CHANGE-00
 - **Article IX in ITG projects**: `musubi-validate project` no longer recommends docker-compose to a project with `steering/rules/itg/`; it reports package.json scripts that start the Firebase Emulator instead (ITG-TST-06). Mocks of Vertex AI and Gemini count as allowed LLM mocks
 - **`musubi-requirements add`** loads the ESM `inquirer` (it failed with "inquirer.prompt is not a function"), adds the requirement when `-p` and `-t` are given (it did nothing), runs unattended with the new `--system`, `-s`, `-r` and `-c` options, and takes the id area from the file (`meeting-rsvp-requirements.md` gives `REQ-MEETING-RSVP-NNN`, not `REQ-FEATURE-NNN`)
 - **Scaffold scripts answer `--help`** with their header comment and exit 0 without doing their work (II-A7)
+- **`musubi-config validate` accepts the `project.yml` that `musubi init` and `musubi-onboard` write**: init writes schema 2.0 (`schema_version`, `project_name`, `package_type`, top-level `languages`, `metadata.created_at`) and quotes its strings; onboard adds `schema_version` and `package_type` and no longer writes the invalid framework purpose `framework`; the schema knows the constitution profile fields (`profile`, `core_paths`, `delivery_paths`, `adapter_paths`, `levels`), `external_specs` and the init languages `csharp`, `cpp`, `swift` and `php`. `musubi-config migrate` moves the old init fields (`name`, `created`, `tech_stack`) to the schema
+- **`musubi-design trace`** reads the design documents: a requirement is traced when a design document names its id (it reported every requirement as missing). **`add-adr`** appends to the template's "Architecture Decision Records (ADR)" section, or adds that section at the end (it inserted the ADR at the top of the document), prints `ADR-003` instead of `ADR-ADR-003`, and runs unattended with `--context`, `-d`, `--consequences` and `--alternatives`
+- **`musubi-tasks update`** accepts `TASK-003` as well as `003`
+- **`musubi-validate complexity`** measures `.ts`, `.tsx`, `.mjs`, `.cjs`, `.mts` and `.cts` files (it analyzed only `.js`); its description no longer claims a function limit, which `musubi-validate project` checks
+- **`musubi-checkpoint`, `musubi-costs` and `musubi-dashboard`** are installed as commands (they were missing from `bin`)
 
 ### Changed
 

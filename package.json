@@ -29,7 +29,10 @@
     "musubi-release": "bin/musubi-release.js",
     "musubi-config": "bin/musubi-config.js",
     "musubi-upgrade": "bin/musubi-upgrade.js",
-    "musubi-code": "bin/musubi-code.js"
+    "musubi-code": "bin/musubi-code.js",
+    "musubi-checkpoint": "bin/musubi-checkpoint.js",
+    "musubi-costs": "bin/musubi-costs.js",
+    "musubi-dashboard": "bin/musubi-dashboard.js"
   },
   "scripts": {
     "test": "jest",

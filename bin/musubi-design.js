@@ -185,6 +185,10 @@ program
   .description('Add Architecture Decision Record')
   .option('-f, --file <path>', 'Design file path')
   .option('--status <status>', 'ADR status (proposed|accepted|rejected|deprecated)', 'proposed')
+  .option('--context <text>', 'Context or problem')
+  .option('-d, --decision <text>', 'The decision')
+  .option('--consequences <text>', 'Consequences of the decision')
+  .option('--alternatives <list>', 'Alternatives considered, comma-separated')
   .action(async (decision, options) => {
     try {
       console.log(chalk.bold(`\n📜 Adding ADR: ${decision}\n`));
@@ -217,52 +221,55 @@ program
         }
       }
 
-      // Interactive prompts for ADR
+      // Ask only for what the options do not give; with every option the command runs unattended
       const inquirerInst2 = await getInquirer();
       const answers = await inquirerInst2.prompt([
         {
           type: 'input',
           name: 'context',
           message: 'What is the context/problem?',
+          when: () => !options.context,
           validate: input => input.length > 0 || 'Context is required',
         },
         {
           type: 'input',
           name: 'decision',
           message: 'What is the decision?',
+          when: () => !options.decision,
           validate: input => input.length > 0 || 'Decision is required',
         },
         {
           type: 'input',
           name: 'consequences',
           message: 'What are the consequences?',
+          when: () => !options.consequences,
           validate: input => input.length > 0 || 'Consequences are required',
         },
         {
           type: 'input',
           name: 'alternatives',
           message: 'Alternatives considered (comma-separated):',
-          filter: input =>
-            input
-              .split(',')
-              .map(s => s.trim())
-              .filter(s => s.length > 0),
+          when: () => options.alternatives === undefined,
         },
       ]);
 
+      const alternatives = options.alternatives ?? answers.alternatives ?? '';
       const adr = {
         title: decision,
         status: options.status,
-        context: answers.context,
-        decision: answers.decision,
-        consequences: answers.consequences,
-        alternatives: answers.alternatives,
+        context: options.context || answers.context,
+        decision: options.decision || answers.decision,
+        consequences: options.consequences || answers.consequences,
+        alternatives: alternatives
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s.length > 0),
       };
 
       const result = await generator.addADR(designFile, adr);
 
       console.log(chalk.green('\n✓ ADR added:'));
-      console.log(chalk.dim(`  ADR-${result.number}: ${result.title}`));
+      console.log(chalk.dim(`  ${result.number}: ${result.title}`));
       console.log(chalk.dim(`  Status: ${result.status}`));
       console.log();
 
@@ -338,15 +345,14 @@ program
       if (options.format === 'json') {
         console.log(JSON.stringify(matrix, null, 2));
       } else {
-        console.log(chalk.bold('| Requirement | Design | Components | Status |'));
-        console.log('|-------------|--------|------------|--------|');
+        console.log(chalk.bold('| Requirement | Design | Design documents | Status |'));
+        console.log('|-------------|--------|------------------|--------|');
 
         matrix.forEach(row => {
           const design = row.design ? '✓' : '-';
-          const components = row.components || 0;
           const status = row.traced ? chalk.green('Traced') : chalk.yellow('Missing');
 
-          console.log(`| ${row.requirement} | ${design} | ${components} | ${status} |`);
+          console.log(`| ${row.requirement} | ${design} | ${row.documents} | ${status} |`);
         });
         console.log();
 

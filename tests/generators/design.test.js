@@ -216,4 +216,65 @@ describe('DesignGenerator', () => {
       expect(generator.slugify(' -feature- ')).toBe('feature');
     });
   });
+
+  describe('addADR (CHANGE-009)', () => {
+    const adr = {
+      title: 'Use Firestore',
+      status: 'accepted',
+      context: 'RSVPs need a store',
+      decision: 'Use Firestore',
+      consequences: 'No SQL joins',
+      alternatives: [],
+    };
+
+    test('appends to the template ADR section with the next number', async () => {
+      const file = path.join(tempDir, 'rsvp-design.md');
+      await fs.writeFile(
+        file,
+        '# Design\n\n## Overview\n\n## Architecture Decision Records (ADR)\n\n### ADR-001: Old\n\n## Risk Assessment\n'
+      );
+
+      const result = await generator.addADR(file, adr);
+      const content = await fs.readFile(file, 'utf-8');
+
+      expect(result.number).toBe('ADR-002');
+      const order = ['## Overview', '### ADR-001', '### ADR-002: Use Firestore', '## Risk'];
+      const positions = order.map(text => content.indexOf(text));
+      expect(positions).toEqual([...positions].sort((a, b) => a - b));
+      expect(positions).not.toContain(-1);
+    });
+
+    test('adds an ADR section at the end of a document without one', async () => {
+      const file = path.join(tempDir, 'plain-design.md');
+      await fs.writeFile(file, '# Design\n\n## Overview\n\nText\n');
+
+      await generator.addADR(file, adr);
+      const content = await fs.readFile(file, 'utf-8');
+
+      expect(content.startsWith('# Design\n\n## Overview\n\nText\n')).toBe(true);
+      expect(content).toMatch(
+        /## Architecture Decision Records \(ADR\)\n\n### ADR-001: Use Firestore/
+      );
+    });
+  });
+
+  describe('generateTraceabilityMatrix (CHANGE-009)', () => {
+    test('marks the requirements that design documents reference', async () => {
+      await fs.outputFile(
+        path.join(tempDir, 'storage/specs/rsvp-requirements.md'),
+        '### REQ-RSVP-001: Record\n\n### REQ-RSVP-002: List\n'
+      );
+      await fs.outputFile(
+        path.join(tempDir, 'storage/design/rsvp-design.md'),
+        'Implements REQ-RSVP-001 and REQ-MEETING-RSVP-002.\n'
+      );
+
+      const matrix = await generator.generateTraceabilityMatrix();
+
+      expect(matrix).toEqual([
+        { requirement: 'REQ-RSVP-001', design: true, documents: 1, traced: true },
+        { requirement: 'REQ-RSVP-002', design: false, documents: 0, traced: false },
+      ]);
+    });
+  });
 });

@@ -23,6 +23,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const { glob } = require('glob');
 
+const ADR_SECTION = /^## Architecture Decision(?:s| Records)\b.*$/m;
+
 class DesignGenerator {
   constructor(rootDir) {
     this.rootDir = rootDir;
@@ -440,8 +442,9 @@ Service --> Repository
     // Generate ADR number
     const number = this.generateADRNumber(content);
 
-    // Format ADR section
-    const section = this.formatADRSection(number, adr);
+    // Format ADR section; a document without an ADR section gets one at the end
+    const heading = ADR_SECTION.test(content) ? '' : '\n## Architecture Decision Records (ADR)\n\n';
+    const section = heading + this.formatADRSection(number, adr);
 
     // Find insertion point (Architecture Decisions section)
     const insertionPoint = this.findADRInsertionPoint(content);
@@ -509,14 +512,9 @@ Service --> Repository
    * @returns {number} Insertion index
    */
   findADRInsertionPoint(content) {
-    // Find Architecture Decisions section
-    const adrMatch = content.match(/## Architecture Decisions/);
+    // Find the ADR section (the design template's "Architecture Decision Records (ADR)")
+    const adrMatch = content.match(ADR_SECTION);
     if (!adrMatch) {
-      // If section doesn't exist, add it before next major section
-      const nextMatch = content.match(/\n## [^#]/);
-      if (nextMatch) {
-        return nextMatch.index;
-      }
       return content.length;
     }
 
@@ -603,12 +601,16 @@ Service --> Repository
   }
 
   /**
-   * Generate traceability matrix
-   * @param {string} [_filePath] - Specific file path
+   * Generate traceability matrix: which design documents reference each requirement
+   * @param {string} [filePath] - Specific design file path
    * @returns {Promise<object[]>} Traceability matrix
    */
-  async generateTraceabilityMatrix(_filePath = null) {
+  async generateTraceabilityMatrix(filePath = null) {
     const matrix = [];
+    const designFiles = filePath
+      ? [path.resolve(this.rootDir, filePath)]
+      : await this.findDesignFiles();
+    const designs = await Promise.all(designFiles.map(file => fs.readFile(file, 'utf-8')));
 
     // Find requirement files
     const reqFiles = await glob('storage/specs/**/*.md', {
@@ -621,11 +623,14 @@ Service --> Repository
       const requirements = this.parseRequirements(content);
 
       for (const req of requirements) {
+        // REQ-RSVP-001 must not match inside REQ-MEETING-RSVP-001 or REQ-RSVP-0011
+        const idPattern = new RegExp(`(?<![\\w-])${req.id}(?![\\w-])`);
+        const documents = designs.filter(design => idPattern.test(design)).length;
         matrix.push({
           requirement: req.id,
-          design: false,
-          components: 0,
-          traced: false,
+          design: documents > 0,
+          documents,
+          traced: documents > 0,
         });
       }
     }

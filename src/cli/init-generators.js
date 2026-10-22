@@ -525,6 +525,56 @@ function buildConstitutionYml({ profile, corePaths, deliveryPaths, adapterPaths 
   return `${lines.join('\n')}\n`;
 }
 
+/**
+ * Build steering/project.yml in schema 2.0, which `musubi-config validate` checks
+ * @param {object} answers - init answers: projectName, description, languages, constitution profile and paths
+ * @param {object|null} [externalSpec] - external specification read by init
+ * @returns {string} YAML
+ */
+function buildProjectYml(answers, externalSpec = null) {
+  // Double-quoted YAML scalars are JSON strings, so a description with ':' or '#' stays intact
+  const quote = value => JSON.stringify(String(value ?? ''));
+  const languages = (answers.languages || []).filter(lang => lang !== 'undecided');
+  const lines = [
+    '# MUSUBI Project Configuration (schema 2.0, checked by musubi-config validate)',
+    'schema_version: "2.0"',
+    `project_name: ${quote(answers.projectName)}`,
+    `description: ${quote(answers.description)}`,
+    'version: "0.1.0"',
+    `package_type: ${answers.constitutionProfile || 'library'}`,
+    '',
+    languages.length > 0
+      ? `languages: [${languages.join(', ')}]`
+      : '# languages: [] # undecided, add them once chosen',
+    '',
+    buildConstitutionYml({
+      profile: answers.constitutionProfile,
+      corePaths: answers.corePaths,
+      deliveryPaths: answers.deliveryPaths,
+      adapterPaths: answers.adapterPaths,
+    }),
+  ];
+  if (externalSpec && !externalSpec.error) {
+    const { metadata } = externalSpec;
+    lines.push(
+      '# External Specification Reference',
+      'external_specs:',
+      `  - source: ${quote(externalSpec.source)}`,
+      `    type: ${quote(externalSpec.type)}`,
+      `    format: ${quote(metadata.format || 'unknown')}`,
+      `    title: ${quote(metadata.summary?.title || 'External Specification')}`,
+      `    fetched_at: ${quote(metadata.fetchedAt || metadata.readAt || 'N/A')}`,
+      ''
+    );
+  }
+  lines.push(
+    'metadata:',
+    `  created_at: ${quote(new Date().toISOString())}`,
+    `  musubi_version: ${quote(require('../../package.json').version)}`
+  );
+  return `${lines.join('\n')}\n`;
+}
+
 module.exports = {
   generateDependencyFiles,
   generateTechMd,
@@ -532,4 +582,5 @@ module.exports = {
   CONSTITUTION_PROFILE_CHOICES,
   defaultApplicationPaths,
   buildConstitutionYml,
+  buildProjectYml,
 };
