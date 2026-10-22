@@ -1112,7 +1112,8 @@ ${skillsSection}
 
 Before starting a task, read \`steering/rules/itg/README.md\` and the policies it maps to your role.
 Apply the rules without being asked, and cite their ids (e.g. \`ITG-SEC-13\`) in designs, tasks,
-PR descriptions and reviews. Record any deviation in the Deviations table of \`steering/tech.md\`
+PR descriptions and reviews. Where a skill, a command or a template example disagrees with an ITG
+policy, the ITG policy wins. Record any deviation in the Deviations table of \`steering/tech.md\`
 or \`steering/structure.md\`; silent deviation is not allowed.
 
 ### Learn More

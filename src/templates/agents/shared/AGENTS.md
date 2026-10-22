@@ -576,7 +576,7 @@ This project follows the **ITG Software Delivery Playbook**. Its policies are in
 - Apply the rules without being asked, and cite their ids (e.g. `ITG-SEC-13`) in designs, tasks, PR descriptions and reviews.
 - Draw architecture as Mermaid C4 and decision logic as Mermaid `flowchart` (ITG-DEL-12).
 - Record any deviation in the Deviations table of `steering/tech.md` or `steering/structure.md`. Silent deviation is not allowed. Never edit `steering/rules/itg/`.
-- Where an agent definition below and an ITG policy disagree, the ITG policy wins.
+- Where an agent definition below, a skill, a command or a template example disagrees with an ITG policy, the ITG policy wins.
 
 ---
 

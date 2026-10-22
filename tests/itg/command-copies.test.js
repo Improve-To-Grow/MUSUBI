@@ -34,14 +34,4 @@ describe('slash command copies', () => {
     expect(missing).toEqual([]);
   });
 
-  it('every skill points agents to the ITG policies', () => {
-    const skillsDir = path.join(AGENTS_DIR, 'claude-code', 'skills');
-    const missing = fs
-      .readdirSync(skillsDir)
-      .map(name => path.join(skillsDir, name, 'SKILL.md'))
-      .filter(file => fs.existsSync(file))
-      .filter(file => !read(file).includes('steering/rules/itg'))
-      .map(file => path.relative(skillsDir, file));
-    expect(missing).toEqual([]);
-  });
 });

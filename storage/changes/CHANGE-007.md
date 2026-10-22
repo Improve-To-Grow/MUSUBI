@@ -39,6 +39,7 @@ The branch first implemented a pre-release v2.1 copy (2026-10-08). The canonical
 - **Playbook copy.** `docs/itg/` holds the canonical v2.2 file and its changelog unchanged. The canonical file has no front matter, so `tests/itg/playbook-sync.test.js` reads the version from the `**Version X.Y` header, the versions table and the `→ vX.Y` changelog heading.
 - **Path conflict, again.** v2.2 §3.3 and §5.4 used folder paths (`storage/specs/<feature>/requirements.md`, `matrix.yml`). Maintainer decision (2026-10-22): the playbook is corrected, MUSUBI's paths stay. The correction is made in the canonical v2.2 draft and its changelog in the playbook repository (not committed there by this change) and copied into `docs/itg/`.
 - **Policies rewritten** for v2.2. Rule ids keep their topic where the topic still exists, so the references in commands and skills stay valid; ITG-SEC-18 (inbound webhooks) is retired because v2.2 §11.7 covers outbound webhooks only; ITG-SEC-24 (kill switch loader), ITG-LOG-17 (generated audit catalogue) and ITG-TST-12 to ITG-TST-14 (fixed test users, App Check in CI, rules test) are new. The main v2.2 changes they carry: Required and Recommended stack classes; Identity Platform with App Check and reCAPTCHA Enterprise instead of Turnstile; bearer-only sessions with the account-state check; Firestore rules deny all client access, Storage uploads tenant-scoped, reads through signed URLs; Firebase Storage instead of R2; Functions for triggers and schedules only (no Cron Triggers, no HTTP Functions); Neon + Hyperdrive instead of the shared VPS PostgreSQL; three configuration classes; log delivery through a Cloudflare Queue and the log-relay Worker; per-table retention; nonce-based CSP; feature registry and kill switch; GitHub Team rulesets as the production guard; `release/X.Y.Z` branches; CI-applied migrations without `schema.sql`; `itg-restore` for restore tests; `europe-west4` everywhere.
+- **Skills (maintainer decision).** The general ITG pointer that 27 skills repeated is removed and those skills are back to their upstream text: the generated agent file already carries the rule, and Claude Code runs skills in the conversation where that file is loaded. The precedence sentence (an ITG policy wins over a skill, a command or a template example) moved into the generated agent block and the shared `AGENTS.md`. `steering` and `system-architect` keep their role-specific ITG content. FORK-09 records the rule.
 - **Templates.** `tech.md`, `structure.md` and `product.md`, the design document template, the `/sdd-design`, `/sdd-implement`, `/sdd-change-apply`, `/sdd-validate` and `/sdd-tasks` commands on every platform and the system-architect skill drop what v2.2 removed and use `tenantId`. The default adapter paths of the `application` profile add `src/lib/api`, where v2.2 puts the route wrappers.
 
 ## Moved onto the latest `ITG-adjustments` (2026-10-12)
@@ -60,7 +61,7 @@ The work started on `bcc435d`. Meanwhile `ITG-adjustments` gained CHANGE-003 to 
   - cite an existing playbook section for its rules;
   - define unique `ITG-<AREA>-NN` rule ids;
   - express decision logic as Mermaid diagrams.
-- REQ-ITG-005: Every skill, every slash command on every platform, and the shared `AGENTS.md` SHALL direct agents to `steering/rules/itg/README.md`.
+- REQ-ITG-005 (modified 2026-10-22): The agent file that `musubi init` generates (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, …), the shared `AGENTS.md` and every slash command on every platform SHALL direct agents to `steering/rules/itg/README.md` and SHALL state that an ITG policy wins over a skill, a command or a template example. A skill SHALL carry ITG content only where it is specific to its role (`steering`, `system-architect`); the general pointer is not repeated in skills.
 - REQ-ITG-006: The design command, the design document template and the system-architect skill SHALL draw architecture as Mermaid C4 and decision logic as Mermaid `flowchart`.
 - REQ-ITG-007: `musubi-onboard` SHALL install the ITG policy files and add a Deviations table to the generated `tech.md`.
 
@@ -88,7 +89,7 @@ The work started on `bcc435d`. Meanwhile `ITG-adjustments` gained CHANGE-003 to 
   - `bin/musubi-onboard.js`.
   - `src/cli/init-generators.js` (`defaultApplicationPaths`).
 - **Agent templates:**
-  - 28 `SKILL.md` files.
+  - 2 skills with role-specific ITG content: `steering` (ITG steering rules, drift reporting) and `system-architect` (Mermaid C4 rule, ITG example diagram, `c4-model-guide.md`). The other skills stay as upstream ships them (see the 2026-10-22 decision below).
   - 9 commands × 6 markdown platforms, plus 9 Gemini `.toml` files.
   - `agents/shared/AGENTS.md`, `shared/documents/design.md`, `shared/constitution/constitution.md`.
   - Examples moved to the ITG stack.
