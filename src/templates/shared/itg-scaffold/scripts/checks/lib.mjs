@@ -63,10 +63,21 @@ export function changedFiles() {
     console.error('BASE_REF is not set (e.g. BASE_REF=origin/staging)');
     process.exit(1);
   }
-  const output = execFileSync('git', ['diff', '--name-only', `${base}...HEAD`], {
-    encoding: 'utf8',
-  });
-  return output.split('\n').filter(Boolean);
+  try {
+    const output = execFileSync('git', ['diff', '--name-only', `${base}...HEAD`], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    return output.split('\n').filter(Boolean);
+  } catch (error) {
+    const reason = String(error.stderr || error.message)
+      .trim()
+      .split('\n')[0];
+    console.error(
+      `cannot diff BASE_REF=${base} against HEAD: ${reason} (fetch the base branch, e.g. actions/checkout with fetch-depth: 0)`
+    );
+    process.exit(1);
+  }
 }
 
 /** Print the problems and exit 1, or print that the check passed */

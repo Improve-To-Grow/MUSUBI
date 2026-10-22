@@ -265,6 +265,16 @@ describe('check-ai-provider', () => {
 });
 
 describe('git-based checks', () => {
+  it('report a BASE_REF that git cannot resolve without a stack trace', () => {
+    gitRepo();
+    for (const name of ['check-changelog', 'check-rules']) {
+      const result = check(name, { BASE_REF: 'origin/missing' });
+      expect(result.status).toBe(1);
+      expect(result.output).toContain('cannot diff BASE_REF=origin/missing against HEAD');
+      expect(result.output).not.toMatch(/\n\s+at /);
+    }
+  });
+
   it('check-changelog fails src/ changes without CHANGELOG.md', () => {
     gitRepo();
     write('src/app/page.tsx', 'export default function Page() {}\n');
