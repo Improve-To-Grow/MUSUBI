@@ -478,8 +478,8 @@ export class {{COMPONENT}}Repository {
   /**
    * REQ-{{COMPONENT}}-004: Persist {{resource}} in Firestore, scoped to the tenant
    */
-  async create(organizationId: string, data: Create{{Resource}}Request): Promise<{{Resource}}> {
-    return createDocument<{{Resource}}>(COLLECTION, { ...data, organizationId });
+  async create(tenantId: string, data: Create{{Resource}}Request): Promise<{{Resource}}> {
+    return createDocument<{{Resource}}>(COLLECTION, { ...data, tenantId });
   }
 
   async findById(id: string): Promise<{{Resource}} | null> {
@@ -488,11 +488,11 @@ export class {{COMPONENT}}Repository {
 }
 ```
 
-Update `firestore.rules` (deny-by-default, server-write-only, tenant scope from the claim) and `firestore.indexes.json` in the same PR, for both Firebase projects (ITG-SEC-15, ITG-PLT-23).
+Keep `firestore.rules` denying all client access, update `storage.rules` when the feature uploads files (tenant path, type and size limits) and `firestore.indexes.json` in the same PR, for both Firebase projects (ITG-SEC-15, ITG-PLT-23).
 
-**PostgreSQL (only when ITG-DAT-02 applies)**: add a numbered, idempotent migration `database/migrations/NNNN_<name>.sql` (`BEGIN; … COMMIT;`, `IF NOT EXISTS`), update `database/schema.sql`, and query with the driver directly, without a wrapper layer (ITG-DAT-05 to ITG-DAT-07, Article VIII).
+**PostgreSQL (only when ITG-DAT-02 applies)**: add the next numbered, append-only migration `database/migrations/NNNN_<name>.sql` (`IF NOT EXISTS`, row-level security on tenant tables); the deploy workflow applies it with `scripts/ci/migrate.mjs`. Query through the Hyperdrive binding with the driver directly, without a wrapper layer (ITG-DAT-05 to ITG-DAT-07, Article VIII).
 
-**Write integration tests** (Article IX: real services, ITG-TST-06 to ITG-TST-08). They run against the staging Firebase project under a test prefix, never the emulator and never production:
+**Write integration tests** (Article IX: real services, ITG-TST-06 to ITG-TST-08). They run against the staging Firebase project under the run prefix `ci-<run-id>`, as the fixed test users, never the emulator and never production:
 
 ```typescript
 // lib/{{feature}}/tests/integration.test.ts
@@ -501,7 +501,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { deleteDocument } from '@/lib/firebase-rest/firestore';
 import { {{COMPONENT}}Repository } from '../src/repository';
 
-const TEST_ORG = `test-${Date.now()}`; // test tenant, cleaned up below (ITG-TST-08)
+const TEST_TENANT = `ci-${process.env.GITHUB_RUN_ID ?? Date.now()}`; // run prefix, cleaned up below (ITG-TST-08)
 
 describe('REQ-{{COMPONENT}}-004: {{COMPONENT}}Repository against staging Firestore', () => {
   const repository = new {{COMPONENT}}Repository();
@@ -512,11 +512,11 @@ describe('REQ-{{COMPONENT}}-004: {{COMPONENT}}Repository against staging Firesto
   });
 
   it('stores the {{resource}} with its tenant', async () => {
-    const result = await repository.create(TEST_ORG, { field1: 'test', field2: 42 });
+    const result = await repository.create(TEST_TENANT, { field1: 'test', field2: 42 });
     created.push(result.id);
 
     const found = await repository.findById(result.id);
-    expect(found).toMatchObject({ organizationId: TEST_ORG, field1: 'test', field2: 42 });
+    expect(found).toMatchObject({ tenantId: TEST_TENANT, field1: 'test', field2: 42 });
   });
 });
 ```
@@ -626,14 +626,14 @@ const create{{Resource}}Schema = z.object({
 // ({{domain}}.{{resource}}.create, .denied, .failed)
 export const POST = withApiRoute(
   'api-{{resource}}-create',
-  withRole('member', async ({ body, claims }) => create{{Resource}}(claims.organizationId, body)),
-  { rateLimit: 'write', schema: create{{Resource}}Schema }
+  withRole('member', async ({ body, claims }) => create{{Resource}}(claims.tenantId, body)),
+  { rateLimit: 'write', schema: create{{Resource}}Schema, feature: '{{feature}}' }
 );
 ```
 
 Errors inside the feature service are thrown as typed `ApiRouteError` helpers (`badRequest`, `notFound`, `conflict`, …); never derive a status code from a message. Identity and tenant come only from `claims`, never from the body (ITG-SEC-06).
 
-Server actions follow the same pattern: validate, authorize from claims, call the feature service, return a result. Operational tasks (seeding, user creation) go in `scripts/*.ts`, registered in `package.json`, with `--help`, an explicit target environment and `--dry-run` for production writes (II-A6–II-A9, advisory).
+Every server mutation is a Route Handler like this one; there are no Server Actions (ITG-PLT-01). Operational tasks (seeding, backfills, restores) go in `scripts/ops/`, registered in `package.json`, with `--help`, an explicit target environment and `--dry-run` for production writes (II-A6–II-A9, advisory).
 
 **Mark TASK-006 as completed**.
 
@@ -657,7 +657,7 @@ const get{{Resource}}Schema = z.object({ params: z.object({ id: z.string().min(1
 export const GET = withApiRoute(
   'api-{{resource}}-get',
   withAuth(async ({ params, claims }) => {
-    const result = await get{{Resource}}(claims.organizationId, params.id);
+    const result = await get{{Resource}}(claims.tenantId, params.id);
     if (!result) throw notFound('{{RESOURCE}}_NOT_FOUND');
     return result;
   }),
@@ -676,7 +676,7 @@ After completing each task:
 ```bash
 # The required CI checks (ITG-CI-01)
 npx tsc --noEmit
-npx eslint . && npm run lint:security
+npx eslint .                 # includes eslint-plugin-security
 npx prettier --check .
 npx vitest run
 npx knip
@@ -822,7 +822,7 @@ Throughout implementation, ensure:
 ### Article IX: Integration Testing ✅
 
 - Integration tests use real database (IX-1)
-- Docker Compose for an isolated test DB (IX-2)
+- An isolated test area in the staging project: the run prefix `ci-<run-id>`, and the Neon `<app>-test` database when PostgreSQL is used (IX-2, ITG-TST-08)
 - Mocks only for services that are unavailable in the test environment, have usage limits or costs, or have no test environment, each justified in the test documentation (IX-4, IX-5)
 
 ---

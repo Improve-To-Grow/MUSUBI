@@ -699,8 +699,8 @@ C4Container
     Container_Boundary(systemBoundary, "[System Name]") {
         Container(webApp, "Web Application", "Next.js on a Cloudflare Worker via OpenNext", "Pages and route handlers through withApiRoute")
         Container(functions, "Firebase Functions", "Node 22", "Backups and scheduled jobs")
-        ContainerDb(firestore, "Firestore", "Firebase", "App data, server-write-only rules")
-        ContainerDb(r2, "R2 bucket", "Cloudflare R2", "Uploads")
+        ContainerDb(firestore, "Firestore", "europe-west4", "App data, rules deny all client access")
+        ContainerDb(storage, "Firebase Storage", "europe-west4", "Uploads, tenant-scoped rules, signed URLs")
     }
 
     System_Ext(auth, "Firebase Authentication", "Roles in custom claims")
@@ -711,7 +711,7 @@ C4Container
     Rel(user, webApp, "Uses", "HTTPS, App Check")
     Rel(webApp, auth, "Verifies tokens", "REST")
     Rel(webApp, firestore, "Reads/Writes", "REST via src/lib/firebase-rest")
-    Rel(webApp, r2, "Stores files", "Binding")
+    Rel(webApp, storage, "Signed URLs", "REST")
     Rel(webApp, acs, "Sends email", "REST")
     Rel(webApp, logs, "Sends events", "HTTPS, HMAC")
     Rel(webApp, externalAPI, "Calls", "HTTPS")
@@ -723,7 +723,7 @@ C4Container
 - **Web Application**: [Description]
 - **Firebase Functions**: [Description]
 - **Firestore**: [Description]; PostgreSQL only when ITG-DAT-02 applies
-- **R2 bucket**: [Description]
+- **Firebase Storage**: [Description]
 
 ---
 

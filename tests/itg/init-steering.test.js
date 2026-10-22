@@ -99,7 +99,7 @@ describe('init steering (ITG)', () => {
       profile: 'application',
       core_paths: ['src/lib'],
       delivery_paths: ['src/app', 'src/components', 'src/features', 'src/middleware'],
-      adapter_paths: ['src/lib/auth'],
+      adapter_paths: ['src/lib/auth', 'src/lib/api'],
     });
   });
 });

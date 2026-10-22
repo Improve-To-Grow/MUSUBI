@@ -470,8 +470,8 @@ const CONSTITUTION_PROFILE_CHOICES = [
 /**
  * Pre-filled core, delivery and adapter paths for an application, based on the project layout.
  * They follow the ITG repository layout (ITG Software Delivery Playbook §4.1): shared logic in
- * lib/ is the core, feature folders and route wrappers are delivery code, lib/auth reads the
- * request context.
+ * lib/ is the core, feature folders and middleware are delivery code, lib/auth and the route
+ * wrappers in lib/api read the request context.
  * @param {string} projectRoot - Project root
  * @returns {{corePaths: string, deliveryPaths: string, adapterPaths: string}} Comma-separated paths
  */
@@ -484,7 +484,7 @@ function defaultApplicationPaths(projectRoot = process.cwd()) {
     deliveryPaths: ['app', 'components', 'features', 'middleware']
       .map(dir => `${base}${dir}`)
       .join(', '),
-    adapterPaths: `${base}lib/auth`,
+    adapterPaths: `${base}lib/auth, ${base}lib/api`,
   };
 }
 

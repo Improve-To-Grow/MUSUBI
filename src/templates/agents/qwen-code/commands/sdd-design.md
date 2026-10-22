@@ -82,7 +82,7 @@ Create **3 levels** of C4 diagrams:
 
 **Level 1: Context Diagram** (`C4Context`): users, the system, external systems (Firebase, ACS, Vertex AI, ITG log-ingest, vendor APIs), integration points
 
-**Level 2: Container Diagram** (`C4Container`): Worker, Firebase Functions, Firestore, R2, PostgreSQL only if ITG-DAT-02 applies, n8n only if ITG-INT-06 applies
+**Level 2: Container Diagram** (`C4Container`): Worker, log queue and log-relay Worker, Firebase Functions, Firestore, Firebase Storage, PostgreSQL on Neon only if ITG-DAT-02 applies, n8n only if ITG-INT-06 applies
 
 **Level 3: Component Diagram** (`C4Component`): route handlers, the `withApiRoute` wrapper and guards, feature services, `src/lib` modules, and the data flow between them
 
@@ -98,7 +98,7 @@ C4Container
     System_Boundary(app, "Client portal") {
         Container(web, "Web application", "Next.js on a Cloudflare Worker", "Pages and route handlers through withApiRoute")
         Container(fn, "Firebase Functions", "Node 22", "Nightly reminder export")
-        ContainerDb(fs, "Firestore", "Firebase", "meetings, rsvps; server-write-only rules")
+        ContainerDb(fs, "Firestore", "Firebase", "meetings, rsvps; rules deny all client access")
     }
     System_Ext(acs, "Azure Communication Services", "Reminder email")
     System_Ext(logs, "ITG log-ingest", "Audit and app events")
@@ -118,7 +118,7 @@ C4Component
         Component(route, "POST /api/rsvp", "route.ts", "withApiRoute('api-rsvp-create', withAuth(handler))")
         Component(svc, "rsvp service", "src/features/rsvp/api/", "Validates the window, writes the RSVP")
         Component(rest, "Firestore REST client", "src/lib/firebase-rest/firestore.ts", "Runtime-constraint client, VIII-4")
-        Component(rec, "Audit recorder", "src/lib/audit/", "Redactor, fire-and-forget")
+        Component(rec, "Audit recorder", "src/lib/audit/", "Allowlist and redactor, one sendBatch per request")
     }
     Rel(route, svc, "calls")
     Rel(svc, rest, "upsert rsvp")
@@ -131,7 +131,7 @@ C4Component
 flowchart TD
     R([RSVP request]) --> A{Verified session?}
     A -- no --> U[unauthorized]
-    A -- yes --> T{Claim org matches the meeting's organizationId?}
+    A -- yes --> T{Claim org matches the meeting's tenantId?}
     T -- no --> F[forbidden, rsvp.response.set.denied]
     T -- yes --> W{Before the RSVP deadline?}
     W -- no --> C[conflict RSVP_CLOSED]
@@ -150,7 +150,7 @@ Create matrix:
 | ----------------------------- | -------------------------- | ------------------------------------ |
 | POST /api/rsvp (route.ts)     | REQ-RSVP-001               | API exposure through withApiRoute    |
 | src/features/rsvp/api/        | REQ-RSVP-001, REQ-RSVP-002 | Feature logic, unit-tested first     |
-| Firestore rules (rsvps)       | REQ-SEC-001                | Server-write-only, tenant scope      |
+| Firestore rules (rsvps)       | REQ-SEC-001                | Deny all client access              |
 | Reminder email (src/lib/email) | REQ-RSVP-003              | ACS from application code            |
 ```
 
@@ -286,36 +286,35 @@ Decide with the diagram in `steering/rules/itg/data.md` (ITG-DAT-02). Firestore 
 
 #### B. Data Model
 
-Draw the model as a Mermaid `erDiagram`. Every entity carries its classification (ITG-DAT-11) and, in a multi-tenant system, its tenant field (ITG-SEC-10). No entity has a role field (ITG-SEC-06).
+Draw the model as a Mermaid `erDiagram`. Every entity holds only the fields the product needs (ITG-DAT-10) and, in a multi-tenant system, its tenant field (ITG-SEC-10). Roles live in custom claims; a user document holds at most a role copy written by the claim endpoint (ITG-SEC-06).
 
 ```mermaid
 erDiagram
     MEETING ||--o{ RSVP : has
     MEETING {
         string id
-        string organizationId
+        string tenantId
         timestamp startsAt
         timestamp rsvpDeadline
     }
     RSVP {
         string id
-        string organizationId
+        string tenantId
         string meetingId
         string userId
         string response
     }
 ```
 
-**Firestore** (default): list collections, document ids, indexes (`firestore.indexes.json`) and the rules that scope reads to the tenant claim (ITG-SEC-15).
+**Firestore** (default): list collections, document ids, indexes (`firestore.indexes.json`) and the rules: Firestore denies all client access, Storage allows tenant-scoped uploads only (ITG-SEC-15).
 
-**PostgreSQL** (only when ITG-DAT-02 applies): numbered, idempotent SQL migrations (ITG-DAT-05, ITG-DAT-06), mapped to requirements:
+**PostgreSQL** (only when ITG-DAT-02 applies): numbered, append-only SQL migrations with `IF NOT EXISTS` (ITG-DAT-05, ITG-DAT-06), mapped to requirements:
 
 ```sql
 -- database/migrations/0003_add_rsvps.sql  (REQ-RSVP-001)
-BEGIN;
 CREATE TABLE IF NOT EXISTS rsvps (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  organization_id TEXT NOT NULL,
+  tenant_id TEXT NOT NULL,
   meeting_id UUID NOT NULL REFERENCES meetings(id) ON DELETE CASCADE,
   user_id TEXT NOT NULL,
   response TEXT NOT NULL CHECK (response IN ('yes', 'no', 'maybe')),
@@ -323,13 +322,13 @@ CREATE TABLE IF NOT EXISTS rsvps (
   UNIQUE (meeting_id, user_id)
 );
 CREATE INDEX IF NOT EXISTS idx_rsvps_meeting ON rsvps(meeting_id);
-COMMIT;
+ALTER TABLE rsvps ENABLE ROW LEVEL SECURITY;
 ```
 
 #### C. Migration Strategy
 
 - Firestore: rules, indexes and backfills versioned in git, applied to staging first, deployed to both projects in the same change (ITG-DAT-09)
-- PostgreSQL: `database/schema.sql` updated with every migration; applied to staging before the merge to `staging`, to production before the merge to `master` (ITG-DAT-07, ITG-DAT-08)
+- PostgreSQL: the deploy workflow applies new migrations with `scripts/ci/migrate.mjs` before `wrangler deploy`, on staging and production; a deploy with a migration runs in the deploy window (ITG-DAT-07, ITG-DAT-08)
 
 ---
 
@@ -402,7 +401,7 @@ src/types/rsvp/rsvp.ts        # Rsvp entity type (ITG-GIT-03)
 | -------------- | -------- | --------------------------- | ---------------------------------------------------------- |
 | POST /api/rsvp | Web UI   | `createRsvpSchema` (zod)    | 200; 400 `VALIDATION_FAILED`; 403 `FORBIDDEN`; 409 `RSVP_CLOSED` |
 
-**Runtime-constraint clients** (VIII-5): `src/lib/firebase-rest/firestore.ts` replaces `firebase-admin`, which cannot run on Cloudflare Workers.
+**Runtime-constraint clients** (VIII-5): `src/lib/firebase-rest/firestore.ts` replaces `firebase-admin`, and `src/lib/vertex-ai/` replaces the Google AI SDKs, which cannot run on Cloudflare Workers.
 ````
 
 ---
@@ -414,28 +413,30 @@ Always include security design, following `steering/rules/itg/security.md`:
 ```markdown
 ### Authentication
 
-- **Method**: Firebase Authentication; ID token in `Authorization: Bearer` for APIs, server-signed session cookie for pages (ITG-SEC-11)
-- **Public forms**: Turnstile; App Check on every API call (ITG-SEC-01)
+- **Method**: Firebase Authentication with Identity Platform; the ID token in `Authorization: Bearer` is the only session, no session cookie; protected pages are client shells (ITG-SEC-11)
+- **Account state**: `accounts:lookup` on every request; disabled, deleted or revoked users rejected on the next request (ITG-SEC-04)
+- **Bot protection**: App Check on every API call and on Storage; reCAPTCHA enforcement on sign-in (ITG-SEC-01)
 - **Admins**: TOTP MFA enforced server-side (ITG-SEC-02)
-- **Session lifetime**: 30 minutes idle, 12 hours absolute (admin app) (ITG-SEC-12)
+- **Session lifetime**: 12 hours absolute from `auth_time`, 30 minutes client idle sign-out (admin app) (ITG-SEC-12)
 
 ### Authorization
 
-- **Roles**: custom claims only, e.g. `admin`, `member`; no role field in any database (ITG-SEC-05, ITG-SEC-06)
-- **Tenant**: `organizationId` from the claim; queries scoped server-side; Firestore rules enforce the same scope (ITG-SEC-10)
+- **Roles**: custom claims, e.g. `admin`, `member`; authorization never reads the role copy on the user document (ITG-SEC-05, ITG-SEC-06)
+- **Tenant**: `tenantId` from the claim; queries scoped server-side through the tenant-scoped helper; Storage rules scope uploads to the tenant (ITG-SEC-10)
 - **Guards**: `withAuth`, `withRole('<role>')`, `withTenant` in the route wrapper (ITG-SEC-13)
 
 ### Data Protection
 
-- **Rules**: Firestore and Storage rules deny-by-default, server-write-only (ITG-SEC-15)
+- **Rules**: Firestore denies all client access; Storage allows tenant-scoped uploads with type and size limits; reads through signed URLs (ITG-SEC-15)
 - **Logs**: ids only, no names or emails; redactor on every event (ITG-LOG-03, ITG-LOG-11)
-- **AI**: Vertex AI only; prompts fingerprinted, never stored (ITG-SEC-19, ITG-SEC-20)
+- **AI**: Vertex AI in `europe-west4` through REST; prompts fingerprinted, never stored (ITG-SEC-19, ITG-SEC-20)
 
 ### Input Validation
 
 - **Schemas**: zod for body and query in the wrapper (ITG-PLT-06)
 - **Rate limiting**: Cloudflare Rate Limiting binding, profile per route (ITG-SEC-14)
-- **Headers**: CSP built at compile time, HSTS in middleware, explicit `ALLOWED_ORIGINS` (ITG-SEC-22)
+- **Headers**: nonce-based CSP and security headers in middleware, explicit `ALLOWED_ORIGINS` (ITG-SEC-22)
+- **Feature**: declared in the registry and named in the wrapper options, so it can be switched off (ITG-SEC-23)
 ```
 
 ---
@@ -547,15 +548,15 @@ Document key decisions:
 **Date**: 2026-10-08
 
 **Context**:
-REQ-RSVP-001 needs per-meeting RSVPs, read in real time by the meeting page. Volume: a few hundred per meeting.
+REQ-RSVP-001 needs per-meeting RSVPs, shown on the meeting page and refreshed by polling an API route. Volume: a few hundred per meeting.
 
 **Decision**:
-Store RSVPs in a Firestore `rsvps` collection scoped by `organizationId` (ITG-DAT-01, ITG-DAT-02).
+Store RSVPs in a Firestore `rsvps` collection scoped by `tenantId` (ITG-DAT-01, ITG-DAT-02).
 
 **Consequences**:
 
-- ✅ Realtime reads, no extra database
-- ✅ Rules enforce the tenant scope (ITG-SEC-15)
+- ✅ No extra database; the page polls an API route, so every read passes the account-state check
+- ✅ The tenant-scoped helper enforces the tenant scope; rules deny client access (ITG-SEC-10, ITG-SEC-15)
 - ❌ Cross-meeting reporting needs an export
 
 **Alternatives Considered**:

@@ -417,13 +417,13 @@ if (process.env.NODE_ENV !== 'production') {
 
 #### Step 7.1: Choose the Migration Path
 
-- **Firestore** (default): change `firestore.rules`, `firestore.indexes.json` or add a backfill script under `scripts/` with `--dry-run`; apply to the staging project first and deploy to both projects in the same change (ITG-DAT-09, ITG-PLT-23)
-- **PostgreSQL** (only when ITG-DAT-02 applies): add the next numbered migration `database/migrations/NNNN_{{change-name}}.sql` and update `database/schema.sql` (ITG-DAT-05 to ITG-DAT-07)
+- **Firestore** (default): change `firestore.rules`, `firestore.indexes.json` or add a backfill script under `scripts/ops/` with `--dry-run`; apply to the staging project first and deploy to both projects in the same change (ITG-DAT-09, ITG-PLT-23)
+- **PostgreSQL** (only when ITG-DAT-02 applies): add the next numbered migration `database/migrations/NNNN_{{change-name}}.sql`; the deploy workflow applies it with `scripts/ci/migrate.mjs`, in the deploy window (ITG-DAT-05 to ITG-DAT-08)
 
 #### Step 7.2: Write Migration Script
 
 ```sql
--- database/migrations/NNNN_{{change-name}}.sql  (BEGIN; ... COMMIT;, IF NOT EXISTS: ITG-DAT-06)
+-- database/migrations/NNNN_{{change-name}}.sql  (append-only, IF NOT EXISTS: ITG-DAT-05, ITG-DAT-06)
 
 -- Backup existing data
 CREATE TABLE {{table}}_backup AS SELECT * FROM {{table}};
@@ -507,8 +507,8 @@ import { describe, it, expect, afterAll } from 'vitest';
 import { createDocument, deleteDocument } from '@/lib/firebase-rest/firestore';
 import { {{method}} } from './{{feature}}-service';
 
-// Real staging Firebase project under a test tenant, no emulator (ITG-TST-06, ITG-TST-08)
-const TEST_ORG = `test-${Date.now()}`;
+// Real staging Firebase project under the run prefix ci-<run-id>, no emulator (ITG-TST-06, ITG-TST-08)
+const TEST_TENANT = `ci-${process.env.GITHUB_RUN_ID ?? Date.now()}`;
 
 describe('REQ-{{AREA}}-{{NNN}}: {{FeatureName}} against staging Firestore', () => {
   const created: string[] = [];
@@ -519,11 +519,11 @@ describe('REQ-{{AREA}}-{{NNN}}: {{FeatureName}} against staging Firestore', () =
 
   it('should {{requirement}} with real data', async () => {
     // Arrange: Set up test data
-    const testData = await createDocument('{{collection}}', { organizationId: TEST_ORG, ...{{test-data}} });
+    const testData = await createDocument('{{collection}}', { tenantId: TEST_TENANT, ...{{test-data}} });
     created.push(testData.id);
 
     // Act: Execute feature
-    const result = await {{method}}(TEST_ORG, testData.id);
+    const result = await {{method}}(TEST_TENANT, testData.id);
 
     // Assert: Verify result
     expect(result).toBeDefined();

@@ -139,7 +139,7 @@ Read `constitution.profile` from `steering/project.yml` first (`library` when ab
      - Create CLI interface per Article II (II-L1)
    - `application`:
      - Create core module folder `src/lib/{{feature}}/` with co-located tests, no own `package.json` (I-A1, I-A2)
-     - Wire delivery: route handler and server action files under delivery paths that import from the core module (I-A3)
+     - Wire delivery: route handler files under delivery paths that import from the core module (I-A3)
 
 2. **TASK-002: Write Tests for REQ-XXX-001**
    - Red phase (failing tests)
@@ -164,7 +164,7 @@ Read `constitution.profile` from `steering/project.yml` first (`library` when ab
      - CLI commands per Article II (II-L1)
      - Help text (II-L2)
      - Error handling, exit codes (II-L4, II-L5)
-   - `application`: Implement Route Handlers / Server Actions (no CLI, II-A3)
+   - `application`: Implement Route Handlers through `withApiRoute` (no CLI, no Server Actions, II-A3)
      - Delegate to core: validate input, authorize, call core, shape response (I-A3)
      - Machine-facing endpoints validate input against a schema (II-A4)
      - Return documented status and error codes (II-A5)

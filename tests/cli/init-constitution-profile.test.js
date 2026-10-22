@@ -58,7 +58,7 @@ describe('init constitution profile', () => {
     expect(defaultApplicationPaths(tmpDir)).toEqual({
       corePaths: 'src/lib',
       deliveryPaths: 'src/app, src/components, src/features, src/middleware',
-      adapterPaths: 'src/lib/auth',
+      adapterPaths: 'src/lib/auth, src/lib/api',
     });
   });
 
@@ -67,7 +67,7 @@ describe('init constitution profile', () => {
     expect(defaultApplicationPaths(tmpDir)).toEqual({
       corePaths: 'lib',
       deliveryPaths: 'app, components, features, middleware',
-      adapterPaths: 'lib/auth',
+      adapterPaths: 'lib/auth, lib/api',
     });
   });
 

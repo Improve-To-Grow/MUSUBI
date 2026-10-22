@@ -77,10 +77,10 @@ Example:
 ADR-001: Store RSVPs in Firestore
 
 Status: Accepted
-Context: REQ-RSVP-001 needs per-meeting RSVPs read in real time; a few hundred per meeting
-Decision: Firestore collection `rsvps`, scoped by organizationId (ITG-DAT-01, ITG-DAT-02)
+Context: REQ-RSVP-001 needs per-meeting RSVPs, refreshed by polling an API route; a few hundred per meeting
+Decision: Firestore collection `rsvps`, scoped by tenantId (ITG-DAT-01, ITG-DAT-02)
 Consequences:
-  + Realtime reads, no extra database; rules enforce the tenant scope
+  + No extra database; every read passes the account-state check; the tenant-scoped helper enforces the scope
   - Cross-meeting reporting needs an export
 Alternatives: PostgreSQL, rejected (small, non-relational data)
 ```
@@ -114,22 +114,22 @@ Every endpoint is a `src/app/api/**/route.ts` exported through `withApiRoute('<r
 
 ## 6. Data Model
 
-Decide Firestore or PostgreSQL with `steering/rules/itg/data.md` (ITG-DAT-02). Draw the model as a Mermaid `erDiagram`; give every entity a classification (ITG-DAT-11) and, if multi-tenant, a tenant field (ITG-SEC-10). No entity has a role field (ITG-SEC-06).
+Decide Firestore or PostgreSQL with `steering/rules/itg/data.md` (ITG-DAT-02). Draw the model as a Mermaid `erDiagram`; give every entity only the fields the product needs (ITG-DAT-10) and, if multi-tenant, a tenant field (ITG-SEC-10). Roles live in custom claims; a user document holds at most a role copy written by the claim endpoint (ITG-SEC-06).
 
 ```mermaid
 erDiagram
     MEETING ||--o{ RSVP : has
     RSVP {
         string id
-        string organizationId
+        string tenantId
         string meetingId
         string userId
         string response
     }
 ```
 
-- Firestore: collections, indexes (`firestore.indexes.json`), server-write-only rules scoped by the tenant claim (ITG-SEC-15)
-- PostgreSQL (only if ITG-DAT-02 applies): numbered, idempotent migrations `database/migrations/NNNN_<name>.sql` (ITG-DAT-05, ITG-DAT-06)
+- Firestore: collections, indexes (`firestore.indexes.json`); rules deny all client access, Storage uploads tenant-scoped (ITG-SEC-15)
+- PostgreSQL (only if ITG-DAT-02 applies): numbered, append-only migrations `database/migrations/NNNN_<name>.sql`, applied by the deploy workflow (ITG-DAT-05 to ITG-DAT-07)
 
 ## 7. Component Design
 
@@ -140,7 +140,7 @@ Choose the variant for `constitution.profile` (Article I: Testable Core). The de
 
 ```typescript
 // src/features/rsvp/api/rsvp-service.ts
-export async function recordRsvp(organizationId: string, input: CreateRsvpInput): Promise<Rsvp>
+export async function recordRsvp(tenantId: string, input: CreateRsvpInput): Promise<Rsvp>
 ```
 
 ## 8. Integration Points
@@ -159,18 +159,18 @@ export async function recordRsvp(organizationId: string, input: CreateRsvpInput)
 
 Follow `steering/rules/itg/security.md`:
 
-- **A01: Broken Access Control**: roles and tenant from custom claims only; guards in withApiRoute; Firestore rules server-write-only (ITG-SEC-05, ITG-SEC-13, ITG-SEC-15)
-- **A02: Cryptographic Failures**: Firebase Authentication; server-signed session cookies (ITG-SEC-11)
+- **A01: Broken Access Control**: roles and tenant from custom claims only; guards in withApiRoute; Firestore rules deny all client access (ITG-SEC-05, ITG-SEC-13, ITG-SEC-15)
+- **A02: Cryptographic Failures**: Firebase Authentication; bearer ID token verified per request, no session cookie (ITG-SEC-11)
 - **A03: Injection**: zod schemas on every route (ITG-PLT-06)
-- **A05: Security Misconfiguration**: secrets only in GitHub Environments; CSP at compile time (ITG-PLT-08, ITG-SEC-22)
-- **A07: Authentication Failures**: Turnstile, App Check, admin TOTP MFA, rate limiting (ITG-SEC-01, ITG-SEC-02)
+- **A05: Security Misconfiguration**: configuration only in GitHub Environments; nonce-based CSP in middleware (ITG-PLT-08, ITG-SEC-22)
+- **A07: Authentication Failures**: App Check, reCAPTCHA enforcement, account-state check, admin TOTP MFA, rate limiting (ITG-SEC-01, ITG-SEC-02, ITG-SEC-04)
 
 ## 10. Performance Considerations
 
-- **Runtime**: Worker bundle within the plan limit; no heavy SDKs in the Worker (ITG-PLT-18)
+- **Runtime**: Worker bundle within 10 MiB; no heavy SDKs in the Worker (ITG-PLT-18)
 - **Shared state**: Cloudflare KV, Durable Objects or Rate Limiting bindings, never isolate memory (ITG-PLT-17)
 - **Data**: Firestore composite indexes for every query
-- **Async work**: Firebase Functions or Cron Triggers; n8n only for large workflows (ITG-INT-06)
+- **Async work**: Firebase Functions for triggers and schedules; n8n only for large workflows (ITG-INT-06)
 
 ## 11. Error Handling
 
@@ -192,7 +192,7 @@ Typed `ApiRouteError` helpers (`badRequest`, `unauthorized`, `forbidden`, `notFo
 - POST /api/rsvp, Firestore rules, tenant isolation (ITG-TST-06, ITG-TST-08)
 
 ### E2E Tests (Playwright)
-- Member RSVPs; member of another organization is blocked (ITG-TST-10)
+- Member RSVPs; a member of another tenant is blocked (ITG-TST-10)
 
 ### Test Coverage Requirements
 - Coverage at or above the configured threshold, default 80% (III-6)
@@ -202,7 +202,7 @@ Typed `ApiRouteError` helpers (`badRequest`, `unauthorized`, `forbidden`, `notFo
 ## 13. Deployment
 
 ### Configuration (GitHub Environments, listed in `.env.example`)
-- New keys: [names only]; `NEXT_PUBLIC_*` as Variables, everything else as Secrets (ITG-PLT-09)
+- New keys: [names only], each in one class: public values and server configuration as Variables, credentials as Secrets (ITG-PLT-09)
 
 ### Infrastructure
 - Firestore rules and indexes deployed to both Firebase projects in the same change (ITG-PLT-23)
@@ -235,7 +235,7 @@ C4Container
     Person(member, "Member", "Client user")
     System_Boundary(app, "Client portal") {
         Container(web, "Web application", "Next.js on a Cloudflare Worker", "Pages and route handlers through withApiRoute")
-        ContainerDb(fs, "Firestore", "Firebase", "meetings, rsvps; server-write-only rules")
+        ContainerDb(fs, "Firestore", "Firebase", "meetings, rsvps; rules deny all client access")
     }
     System_Ext(acs, "Azure Communication Services", "Reminder email")
     System_Ext(logs, "ITG log-ingest", "Audit and app events")

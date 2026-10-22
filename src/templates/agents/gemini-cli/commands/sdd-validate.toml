@@ -337,7 +337,7 @@ find tests/integration -name "*{{feature-name}}*.test.ts"
 - [ ] No direct object references
 
 ## A02: Cryptographic Failures
-- [ ] Firebase Authentication; server-signed session cookies (ITG-SEC-11)
+- [ ] Firebase Authentication; bearer ID token verified per request, no session cookie (ITG-SEC-11)
 - [ ] Sensitive data encrypted
 - [ ] TLS/HTTPS enforced
 
@@ -554,7 +554,7 @@ Generate comprehensive report:
 ### Article IX: Integration-First Testing
 **Status**: ✅ PASS
 
-- ✅ Tests use the staging Firebase project under a test tenant (no emulator)
+- ✅ Tests use the staging Firebase project under the run prefix ci-<run-id> (no emulator)
 - ✅ No unjustified mocks (0 mocks found, IX-4)
 - ✅ Integration tests present
 
@@ -573,7 +573,7 @@ Generate comprehensive report:
 ## Security Validation (OWASP Top 10)
 
 - ✅ A01: Authorization checks present
-- ✅ A02: Firebase Authentication, server-signed session cookies
+- ✅ A02: Firebase Authentication, bearer ID token, no session cookie
 - ✅ A03: zod schemas on every route
 - ✅ A05: Secrets in env variables
 - ✅ A07: Rate limiting implemented

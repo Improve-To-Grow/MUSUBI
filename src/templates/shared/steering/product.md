@@ -4,7 +4,7 @@
 **Client**: [client name]
 **Last Updated**: {{DATE}}
 **Version**: 1.0
-**Standard**: ITG Software Delivery Playbook v2.1 (`steering/rules/itg/delivery-lifecycle.md`)
+**Standard**: ITG Software Delivery Playbook v2.2 (`steering/rules/itg/delivery-lifecycle.md`)
 
 ---
 
@@ -12,7 +12,7 @@
 
 {{DESCRIPTION}}
 
-The client is the hero and ITG is the guide: this product exists to help the client reach a business outcome (§1.1 of the playbook). This file holds the outputs of Discovery (ITG-DEL-08) and Scope Definition (ITG-DEL-09). Fill it in before writing requirements. Every requirement (`/sdd-requirements`) traces back to a goal or workflow here.
+The client is the hero and ITG is the guide: this product exists to help the client reach a business outcome. This file holds the outputs of Discovery (ITG-DEL-08) and Scope Definition (ITG-DEL-09). Fill it in before writing requirements. Every requirement (`/sdd-requirements`) traces back to a goal or workflow here.
 
 ---
 
@@ -22,7 +22,7 @@ The client is the hero and ITG is the guide: this product exists to help the cli
 
 **Business goal**: [the client's measurable goal, e.g. "cut lead qualification time from 2 days to 2 hours"]
 
-### Before We Build (ITG-DEL-01)
+### Before We Build (ITG-DEL-08)
 
 | Question | Answer |
 |---|---|
@@ -64,9 +64,9 @@ The client is the hero and ITG is the guide: this product exists to help the cli
 
 ### Data Sensitivity
 
-Highest classification of data this product handles (ITG-DAT-11): [Public / Internal / Confidential / Sensitive / Highly sensitive]
+Data sensitivity level from Discovery (ITG-DEL-08): [Public / Internal / Confidential / Sensitive / Highly sensitive]
 
-| Data object | Classification | Personal data? | Retention |
+| Data object | Sensitivity | Personal data? | Retention |
 |---|---|---|---|
 | [e.g. Lead] | [Confidential] | [yes: name, email] | [period] |
 
@@ -134,7 +134,7 @@ Fill in when the product uses AI (Vertex AI only, ITG-SEC-20).
 
 ## Handover
 
-The client handover packet (ITG-OPS-10) is prepared in ClickUp. The client owns these DNS records: [CNAME for the SaaS hostname], [SPF / DKIM for the email sending domain].
+The client handover packet (ITG-OPS-10) is prepared in ClickUp. It names the ITG admin seat in production and who holds it. The client owns these DNS records: [CNAME for the SaaS hostname], [ACS ownership TXT, two DKIM CNAMEs and the SPF `include` for the email sending domain].
 
 ---
 

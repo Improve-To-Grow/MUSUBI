@@ -91,13 +91,13 @@ C4Container
     Person(user, "Client user")
     System_Boundary(sys, "{{SYSTEM}}") {
         Container(web, "Web application", "Next.js on a Cloudflare Worker", "Pages and route handlers through withApiRoute")
-        Container(fn, "Firebase Functions", "Node 22", "[Scheduled job, if any]")
-        ContainerDb(fs, "Firestore", "Firebase", "[Collections of this feature]")
+        Container(fn, "Firebase Functions", "Node 22, europe-west4", "[Trigger or scheduled job, if any]")
+        ContainerDb(fs, "Firestore", "europe-west4", "[Collections of this feature]")
     }
     System_Ext(logs, "ITG log-ingest", "Central log store")
-    Rel(user, web, "HTTPS", "Turnstile, App Check")
+    Rel(user, web, "HTTPS", "Bearer ID token, App Check")
     Rel(web, fs, "Read and write", "REST via src/lib/firebase-rest")
-    Rel(web, logs, "Events", "ctx.waitUntil")
+    Rel(web, logs, "Events", "Queue and log-relay")
     Rel(fn, fs, "[Export]", "firebase-admin")
 ```
 
@@ -118,7 +118,7 @@ C4Component
         Component(route, "POST /api/{{resource}}", "route.ts", "withApiRoute + guard + zod schema")
         Component(svc, "{{COMPONENT}} service", "src/features/{{component}}/api/", "Feature logic")
         Component(rest, "Firestore REST client", "src/lib/firebase-rest/", "Runtime-constraint client, VIII-4")
-        Component(rec, "Audit recorder", "src/lib/audit/", "Redactor, fire-and-forget")
+        Component(rec, "Audit recorder", "src/lib/audit/", "Allowlist and redactor, one sendBatch per request")
     }
     Rel(route, svc, "calls")
     Rel(svc, rest, "reads and writes")
@@ -325,10 +325,10 @@ See [openapi.yaml](./openapi.yaml) for complete API specification.
 
 ```mermaid
 erDiagram
-    ORGANIZATION ||--o{ RESOURCE : owns
+    TENANT ||--o{ RESOURCE : owns
     RESOURCE {
         string id
-        string organizationId
+        string tenantId
         string field1
         number field2
         timestamp createdAt
@@ -336,33 +336,32 @@ erDiagram
     }
 ```
 
-| Field | Type | Classification (ITG-DAT-11) | Retention | Reason it is stored (ITG-DAT-10) |
-| ----- | ---- | --------------------------- | --------- | -------------------------------- |
-| field1 | string | [Confidential] | [period] | [reason] |
+| Field | Type | Reason the product needs it (ITG-DAT-10) | Personal data? (ITG-DAT-12) |
+| ----- | ---- | ---------------------------------------- | --------------------------- |
+| field1 | string | [reason] | [no / yes: deleted by the erasure endpoint] |
 
-- Every record carries its tenant field when the system is multi-tenant (ITG-SEC-10). No record holds a role (ITG-SEC-06).
+- Every record carries its tenant field when the system is multi-tenant (ITG-SEC-10). Roles live in custom claims; a user document holds at most a role copy written by the claim endpoint (ITG-SEC-06).
 
 ### Firestore (default)
 
 - **Collections**: `{{resource}}` ([document id scheme])
 - **Indexes**: [composite indexes in `firestore.indexes.json`]
-- **Rules**: deny-by-default, server-write-only, reads scoped by the tenant claim (ITG-SEC-15)
+- **Rules**: Firestore denies all client access; reads and writes go through API routes; live updates poll (ITG-SEC-15)
 
 ### PostgreSQL (only when ITG-DAT-02 applies)
 
 ```sql
 -- database/migrations/NNNN_create_{{resource}}.sql
-BEGIN;
 CREATE TABLE IF NOT EXISTS {{resource}} (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  organization_id TEXT NOT NULL,
+  tenant_id TEXT NOT NULL,
   field1 VARCHAR(255) NOT NULL,
   field2 INTEGER NOT NULL CHECK (field2 > 0),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS idx_{{resource}}_org ON {{resource}}(organization_id);
-COMMIT;
+CREATE INDEX IF NOT EXISTS idx_{{resource}}_tenant ON {{resource}}(tenant_id);
+ALTER TABLE {{resource}} ENABLE ROW LEVEL SECURITY;
 ```
 
 ### Migration Strategy
@@ -370,7 +369,7 @@ COMMIT;
 **Maps to Requirements**: REQ-MAINT-001
 
 - Firestore: rules, indexes and backfills versioned in git, applied to staging first, deployed to both projects in the same change (ITG-DAT-09)
-- PostgreSQL: numbered, idempotent migrations; `database/schema.sql` updated; applied to staging before the merge to `staging` and to production before the merge to `master` (ITG-DAT-05 to ITG-DAT-08)
+- PostgreSQL: numbered, append-only migrations, applied by the deploy workflow with `scripts/ci/migrate.mjs` on staging and production; a deploy with a migration runs in the deploy window (ITG-DAT-05 to ITG-DAT-08)
 
 ---
 
@@ -489,27 +488,28 @@ Follow `steering/rules/itg/security.md`; run its release checklist when the feat
 
 ### Authentication
 
-- **Method**: Firebase Authentication; ID token in `Authorization: Bearer` for APIs, server-signed session cookie for pages (ITG-SEC-11)
-- **Public forms**: Turnstile; App Check on every API call (ITG-SEC-01)
+- **Method**: Firebase Authentication with Identity Platform; the ID token in `Authorization: Bearer` is the only session, no session cookie (ITG-SEC-11); account-state check on every request (ITG-SEC-04)
+- **Bot protection**: App Check on every API call and on Storage; reCAPTCHA enforcement on sign-in (ITG-SEC-01)
 - **Admins**: TOTP MFA enforced server-side (ITG-SEC-02)
 
 ### Authorization
 
 - **Roles**: [roles this feature checks], read only from custom claims (ITG-SEC-05, ITG-SEC-06)
-- **Tenant**: [tenant field], scoped server-side and in the rules (ITG-SEC-10)
+- **Tenant**: `tenantId` from the claim, scoped server-side through the tenant-scoped helper (ITG-SEC-10)
 - **Guards**: [withAuth / withRole('<role>') / withTenant] per route (ITG-SEC-13)
 
 ### Data Protection
 
-- **Rules**: server-write-only Firestore and Storage rules (ITG-SEC-15)
+- **Rules**: Firestore denies all client access; Storage uploads tenant-scoped; reads through signed URLs (ITG-SEC-15)
 - **Logs**: ids only; no names, emails or bodies (ITG-LOG-03)
-- **AI** (if used): Vertex AI only; prompt-injection review; prompts fingerprinted (ITG-SEC-19, ITG-SEC-20)
+- **AI** (if used): Vertex AI in `europe-west4` through REST; prompt-injection review; prompts fingerprinted (ITG-SEC-19, ITG-SEC-20)
+- **Feature**: [registry name]; can be switched off with the kill switch (ITG-SEC-23, ITG-SEC-24)
 
 ### Input Validation
 
 - **Schemas**: zod for body and query of every route (ITG-PLT-06)
 - **Rate Limiting**: [auth / read / write / admin / ai] profile per route (ITG-SEC-14)
-- **Webhooks** (if any): signed outbound, verified inbound (ITG-SEC-17, ITG-SEC-18)
+- **Webhooks** (if any): outbound webhooks signed (ITG-SEC-17)
 
 ---
 
@@ -539,7 +539,7 @@ Follow `steering/rules/itg/security.md`; run its release checklist when the feat
 **Maps to Requirements**: REQ-AVAIL-001
 
 - **Environments**: local, staging, production (ITG-PLT-21); deployed by `.github/workflows/deploy.yml` (ITG-CI-03)
-- **New bindings**: [KV / R2 / Rate Limiting] per environment in `wrangler.jsonc` (ITG-PLT-19)
+- **New bindings**: [KV / Durable Objects / Rate Limiting / Hyperdrive] in both environment blocks of `wrangler.jsonc` (ITG-PLT-19)
 - **Rules and indexes**: deployed to both Firebase projects in the same change (ITG-PLT-23)
 
 ### Configuration
@@ -670,7 +670,7 @@ This design complies with:
 [Volume, query shape and reporting needs of {{resource}} data.]
 
 **Decision**:
-[Firestore (ITG-DAT-01), or PostgreSQL on the shared ITG instance because the data is large, relational or reporting-heavy (ITG-DAT-02).]
+[Firestore (ITG-DAT-01), or PostgreSQL on Neon through Hyperdrive because it is a large dataset the app works on (ITG-DAT-02).]
 
 **Consequences**:
 
@@ -723,7 +723,7 @@ This design complies with:
 - [Requirements Specification](requirements.md)
 - [Steering Context](../../steering/)
 - [API Documentation](./api-docs.md)
-- [Database Schema](./schema.sql)
+- [Database Migrations](../../database/migrations/)
 
 ---
 

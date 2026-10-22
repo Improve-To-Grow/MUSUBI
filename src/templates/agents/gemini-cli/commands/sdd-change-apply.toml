@@ -134,12 +134,12 @@ Integration test example:
 ```typescript
 import { describe, it } from 'vitest';
 
-// Real staging Firebase project under a test tenant, no emulator (ITG-TST-06, ITG-TST-08)
-const TEST_ORG = `test-${Date.now()}`;
+// Real staging Firebase project under the run prefix ci-<run-id>, no emulator (ITG-TST-06, ITG-TST-08)
+const TEST_TENANT = `ci-${process.env.GITHUB_RUN_ID ?? Date.now()}`;
 
 describe('<Feature> Integration', () => {
   it('should work with real data', async () => {
-    // Use REAL services through src/lib/firebase-rest, not mocks; clean up TEST_ORG data
+    // Use REAL services through src/lib/firebase-rest, not mocks; clean up TEST_TENANT data
   });
 });
 ```

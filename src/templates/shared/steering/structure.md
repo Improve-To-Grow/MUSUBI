@@ -3,7 +3,7 @@
 **Project**: {{PROJECT_NAME}}
 **Last Updated**: {{DATE}}
 **Version**: 1.0
-**Standard**: ITG Software Delivery Playbook v2.1 (`steering/rules/itg/git-and-code-quality.md`)
+**Standard**: ITG Software Delivery Playbook v2.2 (`steering/rules/itg/git-and-code-quality.md`)
 
 ---
 
@@ -24,20 +24,26 @@ src/components/ui/                 shadcn/ui primitives
 src/components/layout/             shells, navigation
 src/features/<domain>/             one folder per feature:
   components/  hooks/  api/  types.ts  (and *.test.ts next to the code)
-src/lib/auth/                      session, claims, guards
+src/lib/auth/                      claims, guards, account-state check
 src/lib/audit/  src/lib/logs/      recorders, redactor, allowlist
 src/lib/firebase-rest/             Firebase REST client (runtime-constraint client, VIII-4)
+src/lib/vertex-ai/                 Vertex AI REST client (runtime-constraint client, VIII-4)
 src/lib/email/                     ACS client and templates
-src/lib/runtime-config.ts          the only place that reads process.env
+src/lib/features/                  feature registry and kill switch
+src/lib/api/                       route wrappers: withApiRoute, withAuth, withRole, withTenant, api-errors
+src/lib/runtime-config.ts          server configuration, validated with zod at startup
 src/lib/logger.ts                  createLogger('<module-id>')
 src/lib/utils/
-src/middleware/                    withAuth, withRole, withTenant, withApiRoute, api-errors
+src/middleware.ts                  security headers and CSP nonce, page kill switch
 src/types/<domain>/<entity>.ts     one file per entity, grouped by domain
 src/locales/<locale>/<page>.json   next-intl messages, one file per page (multilingual products only)
-functions/                         Firebase Functions (scheduled jobs, backups)
-scripts/ci/                        CI helpers (env materialization, deploy helpers)
-scripts/checks/                    CI gate scripts (route guards, route logging, changelog)
-database/                          schema.sql, migrations/ (only if PostgreSQL)
+functions/                         Firebase Functions: Firebase triggers and scheduled work only
+workers/log-relay/                 queue consumer that forwards events to log-ingest; own wrangler.jsonc
+scripts/ci/                        CI helpers (configuration materialization, migrate.mjs, deploy helpers)
+scripts/checks/                    CI gate scripts (route guards, route logging, function triggers,
+                                   audit catalogue, changelog, feature registry, AI provider, rules)
+scripts/ops/                       operator scripts against a Firebase project (seed-test-users, backfill, restore)
+database/migrations/               numbered SQL migrations (only if PostgreSQL)
 steering/  storage/                MUSUBI
 documentation/                     engineering docs, hardening/, incidents/, n8n/
 tests/e2e/                         Playwright specs
@@ -49,7 +55,11 @@ tests/e2e/                         Playwright specs
 flowchart TD
     C([New code]) --> R{API route handler?}
     R -- yes --> API[src/app/api/.../route.ts<br/>withApiRoute + guard + zod schema]
-    R -- no --> PG{Page or layout?}
+    R -- no --> FT{Firebase trigger or schedule?}
+    FT -- yes --> FNS[functions/src/]
+    FT -- no --> SC{Script run in CI or against<br/>a Firebase project?}
+    SC -- yes --> SCR[scripts/ci/, scripts/checks/<br/>or scripts/ops/]
+    SC -- no --> PG{Page or layout?}
     PG -- yes --> APP[src/app/...]
     PG -- no --> UI{shadcn/ui primitive?}
     UI -- yes --> CUI[src/components/ui/]
@@ -60,17 +70,18 @@ flowchart TD
     VEN -- "shared, or a runtime-constraint client" --> LV[src/lib/vendor/]
     VEN -- no --> SH{Used by a second feature?}
     SH -- yes --> LIB[Promote to src/lib/]
-    SH -- no --> FEAT[src/features/domain/]
+    SH -- no --> FEAT[src/features/domain/<br/>declared in the feature registry]
 ```
 
 ### Rules
 
-- A feature folder is self-contained: removing the feature removes one folder (ITG-GIT-02).
+- A feature folder is self-contained: removing the feature removes one folder, and it is declared in `src/lib/features/registry.ts` (ITG-GIT-02, ITG-SEC-23).
 - Shared code moves to `src/lib` or `src/components/ui` only when a second feature needs it (ITG-GIT-02). A second copy of the same logic is a review blocker (ITG-GIT-14).
 - Types are split per entity in `src/types/<domain>/<entity>.ts`, re-exported by a small `src/types/<domain>/index.ts`; there is no global types file (ITG-GIT-03).
 - Path alias `@/*` → `src/*`; TypeScript `strict: true` (ITG-GIT-04).
-- Only `src/lib/runtime-config.ts` reads `process.env` (ITG-LOG-14).
-- Only `functions/` imports `firebase-admin` (ITG-PLT-14).
+- Server configuration is read in `src/lib/runtime-config.ts` (ITG-LOG-14).
+- Only `functions/` and `scripts/` import `firebase-admin`; an ESLint rule keeps it out of `src/` and `workers/` (ITG-PLT-14).
+- `functions/` exports Firebase triggers and schedules only, never `onRequest` or `onCall` (ITG-SEC-13).
 
 ---
 
@@ -82,12 +93,12 @@ ITG projects use the `application` profile (constitution "Project Profiles"). `m
 |---|---|---|
 | Profile | `application` | A web application deployed as one unit (P-1) |
 | Core paths | `src/lib` | Shared logic, tested without starting the app (I-1, I-2) |
-| Delivery paths | `src/app`, `src/components`, `src/features`, `src/middleware` | Pages, route handlers, UI, feature folders, route wrappers |
-| Adapter paths | `src/lib/auth` | Request-context code (session cookies, `next/headers`) that core logic depends on |
+| Delivery paths | `src/app`, `src/components`, `src/features`, `src/middleware` | Pages, route handlers, UI, feature folders, middleware |
+| Adapter paths | `src/lib/auth`, `src/lib/api` | Request-context code (the Bearer token, `next/server`) that core logic depends on: guards and the route wrappers |
 
 How the ITG layout maps to Article I:
 
-- `src/lib` is the core: shared modules (`firebase-rest`, `email`, `logs`, `audit`, `utils`) have no UI and are unit-tested without the app (I-2, ITG-TST-04).
+- `src/lib` is the core: shared modules (`firebase-rest`, `vertex-ai`, `email`, `logs`, `audit`, `features`, `utils`) have no UI and are unit-tested without the app (I-2, ITG-TST-04).
 - A feature folder owns its UI, hooks and API calls, so in Article I terms it is delivery code. A feature's logic still has unit tests next to the code, written first (ITG-TST-01).
 - A core module SHALL NOT import from a delivery path (I-3). `src/lib` therefore never imports from `src/features` or `src/app`.
 - `src/lib` has no components, React hooks or providers (I-A4). Request-context APIs (`next/headers`, `next/server`) stay in delivery or adapter paths (I-A5).
@@ -110,6 +121,8 @@ How the ITG layout maps to Article I:
 | Hardening doc | `documentation/hardening/<TOPIC>_HARDENING_<YYYY-MM-DD>.md` | `SESSION_HARDENING_2026-10-08.md` | ITG-DEL-07 |
 | Postmortem | `documentation/incidents/<YYYY-MM-DD>_<slug>.md` | `2026-11-02_login-outage.md` | ITG-OPS-07 |
 | Firebase project / Worker | `<app>-staging`, `<app>-production` | `{{PROJECT_NAME}}-staging` | ITG-PLT-21 |
+| Log relay Worker / queue | `<app>-log-relay-<environment>`, `<app>-logs-<environment>` | `{{PROJECT_NAME}}-logs-staging` | ITG-LOG-01 |
+| Feature | folder name under `src/features/`, same name in the registry | `leads` | ITG-SEC-23 |
 
 ---
 
@@ -132,7 +145,7 @@ When a behavior changes, the old code path, flag, migration helper, message key 
 |---|---|---|
 | `steering/`, `storage/` | Product, stack, structure, ITG policies, EARS requirements, Mermaid C4 designs, tasks, traceability | ITG-DEL-11 |
 | `documentation/` | `SECURITY.md`, `AUDIT_LOGGING.md`, `DATABASE.md`, `OPERATIONS.md`, `INTEGRATIONS.md`, `RELEASE_PROCESS.md`, `hardening/`, `incidents/`, `n8n/` | ITG-DEL-06 |
-| ClickUp | Brief, scope, sprints, sign-off checklists, handover packet, integration registry | ITG-DEL-04 |
+| ClickUp | Brief, scope, sprints, sign-off checklists, handover packet, backup / restore status | ITG-DEL-04 |
 | Microsoft OneDrive | Client assets, design files, large binaries | ITG-DEL-04 |
 
 ### SDD Artifacts
@@ -157,7 +170,7 @@ This structure enforces:
 - **Article III**: Tests next to the code, written first (ITG-TST-01)
 - **Article VI**: Steering files and `steering/rules/itg/` are the project memory
 - **Article VII**: Code-size limits above
-- **Article VIII**: Vendor SDKs called directly; the Firebase REST client is the accepted runtime-constraint client (VIII-4)
+- **Article VIII**: Vendor SDKs called directly; the Firebase and Vertex AI REST clients are the accepted runtime-constraint clients (VIII-4)
 - **Article IX**: Integration tests against the staging Firebase project, no emulator (ITG-TST-06)
 
 ---

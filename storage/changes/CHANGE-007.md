@@ -1,13 +1,13 @@
 # ITG Software Delivery Playbook as steering templates
 
 **Change ID**: CHANGE-007  
-**Date**: 2026-10-12  
+**Date**: 2026-10-12, updated to playbook v2.2 on 2026-10-22  
 **Status**: ~~Proposed~~ → ~~Approved~~ → **Implemented** (branch `feat/itg-playbook-steering`, not merged)  
 **Approved**: 2026-10-08 (maintainer, in chat; plan approved before implementation)  
 **Type**: Feature / Template change  
 **Priority**: P1  
-**Baseline**: commit `9b9a2f4` on `ITG-adjustments` (work started on `bcc435d` and was moved onto `9b9a2f4`)  
-**Release**: `6.3.1-itg.3`, implements ITG Software Delivery Playbook v2.1
+**Baseline**: `ITG-adjustments` at `a1acbb6`, merged into the branch on 2026-10-22 (work started on `bcc435d`, moved onto `9b9a2f4` on 2026-10-12)  
+**Release**: `6.3.1-itg.4`, implements ITG Software Delivery Playbook v2.2
 
 ## Description
 
@@ -29,7 +29,17 @@ Yaroslav's request: "create steering files based on what's described here, so ag
 | Mermaid | In the policy files and steering templates, and in the design generators (`/sdd-design`, design template, system-architect skill). |
 | Path conflict | MUSUBI's artifact paths stay. The playbook is corrected (v2.0 → v2.1): `storage/specs/<feature>-requirements.md`, `storage/design/<feature>-design.md`, `storage/tasks/<feature>-tasks.md`, `storage/traceability/matrix.md`. |
 | ITG mode | Always on in the fork, with no flag. |
-| Scaffolding | Moves to a follow-up change: CI check scripts, PR template, `deploy.yml` outline, `.env.example`. |
+| Scaffolding | Moves to a follow-up change: CI check scripts, PR template, `deploy.yml` outline, `.env.example`. Confirmed again for v2.2 on 2026-10-22: a separate change (CHANGE-008). |
+
+## Updated to playbook v2.2 (2026-10-22)
+
+The branch first implemented a pre-release v2.1 copy (2026-10-08). The canonical playbook moved on to v2.1 (2026-10-13), v2.1.1 and the v2.2 draft (2026-10-19), which the maintainer named the approach MUSUBI must follow. Steps:
+
+- **Merge first.** `ITG-adjustments` was merged into the branch before any v2.2 work, so later merges do not conflict. It had released its own CHANGE-006 (Python code navigation) as `6.3.1-itg.3`, so this change became **CHANGE-007** and releases as **`6.3.1-itg.4`**. `steering/product.md` and `steering/structure.md` take the ITG-adjustments rewrite and add the ITG template layer notes.
+- **Playbook copy.** `docs/itg/` holds the canonical v2.2 file and its changelog unchanged. The canonical file has no front matter, so `tests/itg/playbook-sync.test.js` reads the version from the `**Version X.Y` header, the versions table and the `→ vX.Y` changelog heading.
+- **Path conflict, again.** v2.2 §3.3 and §5.4 used folder paths (`storage/specs/<feature>/requirements.md`, `matrix.yml`). Maintainer decision (2026-10-22): the playbook is corrected, MUSUBI's paths stay. The correction is made in the canonical v2.2 draft and its changelog in the playbook repository (not committed there by this change) and copied into `docs/itg/`.
+- **Policies rewritten** for v2.2. Rule ids keep their topic where the topic still exists, so the references in commands and skills stay valid; ITG-SEC-18 (inbound webhooks) is retired because v2.2 §11.7 covers outbound webhooks only; ITG-SEC-24 (kill switch loader), ITG-LOG-17 (generated audit catalogue) and ITG-TST-12 to ITG-TST-14 (fixed test users, App Check in CI, rules test) are new. The main v2.2 changes they carry: Required and Recommended stack classes; Identity Platform with App Check and reCAPTCHA Enterprise instead of Turnstile; bearer-only sessions with the account-state check; Firestore rules deny all client access, Storage uploads tenant-scoped, reads through signed URLs; Firebase Storage instead of R2; Functions for triggers and schedules only (no Cron Triggers, no HTTP Functions); Neon + Hyperdrive instead of the shared VPS PostgreSQL; three configuration classes; log delivery through a Cloudflare Queue and the log-relay Worker; per-table retention; nonce-based CSP; feature registry and kill switch; GitHub Team rulesets as the production guard; `release/X.Y.Z` branches; CI-applied migrations without `schema.sql`; `itg-restore` for restore tests; `europe-west4` everywhere.
+- **Templates.** `tech.md`, `structure.md` and `product.md`, the design document template, the `/sdd-design`, `/sdd-implement`, `/sdd-change-apply`, `/sdd-validate` and `/sdd-tasks` commands on every platform and the system-architect skill drop what v2.2 removed and use `tenantId`. The default adapter paths of the `application` profile add `src/lib/api`, where v2.2 puts the route wrappers.
 
 ## Moved onto the latest `ITG-adjustments` (2026-10-12)
 
@@ -65,7 +75,7 @@ The work started on `bcc435d`. Meanwhile `ITG-adjustments` gained CHANGE-003 to 
 ## Implementation
 
 - **Playbook:**
-  - `docs/itg/ITG_Software_Delivery_Playbook.md` (v2.1) and `docs/itg/PLAYBOOK_CHANGELOG.md`.
+  - `docs/itg/ITG_Software_Delivery_Playbook.md` (v2.2 since 2026-10-22) and `docs/itg/PLAYBOOK_CHANGELOG.md`.
   - These are identical to the canonical copies, which were updated in the same change.
 - **Policies:** `src/templates/shared/steering/rules/itg/`:
   - `README.md` (index, role → policy map, deviation process);
@@ -89,6 +99,15 @@ The work started on `bcc435d`. Meanwhile `ITG-adjustments` gained CHANGE-003 to 
 
 ## Verification
 
+After the v2.2 update (2026-10-22):
+
+- `npm test`: 178 suites, 5004 tests; 4994 pass. The 10 failures are the scip-python tests of `tests/code-index/python.test.js` and `mixed.test.js`, which fail the same way on `ITG-adjustments` itself in this environment (the Python indexer finds no definitions); they are not caused by this change.
+- `tests/itg/` (45 tests) passes against the canonical v2.2 copy: every policy names v2.2, cites only sections that exist in it, and defines every rule id the policies and steering templates reference.
+- `npm run lint` and `npm run format:check` pass.
+- A temporary project with the ITG steering installed has all eleven policy files and no `{{…}}` placeholders; `musubi validate constitution` reports only the expected findings of an empty project (no tests yet).
+
+Before the v2.2 update (2026-10-12):
+
 - `npm test`: 175 suites, 4964 tests, all passing (after the move onto `9b9a2f4`).
 - `npm run lint` and `prettier --check` pass.
 - All 41 Mermaid blocks in the changed policy, steering and design templates render with Mermaid 11.4.1.
@@ -100,10 +119,12 @@ The work started on `bcc435d`. Meanwhile `ITG-adjustments` gained CHANGE-003 to 
 
 ## Follow-ups
 
-- **Scaffolding (Appendix C of the playbook):**
-  - `scripts/checks/check-route-guards.mjs`, `check-route-logging.mjs`, `check-changelog.mjs`;
+- **Scaffolding (CHANGE-008, Appendix C of the playbook v2.2):**
+  - the eight check scripts of C.3: `check-route-guards`, `check-route-logging`, `check-function-triggers`, `check-changelog`, `check-audit-catalogue`, `check-feature-registry`, `check-rules`, `check-ai-provider`;
   - the PR template;
-  - the `deploy.yml` outline;
-  - `.env.example`.
+  - `.github/workflows/ci.yml`, `deploy.yml` and `ci-cleanup.yml` (C.2);
+  - `.env.example` (C.1).
+- **Playbook repository:** commit the path correction of v2.2 §3.3 and §5.4 and its changelog row there. The Project Setup Guide v2.2 also asks the playbook to name `FIREBASE_DEPLOY_SERVICE_ACCOUNT` (the credential of the Functions deploy job) in §2.1.3 and C.1; the policies follow the playbook once it decides.
+- **Templates not yet on the ITG stack:** `src/templates/shared/documents/tasks.md` and the Article IX checklist of the constitution template still describe Docker test databases; ITG projects test against staging (ITG-TST-06).
 - **Generator file names:** the `musubi-requirements`, `musubi-design` and `musubi-tasks` CLI generators write `storage/<kind>/<feature>.md`, while the slash commands and the playbook use the `-requirements` / `-design` / `-tasks` suffixes. Align the generators.
 - **Gemini examples:** the Gemini CLI `sdd-implement`, `sdd-tasks` and `sdd-requirements` worked examples still show password hashing. `sdd-implement` has an ITG note saying these are TDD illustrations only. Replace them with ITG examples.

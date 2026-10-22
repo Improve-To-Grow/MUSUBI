@@ -1,7 +1,7 @@
 ---
 policy: ITG
 title: ITG delivery policies (index)
-playbook: ITG Software Delivery Playbook v2.1
+playbook: ITG Software Delivery Playbook v2.2
 sections: ["§1.2", "§3.3", "§18"]
 roles: [all]
 ---
@@ -41,11 +41,11 @@ flowchart TD
 | File | Prefix | Playbook | Covers |
 |---|---|---|---|
 | [delivery-lifecycle.md](delivery-lifecycle.md) | ITG-DEL | §1, §3.1–§3.4, §5, §6 | Lifecycle, documentation homes, Sprint 0, ClickUp, Definition of Ready / Done |
-| [platform.md](platform.md) | ITG-PLT | §2.1, §2.2 | Default stack, Cloudflare Workers, Firebase over REST, environments, secrets, UI library set |
-| [data.md](data.md) | ITG-DAT | §2.3, §2.5, §3.5, §13 | Firestore vs PostgreSQL, migrations, classification, privacy, exports |
+| [platform.md](platform.md) | ITG-PLT | §2.1, §2.2 | Required and Recommended stack, Cloudflare Workers, Firebase over REST, environments, configuration classes, UI library set |
+| [data.md](data.md) | ITG-DAT | §2.3, §2.5, §3.5, §13 | Firestore vs PostgreSQL, external API data, migrations, privacy, exports, erasure |
 | [integrations.md](integrations.md) | ITG-INT | §2.2.2, §2.4, §12 | Vendor calls, ACS email, background jobs, n8n, retry policy |
-| [security.md](security.md) | ITG-SEC | §11 | Authentication, claims-only roles, tenant isolation, sessions, `withApiRoute`, AI security |
-| [logging.md](logging.md) | ITG-LOG | §9, Appendix B | Central log store, action names, required fields, redactor, retention, GDPR |
+| [security.md](security.md) | ITG-SEC | §11 | Identity Platform and App Check, roles in claims, tenant isolation, bearer-only sessions, account-state check, `withApiRoute`, rules, AI security, kill switch |
+| [logging.md](logging.md) | ITG-LOG | §9, Appendix B | Central log store, queue and log-relay, action names, required fields, allowlist and redactor, retention, GDPR |
 | [testing.md](testing.md) | ITG-TST | §7 | Test-first, test levels, real services, required flows, manual QA |
 | [git-and-code-quality.md](git-and-code-quality.md) | ITG-GIT | §4 | Repository layout, branches, commits, PRs, review, code limits |
 | [ci-cd-and-release.md](ci-cd-and-release.md) | ITG-CI | §8, §14 | Required CI checks, deploy pipeline, production rules, smoke test, releases |
@@ -74,7 +74,7 @@ Read the policies of your role before you start. When a task touches another are
 
 ## Deviations
 
-A project may deviate from a default rule when its domain justifies it. Silent deviation is not allowed (playbook, Purpose):
+The Required rows of the stack (ITG-PLT-01) change only through a playbook change. A project may deviate from a Recommended row or a default rule when its domain justifies it. Silent deviation is not allowed (ITG-DEL-02; playbook, Purpose):
 
 1. Record the deviation in the `## Deviations from the ITG Playbook` table in `steering/tech.md` (stack, platform, data) or `steering/structure.md` (layout, naming). Give the rule id, the decision, the reason and the date.
 2. Record the wider rationale in the project's `documentation/` folder. Use `documentation/hardening/` (ITG-DEL-07) when the change is a security or architecture decision.

@@ -23,7 +23,8 @@ const REQUIRED_SECTIONS = [
 ];
 
 const playbook = fs.readFileSync(PLAYBOOK, 'utf8');
-const playbookVersion = playbook.match(/^version:\s*(\d+\.\d+)\s*$/m)[1];
+// The canonical playbook has no front matter; its version is in the bold header line
+const playbookVersion = playbook.match(/^\*\*Version (\d+\.\d+) /m)[1];
 const playbookSections = new Set(
   [...playbook.matchAll(/^#{1,4} (\d+(?:\.\d+)*)\.?\s/gm)].map(match => match[1])
 );
@@ -51,8 +52,8 @@ function definedRules() {
 }
 
 describe('ITG playbook copy', () => {
-  it('names its version in the front matter and in the heading', () => {
-    expect(playbook).toMatch(new RegExp(`\\*\\*Version ${playbookVersion.replace('.', '\\.')} `));
+  it('lists its version in the versions table', () => {
+    expect(playbook).toMatch(new RegExp(`^\\| ${playbookVersion.replace('.', '\\.')} \\|`, 'm'));
   });
 
   it('has a changelog entry for its version', () => {
@@ -60,7 +61,7 @@ describe('ITG playbook copy', () => {
       path.join(ROOT, 'docs', 'itg', 'PLAYBOOK_CHANGELOG.md'),
       'utf8'
     );
-    expect(changelog).toMatch(new RegExp(`^## v${playbookVersion.replace('.', '\\.')} `, 'm'));
+    expect(changelog).toMatch(new RegExp(`^# .*→ v${playbookVersion.replace('.', '\\.')} `, 'm'));
   });
 
   it('is named in the fork CHANGELOG', () => {

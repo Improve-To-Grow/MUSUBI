@@ -663,7 +663,7 @@ AND the system SHALL create a session.
 **Validation Steps**:
 
 1. Check integration tests use real services (IX-1, III-7):
-   - Real database, isolated: the staging Firebase project under a test tenant or prefix, no emulator (IX-2, ITG-TST-06, ITG-TST-08)
+   - Real database, isolated: the staging Firebase project under the run prefix `ci-<run-id>`, no emulator (IX-2, ITG-TST-06, ITG-TST-08)
    - Real log-ingest: the staging endpoint
    - Real external APIs (sandbox environments) (IX-3)
 2. Verify that each mock covers a service that is unavailable in the test environment, has usage limits or costs, or has no test environment (IX-4), and that the test documentation justifies it (IX-5)
@@ -683,7 +683,7 @@ AND the system SHALL create a session.
 - Evidence: `src/features/rsvp/api/rsvp-repository.test.ts:8`
 
 ```typescript
-const TEST_ORG = `test-${Date.now()}`; // cleaned up in afterAll
+const TEST_TENANT = `ci-${process.env.GITHUB_RUN_ID ?? Date.now()}`; // cleaned up in afterAll
 ```
 
 - ✅ Real database confirmed
@@ -764,7 +764,7 @@ npx tsc --noEmit
 **OWASP Top 10 Check**:
 
 - ✅ A01: Broken Access Control - Auth middleware enforced
-- ✅ A02: Cryptographic Failures - Firebase Authentication; session cookies server-signed (ITG-SEC-11)
+- ✅ A02: Cryptographic Failures - Firebase Authentication; bearer ID token verified per request, no session cookie (ITG-SEC-11)
 - ✅ A03: Injection - zod schemas on every route (ITG-PLT-06)
 - ✅ A04: Insecure Design - Security by design principles
 - ✅ A05: Security Misconfiguration - Proper config
