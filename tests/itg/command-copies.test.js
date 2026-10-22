@@ -33,5 +33,4 @@ describe('slash command copies', () => {
       .map(file => path.relative(AGENTS_DIR, file));
     expect(missing).toEqual([]);
   });
-
 });
