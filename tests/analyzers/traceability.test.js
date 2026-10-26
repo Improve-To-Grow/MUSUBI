@@ -465,4 +465,38 @@ describe('TraceabilityAnalyzer', () => {
       expect(tests.map(t => t.file)).toEqual(['src/lib/rsvp/service.test.ts']);
     });
   });
+
+  describe('items of one requirement (CHANGE-010)', () => {
+    beforeEach(async () => {
+      const write = (rel, content) => fs.outputFile(path.join(tmpDir, rel), content);
+      await write(
+        'storage/specs/rsvp-requirements.md',
+        '### REQ-RSVP-001: Record\n\nText\n\n### REQ-RSVP-002: Summary\n\nText\n'
+      );
+      await write(
+        'storage/design/rsvp-design.md',
+        '## Mapping\n\n| Service | REQ-RSVP-002 |\n\n## ADR\n\n### ADR-001: Store\n\nCovers REQ-RSVP-001.\n\n### ADR-002: Placeholder\n\nText\n'
+      );
+      await write(
+        'storage/tasks/rsvp-tasks.md',
+        '### TASK-001: Store\n\n**Status**: In Progress\n\n- REQ-RSVP-001\n\n### TASK-002: Other\n\n**Status**: Not Started\n\n- REQ-RSVP-0011\n'
+      );
+    });
+
+    test('links the ADR and task whose own section names the id', async () => {
+      const trace = await analyzer.traceRequirement('REQ-RSVP-001');
+
+      expect(trace.design.map(d => d.id)).toEqual(['ADR-001']);
+      expect(trace.tasks.map(t => [t.id, t.status])).toEqual([['TASK-001', 'In Progress']]);
+    });
+
+    test('links the document when only other text names the id', async () => {
+      const impact = await analyzer.analyzeImpact('REQ-RSVP-002');
+
+      expect(impact.impacted.design).toEqual([
+        expect.objectContaining({ id: 'rsvp-design.md', type: 'document' }),
+      ]);
+      expect(impact.counts.tasks).toBe(0);
+    });
+  });
 });

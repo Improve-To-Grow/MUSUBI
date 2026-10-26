@@ -161,18 +161,7 @@ class TraceabilityAnalyzer {
       return { requirement: null, design: [], tasks: [], code: [], tests: [] };
     }
 
-    const relatedDesign = design.filter(d => this.linksToRequirement(d, requirementId));
-    const relatedTasks = tasks.filter(t => this.linksToRequirement(t, requirementId));
-    const relatedCode = code.filter(c => this.linksToRequirement(c, requirementId));
-    const relatedTests = tests.filter(t => this.linksToRequirement(t, requirementId));
-
-    return {
-      requirement,
-      design: relatedDesign,
-      tasks: relatedTasks,
-      code: relatedCode,
-      tests: relatedTests,
-    };
+    return { requirement, ...this.relatedTo(requirementId, { design, tasks, code, tests }) };
   }
 
   /**
@@ -308,10 +297,12 @@ class TraceabilityAnalyzer {
     const code = await this.findCode(options.code || 'src');
     const tests = await this.findTests(options.tests || 'tests', options.code || 'src');
 
-    const impactedDesign = design.filter(d => this.linksToRequirement(d, requirementId));
-    const impactedTasks = tasks.filter(t => this.linksToRequirement(t, requirementId));
-    const impactedCode = code.filter(c => this.linksToRequirement(c, requirementId));
-    const impactedTests = tests.filter(t => this.linksToRequirement(t, requirementId));
+    const {
+      design: impactedDesign,
+      tasks: impactedTasks,
+      code: impactedCode,
+      tests: impactedTests,
+    } = this.relatedTo(requirementId, { design, tasks, code, tests });
 
     // Calculate effort estimate (simple heuristic)
     const impactScore = {
@@ -484,16 +475,19 @@ class TraceabilityAnalyzer {
     const chalk = require('chalk');
     let output = '';
 
+    // The id column fits the longest id (REQ-MEETING-RSVP-001 is 20 characters)
+    const idWidth = Math.max(20, ...matrix.map(row => row.requirement.id.length + 2));
+
     output += chalk.bold('Requirement Traceability Matrix\n\n');
     output +=
       chalk.dim(
-        'REQ ID'.padEnd(20) +
+        'REQ ID'.padEnd(idWidth) +
           'Design'.padEnd(10) +
           'Tasks'.padEnd(10) +
           'Code'.padEnd(10) +
           'Tests'.padEnd(10)
       ) + '\n';
-    output += chalk.dim('-'.repeat(60)) + '\n';
+    output += chalk.dim('-'.repeat(idWidth + 40)) + '\n';
 
     matrix.forEach(row => {
       const designIcon = row.coverage.design ? chalk.green('✓') : chalk.red('✗');
@@ -501,7 +495,7 @@ class TraceabilityAnalyzer {
       const codeIcon = row.coverage.code ? chalk.green('✓') : chalk.red('✗');
       const testsIcon = row.coverage.tests ? chalk.green('✓') : chalk.red('✗');
 
-      output += `${row.requirement.id.padEnd(20)}${designIcon.padEnd(10)}${tasksIcon.padEnd(10)}${codeIcon.padEnd(10)}${testsIcon.padEnd(10)}\n`;
+      output += `${row.requirement.id.padEnd(idWidth)}${designIcon.padEnd(10)}${tasksIcon.padEnd(10)}${codeIcon.padEnd(10)}${testsIcon.padEnd(10)}\n`;
     });
 
     return output;
@@ -658,6 +652,7 @@ class TraceabilityAnalyzer {
           type: 'C4',
           file: path.relative(this.workspaceRoot, file),
           content,
+          section: this.sectionAt(content, match.index),
         });
       }
 
@@ -668,6 +663,7 @@ class TraceabilityAnalyzer {
           type: 'ADR',
           file: path.relative(this.workspaceRoot, file),
           content,
+          section: this.sectionAt(content, match.index),
         });
       }
     }
@@ -694,14 +690,15 @@ class TraceabilityAnalyzer {
       for (const match of taskMatches) {
         // Extract status - look for **Status**: pattern after task heading
         const taskSection = content.substring(match.index);
-        const statusMatch = taskSection.match(/\*\*Status\*\*:\s*(\w+)/);
+        const statusMatch = taskSection.match(/\*\*Status\*\*:\s*(.+)/);
 
         tasks.push({
           id: match[1],
           title: match[2],
-          status: statusMatch ? statusMatch[1] : 'Unknown',
+          status: statusMatch ? statusMatch[1].trim() : 'Unknown',
           file: path.relative(this.workspaceRoot, file),
           content,
+          section: this.sectionAt(content, match.index),
         });
       }
     }
@@ -776,6 +773,7 @@ class TraceabilityAnalyzer {
           file: path.relative(this.workspaceRoot, file),
           test: match[1],
           content,
+          section: match[1],
         });
       }
     }
@@ -787,7 +785,71 @@ class TraceabilityAnalyzer {
    * Check if document links to requirement
    */
   linksToRequirement(doc, requirementId) {
-    return doc.content.includes(requirementId);
+    return this.mentions(doc.content, requirementId);
+  }
+
+  /**
+   * Whether a text names the requirement id itself (REQ-A-001 is not named by REQ-A-0011)
+   */
+  mentions(text, requirementId) {
+    const id = requirementId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`(?<![\\w-])${id}(?![\\w-])`).test(text);
+  }
+
+  /**
+   * The items of one requirement: in every file that names it, the items whose own section
+   * (ADR, C4 view, task, test name) names it, or one entry for the file when only other text
+   * names it, such as a mapping table. Items without a section (code symbols) give one entry per file.
+   * @param {object[]} items - Items with file, content and an optional section
+   * @param {string} requirementId - Requirement id
+   * @param {Function} [documentEntry] - (file) => entry for a file named outside its items
+   */
+  relatedItems(items, requirementId, documentEntry) {
+    const byFile = new Map();
+    for (const item of items) {
+      if (!byFile.has(item.file)) byFile.set(item.file, []);
+      byFile.get(item.file).push(item);
+    }
+
+    const related = [];
+    for (const [file, fileItems] of byFile) {
+      if (!this.linksToRequirement(fileItems[0], requirementId)) continue;
+      const own = fileItems.filter(
+        item => item.section !== undefined && this.mentions(item.section, requirementId)
+      );
+      if (own.length > 0) related.push(...own);
+      else related.push(documentEntry ? documentEntry(file) : fileItems[0]);
+    }
+    return related;
+  }
+
+  /**
+   * Related design, tasks, code and tests of a requirement
+   * @private
+   */
+  relatedTo(requirementId, { design, tasks, code, tests }) {
+    const documentEntry = kind => file => ({
+      id: path.basename(file),
+      title: `${kind} document`,
+      type: 'document',
+      status: 'document',
+      file,
+    });
+    return {
+      design: this.relatedItems(design, requirementId, documentEntry('Design')),
+      tasks: this.relatedItems(tasks, requirementId, documentEntry('Task')),
+      code: this.relatedItems(code, requirementId),
+      tests: this.relatedItems(tests, requirementId),
+    };
+  }
+
+  /**
+   * Text of the Markdown section that starts at `index`, up to the next ## or ### heading
+   */
+  sectionAt(content, index) {
+    const rest = content.slice(index);
+    const next = rest.slice(1).search(/\n#{2,3} /);
+    return next === -1 ? rest : rest.slice(0, next + 1);
   }
 
   /**

@@ -245,6 +245,11 @@ WHEN user clicks, the system shall respond.
         '### TASK-001: Store\n\n**Status**: Done\n\n- [ ] criterion\n\n### TASK-002: List\n\n**Status**: Not Started\n'
       );
 
+      await fs.outputFile(
+        path.join(tempDir, 'storage/design/rsvp-design.md'),
+        '## Validation\n\n- [ ] C4 diagrams reviewed\n- [x] ADRs written\n'
+      );
+
       const project = await scanner.scan();
       const tasks = project.specs.flatMap(spec => spec.tasks);
 

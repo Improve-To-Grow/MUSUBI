@@ -379,9 +379,11 @@ program
 
       // Get last tag
       try {
+        // stderr is captured: "fatal: No names found" means no tag yet, reported below
         const lastTag = execSync('git describe --tags --abbrev=0', {
           cwd: projectRoot,
           encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'pipe'],
         }).trim();
         console.log(chalk.white(`  Last tag: ${chalk.gray(lastTag)}`));
 

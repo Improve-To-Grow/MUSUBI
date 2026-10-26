@@ -16,12 +16,17 @@ Findings of a clean test run of 6.3.1-itg.6 in a new ITG project and an onboarde
 - **The scaffold's CI constitution job runs on a new project**: `musubi-trace` creates the folder of an `--output` file, so `musubi-trace matrix --output storage/traceability/matrix.md` no longer fails where `storage/traceability/` does not exist yet
 - **Requirement ids with several area segments are recognized everywhere**: one shared pattern (`src/traceability/req-id.js`) accepts `REQ-001`, `REQ-RSVP-001` and the `REQ-MEETING-RSVP-001` that `musubi-requirements add` writes. Article V of `musubi-validate project` no longer reports a CRITICAL "test files do not reference requirement IDs" for them (and reads `.tsx`, `.mjs`, `.cjs` and `.spec` tests); `musubi-gaps` finds the `###` requirements (it reported 0 requirements and 100% coverage) and the tests next to the code; `musubi-change` keeps such delta items and reports a malformed id instead of dropping it; the extractor, critic system, requirements reviewer, delta format validator, issue resolver and steering reference validator use the same pattern
 - **`musubi init` keeps the steering that exists**, such as what `musubi-onboard` wrote (`structure.md`, `tech.md`, `product.md`, `project.yml`), reports it, and takes the default project name from `package.json`
+- **`musubi-trace requirement` and `impact`** link the ADRs, C4 views, tasks and tests whose own section names the requirement, one entry for a document that names it only elsewhere (a mapping table) and one entry per code file, instead of every ADR, task and symbol of a file; task statuses keep every word ("In Progress"), ids are matched whole, and the matrix table fits long ids
+- **`musubi-gui status`** no longer counts the checklists of requirements and design documents as tasks
+- **`musubi-release status`** reports "No tags found" without git's "fatal: No names found"
+- **`musubi-dashboard create`, `advance` and `show`** print the feature, stage and completion instead of "Unknown" and "N/A"
 
 ### Changed
 
 - **`musubi init` writes the Next.js `tsconfig.json` for the `application` profile**: strict mode, bundler resolution and the `@/*` alias (ITG-GIT-04), which also lets `musubi-code` resolve `@/` imports
 - **The design and tasks templates name no requirement id until the author writes one**: their example ids are `REQ-<AREA>-NNN` placeholders, so an unedited template section no longer counts as tracing a requirement, and the tasks template writes the id area in upper case (`REQ-MEETING-RSVP-NNN`, not `REQ-meeting-rsvp-001`)
 - **`musubi-tasks add`** runs unattended with `-p`, `--points`, `--hours`, `-a`, `-d`, `-r`, `-c` and `--depends`, and prompts only for the details not given
+- **`musubi init` writes a `package.json` on the ITG stack for a new application** (Next.js, OpenNext and Wrangler, Firebase, zod, Vitest, Playwright, ESLint with eslint-plugin-security, Prettier, knip, and the matching scripts) instead of the library one with Jest and `dist/`, and `.nvmrc` with Node 22; an existing `package.json` is kept
 
 ## [6.3.1-itg.6] - 2026-10-22
 

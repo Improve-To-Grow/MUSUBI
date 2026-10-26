@@ -53,6 +53,57 @@ const NEXT_TSCONFIG = {
 };
 
 /**
+ * package.json of an application on the ITG stack (steering/tech.md): Next.js on Cloudflare
+ * Workers through OpenNext, with the tools the scaffold's CI runs (Vitest, Playwright, ESLint with
+ * eslint-plugin-security, Prettier, knip)
+ * @param {string} name - Package name
+ * @param {string} [description] - Project description
+ * @returns {object}
+ */
+function nextPackageJson(name, description = '') {
+  return {
+    name,
+    version: '0.1.0',
+    private: true,
+    description,
+    engines: { node: '>=22' },
+    scripts: {
+      dev: 'next dev',
+      build: 'next build',
+      'build:worker': 'opennextjs-cloudflare build',
+      typecheck: 'tsc --noEmit',
+      lint: 'eslint .',
+      format: 'prettier --write .',
+      'format:check': 'prettier --check .',
+      test: 'vitest run',
+      'test:e2e': 'playwright test',
+      knip: 'knip',
+      'audit:catalogue': 'node scripts/checks/check-audit-catalogue.mjs --write',
+    },
+    dependencies: {
+      next: '^15.0.0',
+      react: '^19.0.0',
+      'react-dom': '^19.0.0',
+      firebase: '^11.0.0',
+      zod: '^3.23.0',
+    },
+    devDependencies: {
+      typescript: '^5.0.0',
+      '@types/node': '^22.0.0',
+      '@types/react': '^19.0.0',
+      '@opennextjs/cloudflare': '^1.0.0',
+      wrangler: '^4.0.0',
+      vitest: '^3.0.0',
+      '@playwright/test': '^1.48.0',
+      eslint: '^9.0.0',
+      'eslint-plugin-security': '^3.0.0',
+      prettier: '^3.0.0',
+      knip: '^5.0.0',
+    },
+  };
+}
+
+/**
  * Generate language-specific dependency files for single-package projects
  */
 async function generateDependencyFiles(primaryLang, answers) {
@@ -60,37 +111,45 @@ async function generateDependencyFiles(primaryLang, answers) {
   const safeName = projectName.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
   if (primaryLang === 'javascript') {
+    const application = answers.constitutionProfile === 'application';
+
     // Check if package.json already exists
     if (!(await fs.pathExists('package.json'))) {
-      const packageJson = {
-        name: safeName,
-        version: '0.1.0',
-        description: answers.description || '',
-        type: 'module',
-        main: 'dist/index.js',
-        types: 'dist/index.d.ts',
-        scripts: {
-          build: 'tsc',
-          test: 'jest',
-          lint: 'eslint src/',
-          format: 'prettier --write .',
-        },
-        devDependencies: {
-          typescript: '^5.0.0',
-          '@types/node': '^20.0.0',
-          jest: '^29.0.0',
-          '@types/jest': '^29.0.0',
-          eslint: '^9.0.0',
-          prettier: '^3.0.0',
-        },
-      };
+      const packageJson = application
+        ? nextPackageJson(safeName, answers.description)
+        : {
+            name: safeName,
+            version: '0.1.0',
+            description: answers.description || '',
+            type: 'module',
+            main: 'dist/index.js',
+            types: 'dist/index.d.ts',
+            scripts: {
+              build: 'tsc',
+              test: 'jest',
+              lint: 'eslint src/',
+              format: 'prettier --write .',
+            },
+            devDependencies: {
+              typescript: '^5.0.0',
+              '@types/node': '^20.0.0',
+              jest: '^29.0.0',
+              '@types/jest': '^29.0.0',
+              eslint: '^9.0.0',
+              prettier: '^3.0.0',
+            },
+          };
       await fs.writeFile('package.json', JSON.stringify(packageJson, null, 2) + '\n');
+    }
+
+    // ITG-GIT-04: the Node version of an application is pinned in .nvmrc
+    if (application && !(await fs.pathExists('.nvmrc'))) {
+      await fs.writeFile('.nvmrc', '22\n');
     }
 
     // Generate tsconfig.json
     if (!(await fs.pathExists('tsconfig.json'))) {
-      const tsconfig =
-        answers.constitutionProfile === 'application' ? NEXT_TSCONFIG : LIBRARY_TSCONFIG;
+      const tsconfig = application ? NEXT_TSCONFIG : LIBRARY_TSCONFIG;
       await fs.writeFile('tsconfig.json', JSON.stringify(tsconfig, null, 2) + '\n');
     }
   } else if (primaryLang === 'rust') {

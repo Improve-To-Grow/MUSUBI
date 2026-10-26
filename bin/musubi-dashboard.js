@@ -49,20 +49,20 @@ async function main() {
       case 'show':
       case 'status':
         result = await cli.execute('workflow:status', [subcommand]);
-        formatWorkflowStatus(result);
+        formatWorkflowStatus({ ...result.workflow, completion: result.summary?.completion });
         break;
 
       case 'create':
       case 'start':
         result = await cli.execute('workflow:create', [subcommand], options);
         console.log(`\n✅ Workflow created for: ${subcommand}`);
-        formatWorkflowStatus(result);
+        formatWorkflowStatus(result.workflow);
         break;
 
       case 'advance':
         result = await cli.execute('workflow:advance', [subcommand], options);
         console.log(`\n✅ Workflow advanced`);
-        formatWorkflowStatus(result);
+        formatWorkflowStatus(result.workflow);
         break;
 
       case 'blocker':

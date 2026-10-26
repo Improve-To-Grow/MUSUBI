@@ -220,8 +220,11 @@ class ProjectScanner {
       // Parse requirements
       const requirements = this.parseRequirements(body);
 
-      // Parse tasks
-      const tasks = this.parseTasks(body);
+      // Parse tasks. Requirements and design documents hold checklists (acceptance criteria,
+      // validation); there only numbered items (- [ ] TASK-001: ...) are tasks
+      const isTaskDocument =
+        filename.endsWith('-tasks') || path.basename(path.dirname(filePath)) === 'tasks';
+      const tasks = this.parseTasks(body, { numberedOnly: !isTaskDocument });
 
       return {
         id,
@@ -283,15 +286,17 @@ class ProjectScanner {
   /**
    * Parse tasks from spec content
    * @param {string} content
+   * @param {{numberedOnly?: boolean}} [options] - numberedOnly: skip checklist items without a TASK id
    * @returns {Array}
    */
-  parseTasks(content) {
+  parseTasks(content, { numberedOnly = false } = {}) {
     const tasks = [];
     const taskRegex = /- \[([ xX])\]\s+(TASK[-\w]+)?:?\s*(.+)/g;
 
     let match;
     let order = 0;
     while ((match = taskRegex.exec(content)) !== null) {
+      if (numberedOnly && !match[2]) continue;
       const completed = match[1].toLowerCase() === 'x';
       const id = match[2] || `TASK-${order + 1}`;
       const title = match[3].trim();
