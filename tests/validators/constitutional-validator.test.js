@@ -53,6 +53,17 @@ describe('ConstitutionalValidator', () => {
       expect(messages(articleV.violations)).not.toContain('No traceability matrix found');
     });
 
+    it('tells how to write the matrix when it is missing (CHANGE-011)', async () => {
+      await write('src/lib/rsvp.test.ts', "it('REQ-RSVP-001', () => {});");
+      const articleV = findingsFor(await validate(), 'CONST-005');
+      const finding = [...articleV.violations, ...articleV.warnings].find(f =>
+        /No traceability matrix/.test(f.message)
+      );
+      expect(finding.recommendation).toContain(
+        'musubi-trace matrix --format markdown --output storage/traceability/matrix.md'
+      );
+    });
+
     it('finds multi-segment ids in co-located TypeScript tests (CHANGE-010)', async () => {
       await write('storage/traceability/matrix.md', '| REQ-MEETING-RSVP-004 | ✓ |');
       await write(

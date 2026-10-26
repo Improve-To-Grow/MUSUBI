@@ -8,6 +8,26 @@
 const fs = require('fs-extra');
 const path = require('path');
 
+/**
+ * JSON as Prettier formats it with the scaffold's .prettierrc.json, so a new project passes
+ * `prettier --check .`: an array of strings stays on one line when it fits in 100 columns
+ * @param {object} value
+ * @returns {string}
+ */
+function toPrettierJson(value) {
+  const json = JSON.stringify(value, null, 2).replace(
+    /^( *)("[^"\n]+": )?\[\n((?: +"[^"\n]*",?\n)+) *\]/gm,
+    (block, indent, key = '', items) => {
+      const line = `${indent}${key}[${items
+        .trim()
+        .split(/,?\n\s*/)
+        .join(', ')}]`;
+      return line.length <= 100 ? line : block;
+    }
+  );
+  return `${json}\n`;
+}
+
 /** tsconfig.json of a library or CLI: compiled to dist/ */
 const LIBRARY_TSCONFIG = {
   compilerOptions: {
@@ -55,7 +75,10 @@ const NEXT_TSCONFIG = {
 /**
  * package.json of an application on the ITG stack (steering/tech.md): Next.js on Cloudflare
  * Workers through OpenNext, with the tools the scaffold's CI runs (Vitest, Playwright, ESLint with
- * eslint-plugin-security, Prettier, knip)
+ * eslint-plugin-security, Prettier, knip) and the packages their scaffold configuration loads.
+ * Ranges are the current majors that work together: OpenNext needs Next.js 16.4.1 or later and
+ * typescript-eslint supports TypeScript up to 6.0. Packages that code imports later, such as
+ * firebase and zod, are added with that code, so knip does not fail on unused dependencies
  * @param {string} name - Package name
  * @param {string} [description] - Project description
  * @returns {object}
@@ -81,24 +104,26 @@ function nextPackageJson(name, description = '') {
       'audit:catalogue': 'node scripts/checks/check-audit-catalogue.mjs --write',
     },
     dependencies: {
-      next: '^15.0.0',
+      next: '^16.4.1',
       react: '^19.0.0',
       'react-dom': '^19.0.0',
-      firebase: '^11.0.0',
-      zod: '^3.23.0',
     },
     devDependencies: {
-      typescript: '^5.0.0',
+      typescript: '~6.0.0',
       '@types/node': '^22.0.0',
       '@types/react': '^19.0.0',
-      '@opennextjs/cloudflare': '^1.0.0',
-      wrangler: '^4.0.0',
-      vitest: '^3.0.0',
-      '@playwright/test': '^1.48.0',
-      eslint: '^9.0.0',
-      'eslint-plugin-security': '^3.0.0',
+      '@opennextjs/cloudflare': '^1.20.0',
+      wrangler: '^4.148.0',
+      vitest: '^5.0.0',
+      '@vitest/coverage-v8': '^5.0.0',
+      '@playwright/test': '^1.51.1',
+      eslint: '^10.0.0',
+      '@eslint/js': '^10.0.0',
+      'typescript-eslint': '^8.72.0',
+      'eslint-plugin-security': '^4.0.0',
+      globals: '^17.0.0',
       prettier: '^3.0.0',
-      knip: '^5.0.0',
+      knip: '^6.0.0',
     },
   };
 }
@@ -139,7 +164,7 @@ async function generateDependencyFiles(primaryLang, answers) {
               prettier: '^3.0.0',
             },
           };
-      await fs.writeFile('package.json', JSON.stringify(packageJson, null, 2) + '\n');
+      await fs.writeFile('package.json', toPrettierJson(packageJson));
     }
 
     // ITG-GIT-04: the Node version of an application is pinned in .nvmrc
@@ -150,7 +175,7 @@ async function generateDependencyFiles(primaryLang, answers) {
     // Generate tsconfig.json
     if (!(await fs.pathExists('tsconfig.json'))) {
       const tsconfig = application ? NEXT_TSCONFIG : LIBRARY_TSCONFIG;
-      await fs.writeFile('tsconfig.json', JSON.stringify(tsconfig, null, 2) + '\n');
+      await fs.writeFile('tsconfig.json', toPrettierJson(tsconfig));
     }
   } else if (primaryLang === 'rust') {
     // Check if Cargo.toml already exists

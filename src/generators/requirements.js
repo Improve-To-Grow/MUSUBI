@@ -192,7 +192,8 @@ class RequirementsGenerator {
    */
   generateRequirementId(content, component = 'FEATURE') {
     const prefix = `REQ-${component.toUpperCase()}-`;
-    const regex = new RegExp(`${this.escapeRegex(prefix)}(\\d+)`, 'g');
+    // Only requirement headings count: the template's user stories and coverage table name ids too
+    const regex = new RegExp(`^###\\s+${this.escapeRegex(prefix)}(\\d+)\\b`, 'gm');
 
     let maxNum = 0;
     let match;

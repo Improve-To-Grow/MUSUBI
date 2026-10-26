@@ -1,0 +1,28 @@
+# format:check covers the project's own code (ITG-GIT-16); generated files and the files that
+# MUSUBI writes for the coding agents stay as their tools write them
+node_modules/
+.next/
+.open-next/
+.wrangler/
+coverage/
+playwright-report/
+test-results/
+next-env.d.ts
+package-lock.json
+
+# MUSUBI project memory and agent files
+steering/
+storage/
+templates/
+.claude/
+.cursor/
+.gemini/
+.codex/
+.qwen/
+.windsurf/
+.github/prompts/
+.github/AGENTS.md
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+QWEN.md

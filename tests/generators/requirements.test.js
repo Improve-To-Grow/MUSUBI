@@ -45,6 +45,16 @@ describe('RequirementsGenerator', () => {
       const id = generator.generateRequirementId(content, 'FEATURE');
       expect(id).toBe('REQ-FEATURE-006');
     });
+
+    test('counts requirement headings only, not ids in stories and tables (CHANGE-011)', () => {
+      const content = [
+        '## User Stories',
+        '- REQ-MEETING-RSVP-001',
+        '| REQ-MEETING-RSVP-003 | P0 |',
+        '### REQ-MEETING-RSVPX-005: Another area',
+      ].join('\n');
+      expect(generator.generateRequirementId(content, 'MEETING-RSVP')).toBe('REQ-MEETING-RSVP-001');
+    });
   });
 
   describe('generateEARSStatement', () => {

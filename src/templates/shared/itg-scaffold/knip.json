@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "scripts/**/*.mjs",
+    "src/lib/features/registry.ts",
+    "src/lib/logs/route-events.ts",
+    "src/lib/logs/allowlist.ts"
+  ],
+  "ignoreDependencies": ["pg"]
+}

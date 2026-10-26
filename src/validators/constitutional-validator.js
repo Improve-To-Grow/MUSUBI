@@ -314,7 +314,7 @@ class ConstitutionalValidator {
         articleName,
         false,
         'No traceability matrix found',
-        'Create coverage-matrix.md linking REQ → Design → Test'
+        'Run musubi-trace matrix --format markdown --output storage/traceability/matrix.md'
       );
     } else {
       this._recordFinding(

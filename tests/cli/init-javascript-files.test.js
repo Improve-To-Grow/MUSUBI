@@ -47,7 +47,7 @@ describe('init JavaScript files', () => {
 
     expect(pkg).toMatchObject({ name: 'meeting-app', private: true });
     expect(pkg.scripts).toMatchObject({ test: 'vitest run', 'format:check': 'prettier --check .' });
-    expect(Object.keys(pkg.dependencies)).toEqual(expect.arrayContaining(['next', 'react', 'zod']));
+    expect(Object.keys(pkg.dependencies)).toEqual(['next', 'react', 'react-dom']);
     expect(Object.keys(pkg.devDependencies)).toEqual(
       expect.arrayContaining(['vitest', 'knip', 'eslint-plugin-security', '@opennextjs/cloudflare'])
     );

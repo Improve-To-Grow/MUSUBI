@@ -1,0 +1,22 @@
+# ITG project (musubi init): dependencies, build output and test reports
+node_modules/
+.next/
+.open-next/
+.wrangler/
+coverage/
+playwright-report/
+test-results/
+next-env.d.ts
+
+# Local configuration and the files scripts/ci/materialize-config.mjs writes in CI;
+# credentials live only in the GitHub Environments (ITG-PLT-09)
+.env
+.env*.local
+.dev.vars
+.env.production
+.app-vars.json
+.relay-vars.json
+.secrets.json
+.relay-secrets.json
+.functions-secrets.json
+functions/.env.*

@@ -55,5 +55,5 @@
 
 ## Follow-ups
 
-- **Application starter files:** `musubi init` writes the ITG `package.json` but no `vitest.config.ts` with the coverage thresholds of ITG-TST-03, no ESLint or knip configuration and no Next.js app folder; the dependency ranges were not installed in a project yet.
-- **Release:** tag `v6.3.1-itg.3` to `v6.3.1-itg.7` when the branch is merged.
+- **Application starter files:** the Vitest, ESLint, knip and Prettier configuration and the dependency ranges are done in CHANGE-011; `musubi init` writes no Next.js app folder.
+- **Release:** tag `v6.3.1-itg.3` to `v6.3.1-itg.7` when the branch is merged (with `v6.3.1-itg.8`, CHANGE-011).

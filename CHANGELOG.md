@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.1-itg.8] - 2026-10-26
+
+The files `musubi init` writes for a new ITG application pass the scaffold's CI jobs (CHANGE-011).
+
+### Added
+
+- **Starter configuration in the ITG scaffold**: `.prettierrc.json` and `.prettierignore` (MUSUBI's agent, steering and storage files and build output ignored), `vitest.config.ts` (the `@/` alias, `tests/e2e/` left to Playwright, coverage on with the 60% thresholds of the `application` profile, ITG-TST-03), `eslint.config.mjs` (typescript-eslint, eslint-plugin-security over `src/`, `functions/` and `workers/`, `firebase-admin` restricted there, ITG-PLT-14), `knip.json` (CI scripts and the files they read as entries) and `.gitignore` (build output, test reports, local configuration and the credential files `materialize-config.mjs` writes in CI). A configuration the project has under another name (`.eslintrc.json`, `vite.config.ts`, `.prettierrc` and others) keeps ours out; `.gitignore` lines are appended to an existing file
+
+### Changed
+
+- **Current dependency majors for a new application**: Next.js 16.4.1 or later (OpenNext's minimum), TypeScript 6.0 (typescript-eslint supports up to 6.0), Vitest 5 with `@vitest/coverage-v8`, ESLint 10 with `@eslint/js`, typescript-eslint and `globals`, eslint-plugin-security 4, knip 6; firebase and zod are added with the code that imports them, so knip does not fail on a new project
+
+### Fixed
+
+- **`prettier --check .` passes on a new project**: the scaffold files are formatted with the scaffold's configuration, and `musubi init` writes `tsconfig.json` and `package.json` as Prettier formats them
+- **`musubi-requirements add` numbers after the requirement headings only**: the template's user stories and coverage table no longer push the first id to 004
+- **Article V** recommends `musubi-trace matrix --format markdown --output storage/traceability/matrix.md` when the matrix is missing, not a `coverage-matrix.md`
+
 ## [6.3.1-itg.7] - 2026-10-26
 
 Findings of a clean test run of 6.3.1-itg.6 in a new ITG project and an onboarded one (CHANGE-010).

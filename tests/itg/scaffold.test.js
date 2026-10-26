@@ -156,6 +156,69 @@ describe('musubi-onboard (REQ-ITG-011)', () => {
   });
 });
 
+describe('starter configuration (CHANGE-011)', () => {
+  it('passes the CI prettier job: prettier --check . with the scaffold config', async () => {
+    const { generateDependencyFiles } = require('../../src/cli/init-generators');
+    const cwd = process.cwd();
+    process.chdir(root);
+    try {
+      await generateDependencyFiles('javascript', {
+        projectName: 'app',
+        constitutionProfile: 'application',
+      });
+    } finally {
+      process.chdir(cwd);
+    }
+    const prettier = path.join(__dirname, '..', '..', 'node_modules', '.bin', 'prettier');
+    const result = spawnSync(prettier, ['--check', '.'], { cwd: root, encoding: 'utf8' });
+
+    expect(result.stdout + result.stderr).toContain('All matched files use Prettier code style');
+    expect(result.status).toBe(0);
+  });
+
+  it('keeps out a config that the project has under another name', async () => {
+    const project = fs.mkdtempSync(path.join(os.tmpdir(), 'musubi-itg-alt-'));
+    try {
+      fs.writeFileSync(path.join(project, '.eslintrc.json'), '{}');
+      fs.writeFileSync(path.join(project, 'vite.config.ts'), 'export default {};');
+      fs.writeFileSync(path.join(project, '.prettierrc'), '{}');
+      const { skipped } = await writeItgScaffold(project);
+      expect(skipped).toEqual(
+        expect.arrayContaining(['.eslintrc.json', 'vite.config.ts', '.prettierrc'])
+      );
+      for (const ours of ['eslint.config.mjs', 'vitest.config.ts', '.prettierrc.json']) {
+        expect(fs.existsSync(path.join(project, ours))).toBe(false);
+      }
+      expect(fs.existsSync(path.join(project, 'knip.json'))).toBe(true);
+    } finally {
+      fs.rmSync(project, { recursive: true, force: true });
+    }
+  });
+
+  it('appends the missing ignore lines to an existing .gitignore', async () => {
+    const project = fs.mkdtempSync(path.join(os.tmpdir(), 'musubi-itg-gitignore-'));
+    try {
+      fs.writeFileSync(
+        path.join(project, '.gitignore'),
+        '# MUSUBI code index (musubi-code)\n.scip/\nnode_modules/\n'
+      );
+      const { written } = await writeItgScaffold(project);
+      const gitignore = fs.readFileSync(path.join(project, '.gitignore'), 'utf8');
+      expect(written).toContain('.gitignore');
+      expect(
+        gitignore.startsWith('# MUSUBI code index (musubi-code)\n.scip/\nnode_modules/\n')
+      ).toBe(true);
+      expect(gitignore.match(/^node_modules\/$/gm)).toHaveLength(1);
+      expect(gitignore).toMatch(/^\.secrets\.json$/m);
+      expect(gitignore).not.toMatch(/^\.env\.example$/m);
+
+      expect((await writeItgScaffold(project)).skipped).toContain('.gitignore');
+    } finally {
+      fs.rmSync(project, { recursive: true, force: true });
+    }
+  });
+});
+
 describe('--help (II-A7)', () => {
   it('every script prints its header comment and exits 0 without doing its work', () => {
     const scripts = ['checks', 'ci'].flatMap(dir =>
