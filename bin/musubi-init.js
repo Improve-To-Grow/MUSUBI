@@ -660,6 +660,11 @@ async function generateSteering(answers, externalSpec = null) {
 
   const projectYml = buildProjectYml(answers, externalSpec);
   await fs.writeFile(path.join('steering', 'project.yml'), projectYml);
+  // musubi-upgrade reads the version the project was set up with from this marker
+  await fs.writeFile(
+    path.join('steering', '.musubi-version'),
+    `${require('../package.json').version}\n`
+  );
 
   // Generate workspace structure if applicable
   if (answers.projectStructure === 'workspace' || answers.projectStructure === 'microservices') {

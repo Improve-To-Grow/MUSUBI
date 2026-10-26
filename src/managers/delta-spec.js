@@ -200,6 +200,15 @@ class DeltaSpecManager {
   }
 
   /**
+   * Load a delta spec, or build one from the `musubi-change init` proposal of that id
+   * @param {string} id - Change ID
+   * @returns {DeltaSpec|null} Delta spec or null
+   */
+  find(id) {
+    return this.load(id) || this.importProposal(id);
+  }
+
+  /**
    * Build a delta spec from a proposal created by `musubi-change init`
    * (storage/changes/<id>.md), so approve/reject work on it
    * @param {string} id - Change ID
@@ -212,6 +221,10 @@ class DeltaSpecManager {
     }
 
     const content = fs.readFileSync(proposalPath, 'utf-8');
+    // change-log.md and other notes in the folder are not proposals
+    if (!/^\*\*Change ID\*\*:/m.test(content)) {
+      return null;
+    }
     const titleMatch = content.match(/^# (.+?)\s*$/m);
     const dateMatch = content.match(/^\*\*Date\*\*:\s*(\d{4}-\d{2}-\d{2})/m);
     const descriptionMatch = content.match(/^## Description\s*$([\s\S]*?)(?=^## |(?![\s\S]))/m);
@@ -230,7 +243,7 @@ class DeltaSpecManager {
       impactedAreas: [],
       before: null,
       after: null,
-      status: 'proposed',
+      status: proposalStatus(content),
       createdAt: dateMatch ? new Date(dateMatch[1]).toISOString() : now,
       updatedAt: now,
     };
@@ -252,8 +265,15 @@ class DeltaSpecManager {
     const deltas = [];
 
     for (const entry of entries) {
-      if (entry.isDirectory()) {
-        const delta = this.load(entry.name);
+      // A proposal of `musubi-change init` without a delta spec yet counts too
+      const proposalOnly =
+        entry.isFile() &&
+        entry.name.endsWith('.md') &&
+        !fs.existsSync(path.join(this.changesDir, entry.name.slice(0, -3), 'delta.json'));
+      if (entry.isDirectory() || proposalOnly) {
+        const delta = entry.isDirectory()
+          ? this.load(entry.name)
+          : this.importProposal(entry.name.slice(0, -3));
         if (delta) {
           // Apply filters
           if (status && delta.status !== status) continue;
@@ -278,7 +298,7 @@ class DeltaSpecManager {
       throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
     }
 
-    const delta = this.load(id) || this.importProposal(id);
+    const delta = this.find(id);
     if (!delta) {
       throw new Error(`Delta not found: ${id}`);
     }
@@ -515,7 +535,21 @@ class DeltaSpecManager {
   }
 }
 
+/**
+ * Status of a proposal from its **Status** line, in the delta spec statuses
+ * ("~~Proposed~~ → **Implemented**" is implemented; the older "Pending" is proposed)
+ */
+function proposalStatus(content) {
+  const line = content.match(/^\*\*Status\*\*:(.*)$/m)?.[1] || '';
+  const word = line
+    .replace(/~~[^~]*~~/g, '')
+    .match(/[A-Za-z]+/)?.[0]
+    ?.toLowerCase();
+  return !word || word === 'pending' ? 'proposed' : word;
+}
+
 module.exports = {
   DeltaSpecManager,
   DeltaType,
+  proposalStatus,
 };

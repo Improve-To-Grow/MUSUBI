@@ -116,9 +116,33 @@ describe('ChangeManager', () => {
     test('filters by status', async () => {
       await manager.initChange('CHANGE-006');
 
-      const changes = await manager.listChanges({ status: 'pending' });
+      const changes = await manager.listChanges({ status: 'proposed' });
 
       expect(changes.length).toBeGreaterThan(0);
+    });
+
+    test('reads the status from delta.json, else from the proposal (CHANGE-009)', async () => {
+      const changesDir = path.join(tmpDir, 'storage/changes');
+      await manager.initChange('CHANGE-010', { title: 'Approved' });
+      await fs.outputJson(path.join(changesDir, 'CHANGE-010/delta.json'), { status: 'approved' });
+      await fs.outputFile(
+        path.join(changesDir, 'CHANGE-011.md'),
+        '# Done\n\n**Change ID**: CHANGE-011\n**Date**: 2026-10-22\n**Status**: ~~Proposed~~ → ~~Approved~~ → **Implemented** (branch x)\n'
+      );
+      await fs.outputFile(path.join(changesDir, 'change-log.md'), '# Change Log\n');
+      await fs.outputJson(path.join(changesDir, 'CHANGE-012/delta.json'), {
+        target: 'REQ-RSVP-001',
+        status: 'proposed',
+        createdAt: '2026-10-26T10:00:00.000Z',
+      });
+
+      const changes = await manager.listChanges();
+
+      expect(changes.map(({ id, status }) => [id, status])).toEqual([
+        ['CHANGE-010', 'approved'],
+        ['CHANGE-011', 'implemented'],
+        ['CHANGE-012', 'proposed'],
+      ]);
     });
   });
 

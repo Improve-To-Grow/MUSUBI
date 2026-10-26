@@ -7,6 +7,20 @@ const fs = require('fs').promises;
 const path = require('path');
 const matter = require('gray-matter');
 
+// REQ-001, REQ-RSVP-001 and REQ-MEETING-RSVP-001
+const REQ_ID = 'REQ-(?:[A-Z0-9]+-)*\\d+';
+const CODE_FILE = /\.[cm]?[jt]sx?$/;
+const TEST_FILE = /\.(?:test|spec)\.[cm]?[jt]sx?$/;
+// Where MUSUBI writes each document; storage/specs is the older place of designs and tasks
+const DESIGN_DIRS = ['storage/design', 'storage/specs'];
+const TASK_DIRS = ['storage/tasks', 'storage/specs'];
+const CODE_DIRS = ['src', 'tests', 'test', '__tests__'];
+
+/** Requirement ids named in a text */
+function mentionedIds(text) {
+  return [...new Set(text.match(new RegExp(REQ_ID, 'g')) || [])];
+}
+
 /**
  * Traceability Service - Manages requirement-to-implementation traceability
  */
@@ -80,13 +94,13 @@ class TraceabilityService {
         }
       }
 
-      // Find linked implementations
+      // Find linked implementations and tests
       for (const impl of implementations) {
-        if (impl.requirements?.includes(req.id)) {
-          entry.links.implementations.push({
-            file: impl.file,
-            type: impl.type,
-          });
+        if (!impl.requirements?.includes(req.id)) continue;
+        if (impl.type === 'test') {
+          entry.links.tests.push({ file: impl.file, type: impl.type });
+        } else {
+          entry.links.implementations.push({ file: impl.file, type: impl.type });
           entry.status = 'implemented';
         }
       }
@@ -96,6 +110,9 @@ class TraceabilityService {
       }
       if (entry.links.implementations.length > 0) {
         matrix.coverage.implemented++;
+      }
+      if (entry.links.tests.length > 0) {
+        matrix.coverage.tested++;
       }
 
       matrix.requirements.push(entry);
@@ -140,7 +157,7 @@ class TraceabilityService {
         const { data: frontmatter, content: body } = matter(content);
 
         // Parse requirements from content
-        const reqRegex = /^###\s+(REQ-\d+[^:]*):?\s*(.*)$/gm;
+        const reqRegex = new RegExp(`^###\\s+(${REQ_ID}):?\\s*(.*)$`, 'gm');
         let match;
 
         while ((match = reqRegex.exec(body)) !== null) {
@@ -180,27 +197,20 @@ class TraceabilityService {
    * @returns {Promise<Array<Object>>}
    */
   async scanDesigns() {
-    const specsPath = path.join(this.projectPath, 'storage', 'specs');
     const designs = [];
 
-    try {
-      const files = await fs.readdir(specsPath);
-      const designFiles = files.filter(f => f.endsWith('-design.md'));
+    for (const filePath of await this.markdownFiles(DESIGN_DIRS, '-design.md')) {
+      const content = await fs.readFile(filePath, 'utf-8');
+      const { data: frontmatter, content: body } = matter(content);
+      const file = path.basename(filePath);
 
-      for (const file of designFiles) {
-        const filePath = path.join(specsPath, file);
-        const content = await fs.readFile(filePath, 'utf-8');
-        const { data: frontmatter } = matter(content);
-
-        designs.push({
-          id: path.basename(file, '-design.md'),
-          title: frontmatter.title || file,
-          requirements: frontmatter.requirements || [],
-          path: filePath,
-        });
-      }
-    } catch {
-      // Specs directory doesn't exist
+      designs.push({
+        id: path.basename(file, '-design.md'),
+        title: frontmatter.title || file,
+        // Declared in frontmatter or named in the document
+        requirements: [...new Set([...(frontmatter.requirements || []), ...mentionedIds(body)])],
+        path: filePath,
+      });
     }
 
     return designs;
@@ -211,74 +221,90 @@ class TraceabilityService {
    * @returns {Promise<Array<Object>>}
    */
   async scanTasks() {
-    const specsPath = path.join(this.projectPath, 'storage', 'specs');
     const tasks = [];
 
-    try {
-      const files = await fs.readdir(specsPath);
-      const taskFiles = files.filter(f => f.endsWith('-tasks.md'));
+    for (const filePath of await this.markdownFiles(TASK_DIRS, '-tasks.md')) {
+      const file = path.basename(filePath);
+      const content = await fs.readFile(filePath, 'utf-8');
+      const { data: frontmatter, content: body } = matter(content);
 
-      for (const file of taskFiles) {
-        const filePath = path.join(specsPath, file);
-        const content = await fs.readFile(filePath, 'utf-8');
-        const { data: frontmatter, content: body } = matter(content);
-
-        // Parse tasks from content
-        const taskRegex = /^-\s+\[([ x])\]\s+(.+?)(?:\s*\(([^)]+)\))?$/gm;
-        let match;
-        let taskIndex = 0;
-
-        while ((match = taskRegex.exec(body)) !== null) {
-          tasks.push({
-            id: `${path.basename(file, '-tasks.md')}-T${++taskIndex}`,
-            title: match[2],
-            status: match[1] === 'x' ? 'done' : 'todo',
-            requirement: frontmatter.requirement || null,
-            requirements: frontmatter.requirements || [],
-            path: filePath,
-          });
-        }
+      // musubi-tasks sections: ### TASK-001: title, **Status**, the REQ ids they cover
+      const sections = body
+        .split(/^(?=###\s+TASK-\d+:)/m)
+        .filter(part => /^###\s+TASK-\d+:/.test(part));
+      for (const section of sections) {
+        const [, id, title] = section.match(/^###\s+(TASK-\d+):\s*(.+)$/m);
+        const status = section.match(/^\*\*Status\*\*:\s*(.+)$/m)?.[1] || '';
+        tasks.push({
+          id,
+          title: title.trim(),
+          status: /done|complete/i.test(status) ? 'done' : 'todo',
+          requirement: null,
+          requirements: mentionedIds(section),
+          path: filePath,
+        });
       }
-    } catch {
-      // Specs directory doesn't exist
+      // Without sections, checklist items are the tasks: - [ ] title
+      if (sections.length > 0) continue;
+
+      const taskRegex = /^-\s+\[([ x])\]\s+(.+?)(?:\s*\(([^)]+)\))?$/gm;
+      let match;
+      let taskIndex = 0;
+
+      while ((match = taskRegex.exec(body)) !== null) {
+        tasks.push({
+          id: `${path.basename(file, '-tasks.md')}-T${++taskIndex}`,
+          title: match[2],
+          status: match[1] === 'x' ? 'done' : 'todo',
+          requirement: frontmatter.requirement || null,
+          requirements: frontmatter.requirements || [],
+          path: filePath,
+        });
+      }
     }
 
     return tasks;
   }
 
   /**
-   * Scan implementations for requirement tags
+   * Markdown files ending in `suffix` in the given project directories
+   * @param {string[]} dirs - Project-relative directories
+   * @param {string} suffix - File name suffix
+   * @returns {Promise<string[]>}
+   */
+  async markdownFiles(dirs, suffix) {
+    const files = [];
+    for (const dir of dirs) {
+      const dirPath = path.join(this.projectPath, dir);
+      const names = await fs.readdir(dirPath).catch(() => []);
+      files.push(
+        ...names.filter(name => name.endsWith(suffix)).map(name => path.join(dirPath, name))
+      );
+    }
+    return files;
+  }
+
+  /**
+   * Scan code and test files for the requirement ids they name
    * @returns {Promise<Array<Object>>}
    */
   async scanImplementations() {
-    const srcPath = path.join(this.projectPath, 'src');
     const implementations = [];
 
-    try {
-      await this.walkDirectory(srcPath, async filePath => {
-        if (filePath.endsWith('.js') || filePath.endsWith('.ts')) {
-          const content = await fs.readFile(filePath, 'utf-8');
+    for (const dir of CODE_DIRS) {
+      await this.walkDirectory(path.join(this.projectPath, dir), async filePath => {
+        if (!CODE_FILE.test(filePath)) return;
 
-          // Look for @implements or @requirement tags
-          const tagRegex = /@(?:implements|requirement)\s+(REQ-\d+[^\s]*)/g;
-          let match;
-          const reqs = [];
-
-          while ((match = tagRegex.exec(content)) !== null) {
-            reqs.push(match[1]);
-          }
-
-          if (reqs.length > 0) {
-            implementations.push({
-              file: path.relative(this.projectPath, filePath),
-              type: 'source',
-              requirements: reqs,
-            });
-          }
+        // Any named requirement id links the file, as musubi-trace counts it
+        const reqs = mentionedIds(await fs.readFile(filePath, 'utf-8'));
+        if (reqs.length > 0) {
+          implementations.push({
+            file: path.relative(this.projectPath, filePath),
+            type: dir === 'src' && !TEST_FILE.test(filePath) ? 'source' : 'test',
+            requirements: reqs,
+          });
         }
       });
-    } catch {
-      // Source directory doesn't exist
     }
 
     return implementations;

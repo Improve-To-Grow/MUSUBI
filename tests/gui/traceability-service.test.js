@@ -334,4 +334,42 @@ describe('TraceabilityService', () => {
       expect(files).toHaveLength(1);
     });
   });
+
+  describe('MUSUBI storage layout (CHANGE-009)', () => {
+    it('links multi-segment ids to designs, tasks, code and tests as musubi-trace does', async () => {
+      const write = (rel, content) => fs.outputFile(path.join(tempDir, rel), content);
+      await write(
+        'storage/specs/meeting-rsvp-requirements.md',
+        '### REQ-MEETING-RSVP-001: Record\n\n### REQ-MEETING-RSVP-002: Summary\n'
+      );
+      await write(
+        'storage/design/meeting-rsvp-design.md',
+        '# Design\n\nCovers REQ-MEETING-RSVP-001.\n'
+      );
+      await write(
+        'storage/tasks/meeting-rsvp-tasks.md',
+        '### TASK-001: Store RSVPs\n\n**Status**: Done\n\n- REQ-MEETING-RSVP-001\n\n- [ ] criterion\n'
+      );
+      await write('src/lib/rsvp.ts', '// REQ-MEETING-RSVP-001\nexport const rsvp = 1;\n');
+      await write('src/lib/rsvp.test.ts', "it('REQ-MEETING-RSVP-001', () => {});\n");
+
+      const matrix = await service.buildMatrix();
+      const [first, second] = matrix.requirements;
+
+      expect(matrix.requirements.map(r => r.id)).toEqual([
+        'REQ-MEETING-RSVP-001',
+        'REQ-MEETING-RSVP-002',
+      ]);
+      expect(first.links.designs.map(d => d.id)).toEqual(['meeting-rsvp']);
+      expect(first.links.tasks).toEqual([
+        expect.objectContaining({ id: 'TASK-001', status: 'done' }),
+      ]);
+      expect(first.links.implementations.map(i => i.file)).toEqual([
+        path.join('src', 'lib', 'rsvp.ts'),
+      ]);
+      expect(first.links.tests.map(t => t.file)).toEqual([path.join('src', 'lib', 'rsvp.test.ts')]);
+      expect(second.status).toBe('unlinked');
+      expect(matrix.coverage).toEqual({ total: 2, linked: 1, implemented: 1, tested: 1 });
+    });
+  });
 });

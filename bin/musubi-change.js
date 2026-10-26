@@ -20,6 +20,8 @@
 
 const { Command } = require('commander');
 const chalk = require('chalk');
+const fs = require('fs');
+const path = require('path');
 const ChangeManager = require('../src/managers/change.js');
 const { DeltaSpecManager } = require('../src/managers/delta-spec.js');
 const { DeltaFormatValidator } = require('../src/validators/delta-format.js');
@@ -106,6 +108,10 @@ program
         console.log(chalk.red(`  ${result.stats.removed} files removed`));
         console.log(chalk.yellow(`  ${result.stats.renamed} files renamed`));
 
+        // archive takes implemented changes only
+        new DeltaSpecManager(workspaceRoot).updateStatus(changeId, 'implemented');
+        console.log(chalk.dim('  Status updated to: implemented'));
+
         console.log();
         console.log(chalk.yellow('Next steps:'));
         console.log(chalk.dim('1. Test the changes'));
@@ -123,7 +129,7 @@ program
   .command('archive <change-id>')
   .description('Archive completed change to specs/')
   .option('--changes <dir>', 'Changes directory', 'storage/changes')
-  .option('--specs <dir>', 'Specs archive directory', 'specs')
+  .option('--specs <dir>', 'Archive directory for the proposal', 'storage/archive')
   .option('--force', 'Force archive even if not in implemented status')
   .action(async (changeId, options) => {
     try {
@@ -141,19 +147,27 @@ program
         if (delta.status !== 'implemented' && !options.force) {
           console.log(chalk.yellow(`⚠ Change ${changeId} is in "${delta.status}" status.`));
           console.log(chalk.dim('Use --force to archive anyway, or update status first:'));
-          console.log(chalk.dim(`  musubi-change approve ${changeId}`));
+          if (delta.status === 'proposed') {
+            console.log(chalk.dim(`  musubi-change approve ${changeId}`));
+          }
           console.log(chalk.dim(`  # implement the change`));
           console.log(chalk.dim(`  musubi-change apply ${changeId}`));
           process.exit(1);
         }
 
+        if (delta.status !== 'implemented') deltaManager.updateStatus(changeId, 'implemented');
         const result = deltaManager.archive(changeId);
 
         console.log(chalk.green('✓ Change archived successfully'));
-        console.log(chalk.dim(`Merged to: ${result.mergedTo}`));
         console.log(chalk.dim(`Archive: ${result.archivePath}`));
-        console.log();
-        console.log(chalk.yellow('Delta merged to canonical specification'));
+        // The proposal of `musubi-change init` moves to the archive with its delta spec
+        if (fs.existsSync(path.join(workspaceRoot, options.changes, `${changeId}.md`))) {
+          const proposal = await changeManager.archiveChange(changeId, {
+            changesDir: options.changes,
+            specsDir: options.specs,
+          });
+          console.log(chalk.dim(`Proposal: ${proposal.archive}`));
+        }
       } else {
         // Fall back to ChangeManager (legacy workflow)
         const result = await changeManager.archiveChange(changeId, {
@@ -179,7 +193,7 @@ program
   .command('list')
   .description('List all change proposals')
   .option('--changes <dir>', 'Changes directory', 'storage/changes')
-  .option('--status <status>', 'Filter by status (pending|applied|archived)')
+  .option('--status <status>', 'Filter by status (proposed|approved|rejected|implemented)')
   .option('--format <format>', 'Output format (table|json)', 'table')
   .action(async options => {
     try {
@@ -210,16 +224,18 @@ program
       changes.forEach(change => {
         const statusColor =
           {
-            pending: chalk.yellow,
-            applied: chalk.blue,
-            archived: chalk.green,
+            proposed: chalk.yellow,
+            approved: chalk.blue,
+            rejected: chalk.red,
+            implemented: chalk.green,
           }[change.status] || chalk.white;
+        const title = change.title.length > 38 ? `${change.title.slice(0, 37)}…` : change.title;
 
         console.log(
           change.id.padEnd(20) +
-            change.title.padEnd(40) +
+            title.padEnd(40) +
             statusColor(change.status.padEnd(15)) +
-            change.date
+            change.date.slice(0, 10)
         );
       });
 
@@ -292,7 +308,7 @@ program
       const workspaceRoot = process.cwd();
       const deltaManager = new DeltaSpecManager(workspaceRoot);
 
-      const delta = deltaManager.load(changeId);
+      const delta = deltaManager.find(changeId);
       if (!delta) {
         console.error(chalk.red(`✗ Change not found: ${changeId}`));
         process.exit(1);
@@ -385,7 +401,7 @@ program
       console.log();
 
       // Load delta
-      const delta = deltaManager.load(changeId);
+      const delta = deltaManager.find(changeId);
       if (!delta) {
         console.error(chalk.red(`✗ Change not found: ${changeId}`));
         process.exit(1);
@@ -624,7 +640,6 @@ program
   .action(async options => {
     try {
       const workspaceRoot = process.cwd();
-      const path = require('path');
       const changesDir = path.join(workspaceRoot, options.changes);
       const validator = new DeltaFormatValidator({ strict: options.strict });
 
@@ -676,7 +691,7 @@ program
       const workspaceRoot = process.cwd();
       const deltaManager = new DeltaSpecManager(workspaceRoot);
 
-      const delta = deltaManager.load(changeId);
+      const delta = deltaManager.find(changeId);
       if (!delta) {
         console.error(chalk.red(`✗ Change not found: ${changeId}`));
         process.exit(1);

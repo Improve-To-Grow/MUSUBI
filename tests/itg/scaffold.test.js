@@ -140,6 +140,9 @@ describe('musubi-onboard (REQ-ITG-011)', () => {
         { cwd: existing, encoding: 'utf8' }
       );
       expect(config.stdout).toContain('Valid: ✓ Yes');
+      expect(fs.readFileSync(path.join(existing, 'steering/.musubi-version'), 'utf8')).toBe(
+        `${version}\n`
+      );
       for (const rel of [
         '.github/workflows/deploy.yml',
         'scripts/checks/check-route-guards.mjs',

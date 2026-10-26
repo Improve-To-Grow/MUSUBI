@@ -216,6 +216,15 @@ function getCurrentVersion(projectDir) {
     return fs.readFileSync(versionPath, 'utf8').trim();
   }
 
+  // musubi init and musubi-onboard of 6.3.1-itg.6 also record the version in project.yml
+  const projectYml = path.join(projectDir, 'steering', 'project.yml');
+  const recorded =
+    fs.existsSync(projectYml) &&
+    fs.readFileSync(projectYml, 'utf8').match(/^\s*musubi_version:\s*["']?([\w.-]+)/m);
+  if (recorded) {
+    return recorded[1];
+  }
+
   // Fallback: check if MUSUBI is initialized
   const steeringDir = path.join(projectDir, 'steering');
   if (fs.existsSync(steeringDir)) {
@@ -364,6 +373,9 @@ program
       console.log(chalk.red('\n⚠️  Some migrations failed. Please check the errors above.\n'));
       process.exit(1);
     }
+
+    // The migrations write their own version; the project is now at the target
+    await fs.writeFile(path.join(projectDir, 'steering', '.musubi-version'), `${targetVersion}\n`);
 
     console.log(chalk.green(`\n✅ Successfully upgraded to v${targetVersion}!\n`));
   });

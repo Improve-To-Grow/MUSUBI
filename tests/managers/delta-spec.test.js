@@ -190,6 +190,27 @@ describe('DeltaSpecManager', () => {
       expect(manager.load('CHANGE-007')).toEqual(updated);
     });
 
+    it('should not treat change-log.md as a proposal (CHANGE-009)', () => {
+      const changesDir = path.join(tempDir, 'storage', 'changes');
+      fs.mkdirSync(changesDir, { recursive: true });
+      fs.writeFileSync(path.join(changesDir, 'change-log.md'), '# Change Log\n');
+
+      expect(manager.find('change-log')).toBeNull();
+      expect(manager.list()).toEqual([]);
+    });
+
+    it('should find and list a proposal before it has a delta spec (CHANGE-009)', () => {
+      const changesDir = path.join(tempDir, 'storage', 'changes');
+      fs.mkdirSync(changesDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(changesDir, 'CHANGE-008.md'),
+        '# Scaffold\n\n**Change ID**: CHANGE-008\n**Status**: ~~Proposed~~ → **Implemented**\n'
+      );
+
+      expect(manager.find('CHANGE-008')).toMatchObject({ id: 'CHANGE-008', status: 'implemented' });
+      expect(manager.list().map(delta => delta.id)).toEqual(['CHANGE-008']);
+    });
+
     it('should throw when neither a delta nor a proposal exists', () => {
       expect(() => manager.updateStatus('CHANGE-404', 'approved')).toThrow(
         'Delta not found: CHANGE-404'
@@ -286,6 +307,14 @@ describe('DeltaFormatValidator', () => {
   });
 
   describe('validate', () => {
+    it('should accept the CHANGE-NNN ids of musubi-change init (CHANGE-009)', () => {
+      validator.validateId('CHANGE-001');
+      validator.validateId('DELTA-AUTH-001');
+      expect(validator.errors).toEqual([]);
+      validator.validateId('change-1');
+      expect(validator.errors).toHaveLength(1);
+    });
+
     it('should validate correct delta', () => {
       const delta = {
         id: 'DELTA-AUTH-001',

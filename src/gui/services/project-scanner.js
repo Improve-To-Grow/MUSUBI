@@ -126,12 +126,22 @@ class ProjectScanner {
    */
   parseConstitutionArticles(content) {
     const articles = [];
-    const articleRegex = /#{2,3}\s+Article\s*(\d+)[:\s]+(.+?)(?=\n#{2,3}|\n##|$)/gs;
+    // "## Article I: Testable-Core Principle" or "## Article 1: ..."
+    const articleRegex = /#{2,3}\s+Article\s*([IVX]+|\d+)[:\s]+(.+?)(?=\n#{2,3}|\n##|$)/gs;
+    const roman = { I: 1, V: 5, X: 10 };
+    const toNumber = value =>
+      /^\d+$/.test(value)
+        ? parseInt(value, 10)
+        : [...value].reduce(
+            (total, char, i) =>
+              total + (roman[char] < (roman[value[i + 1]] || 0) ? -roman[char] : roman[char]),
+            0
+          );
 
     let match;
     while ((match = articleRegex.exec(content)) !== null) {
       articles.push({
-        number: parseInt(match[1], 10),
+        number: toNumber(match[1]),
         title: match[2].trim().split('\n')[0],
         content: match[2].trim(),
       });
@@ -145,22 +155,20 @@ class ProjectScanner {
    * @returns {Promise<Array>}
    */
   async getSpecs() {
-    const specsPath = path.join(this.projectPath, 'storage', 'specs');
-
-    if (!(await fs.pathExists(specsPath))) {
-      return [];
-    }
-
-    const files = await fs.readdir(specsPath);
     const specs = [];
 
-    for (const file of files) {
-      if (!file.endsWith('.md')) continue;
+    // Requirements, designs and tasks: storage/specs, storage/design and storage/tasks
+    for (const dir of ['specs', 'design', 'tasks']) {
+      const dirPath = path.join(this.projectPath, 'storage', dir);
+      if (!(await fs.pathExists(dirPath))) continue;
 
-      const filePath = path.join(specsPath, file);
-      const spec = await this.parseSpec(filePath);
-      if (spec) {
-        specs.push(spec);
+      for (const file of await fs.readdir(dirPath)) {
+        if (!file.endsWith('.md')) continue;
+
+        const spec = await this.parseSpec(path.join(dirPath, file));
+        if (spec) {
+          specs.push(spec);
+        }
       }
     }
 
@@ -295,6 +303,19 @@ class ProjectScanner {
         order,
       });
       order++;
+    }
+
+    // musubi-tasks sections (### TASK-001: title, **Status** line) replace the checklist items,
+    // which are their acceptance criteria
+    const sections = content
+      .split(/^(?=###\s+TASK-\d+:)/m)
+      .filter(part => /^###\s+TASK-\d+:/.test(part));
+    if (sections.length > 0) {
+      return sections.map((section, index) => {
+        const [, id, title] = section.match(/^###\s+(TASK-\d+):\s*(.+)$/m);
+        const status = section.match(/^\*\*Status\*\*:\s*(.+)$/m)?.[1] || '';
+        return { id, title: title.trim(), completed: /done|complete/i.test(status), order: index };
+      });
     }
 
     return tasks;

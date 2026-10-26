@@ -19,7 +19,7 @@ A run of every MUSUBI CLI feature in a clean ITG test project (2026-10-22) found
 | Upstream | The fork is developed independently: no upstream merges, no upstream pull requests. FORK-07 now states this; the "stay mergeable with upstream" rules are removed from steering. |
 | Version scheme | Unchanged: `6.3.1-itg.N`. The base 6.3.1 stays fixed and N counts ITG releases. |
 | Branch | `feat/itg-playbook-steering`; a pull request into `ITG-adjustments` when the work is done. |
-| Scope | The P0, P1 and P2 findings. The P3 findings of the same run stay open (Follow-ups). |
+| Scope | The P0 to P3 findings of the run. |
 
 ## Requirements Changes
 
@@ -40,6 +40,9 @@ A run of every MUSUBI CLI feature in a clean ITG test project (2026-10-22) found
 - REQ-ITG-024: `musubi-tasks update` SHALL accept the task id with or without `TASK-`.
 - REQ-ITG-025: `musubi-validate complexity` SHALL measure TypeScript and ES module files.
 - REQ-ITG-026: Every CLI in `bin/` SHALL be listed in the `bin` field of `package.json`.
+- REQ-ITG-027: `musubi-change` SHALL treat a proposal made by `init` and its delta spec as one change: `show`, `impact`, `diff`, `list` and `status` SHALL find it in every status, `list` SHALL show its current status, `apply` SHALL mark it implemented, `archive` SHALL move both records to `storage/archive/`, and `validate-all` SHALL accept `CHANGE-NNN` ids.
+- REQ-ITG-028: `musubi-gui matrix` SHALL read the requirement ids, designs and tasks where MUSUBI writes them and SHALL link a requirement to every design, task, code and test file that names it; `musubi-gui status` SHALL count the constitution articles and the `### TASK-NNN` tasks.
+- REQ-ITG-029: `musubi init` and `musubi-onboard` SHALL record the MUSUBI version in `steering/.musubi-version`, and `musubi-upgrade` SHALL set it to the target version after an upgrade.
 
 ## Implementation
 
@@ -54,17 +57,19 @@ A run of every MUSUBI CLI feature in a clean ITG test project (2026-10-22) found
 - **Project configuration:** `buildProjectYml` in `src/cli/init-generators.js` (used by `bin/musubi-init.js`); `bin/musubi-onboard.js` (`schema_version`, `package_type`, framework purpose `runtime`); `src/schemas/project-schema.json` (constitution profile fields, `external_specs`, languages); `migrateToV2` in `src/validators/project-validator.js`.
 - **Design:** `generateTraceabilityMatrix`, `addADR` and `findADRInsertionPoint` in `src/generators/design.js`; the `add-adr` options and the `trace` table in `bin/musubi-design.js`.
 - **Tasks, complexity, bin:** `updateStatus` in `src/generators/tasks.js`; `validateComplexity` in `src/validators/constitution.js` uses `CODE_EXTENSIONS`; `package.json` `bin` lists `musubi-checkpoint`, `musubi-costs` and `musubi-dashboard`.
+- **Change management:** `find`, `proposalStatus` and proposals in `list` (`src/managers/delta-spec.js`); real statuses, delta-only changes and the `storage/archive` default in `src/managers/change.js`; `CHANGE-NNN` in `ID_PATTERN` (`src/validators/delta-format.js`); `show`, `impact`, `diff`, `apply`, `archive` and the `list` table in `bin/musubi-change.js`.
+- **GUI:** `src/gui/services/traceability-service.js` (id pattern, `storage/design`, `storage/tasks`, `TASK-NNN` sections, code and test mentions); `src/gui/services/project-scanner.js` (Roman-numeral articles, the three storage folders, `TASK-NNN` sections).
+- **Upgrade:** `bin/musubi-init.js` and `bin/musubi-onboard.js` write `steering/.musubi-version`; `getCurrentVersion` and the end of the upgrade in `bin/musubi-upgrade.js`.
 - **Scaffold and policies:** `ci.yml` constitution job; ITG-CI-01, ITG-GIT-17, ITG-TST-03, the minimum standard of `operations.md` and the development commands of `tech.md` name the real checks.
 
 ## Verification
 
 - `npm test`: 179 suites, 5036 tests; 5026 pass. The 10 failures are the scip-python tests that fail the same way on `ITG-adjustments` in this environment.
-- New tests: the template format, multi-segment ids and whole-word matching of the EARS parser (`tests/generators/requirements.test.js`); TypeScript tests, Vitest thresholds, `storage/specs` and `storage/traceability` (`tests/validators/constitution.test.js`); the matrix in `storage/traceability/` (`tests/validators/constitutional-validator.test.js`); co-located tests (`tests/analyzers/traceability.test.js`); the `ci.yml` constitution job and the onboard profile (`tests/itg/scaffold.test.js`); `CONST-007: critical` (`tests/cli/init-constitution-profile.test.js`, `tests/itg/init-steering.test.js`); Article IX in an ITG project (`tests/validators/constitutional-validator.test.js`); `--help` of every scaffold script (`tests/itg/scaffold.test.js`); `musubi-requirements add` with options (`tests/cli/musubi-requirements-add.test.js`, which fails on the previous CLI); the init and onboard `project.yml` against the schema and the migration of the old init format (`tests/project-validator.test.js`, `tests/itg/scaffold.test.js`); design trace and ADR insertion (`tests/generators/design.test.js`); `TASK-` ids (`tests/generators/tasks.test.js`); TypeScript in `complexity` (`tests/validators/constitution.test.js`); the `bin` list (`tests/cli/package-bin.test.js`).
+- New tests: the template format, multi-segment ids and whole-word matching of the EARS parser (`tests/generators/requirements.test.js`); TypeScript tests, Vitest thresholds, `storage/specs` and `storage/traceability` (`tests/validators/constitution.test.js`); the matrix in `storage/traceability/` (`tests/validators/constitutional-validator.test.js`); co-located tests (`tests/analyzers/traceability.test.js`); the `ci.yml` constitution job and the onboard profile (`tests/itg/scaffold.test.js`); `CONST-007: critical` (`tests/cli/init-constitution-profile.test.js`, `tests/itg/init-steering.test.js`); Article IX in an ITG project (`tests/validators/constitutional-validator.test.js`); `--help` of every scaffold script (`tests/itg/scaffold.test.js`); `musubi-requirements add` with options (`tests/cli/musubi-requirements-add.test.js`, which fails on the previous CLI); the init and onboard `project.yml` against the schema and the migration of the old init format (`tests/project-validator.test.js`, `tests/itg/scaffold.test.js`); design trace and ADR insertion (`tests/generators/design.test.js`); `TASK-` ids (`tests/generators/tasks.test.js`); TypeScript in `complexity` (`tests/validators/constitution.test.js`); the `bin` list (`tests/cli/package-bin.test.js`); the `musubi-change` flow (`tests/cli/musubi-change-flow.test.js`, `tests/managers/change.test.js`, `tests/managers/delta-spec.test.js`); the GUI matrix and status on the MUSUBI layout (`tests/gui/traceability-service.test.js`, `tests/gui/project-scanner.test.js`); the upgrade version (`tests/cli/musubi-upgrade-version.test.js`, `tests/itg/scaffold.test.js`).
 - `npm run lint` and `npm run format:check` pass.
 - In the clean ITG test project of 2026-10-22, with this branch's code: the requirements written in the template's multi-line format validate (5 of 5); `musubi-validate constitution` passes 9 of 9 articles; `musubi-validate project` passes, and fails with a CRITICAL VII-5 finding once a 63-line function is added and `CONST-007: critical` is set; `musubi-trace ci-check` counts the co-located test and fails on the two requirements that have no code or tests.
 
 ## Follow-ups (from the same run)
 
-- **P3:** the `musubi-change` CLI (id format, `show`, `impact`, `archive`); `musubi-gui matrix` against `status`; the `6.0.0` marker of `musubi-upgrade check`.
 - **Release:** tag `v6.3.1-itg.3` to `v6.3.1-itg.6` when the branch is merged; `ci.yml` installs MUSUBI by that tag.
 - **Playbook:** report that §8.1's constitution check is `musubi-validate project` plus `musubi-trace ci-check`, not `musubi validate`.

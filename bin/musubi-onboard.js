@@ -89,6 +89,8 @@ async function main() {
   // Generate project.yml
   await generateProjectYml(projectConfig, techStack, directoryAnalysis);
   console.log(chalk.gray('  Created steering/project.yml'));
+  // musubi-upgrade reads the version the project was set up with from this marker
+  await fs.writeFile('steering/.musubi-version', `${require('../package.json').version}\n`);
 
   // Generate structure.md
   await generateStructureMd(directoryAnalysis);

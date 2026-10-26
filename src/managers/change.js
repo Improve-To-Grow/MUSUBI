@@ -8,6 +8,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const glob = require('glob');
+const { proposalStatus } = require('./delta-spec');
 
 class ChangeManager {
   constructor(workspaceRoot) {
@@ -118,7 +119,7 @@ class ChangeManager {
    */
   async archiveChange(changeId, options = {}) {
     const changesDir = path.join(this.workspaceRoot, options.changesDir || 'storage/changes');
-    const specsDir = path.join(this.workspaceRoot, options.specsDir || 'specs');
+    const specsDir = path.join(this.workspaceRoot, options.specsDir || 'storage/archive');
     const sourceFile = path.join(changesDir, `${changeId}.md`);
     const archiveFile = path.join(specsDir, 'changes', `${changeId}.md`);
 
@@ -159,20 +160,34 @@ class ChangeManager {
     for (const file of files) {
       const content = await fs.readFile(file, 'utf-8');
       const changeId = path.basename(file, '.md');
+      // change-log.md and other notes in the folder are not proposals
+      if (!/^\*\*Change ID\*\*:/m.test(content)) continue;
 
       // Extract title and date
       const titleMatch = content.match(/# (.+)/);
       const dateMatch = content.match(/\*\*Date\*\*: (.+)/);
-
-      // Determine status (simplified - could be more sophisticated)
-      const status = 'pending'; // In real implementation, track applied/archived status
+      const delta = await readDelta(changesDir, changeId);
 
       changes.push({
         id: changeId,
         title: titleMatch ? titleMatch[1] : changeId,
-        date: dateMatch ? dateMatch[1] : 'Unknown',
-        status,
+        date: dateMatch ? dateMatch[1].trim() : 'Unknown',
+        // approve, reject and apply record the status in <id>/delta.json
+        status: delta?.status || proposalStatus(content),
         file: path.relative(this.workspaceRoot, file),
+      });
+    }
+
+    // Delta specs made by `musubi-change create` have no proposal file
+    for (const entry of await fs.readdir(changesDir, { withFileTypes: true })) {
+      const delta = entry.isDirectory() && (await readDelta(changesDir, entry.name));
+      if (!delta || changes.some(change => change.id === entry.name)) continue;
+      changes.push({
+        id: entry.name,
+        title: delta.target || entry.name,
+        date: (delta.createdAt || 'Unknown').slice(0, 10),
+        status: delta.status,
+        file: path.relative(this.workspaceRoot, path.join(changesDir, entry.name, 'delta.md')),
       });
     }
 
@@ -228,7 +243,7 @@ class ChangeManager {
 
 **Change ID**: {{changeId}}  
 **Date**: {{date}}  
-**Status**: Pending
+**Status**: Proposed
 
 ## Description
 
@@ -466,6 +481,14 @@ class ChangeManager {
     await fs.mkdirp(specsDir);
     return delta;
   }
+}
+
+/**
+ * The delta spec of a change (<changesDir>/<id>/delta.json), or null
+ */
+async function readDelta(changesDir, changeId) {
+  const jsonPath = path.join(changesDir, changeId, 'delta.json');
+  return (await fs.pathExists(jsonPath)) ? fs.readJson(jsonPath) : null;
 }
 
 module.exports = ChangeManager;

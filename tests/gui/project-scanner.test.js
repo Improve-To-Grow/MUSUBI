@@ -229,4 +229,33 @@ WHEN user clicks, the system shall respond.
       expect(result.nodes.some(n => n.id === 'TASK-001')).toBe(true);
     });
   });
+
+  describe('MUSUBI storage layout (CHANGE-009)', () => {
+    it('counts Roman-numeral articles and the TASK sections in storage/tasks', async () => {
+      await fs.outputFile(
+        path.join(tempDir, 'steering/rules/constitution.md'),
+        '# Constitution\n\n## Article I: Testable-Core\nText\n\n## Article IX: Integration-First\nText\n'
+      );
+      await fs.outputFile(
+        path.join(tempDir, 'storage/specs/rsvp-requirements.md'),
+        '### REQ-RSVP-001: Record\n'
+      );
+      await fs.outputFile(
+        path.join(tempDir, 'storage/tasks/rsvp-tasks.md'),
+        '### TASK-001: Store\n\n**Status**: Done\n\n- [ ] criterion\n\n### TASK-002: List\n\n**Status**: Not Started\n'
+      );
+
+      const project = await scanner.scan();
+      const tasks = project.specs.flatMap(spec => spec.tasks);
+
+      expect(project.constitution.articles.map(a => a.number)).toEqual([1, 9]);
+      expect(project.specs.flatMap(spec => spec.requirements).map(r => r.id)).toEqual([
+        'REQ-RSVP-001',
+      ]);
+      expect(tasks.map(({ id, completed }) => [id, completed])).toEqual([
+        ['TASK-001', true],
+        ['TASK-002', false],
+      ]);
+    });
+  });
 });

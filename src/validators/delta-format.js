@@ -13,8 +13,9 @@ const { DeltaType } = require('../managers/delta-spec');
  * Validation rules for delta specifications
  */
 const ValidationRules = {
-  // ID format: PREFIX-IDENTIFIER (e.g., DELTA-AUTH-001, CHG-UI-002)
-  ID_PATTERN: /^[A-Z]+-[A-Z0-9]+-\d{3}$/,
+  // ID format: PREFIX-IDENTIFIER-NNN (e.g., DELTA-AUTH-001, CHG-UI-002) or PREFIX-NNN, the
+  // CHANGE-001 that `musubi-change init` creates
+  ID_PATTERN: /^[A-Z]+(?:-[A-Z0-9]+)?-\d{3}$/,
 
   // Delta marker in markdown: [TYPE] ID: Description
   MARKER_PATTERN: /^\[([A-Z]+)\]\s+([A-Z]+-[A-Z0-9]+-\d{3}):\s+(.+)$/,
@@ -81,7 +82,7 @@ class DeltaFormatValidator {
     if (!ValidationRules.ID_PATTERN.test(id)) {
       this.errors.push({
         rule: 'id-format',
-        message: `Invalid ID format: "${id}". Expected: PREFIX-IDENTIFIER-NNN (e.g., DELTA-AUTH-001)`,
+        message: `Invalid ID format: "${id}". Expected: PREFIX-IDENTIFIER-NNN or PREFIX-NNN (e.g., DELTA-AUTH-001, CHANGE-001)`,
         value: id,
       });
     }

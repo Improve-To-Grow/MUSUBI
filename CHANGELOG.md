@@ -26,6 +26,9 @@ The fork is now developed independently of upstream `nahisaho/MUSUBI` (CHANGE-00
 - **`musubi-tasks update`** accepts `TASK-003` as well as `003`
 - **`musubi-validate complexity`** measures `.ts`, `.tsx`, `.mjs`, `.cjs`, `.mts` and `.cts` files (it analyzed only `.js`); its description no longer claims a function limit, which `musubi-validate project` checks
 - **`musubi-checkpoint`, `musubi-costs` and `musubi-dashboard`** are installed as commands (they were missing from `bin`)
+- **`musubi-change` works as one flow**: `show`, `impact`, `diff` and `status` see a proposal made by `init` before it is approved; `list` shows the real status (from `approve`, `reject` and `apply`, else the proposal's Status line) instead of always "pending", includes changes made by `create` and skips `change-log.md`; `apply` marks the change implemented, so `archive` accepts it; `archive` moves the delta spec and the proposal to `storage/archive/` (no `specs/` folder in the project root); `validate-all` accepts `CHANGE-NNN` ids; new proposals start as Proposed
+- **`musubi-gui matrix` agrees with `status` and `musubi-trace`**: it reads multi-segment ids (`REQ-RSVP-001`), designs from `storage/design/` and tasks from `storage/tasks/`, and links a requirement to every design, task, code and test file that names it (tested coverage included). `musubi-gui status` counts the Roman-numeral constitution articles and the `### TASK-NNN` tasks
+- **`musubi-upgrade check`** no longer reports a new project as 6.0.0: `musubi init` and `musubi-onboard` write `steering/.musubi-version`, the version is also read from `project.yml` metadata, and an upgrade sets the marker to the target version
 
 ### Changed
 
