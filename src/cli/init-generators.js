@@ -77,7 +77,7 @@ const NEXT_TSCONFIG = {
  * Workers through OpenNext, with the tools the scaffold's CI runs (Vitest, Playwright, ESLint with
  * eslint-plugin-security, Prettier, knip) and the packages their scaffold configuration loads.
  * Ranges are the current majors that work together: OpenNext needs Next.js 16.4.1 or later and
- * typescript-eslint supports TypeScript up to 6.0. Packages that code imports later, such as
+ * typescript-eslint (through eslint-config-next) supports TypeScript up to 6.0. Packages that code imports later, such as
  * firebase and zod, are added with that code, so knip does not fail on unused dependencies
  * @param {string} name - Package name
  * @param {string} [description] - Project description
@@ -90,18 +90,20 @@ function nextPackageJson(name, description = '') {
     private: true,
     description,
     engines: { node: '>=22' },
+    // The create-next-app scripts plus the ones of the Project Setup Guide §10.2
     scripts: {
       dev: 'next dev',
       build: 'next build',
-      'build:worker': 'opennextjs-cloudflare build',
-      typecheck: 'tsc --noEmit',
-      lint: 'eslint .',
-      format: 'prettier --write .',
+      start: 'next start',
+      lint: 'eslint',
+      'cf:build': 'opennextjs-cloudflare build',
+      'cf:preview': 'opennextjs-cloudflare build && opennextjs-cloudflare preview',
       'format:check': 'prettier --check .',
+      'audit:catalogue': 'node scripts/checks/check-audit-catalogue.mjs --write',
+      typecheck: 'tsc --noEmit',
       test: 'vitest run',
       'test:e2e': 'playwright test',
       knip: 'knip',
-      'audit:catalogue': 'node scripts/checks/check-audit-catalogue.mjs --write',
     },
     dependencies: {
       next: '^16.4.1',
@@ -117,11 +119,11 @@ function nextPackageJson(name, description = '') {
       vitest: '^5.0.0',
       '@vitest/coverage-v8': '^5.0.0',
       '@playwright/test': '^1.51.1',
-      eslint: '^10.0.0',
-      '@eslint/js': '^10.0.0',
-      'typescript-eslint': '^8.72.0',
+      // ESLint 9, as create-next-app installs it: the React, import and jsx-a11y plugins of
+      // eslint-config-next support ESLint up to 9
+      eslint: '^9.39.0',
+      'eslint-config-next': '^16.4.1',
       'eslint-plugin-security': '^4.0.0',
-      globals: '^17.0.0',
       prettier: '^3.0.0',
       knip: '^6.0.0',
     },

@@ -176,6 +176,24 @@ describe('starter configuration (CHANGE-011)', () => {
     expect(result.status).toBe(0);
   });
 
+  it('adds the ITG rules of the Project Setup Guide §10.4 to the Next.js ESLint defaults', () => {
+    const config = fs.readFileSync(path.join(root, 'eslint.config.mjs'), 'utf8');
+    for (const text of [
+      "from 'eslint-config-next/core-web-vitals'",
+      "from 'eslint-config-next/typescript'",
+      "securityRules['security/detect-object-injection'] = 'off'",
+      "files: ['src/**', 'functions/**', 'workers/**']",
+      "group: ['firebase-admin', 'firebase-admin/*']",
+      "files: ['src/app/api/**', 'src/lib/**']",
+      "'no-console': 'error'",
+    ]) {
+      expect(config).toContain(text);
+    }
+    for (const rule of ['no-eval', 'no-implied-eval', 'no-new-func', 'no-script-url']) {
+      expect(config).toContain(`'${rule}': 'error'`);
+    }
+  });
+
   it('keeps out a config that the project has under another name', async () => {
     const project = fs.mkdtempSync(path.join(os.tmpdir(), 'musubi-itg-alt-'));
     try {

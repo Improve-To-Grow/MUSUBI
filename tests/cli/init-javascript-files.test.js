@@ -46,12 +46,29 @@ describe('init JavaScript files', () => {
     const pkg = await fs.readJson('package.json');
 
     expect(pkg).toMatchObject({ name: 'meeting-app', private: true });
-    expect(pkg.scripts).toMatchObject({ test: 'vitest run', 'format:check': 'prettier --check .' });
+    // The scripts of the Project Setup Guide §10.2 (CHANGE-011)
+    expect(pkg.scripts).toMatchObject({
+      'cf:build': 'opennextjs-cloudflare build',
+      'cf:preview': 'opennextjs-cloudflare build && opennextjs-cloudflare preview',
+      'format:check': 'prettier --check .',
+      'audit:catalogue': 'node scripts/checks/check-audit-catalogue.mjs --write',
+      test: 'vitest run',
+    });
     expect(Object.keys(pkg.dependencies)).toEqual(['next', 'react', 'react-dom']);
     expect(Object.keys(pkg.devDependencies)).toEqual(
-      expect.arrayContaining(['vitest', 'knip', 'eslint-plugin-security', '@opennextjs/cloudflare'])
+      expect.arrayContaining([
+        'vitest',
+        'knip',
+        'eslint-config-next',
+        'eslint-plugin-security',
+        '@opennextjs/cloudflare',
+      ])
     );
-    expect(pkg.devDependencies).not.toHaveProperty('jest');
+    // The scaffold's eslint.config.mjs loads only these; eslint-config-next brings typescript-eslint
+    for (const unused of ['jest', 'typescript-eslint', '@eslint/js', 'globals']) {
+      expect(pkg.devDependencies).not.toHaveProperty(unused);
+    }
+    expect(pkg.devDependencies.eslint).toMatch(/^\^9\./);
     expect(await fs.readFile('.nvmrc', 'utf8')).toBe('22\n');
   });
 
