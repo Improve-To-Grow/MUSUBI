@@ -52,6 +52,18 @@ describe('ConstitutionalValidator', () => {
       const articleV = findingsFor(await validate(), 'CONST-005');
       expect(messages(articleV.violations)).not.toContain('No traceability matrix found');
     });
+
+    it('finds multi-segment ids in co-located TypeScript tests (CHANGE-010)', async () => {
+      await write('storage/traceability/matrix.md', '| REQ-MEETING-RSVP-004 | ✓ |');
+      await write(
+        'src/lib/rsvp.test.ts',
+        "it('REQ-MEETING-RSVP-004: stores the answer', () => {});"
+      );
+      const articleV = findingsFor(await validate(), 'CONST-005');
+      expect(messages([...articleV.violations, ...articleV.warnings])).not.toMatch(
+        /do not reference requirement IDs/
+      );
+    });
   });
 
   describe('Article IX in an ITG project (ITG-TST-06)', () => {

@@ -412,4 +412,26 @@ test('login', () => {});
       expect(markdown).toContain('90.0%');
     });
   });
+
+  describe('multi-segment ids and co-located tests (CHANGE-010)', () => {
+    it('finds ### REQ-MEETING-RSVP-NNN requirements and src/**/*.test.ts references', async () => {
+      await fs.writeFile(
+        path.join(detector.requirementsDir, 'meeting-rsvp-requirements.md'),
+        '### REQ-MEETING-RSVP-001: Record\n\n### REQ-MEETING-RSVP-002: Summary\n'
+      );
+      await fs.outputFile(path.join(detector.srcDir, 'lib/rsvp.ts'), '// REQ-MEETING-RSVP-001\n');
+      await fs.outputFile(
+        path.join(detector.srcDir, 'lib/rsvp.test.ts'),
+        "it('REQ-MEETING-RSVP-001', () => {});\n"
+      );
+
+      const requirements = await detector.extractRequirements();
+      const testRefs = await detector.extractTestReferences();
+      const untested = await detector.detectUntestedCode();
+
+      expect(requirements.map(r => r.id)).toEqual(['REQ-MEETING-RSVP-001', 'REQ-MEETING-RSVP-002']);
+      expect(testRefs).toEqual(['REQ-MEETING-RSVP-001']);
+      expect(untested).toEqual([]);
+    });
+  });
 });

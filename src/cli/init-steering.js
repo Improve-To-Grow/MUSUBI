@@ -50,10 +50,11 @@ async function copyItgPolicies(projectRoot = process.cwd()) {
 }
 
 /**
- * Write structure.md, tech.md and product.md from the shared templates, and the ITG policies
+ * Write structure.md, tech.md and product.md from the shared templates, keeping the ones that
+ * exist, and the ITG policies
  * @param {{projectName: string, description: string}} answers - Init answers
  * @param {string} projectRoot - Project root
- * @returns {Promise<void>}
+ * @returns {Promise<string[]>} The steering files that were kept
  */
 async function writeSteeringTemplates(answers, projectRoot = process.cwd()) {
   const values = {
@@ -63,11 +64,18 @@ async function writeSteeringTemplates(answers, projectRoot = process.cwd()) {
   };
   const steeringDir = path.join(projectRoot, 'steering');
   await fs.ensureDir(steeringDir);
+  const kept = [];
   for (const file of STEERING_TEMPLATES) {
+    // Project memory written before (musubi-onboard, an earlier init) stays as it is
+    if (await fs.pathExists(path.join(steeringDir, file))) {
+      kept.push(`steering/${file}`);
+      continue;
+    }
     const template = await fs.readFile(path.join(SHARED_TEMPLATE_DIR, 'steering', file), 'utf8');
     await fs.writeFile(path.join(steeringDir, file), fillPlaceholders(template, values));
   }
   await copyItgPolicies(projectRoot);
+  return kept;
 }
 
 /**

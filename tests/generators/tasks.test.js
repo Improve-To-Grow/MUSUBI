@@ -46,6 +46,16 @@ describe('TasksGenerator', () => {
 
       expect(result.path).toContain('payment-checkout-system-tasks.md');
     });
+
+    test('writes upper-case placeholder ids that trace does not count (CHANGE-010)', async () => {
+      const { reqIdPattern } = require('../../src/traceability/req-id');
+      const result = await generator.init('Meeting RSVP');
+      const content = await fs.readFile(result.path, 'utf-8');
+
+      expect(content).toContain('REQ-MEETING-RSVP-NNN');
+      expect(content).not.toMatch(/REQ-meeting/);
+      expect(content.match(reqIdPattern())).toBeNull();
+    });
   });
 
   describe('generateTaskId', () => {

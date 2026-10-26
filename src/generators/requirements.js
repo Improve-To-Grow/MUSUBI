@@ -15,9 +15,9 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { glob } = require('glob');
+// Requirement ids with one or more area segments: REQ-AUTH-001, REQ-MEETING-RSVP-001
+const { REQ_ID_SOURCE: REQ_ID } = require('../traceability/req-id');
 
-/** Requirement ids with one or more area segments: REQ-AUTH-001, REQ-MEETING-RSVP-001 */
-const REQ_ID = 'REQ-[A-Z0-9]+(?:-[A-Z0-9]+)*-\\d+';
 const AMBIGUOUS_WORDS = ['should', 'could', 'might', 'may', 'will', 'can', 'must'];
 const VAGUE_TERMS = [
   'etc',

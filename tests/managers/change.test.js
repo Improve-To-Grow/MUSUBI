@@ -147,6 +147,26 @@ describe('ChangeManager', () => {
   });
 
   describe('validateChange', () => {
+    test('keeps multi-segment ids and reports malformed ones (CHANGE-010)', async () => {
+      await manager.initChange('CHANGE-020');
+      const changeFile = path.join(tmpDir, 'storage/changes/CHANGE-020.md');
+      const content = await fs.readFile(changeFile, 'utf-8');
+      await fs.writeFile(
+        changeFile,
+        content.replace(
+          '### ADDED\n\n<!-- List new requirements here -->',
+          '### ADDED\n\n- REQ-MEETING-RSVP-009: Reminder\n- REQ-meeting-010: Lowercase'
+        )
+      );
+
+      const delta = await manager.parseDelta(changeFile);
+      const result = await manager.validateChange('CHANGE-020');
+
+      expect(delta.added.map(item => item.id)).toEqual(['REQ-MEETING-RSVP-009', 'REQ-meeting-010']);
+      expect(result.valid).toBe(false);
+      expect(JSON.stringify(result)).toContain('Invalid requirement ID: REQ-meeting-010');
+    });
+
     test('validates change with valid delta', async () => {
       await manager.initChange('CHANGE-007');
       const changeFile = path.join(tmpDir, 'storage/changes/CHANGE-007.md');

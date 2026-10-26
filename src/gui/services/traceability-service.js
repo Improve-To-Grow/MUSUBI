@@ -7,8 +7,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const matter = require('gray-matter');
 
-// REQ-001, REQ-RSVP-001 and REQ-MEETING-RSVP-001
-const REQ_ID = 'REQ-(?:[A-Z0-9]+-)*\\d+';
+const { REQ_ID_SOURCE: REQ_ID } = require('../../traceability/req-id');
 const CODE_FILE = /\.[cm]?[jt]sx?$/;
 const TEST_FILE = /\.(?:test|spec)\.[cm]?[jt]sx?$/;
 // Where MUSUBI writes each document; storage/specs is the older place of designs and tasks

@@ -152,11 +152,11 @@ flowchart TD
 
 | Component                 | Requirements Implemented                     | Design Rationale             |
 | ------------------------- | -------------------------------------------- | ---------------------------- |
-| {{COMPONENT}} Service     | REQ-{{COMPONENT}}-001, REQ-{{COMPONENT}}-002 | Business logic encapsulation |
-| {{COMPONENT}} Controller  | REQ-{{COMPONENT}}-003                        | API exposure                 |
-| Database Schema           | REQ-{{COMPONENT}}-004                        | Data persistence             |
-| Authentication Middleware | REQ-SEC-001                                  | Security enforcement         |
-| Caching Layer             | REQ-PERF-001                                 | Performance optimization     |
+| {{COMPONENT}} Service     | REQ-{{COMPONENT}}-NNN, REQ-{{COMPONENT}}-NNN | Business logic encapsulation |
+| {{COMPONENT}} Controller  | REQ-{{COMPONENT}}-NNN                        | API exposure                 |
+| Database Schema           | REQ-{{COMPONENT}}-NNN                        | Data persistence             |
+| Authentication Middleware | REQ-SEC-NNN                                  | Security enforcement         |
+| Caching Layer             | REQ-PERF-NNN                                 | Performance optimization     |
 
 **Coverage**:
 
@@ -176,7 +176,7 @@ Every endpoint is a `src/app/api/**/route.ts` exported through `withApiRoute('<r
 
 **Purpose**: [Create new resource]
 
-**Maps to Requirements**: REQ-{{COMPONENT}}-001
+**Maps to Requirements**: REQ-{{COMPONENT}}-NNN
 
 **Request**:
 
@@ -241,7 +241,7 @@ Content-Type: application/json
 - 409: Conflict (resource already exists)
 - 500: Internal server error
 
-**Acceptance Criteria** (from REQ-{{COMPONENT}}-001):
+**Acceptance Criteria** (from REQ-{{COMPONENT}}-NNN):
 
 - ✅ Validates request schema
 - ✅ Emits `{{component}}.{{resource}}.create` (and `.denied` / `.failed`) (ITG-LOG-02)
@@ -255,7 +255,7 @@ Content-Type: application/json
 
 **Purpose**: [Retrieve resource by ID]
 
-**Maps to Requirements**: REQ-{{COMPONENT}}-002
+**Maps to Requirements**: REQ-{{COMPONENT}}-NNN
 
 **Request**:
 
@@ -321,7 +321,7 @@ See [openapi.yaml](./openapi.yaml) for complete API specification.
 
 ### Data Model
 
-**Maps to Requirements**: REQ-{{COMPONENT}}-004
+**Maps to Requirements**: REQ-{{COMPONENT}}-NNN
 
 ```mermaid
 erDiagram
@@ -366,7 +366,7 @@ ALTER TABLE {{resource}} ENABLE ROW LEVEL SECURITY;
 
 ### Migration Strategy
 
-**Maps to Requirements**: REQ-MAINT-001
+**Maps to Requirements**: REQ-MAINT-NNN
 
 - Firestore: rules, indexes and backfills versioned in git, applied to staging first, deployed to both projects in the same change (ITG-DAT-09)
 - PostgreSQL: numbered, append-only migrations, applied by the deploy workflow with `scripts/ci/migrate.mjs` on staging and production; a deploy with a migration runs in the deploy window (ITG-DAT-05 to ITG-DAT-08)
@@ -377,7 +377,7 @@ ALTER TABLE {{resource}} ENABLE ROW LEVEL SECURITY;
 
 ### {{COMPONENT}} Service
 
-**Maps to Requirements**: REQ-{{COMPONENT}}-001, REQ-{{COMPONENT}}-002
+**Maps to Requirements**: REQ-{{COMPONENT}}-NNN, REQ-{{COMPONENT}}-NNN
 
 **Responsibilities**:
 
@@ -405,10 +405,10 @@ export class {{COMPONENT}}Service implements {{COMPONENT}}Service {
   constructor(private repository: {{COMPONENT}}Repository) {}
 
   async create(data: CreateResourceDTO): Promise<Resource> {
-    // REQ-{{COMPONENT}}-001: Validate input
+    // REQ-{{COMPONENT}}-NNN: Validate input
     this.validateCreateInput(data);
 
-    // REQ-{{COMPONENT}}-001: Check for duplicates
+    // REQ-{{COMPONENT}}-NNN: Check for duplicates
     const existing = await this.repository.findByUserAndField1(
       data.userId,
       data.field1
@@ -417,7 +417,7 @@ export class {{COMPONENT}}Service implements {{COMPONENT}}Service {
       throw new ConflictError('Resource already exists');
     }
 
-    // REQ-{{COMPONENT}}-001: Create resource
+    // REQ-{{COMPONENT}}-NNN: Create resource
     return this.repository.create(data);
   }
 
@@ -429,7 +429,7 @@ export class {{COMPONENT}}Service implements {{COMPONENT}}Service {
 
 ### {{COMPONENT}} Repository
 
-**Maps to Requirements**: REQ-{{COMPONENT}}-004
+**Maps to Requirements**: REQ-{{COMPONENT}}-NNN
 
 **Responsibilities**:
 
@@ -457,7 +457,7 @@ interface {{COMPONENT}}Repository {
 
 **Service**: [External API Name]
 **Purpose**: [Integration purpose]
-**Maps to Requirements**: REQ-{{COMPONENT}}-005
+**Maps to Requirements**: REQ-{{COMPONENT}}-NNN
 
 **Endpoint**: `https://api.external.com/v1/endpoint`
 **Authentication**: API key, server-side only (ITG-INT-01); stored as a GitHub Environment Secret
@@ -482,7 +482,7 @@ X-API-Key: <secret from runtime-config>
 
 ## Security Design
 
-**Maps to Requirements**: REQ-SEC-001
+**Maps to Requirements**: REQ-SEC-NNN
 
 Follow `steering/rules/itg/security.md`; run its release checklist when the feature touches auth, data access or integrations.
 
@@ -515,7 +515,7 @@ Follow `steering/rules/itg/security.md`; run its release checklist when the feat
 
 ## Performance Design
 
-**Maps to Requirements**: REQ-PERF-001
+**Maps to Requirements**: REQ-PERF-NNN
 
 ### Runtime
 
@@ -536,7 +536,7 @@ Follow `steering/rules/itg/security.md`; run its release checklist when the feat
 
 ## Deployment
 
-**Maps to Requirements**: REQ-AVAIL-001
+**Maps to Requirements**: REQ-AVAIL-NNN
 
 - **Environments**: local, staging, production (ITG-PLT-21); deployed by `.github/workflows/deploy.yml` (ITG-CI-03)
 - **New bindings**: [KV / Durable Objects / Rate Limiting / Hyperdrive] in both environment blocks of `wrangler.jsonc` (ITG-PLT-19)
@@ -554,7 +554,7 @@ New keys go in `.env.example`, both GitHub Environments and `src/lib/runtime-con
 
 ## Logging and Observability
 
-**Maps to Requirements**: REQ-AVAIL-001
+**Maps to Requirements**: REQ-AVAIL-NNN
 
 ### Events (ITG-LOG-02, ITG-LOG-07)
 

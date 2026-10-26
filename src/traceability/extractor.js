@@ -11,6 +11,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const { exec } = require('child_process');
 const { promisify } = require('util');
+const { reqIdPattern } = require('./req-id');
 
 const execAsync = promisify(exec);
 
@@ -18,7 +19,7 @@ const execAsync = promisify(exec);
  * Requirement ID patterns
  */
 const REQ_PATTERNS = [
-  /REQ-[A-Z0-9]+-\d{3}/g, // REQ-XXX-NNN
+  reqIdPattern(), // REQ-XXX-NNN, REQ-AREA-XXX-NNN
   /IMP-\d+\.\d+-\d{3}(?:-\d{2})?/g, // IMP-6.2-001 or IMP-6.2-001-01
   /FEAT-\d{3}/g, // FEAT-001
   /TASK-\d{3}/g, // TASK-001

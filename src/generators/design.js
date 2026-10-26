@@ -22,6 +22,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { glob } = require('glob');
+const { REQ_ID_SOURCE } = require('../traceability/req-id');
 
 const ADR_SECTION = /^## Architecture Decision(?:s| Records)\b.*$/m;
 
@@ -645,7 +646,7 @@ Service --> Repository
    */
   parseRequirements(content) {
     const requirements = [];
-    const reqRegex = /### (REQ-[A-Z0-9]+(?:-[A-Z0-9]+)*-\d+):/g;
+    const reqRegex = new RegExp(`### (${REQ_ID_SOURCE}):`, 'g');
 
     let match;
     while ((match = reqRegex.exec(content)) !== null) {

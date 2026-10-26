@@ -10,6 +10,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { reqIdPattern } = require('../traceability/req-id');
 
 // GitHub client (optional dependency)
 let GitHubClient;
@@ -551,7 +552,7 @@ class IssueResolver {
     }
 
     // Detect requirement IDs
-    const reqPattern = /REQ-[A-Z0-9]+-\d+/g;
+    const reqPattern = reqIdPattern();
     const reqMatches = issue.fullContent.match(reqPattern) || [];
     analysis.relatedRequirements = [...new Set(reqMatches)];
 

@@ -8,6 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const { DeltaType } = require('../managers/delta-spec');
+const { reqIdPattern } = require('../traceability/req-id');
 
 /**
  * Validation rules for delta specifications
@@ -20,8 +21,8 @@ const ValidationRules = {
   // Delta marker in markdown: [TYPE] ID: Description
   MARKER_PATTERN: /^\[([A-Z]+)\]\s+([A-Z]+-[A-Z0-9]+-\d{3}):\s+(.+)$/,
 
-  // Requirement reference: REQ-xxx-nnn
-  REQ_PATTERN: /REQ-[A-Z]+-\d{3}/g,
+  // Requirement reference: REQ-xxx-nnn or REQ-AREA-xxx-nnn
+  REQ_PATTERN: reqIdPattern(''),
 
   // Valid statuses
   VALID_STATUSES: ['proposed', 'approved', 'rejected', 'implemented', 'archived'],

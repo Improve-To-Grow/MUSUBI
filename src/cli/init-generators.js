@@ -8,6 +8,50 @@
 const fs = require('fs-extra');
 const path = require('path');
 
+/** tsconfig.json of a library or CLI: compiled to dist/ */
+const LIBRARY_TSCONFIG = {
+  compilerOptions: {
+    target: 'ES2022',
+    module: 'NodeNext',
+    moduleResolution: 'NodeNext',
+    declaration: true,
+    outDir: './dist',
+    rootDir: './src',
+    strict: true,
+    esModuleInterop: true,
+    skipLibCheck: true,
+    forceConsistentCasingInFileNames: true,
+  },
+  include: ['src/**/*'],
+  exclude: ['node_modules', 'dist'],
+};
+
+/**
+ * tsconfig.json of an application: the Next.js one, with the `@/*` alias and strict mode of
+ * ITG-GIT-04; bundler resolution also lets musubi-code resolve `@/` imports
+ */
+const NEXT_TSCONFIG = {
+  compilerOptions: {
+    target: 'ES2017',
+    lib: ['dom', 'dom.iterable', 'esnext'],
+    allowJs: true,
+    skipLibCheck: true,
+    strict: true,
+    noEmit: true,
+    esModuleInterop: true,
+    module: 'esnext',
+    moduleResolution: 'bundler',
+    resolveJsonModule: true,
+    isolatedModules: true,
+    jsx: 'preserve',
+    incremental: true,
+    plugins: [{ name: 'next' }],
+    paths: { '@/*': ['./src/*'] },
+  },
+  include: ['next-env.d.ts', '**/*.ts', '**/*.tsx', '.next/types/**/*.ts'],
+  exclude: ['node_modules'],
+};
+
 /**
  * Generate language-specific dependency files for single-package projects
  */
@@ -45,22 +89,8 @@ async function generateDependencyFiles(primaryLang, answers) {
 
     // Generate tsconfig.json
     if (!(await fs.pathExists('tsconfig.json'))) {
-      const tsconfig = {
-        compilerOptions: {
-          target: 'ES2022',
-          module: 'NodeNext',
-          moduleResolution: 'NodeNext',
-          declaration: true,
-          outDir: './dist',
-          rootDir: './src',
-          strict: true,
-          esModuleInterop: true,
-          skipLibCheck: true,
-          forceConsistentCasingInFileNames: true,
-        },
-        include: ['src/**/*'],
-        exclude: ['node_modules', 'dist'],
-      };
+      const tsconfig =
+        answers.constitutionProfile === 'application' ? NEXT_TSCONFIG : LIBRARY_TSCONFIG;
       await fs.writeFile('tsconfig.json', JSON.stringify(tsconfig, null, 2) + '\n');
     }
   } else if (primaryLang === 'rust') {

@@ -65,6 +65,18 @@ describe('init steering (ITG)', () => {
     expect(tech).toContain('acme-portal-staging.improvetogrow.com');
   });
 
+  it('keeps steering files that exist, such as the ones musubi-onboard wrote (CHANGE-010)', async () => {
+    await fs.outputFile(path.join(tmpDir, 'steering', 'tech.md'), '# Onboarded stack\n');
+
+    const kept = await writeSteeringTemplates({ projectName: 'p', description: 'd' }, tmpDir);
+
+    expect(kept).toEqual(['steering/tech.md']);
+    expect(await fs.readFile(path.join(tmpDir, 'steering', 'tech.md'), 'utf8')).toBe(
+      '# Onboarded stack\n'
+    );
+    expect(await fs.pathExists(path.join(tmpDir, 'steering', 'product.md'))).toBe(true);
+  });
+
   it('installs every ITG policy file', async () => {
     await writeSteeringTemplates({ projectName: 'p', description: 'd' }, tmpDir);
     const expected = (await fs.readdir(POLICY_DIR)).sort();

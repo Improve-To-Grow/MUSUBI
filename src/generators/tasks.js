@@ -35,6 +35,8 @@ class TasksGenerator {
       .replace(/\{\{PROJECT_NAME\}\}/g, options.project || '[Project Name]')
       .replace(/\{\{DATE\}\}/g, new Date().toISOString().split('T')[0])
       .replace(/\{\{AUTHOR\}\}/g, options.author || '[Author]')
+      // Requirement ids use the upper-case area, as musubi-requirements writes them
+      .replace(/REQ-\{\{COMPONENT\}\}-/g, `REQ-${this.slugify(feature).toUpperCase()}-`)
       .replace(/\{\{COMPONENT\}\}/g, this.slugify(feature));
 
     await fs.writeFile(filePath, content, 'utf-8');

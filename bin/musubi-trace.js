@@ -45,7 +45,7 @@ program
 
       if (options.output) {
         const fs = require('fs-extra');
-        await fs.writeFile(options.output, analyzer.formatMatrix(matrix, options.format), 'utf-8');
+        await fs.outputFile(options.output, analyzer.formatMatrix(matrix, options.format), 'utf-8');
         console.log(chalk.green(`✓ Matrix saved to ${options.output}`));
       } else {
         console.log(analyzer.formatMatrix(matrix, options.format));
@@ -437,7 +437,7 @@ program
         const output = JSON.stringify(result, null, 2);
         if (options.output) {
           const fs = require('fs-extra');
-          await fs.writeFile(options.output, output, 'utf-8');
+          await fs.outputFile(options.output, output, 'utf-8');
           console.log(chalk.green(`✓ Report saved to ${options.output}\n`));
         } else {
           console.log(output);
@@ -500,7 +500,7 @@ program
         const output = JSON.stringify(impact, null, 2);
         if (options.output) {
           const fs = require('fs-extra');
-          await fs.writeFile(options.output, output, 'utf-8');
+          await fs.outputFile(options.output, output, 'utf-8');
           console.log(chalk.green(`✓ Impact analysis saved to ${options.output}\n`));
         } else {
           console.log(output);
@@ -601,7 +601,7 @@ program
         const output = JSON.stringify(stats, null, 2);
         if (options.output) {
           const fs = require('fs-extra');
-          await fs.writeFile(options.output, output, 'utf-8');
+          await fs.outputFile(options.output, output, 'utf-8');
           console.log(chalk.green(`✓ Statistics saved to ${options.output}\n`));
         } else {
           console.log(output);
@@ -700,7 +700,7 @@ program
       if (options.output) {
         const fs = require('fs-extra');
         const report = validator.generateReport(result);
-        await fs.writeFile(options.output, report, 'utf-8');
+        await fs.outputFile(options.output, report, 'utf-8');
         console.log();
         console.log(chalk.green(`✓ Report saved to ${options.output}`));
       }
@@ -737,8 +737,7 @@ program
 
       if (options.output) {
         const fs = require('fs-extra');
-        await fs.ensureDir(require('path').dirname(options.output));
-        await fs.writeFile(options.output, report, 'utf-8');
+        await fs.outputFile(options.output, report, 'utf-8');
         console.log(chalk.green(`✓ Report saved to ${options.output}`));
         console.log();
       } else {
@@ -793,7 +792,7 @@ program
 
         if (options.output) {
           const fs = require('fs-extra');
-          await fs.writeFile(options.output, output, 'utf-8');
+          await fs.outputFile(options.output, output, 'utf-8');
         } else {
           console.log(output);
         }
@@ -885,7 +884,7 @@ program
       if (options.output) {
         const fs = require('fs-extra');
         const report = validator.generateReport(result);
-        await fs.writeFile(options.output, report, 'utf-8');
+        await fs.outputFile(options.output, report, 'utf-8');
         console.log();
         console.log(chalk.green(`✓ Report saved to ${options.output}`));
       }
@@ -915,7 +914,7 @@ program
         const output = JSON.stringify(result, null, 2);
         if (options.output) {
           const fs = require('fs-extra');
-          await fs.writeFile(options.output, output, 'utf-8');
+          await fs.outputFile(options.output, output, 'utf-8');
           console.log(chalk.green(`✓ Report saved to ${options.output}`));
         } else {
           console.log(output);
@@ -934,7 +933,7 @@ program
 
         if (options.output) {
           const fs = require('fs-extra');
-          await fs.writeFile(options.output, html, 'utf-8');
+          await fs.outputFile(options.output, html, 'utf-8');
           console.log(chalk.green(`✓ HTML report saved to ${options.output}`));
         } else {
           console.log(html);
@@ -1012,7 +1011,7 @@ program
       const html = await reporter.generate(traceabilityData, ReportFormat.HTML);
 
       const fs = require('fs-extra');
-      await fs.writeFile(options.output, html, 'utf-8');
+      await fs.outputFile(options.output, html, 'utf-8');
 
       console.log(chalk.green(`✓ HTML report generated: ${options.output}`));
       console.log();

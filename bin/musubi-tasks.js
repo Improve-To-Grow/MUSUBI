@@ -107,8 +107,16 @@ program
 // Add task
 program
   .command('add <title>')
-  .description('Add new task with interactive prompts')
+  .description('Add new task; prompts for every detail not given as an option')
   .option('-f, --file <path>', 'Task breakdown file path')
+  .option('-p, --priority <level>', 'Priority (P0|P1|P2|P3)')
+  .option('--points <n>', 'Story points (1|2|3|5|8|13)')
+  .option('--hours <n>', 'Estimated hours')
+  .option('-a, --assignee <name>', 'Assignee')
+  .option('-d, --description <text>', 'Task description')
+  .option('-r, --requirements <ids>', 'Requirements, comma-separated REQ ids')
+  .option('-c, --acceptance <list>', 'Acceptance criteria, semicolon-separated')
+  .option('--depends <ids>', 'Dependencies, comma-separated TASK ids')
   .action(async (title, options) => {
     try {
       console.log(chalk.bold(`\n📝 Adding task: ${title}\n`));
@@ -141,12 +149,13 @@ program
         }
       }
 
-      // Interactive prompts for task details
+      // Ask only for what the options do not give; with every option the command runs unattended
       const inquirerInst2 = await getInquirer();
       const answers = await inquirerInst2.prompt([
         {
           type: 'list',
           name: 'priority',
+          when: () => options.priority === undefined,
           message: 'Task priority:',
           choices: [
             { name: 'P0 (Critical - Launch Blocker)', value: 'P0' },
@@ -159,6 +168,7 @@ program
         {
           type: 'list',
           name: 'storyPoints',
+          when: () => options.points === undefined,
           message: 'Story points (Fibonacci):',
           choices: ['1', '2', '3', '5', '8', '13'],
           default: '3',
@@ -166,6 +176,7 @@ program
         {
           type: 'input',
           name: 'estimatedHours',
+          when: () => options.hours === undefined,
           message: 'Estimated hours:',
           default: '4',
           validate: input => !isNaN(input) || 'Must be a number',
@@ -173,58 +184,54 @@ program
         {
           type: 'input',
           name: 'assignee',
+          when: () => options.assignee === undefined,
           message: 'Assignee (optional):',
           default: '[Unassigned]',
         },
         {
           type: 'input',
           name: 'description',
+          when: () => options.description === undefined,
           message: 'Task description:',
           validate: input => input.length > 0 || 'Description is required',
         },
         {
           type: 'input',
           name: 'requirements',
+          when: () => options.requirements === undefined,
           message: 'Requirements (comma-separated REQ-XXX-NNN):',
-          filter: input =>
-            input
-              .split(',')
-              .map(s => s.trim())
-              .filter(s => s.length > 0),
         },
         {
           type: 'input',
           name: 'acceptance',
+          when: () => options.acceptance === undefined,
           message: 'Acceptance criteria (semicolon-separated):',
-          filter: input =>
-            input
-              .split(';')
-              .map(s => s.trim())
-              .filter(s => s.length > 0),
         },
         {
           type: 'input',
           name: 'dependencies',
+          when: () => options.depends === undefined,
           message: 'Dependencies (comma-separated TASK-XXX):',
-          filter: input =>
-            input
-              .split(',')
-              .map(s => s.trim())
-              .filter(s => s.length > 0),
         },
       ]);
 
+      const pick = (option, answer) => (option !== undefined ? option : answer);
+      const list = (value, separator) =>
+        (value || '')
+          .split(separator)
+          .map(s => s.trim())
+          .filter(s => s.length > 0);
       const task = {
         title,
-        priority: answers.priority,
-        storyPoints: parseInt(answers.storyPoints),
-        estimatedHours: parseFloat(answers.estimatedHours),
-        assignee: answers.assignee,
+        priority: pick(options.priority, answers.priority),
+        storyPoints: parseInt(pick(options.points, answers.storyPoints)),
+        estimatedHours: parseFloat(pick(options.hours, answers.estimatedHours)),
+        assignee: pick(options.assignee, answers.assignee),
         status: 'Not Started',
-        description: answers.description,
-        requirements: answers.requirements,
-        acceptance: answers.acceptance,
-        dependencies: answers.dependencies,
+        description: pick(options.description, answers.description),
+        requirements: list(pick(options.requirements, answers.requirements), ','),
+        acceptance: list(pick(options.acceptance, answers.acceptance), ';'),
+        dependencies: list(pick(options.depends, answers.dependencies), ','),
       };
 
       const result = await generator.addTask(taskFile, task);

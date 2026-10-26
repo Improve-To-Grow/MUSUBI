@@ -151,7 +151,7 @@ async function main(agent, agentKey, options = {}) {
       type: 'input',
       name: 'projectName',
       message: 'Project name:',
-      default: path.basename(process.cwd()),
+      default: () => readPackageName() || path.basename(process.cwd()),
     },
     {
       type: 'input',
@@ -513,8 +513,11 @@ async function main(agent, agentKey, options = {}) {
 
   // Generate steering context
   if (answers.createSteering) {
-    await generateSteering(answers, externalSpec);
+    const kept = await generateSteering(answers, externalSpec);
     console.log(chalk.green('  Generated steering context'));
+    if (kept.length > 0) {
+      console.log(chalk.yellow(`  Kept existing steering: ${kept.join(', ')}`));
+    }
   }
 
   // Save external specification reference
@@ -599,6 +602,17 @@ async function main(agent, agentKey, options = {}) {
   console.log(chalk.cyan('Learn more: https://github.com/nahisaho/MUSUBI\n'));
 }
 
+/**
+ * The name in package.json, so an existing project keeps its name (musubi-onboard reads it too)
+ */
+function readPackageName() {
+  try {
+    return JSON.parse(fs.readFileSync('package.json', 'utf8')).name || null;
+  } catch {
+    return null;
+  }
+}
+
 async function copySkill(skillName, agent) {
   // Only Claude Code has skillsDir (Skills API)
   if (!agent.layout.skillsDir) {
@@ -655,11 +669,16 @@ async function copyAgentsFile(agent) {
 
 async function generateSteering(answers, externalSpec = null) {
   // structure.md, tech.md and product.md start from the ITG defaults; the ITG delivery
-  // policies go to steering/rules/itg/ (English only, REQ-LANG-001)
-  await writeSteeringTemplates(answers);
+  // policies go to steering/rules/itg/ (English only, REQ-LANG-001). Steering that exists,
+  // such as what musubi-onboard wrote, is kept.
+  const kept = await writeSteeringTemplates(answers);
 
-  const projectYml = buildProjectYml(answers, externalSpec);
-  await fs.writeFile(path.join('steering', 'project.yml'), projectYml);
+  const projectYmlPath = path.join('steering', 'project.yml');
+  if (fs.existsSync(projectYmlPath)) {
+    kept.push('steering/project.yml');
+  } else {
+    await fs.writeFile(projectYmlPath, buildProjectYml(answers, externalSpec));
+  }
   // musubi-upgrade reads the version the project was set up with from this marker
   await fs.writeFile(
     path.join('steering', '.musubi-version'),
@@ -670,6 +689,7 @@ async function generateSteering(answers, externalSpec = null) {
   if (answers.projectStructure === 'workspace' || answers.projectStructure === 'microservices') {
     await generateWorkspaceStructure(answers);
   }
+  return kept;
 }
 
 /**

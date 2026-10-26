@@ -9,6 +9,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const glob = require('glob');
 const { proposalStatus } = require('./delta-spec');
+const { isReqId } = require('../traceability/req-id');
 
 class ChangeManager {
   constructor(workspaceRoot) {
@@ -401,7 +402,8 @@ class ChangeManager {
 
       if (trimmed.startsWith('- REQ-')) {
         // Extract requirement ID and title
-        const match = trimmed.match(/- (REQ-[A-Z0-9]+-\d{3}):?\s*(.+)?/);
+        // Any REQ- token, so validateDelta reports a malformed id instead of dropping the item
+        const match = trimmed.match(/- (REQ-[^\s:]+):?\s*(.+)?/);
         if (match) {
           items.push({
             id: match[1],
@@ -425,7 +427,7 @@ class ChangeManager {
     const allItems = [...delta.added, ...delta.modified, ...delta.removed, ...delta.renamed];
 
     for (const item of allItems) {
-      if (!item.id || !item.id.match(/^REQ-[A-Z0-9]+-\d{3}$/)) {
+      if (!item.id || !isReqId(item.id)) {
         errors.push({
           message: `Invalid requirement ID: ${item.id}`,
           line: item.line,

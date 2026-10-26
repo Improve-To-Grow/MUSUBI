@@ -115,7 +115,7 @@ Create the core module for {{component}} following Article I (Testable-Core Prin
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-001 (indirectly - foundation for implementation)
+- REQ-{{COMPONENT}}-NNN (indirectly - foundation for implementation)
 
 **Acceptance Criteria** (all profiles):
 
@@ -181,7 +181,7 @@ The tasks below use the `library` / `cli` paths. For the `application` variant, 
 
 ---
 
-### TASK-002: Write Tests for REQ-{{COMPONENT}}-001
+### TASK-002: Write Tests for REQ-{{COMPONENT}}-NNN
 
 **Priority**: P0
 **Story Points**: 2
@@ -190,19 +190,19 @@ The tasks below use the `library` / `cli` paths. For the `application` variant, 
 **Status**: Not Started
 
 **Description**:
-Write failing tests for REQ-{{COMPONENT}}-001 (Test-First / Red phase).
+Write failing tests for REQ-{{COMPONENT}}-NNN (Test-First / Red phase).
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-001: [Requirement title]
+- REQ-{{COMPONENT}}-NNN: [Requirement title]
 
 **Acceptance Criteria**:
 
 - [ ] Test file created: `lib/{{component}}/tests/service.test.ts`
-- [ ] All acceptance criteria from REQ-{{COMPONENT}}-001 have tests
+- [ ] All acceptance criteria from REQ-{{COMPONENT}}-NNN have tests
 - [ ] Tests fail (Red phase)
 - [ ] Tests reference requirement ID in description
-- [ ] Git commit message: `test: add failing tests for REQ-{{COMPONENT}}-001`
+- [ ] Git commit message: `test: add failing tests for REQ-{{COMPONENT}}-NNN`
 
 **Constitutional Compliance**:
 
@@ -214,7 +214,7 @@ Write failing tests for REQ-{{COMPONENT}}-001 (Test-First / Red phase).
 ```typescript
 // lib/{{component}}/tests/service.test.ts
 
-describe('REQ-{{COMPONENT}}-001: [Requirement title]', () => {
+describe('REQ-{{COMPONENT}}-NNN: [Requirement title]', () => {
   it('should [acceptance criterion 1]', async () => {
     // Arrange
     const service = new {{COMPONENT}}Service(mockRepository);
@@ -250,7 +250,7 @@ npm test lib/{{component}}/tests/service.test.ts
 
 ---
 
-### TASK-003: Implement {{COMPONENT}} Service (REQ-{{COMPONENT}}-001)
+### TASK-003: Implement {{COMPONENT}} Service (REQ-{{COMPONENT}}-NNN)
 
 **Priority**: P0
 **Story Points**: 5
@@ -263,7 +263,7 @@ Implement minimal {{COMPONENT}} service to pass tests (Green phase).
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-001: [Requirement title]
+- REQ-{{COMPONENT}}-NNN: [Requirement title]
 
 **Acceptance Criteria**:
 
@@ -272,12 +272,12 @@ Implement minimal {{COMPONENT}} service to pass tests (Green phase).
 - [ ] Input validation
 - [ ] Error handling for edge cases
 - [ ] All tests from TASK-002 pass
-- [ ] Git commit message: `feat: implement REQ-{{COMPONENT}}-001`
+- [ ] Git commit message: `feat: implement REQ-{{COMPONENT}}-NNN`
 
 **Constitutional Compliance**:
 
 - ✅ **Article III**: Test-First (Green phase, III-3)
-- ✅ **Article V**: Code comments reference REQ-{{COMPONENT}}-001 (V-2)
+- ✅ **Article V**: Code comments reference REQ-{{COMPONENT}}-NNN (V-2)
 
 **Implementation Notes**:
 
@@ -288,7 +288,7 @@ export class {{COMPONENT}}Service {
   constructor(private repository: {{COMPONENT}}Repository) {}
 
   /**
-   * REQ-{{COMPONENT}}-001: Create new {{resource}}
+   * REQ-{{COMPONENT}}-NNN: Create new {{resource}}
    */
   async create(data: CreateResourceDTO): Promise<Resource> {
     // Acceptance Criterion 1: Validate input
@@ -344,7 +344,7 @@ Refactor service code for better design (Blue phase).
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-001 (maintained)
+- REQ-{{COMPONENT}}-NNN (maintained)
 
 **Acceptance Criteria**:
 
@@ -393,7 +393,7 @@ Store {{resource}} in Firestore through the project-owned REST client (`src/lib/
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-004: Data storage
+- REQ-{{COMPONENT}}-NNN: Data storage
 
 **Acceptance Criteria**:
 
@@ -453,7 +453,7 @@ Make the primary operations of {{component}} callable without the UI (Article II
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-001 (automation interface exposure)
+- REQ-{{COMPONENT}}-NNN (automation interface exposure)
 
 **Acceptance Criteria** (variant `library` / `cli`: CLI):
 
@@ -539,9 +539,9 @@ Expose {{component}} through Route Handlers under `src/app/api/`, each through `
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-001: Create
-- REQ-{{COMPONENT}}-002: Get
-- REQ-{{COMPONENT}}-003: List
+- REQ-{{COMPONENT}}-NNN: Create
+- REQ-{{COMPONENT}}-NNN: Get
+- REQ-{{COMPONENT}}-NNN: List
 
 **Acceptance Criteria**:
 
@@ -601,7 +601,7 @@ Write integration tests against the real staging services (ITG-TST-06).
 
 **Requirements Coverage**:
 
-- REQ-{{COMPONENT}}-001 to REQ-{{COMPONENT}}-005 (all requirements)
+- All requirements of the feature
 
 **Acceptance Criteria**:
 
@@ -634,7 +634,7 @@ Keep the {{resource}} list current without client reads of Firestore: the page p
 
 **Requirements Coverage**:
 
-- REQ-PERF-001: Fresh data within [interval]
+- REQ-PERF-NNN: Fresh data within [interval]
 
 **Acceptance Criteria**:
 
@@ -657,7 +657,7 @@ Perform security audit and fix vulnerabilities.
 
 **Requirements Coverage**:
 
-- REQ-SEC-001: Security requirements
+- REQ-SEC-NNN: Security requirements
 
 **Acceptance Criteria**:
 
@@ -691,7 +691,7 @@ Add pagination to list endpoint.
 
 **Requirements Coverage**:
 
-- REQ-PERF-001 (performance enhancement)
+- REQ-PERF-NNN (performance enhancement)
 
 **Acceptance Criteria**:
 
@@ -715,7 +715,7 @@ Create Grafana dashboards for monitoring.
 
 **Requirements Coverage**:
 
-- REQ-AVAIL-001: Monitoring setup
+- REQ-AVAIL-NNN: Monitoring setup
 
 ---
 
@@ -723,13 +723,13 @@ Create Grafana dashboards for monitoring.
 
 | Requirement ID        | Priority | Tasks                                  | Test Coverage | Status      |
 | --------------------- | -------- | -------------------------------------- | ------------- | ----------- |
-| REQ-{{COMPONENT}}-001 | P0       | TASK-002, TASK-003, TASK-004, TASK-007 | 95%           | Not Started |
-| REQ-{{COMPONENT}}-002 | P0       | TASK-007                               | 90%           | Not Started |
-| REQ-{{COMPONENT}}-003 | P0       | TASK-007                               | 90%           | Not Started |
-| REQ-{{COMPONENT}}-004 | P0       | TASK-005                               | 85%           | Not Started |
-| REQ-PERF-001          | P1       | TASK-009, TASK-011                     | 80%           | Not Started |
-| REQ-SEC-001           | P1       | TASK-010                               | 100%          | Not Started |
-| REQ-AVAIL-001         | P2       | TASK-012                               | N/A           | Not Started |
+| REQ-{{COMPONENT}}-NNN | P0       | TASK-002, TASK-003, TASK-004, TASK-007 | 95%           | Not Started |
+| REQ-{{COMPONENT}}-NNN | P0       | TASK-007                               | 90%           | Not Started |
+| REQ-{{COMPONENT}}-NNN | P0       | TASK-007                               | 90%           | Not Started |
+| REQ-{{COMPONENT}}-NNN | P0       | TASK-005                               | 85%           | Not Started |
+| REQ-PERF-NNN          | P1       | TASK-009, TASK-011                     | 80%           | Not Started |
+| REQ-SEC-NNN           | P1       | TASK-010                               | 100%          | Not Started |
+| REQ-AVAIL-NNN         | P2       | TASK-012                               | N/A           | Not Started |
 
 **Coverage Summary**:
 

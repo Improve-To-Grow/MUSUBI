@@ -217,6 +217,15 @@ describe('DesignGenerator', () => {
     });
   });
 
+  describe('init template (CHANGE-010)', () => {
+    test('names no requirement id until the author writes one', async () => {
+      const { reqIdPattern } = require('../../src/traceability/req-id');
+      const result = await generator.init('meeting-rsvp');
+      const content = await fs.readFile(result.path, 'utf-8');
+      expect(content.match(reqIdPattern())).toBeNull();
+    });
+  });
+
   describe('addADR (CHANGE-009)', () => {
     const adr = {
       title: 'Use Firestore',

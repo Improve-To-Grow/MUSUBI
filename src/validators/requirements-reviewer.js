@@ -9,6 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { REQ_ID_SOURCE } = require('../traceability/req-id');
 
 /**
  * Defect severity
@@ -315,7 +316,10 @@ class RequirementsReviewer {
    */
   extractRequirements(content) {
     const requirements = [];
-    const reqPattern = /(?:REQ-[A-Z0-9]+-\d+|FR-\d+|NFR-\d+|UC-\d+)[:\s]+([^\n]+)/gi;
+    const reqPattern = new RegExp(
+      `(?:${REQ_ID_SOURCE}|FR-\\d+|NFR-\\d+|UC-\\d+)[:\\s]+([^\\n]+)`,
+      'gi'
+    );
     let match;
 
     while ((match = reqPattern.exec(content)) !== null) {

@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const glob = require('glob');
 const chalk = require('chalk');
+const { REQ_ID_SOURCE, reqIdPattern } = require('../traceability/req-id');
 
 /**
  * Gap Detector - Identifies orphaned requirements, untested code, and missing traceability
@@ -204,7 +205,7 @@ class GapDetector {
 
     for (const file of files) {
       const content = await fs.readFile(file, 'utf-8');
-      const matches = content.matchAll(/^##\s+(REQ-[A-Z]+-\d+):\s+(.+)$/gm);
+      const matches = content.matchAll(new RegExp(`^#{2,3}\\s+(${REQ_ID_SOURCE}):\\s+(.+)$`, 'gm'));
 
       for (const match of matches) {
         requirements.push({
@@ -231,7 +232,7 @@ class GapDetector {
 
     for (const file of files) {
       const content = await fs.readFile(file, 'utf-8');
-      const matches = content.matchAll(/REQ-[A-Z]+-\d+/g);
+      const matches = content.matchAll(reqIdPattern());
 
       for (const match of matches) {
         references.add(match[0]);
@@ -254,7 +255,7 @@ class GapDetector {
 
     for (const file of files) {
       const content = await fs.readFile(file, 'utf-8');
-      const matches = content.matchAll(/REQ-[A-Z]+-\d+/g);
+      const matches = content.matchAll(reqIdPattern());
 
       for (const match of matches) {
         references.add(match[0]);
@@ -277,7 +278,7 @@ class GapDetector {
 
     for (const file of files) {
       const content = await fs.readFile(file, 'utf-8');
-      const matches = content.matchAll(/REQ-[A-Z]+-\d+/g);
+      const matches = content.matchAll(reqIdPattern());
 
       for (const match of matches) {
         references.add(match[0]);
@@ -291,16 +292,12 @@ class GapDetector {
    * Extract test references from tests directory
    */
   async extractTestReferences() {
-    if (!(await fs.pathExists(this.testsDir))) {
-      return [];
-    }
-
-    const files = glob.sync(`${this.testsDir}/**/*.{test,spec}.{js,ts,jsx,tsx,py,java,go,rb}`);
+    const files = await this.getTestFiles('js,ts,jsx,tsx,py,java,go,rb');
     const references = new Set();
 
     for (const file of files) {
       const content = await fs.readFile(file, 'utf-8');
-      const matches = content.matchAll(/REQ-[A-Z]+-\d+/g);
+      const matches = content.matchAll(reqIdPattern());
 
       for (const match of matches) {
         references.add(match[0]);
@@ -324,14 +321,18 @@ class GapDetector {
   }
 
   /**
-   * Get test files
+   * Get test files: in the tests directory and next to the code (src/lib/x.test.ts)
+   * @param {string} [extensions] - Comma-separated file extensions
    */
-  async getTestFiles() {
-    if (!(await fs.pathExists(this.testsDir))) {
-      return [];
+  async getTestFiles(extensions = 'js,ts,jsx,tsx') {
+    const files = [];
+    for (const dir of [this.testsDir, this.srcDir]) {
+      if (!(await fs.pathExists(dir))) continue;
+      files.push(
+        ...glob.sync(`${dir}/**/*.{test,spec}.{${extensions}}`, { ignore: ['**/node_modules/**'] })
+      );
     }
-
-    return glob.sync(`${this.testsDir}/**/*.{test,spec}.{js,ts,jsx,tsx}`);
+    return [...new Set(files)];
   }
 
   /**

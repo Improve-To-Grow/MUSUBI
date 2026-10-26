@@ -10,6 +10,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { reqIdPattern } = require('../traceability/req-id');
 
 /**
  * Default SRS document evaluated when no content is passed in the context
@@ -224,7 +225,7 @@ class RequirementsCritic extends BaseCritic {
       /\bshall be able to\b/gi,
     ];
 
-    const reqPattern = /REQ-[A-Z0-9]+-\d+/g;
+    const reqPattern = reqIdPattern();
     const requirements = content.match(reqPattern) || [];
 
     if (requirements.length === 0) return 0;
@@ -287,7 +288,7 @@ class RequirementsCritic extends BaseCritic {
     const content = context.content || '';
 
     // Check references to requirement IDs
-    const reqPattern = /REQ-[A-Z0-9]+-\d+/g;
+    const reqPattern = reqIdPattern();
     const requirements = content.match(reqPattern) || [];
 
     // Count unique requirements (duplicates removed)
@@ -385,7 +386,7 @@ class DesignCritic extends BaseCritic {
 
     for (const file of files) {
       const content = fs.readFileSync(path.join(designDir, file), 'utf-8');
-      const matches = content.match(/REQ-[A-Z0-9]+-\d+/g) || [];
+      const matches = content.match(reqIdPattern()) || [];
       matches.forEach(m => reqReferences.add(m));
     }
 

@@ -17,6 +17,7 @@ const { ConstitutionLevelManager, ArticleId } = require('./constitution-level-ma
 const { isUnder } = require('../constitutional/articles');
 const { ProjectFiles, CODE_EXTENSIONS } = require('./project-files');
 const { checkTestableCore, checkAutomationInterface, checkCodeSize } = require('./profile-checks');
+const { reqIdPattern } = require('../traceability/req-id');
 
 /**
  * Validates a project against the 9 Constitutional Articles of steering/rules/constitution.md
@@ -326,12 +327,12 @@ class ConstitutionalValidator {
     }
 
     // Check for REQ-XXX patterns in test files
-    const testFiles = this.files.glob('**/*.test.{js,ts}');
+    const testFiles = this.files.glob('**/*.{test,spec}.{js,jsx,ts,tsx,mjs,cjs}');
 
     let testsWithReqs = 0;
     for (const file of testFiles) {
       const content = fs.readFileSync(file, 'utf-8');
-      if (/REQ-\w+-\d+/g.test(content)) {
+      if (reqIdPattern('').test(content)) {
         testsWithReqs++;
       }
     }

@@ -10,6 +10,7 @@
 
 const EventEmitter = require('events');
 const _path = require('path');
+const { reqIdPattern } = require('../traceability/req-id');
 
 // Validation Types
 const ValidationType = {
@@ -544,7 +545,7 @@ class ReferenceValidator {
   constructor(options = {}) {
     this.references = new Map();
     this.patterns = options.patterns || {
-      requirement: /REQ-\d+/g,
+      requirement: reqIdPattern(),
       design: /DES-\d+/g,
       test: /TEST-\d+/g,
       issue: /#\d+/g,
