@@ -9,6 +9,8 @@ playwright-report/
 test-results/
 next-env.d.ts
 package-lock.json
+# next build and create-next-app write it in their own format
+tsconfig.json
 
 # MUSUBI project memory and agent files
 steering/

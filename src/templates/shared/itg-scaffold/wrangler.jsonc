@@ -1,0 +1,65 @@
+// The application Worker: bindings, routes and names (Project Setup Guide §15). Configuration
+// values come from the GitHub Environments (ITG-PLT-09). Bindings are not inherited: each
+// environment lists all of its own. Replace every <id> with the ids of Setup Guide step 5.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "{{APP_NAME}}",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "{{DATE}}",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "observability": { "enabled": true },
+  "env": {
+    "staging": {
+      "name": "{{APP_NAME}}-staging",
+      "workers_dev": false,
+      "routes": [
+        {
+          "pattern": "{{APP_NAME}}-staging.improvetogrow.com",
+          "custom_domain": true,
+        },
+      ],
+      "queues": {
+        "producers": [
+          {
+            "binding": "LOG_QUEUE",
+            "queue": "{{APP_NAME}}-logs-staging",
+          },
+        ],
+      },
+      // Starting values; each route can declare its own limit in the wrapper (ITG-SEC-14)
+      "ratelimits": [
+        { "name": "RL_AUTH", "namespace_id": "<id>", "simple": { "limit": 10, "period": 60 } },
+        { "name": "RL_READ", "namespace_id": "<id>", "simple": { "limit": 120, "period": 60 } },
+        { "name": "RL_WRITE", "namespace_id": "<id>", "simple": { "limit": 60, "period": 60 } },
+        { "name": "RL_ADMIN", "namespace_id": "<id>", "simple": { "limit": 30, "period": 60 } },
+        { "name": "RL_AI", "namespace_id": "<id>", "simple": { "limit": 10, "period": 60 } },
+      ],
+      // With PostgreSQL (ITG-DAT-02):
+      // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<staging-hyperdrive-id>" }],
+    },
+    "production": {
+      "name": "{{APP_NAME}}-production",
+      "workers_dev": false,
+      // Add once the client domain is known (Cloudflare for SaaS, ITG-PLT-20):
+      // "routes": [{ "pattern": "<subdomain>.<client-domain>/*", "zone_name": "improvetogrow.com" }],
+      "queues": {
+        "producers": [
+          {
+            "binding": "LOG_QUEUE",
+            "queue": "{{APP_NAME}}-logs-production",
+          },
+        ],
+      },
+      "ratelimits": [
+        { "name": "RL_AUTH", "namespace_id": "<id>", "simple": { "limit": 10, "period": 60 } },
+        { "name": "RL_READ", "namespace_id": "<id>", "simple": { "limit": 120, "period": 60 } },
+        { "name": "RL_WRITE", "namespace_id": "<id>", "simple": { "limit": 60, "period": 60 } },
+        { "name": "RL_ADMIN", "namespace_id": "<id>", "simple": { "limit": 30, "period": 60 } },
+        { "name": "RL_AI", "namespace_id": "<id>", "simple": { "limit": 10, "period": 60 } },
+      ],
+      // With PostgreSQL (ITG-DAT-02):
+      // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<production-hyperdrive-id>" }],
+    },
+  },
+}

@@ -47,8 +47,9 @@ const LIBRARY_TSCONFIG = {
 };
 
 /**
- * tsconfig.json of an application: the Next.js one, with the `@/*` alias and strict mode of
- * ITG-GIT-04; bundler resolution also lets musubi-code resolve `@/` imports
+ * tsconfig.json of an application: the one create-next-app writes for Next.js 16 (so `next build`
+ * leaves it unchanged), with the `@/*` alias and strict mode of ITG-GIT-04; bundler resolution
+ * also lets musubi-code resolve `@/` imports
  */
 const NEXT_TSCONFIG = {
   compilerOptions: {
@@ -63,12 +64,19 @@ const NEXT_TSCONFIG = {
     moduleResolution: 'bundler',
     resolveJsonModule: true,
     isolatedModules: true,
-    jsx: 'preserve',
+    jsx: 'react-jsx',
     incremental: true,
     plugins: [{ name: 'next' }],
     paths: { '@/*': ['./src/*'] },
   },
-  include: ['next-env.d.ts', '**/*.ts', '**/*.tsx', '.next/types/**/*.ts'],
+  include: [
+    'next-env.d.ts',
+    '**/*.ts',
+    '**/*.tsx',
+    '.next/types/**/*.ts',
+    '.next/dev/types/**/*.ts',
+    '**/*.mts',
+  ],
   exclude: ['node_modules'],
 };
 

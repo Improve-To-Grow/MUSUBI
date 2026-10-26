@@ -541,11 +541,12 @@ async function main(agent, agentKey, options = {}) {
   // ITG applications start with the files of the playbook's Appendix C: .env.example, the PR
   // template, the CI, deploy and cleanup workflows, and scripts/checks/ and scripts/ci/
   if (answers.constitutionProfile === 'application') {
-    const scaffold = await writeItgScaffold();
+    const scaffold = await writeItgScaffold(process.cwd(), { projectName: answers.projectName });
     console.log(chalk.green(`  Wrote the ITG project scaffold (${scaffold.written.length} files)`));
     if (scaffold.skipped.length > 0) {
       console.log(chalk.yellow(`  Kept existing files: ${scaffold.skipped.join(', ')}`));
     }
+    for (const note of scaffold.notes) console.log(chalk.yellow(`  ${note}`));
   }
 
   // Generate language-specific dependency files (for single-package projects)

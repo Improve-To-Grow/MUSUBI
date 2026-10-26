@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.1-itg.9] - 2026-10-26
+
+The scaffold's CI build job runs on a new project (CHANGE-012).
+
+### Added
+
+- **OpenNext files in the ITG scaffold** (ITG Project Setup Guide §10.2 and §15): `open-next.config.ts` with the OpenNext defaults (no R2 or KV cache), `next.config.ts` with `initOpenNextCloudflareForDev()` when the project has no `next.config`, and `wrangler.jsonc` with the Worker names, staging hostname and log queue named after the project, the five rate-limit bindings per environment (`<id>` placeholders) and the compatibility date of the day. `opennextjs-cloudflare build` failed without them. An existing `next.config` without the call is kept and reported; a `wrangler.json` or `wrangler.toml` keeps ours out
+- **`docs/itg/PLAYBOOK_FEEDBACK.md`**: the points to report to the playbook maintainers in one list, including the jose `postinstall` patch, which jose 6 no longer needs
+
+### Changed
+
+- **`tsconfig.json` of a new application is the one `next build` of Next.js 16 leaves unchanged** (`jsx: react-jsx`, `.next/dev/types`), and `.prettierignore` lists `tsconfig.json`, which `next build` and create-next-app write in their own format
+
 ## [6.3.1-itg.8] - 2026-10-26
 
 The files `musubi init` writes for a new ITG application pass the scaffold's CI jobs (CHANGE-011).

@@ -35,7 +35,10 @@ describe('init JavaScript files', () => {
       moduleResolution: 'bundler',
       noEmit: true,
       paths: { '@/*': ['./src/*'] },
+      // The values next build writes, so it leaves the file unchanged (CHANGE-012)
+      jsx: 'react-jsx',
     });
+    expect((await fs.readJson('tsconfig.json')).include).toContain('.next/dev/types/**/*.ts');
   });
 
   it('writes a package.json on the ITG stack and .nvmrc for the application profile', async () => {

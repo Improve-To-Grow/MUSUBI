@@ -72,4 +72,4 @@ A run of every MUSUBI CLI feature in a clean ITG test project (2026-10-22) found
 ## Follow-ups (from the same run)
 
 - **Release:** tag `v6.3.1-itg.3` to `v6.3.1-itg.6` when the branch is merged (with `v6.3.1-itg.7`, CHANGE-010); `ci.yml` installs MUSUBI by that tag.
-- **Playbook:** report that §8.1's constitution check is `musubi-validate project` plus `musubi-trace ci-check`, not `musubi validate`.
+- **Playbook:** report that §8.1's constitution check is `musubi-validate project` plus `musubi-trace ci-check`, not `musubi validate` (listed in `docs/itg/PLAYBOOK_FEEDBACK.md`).

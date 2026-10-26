@@ -237,6 +237,81 @@ describe('starter configuration (CHANGE-011)', () => {
   });
 });
 
+describe('OpenNext files (CHANGE-012)', () => {
+  // JSONC to JSON: the template has whole-line comments and trailing commas only
+  const parseJsonc = text =>
+    JSON.parse(text.replace(/^\s*\/\/.*$/gm, '').replace(/,(\s*[}\]])/g, '$1'));
+
+  it('writes wrangler.jsonc of the Setup Guide §15 with the project name and date', async () => {
+    const project = fs.mkdtempSync(path.join(os.tmpdir(), 'musubi-itg-wrangler-'));
+    try {
+      await writeItgScaffold(project, { projectName: 'Meeting RSVP' });
+      const text = fs.readFileSync(path.join(project, 'wrangler.jsonc'), 'utf8');
+      const config = parseJsonc(text);
+
+      expect(text).not.toMatch(/\{\{[A-Z_]+\}\}/);
+      expect(config).toMatchObject({
+        name: 'meeting-rsvp',
+        main: '.open-next/worker.js',
+        compatibility_date: new Date().toISOString().slice(0, 10),
+        compatibility_flags: ['nodejs_compat', 'global_fetch_strictly_public'],
+      });
+      expect(config.env.staging.name).toBe('meeting-rsvp-staging');
+      expect(config.env.staging.routes[0].pattern).toBe('meeting-rsvp-staging.improvetogrow.com');
+      expect(config.env.production.queues.producers[0]).toEqual({
+        binding: 'LOG_QUEUE',
+        queue: 'meeting-rsvp-logs-production',
+      });
+      for (const env of ['staging', 'production']) {
+        expect(config.env[env].ratelimits.map(limit => limit.name)).toEqual([
+          'RL_AUTH',
+          'RL_READ',
+          'RL_WRITE',
+          'RL_ADMIN',
+          'RL_AI',
+        ]);
+      }
+      // No client domain yet and no PostgreSQL by default (Setup Guide §15)
+      expect(config.env.production).not.toHaveProperty('routes');
+      expect(config.env.staging).not.toHaveProperty('hyperdrive');
+    } finally {
+      fs.rmSync(project, { recursive: true, force: true });
+    }
+  });
+
+  it('writes open-next.config.ts with the defaults and next.config.ts with the dev bindings', () => {
+    expect(fs.readFileSync(path.join(root, 'open-next.config.ts'), 'utf8')).toContain(
+      'export default defineCloudflareConfig({});'
+    );
+    expect(fs.readFileSync(path.join(root, 'next.config.ts'), 'utf8')).toContain(
+      'initOpenNextCloudflareForDev();'
+    );
+  });
+
+  it('keeps an existing next.config and says when it lacks the dev bindings', async () => {
+    const project = fs.mkdtempSync(path.join(os.tmpdir(), 'musubi-itg-next-'));
+    try {
+      fs.writeFileSync(path.join(project, 'next.config.mjs'), 'export default {};\n');
+      fs.writeFileSync(path.join(project, 'wrangler.toml'), 'name = "legacy"\n');
+      const result = await writeItgScaffold(project);
+
+      expect(result.skipped).toEqual(expect.arrayContaining(['next.config.mjs', 'wrangler.toml']));
+      expect(fs.existsSync(path.join(project, 'next.config.ts'))).toBe(false);
+      expect(fs.existsSync(path.join(project, 'wrangler.jsonc'))).toBe(false);
+      expect(result.notes).toEqual([expect.stringContaining('initOpenNextCloudflareForDev()')]);
+      expect(result.notes[0]).toContain('next.config.mjs');
+
+      fs.writeFileSync(
+        path.join(project, 'next.config.mjs'),
+        "import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';\ninitOpenNextCloudflareForDev();\n"
+      );
+      expect((await writeItgScaffold(project)).notes).toEqual([]);
+    } finally {
+      fs.rmSync(project, { recursive: true, force: true });
+    }
+  });
+});
+
 describe('--help (II-A7)', () => {
   it('every script prints its header comment and exits 0 without doing its work', () => {
     const scripts = ['checks', 'ci'].flatMap(dir =>

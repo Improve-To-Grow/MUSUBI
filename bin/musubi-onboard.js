@@ -114,6 +114,7 @@ async function main() {
   if (scaffold.skipped.length > 0) {
     console.log(chalk.yellow(`  Kept existing files: ${scaffold.skipped.join(', ')}`));
   }
+  for (const note of scaffold.notes) console.log(chalk.yellow(`  ${note}`));
 
   // Step 7: Initialize memories (if not skipped)
   if (!skipMemories) {

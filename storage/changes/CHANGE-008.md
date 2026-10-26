@@ -62,4 +62,4 @@ Playbook v2.2 §3.3 says a new project is initialized with the ITG profile, whic
 ## Follow-ups
 
 - `ci-cleanup.yml` calls the project's `npm run ops:cleanup-ci`, which the project writes in Sprint 0 with `scripts/ops/seed-test-users`.
-- Report to the playbook: the route event catalogue path, `FIREBASE_DEPLOY_SERVICE_ACCOUNT`, and Workers deployed with `npx wrangler` instead of `cloudflare/wrangler-action`.
+- Report to the playbook: the route event catalogue path, `FIREBASE_DEPLOY_SERVICE_ACCOUNT`, and Workers deployed with `npx wrangler` instead of `cloudflare/wrangler-action` (listed in `docs/itg/PLAYBOOK_FEEDBACK.md`).

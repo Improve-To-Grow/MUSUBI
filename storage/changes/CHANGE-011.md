@@ -42,4 +42,4 @@ A clean run of `6.3.1-itg.7` (commit `28bebcc`) installed the dependencies of th
 ## Follow-ups
 
 - A project with no source file yet fails `tsc --noEmit` (no inputs) and `vitest run` (no test files) until Sprint 0 adds the Next.js app and its first test.
-- **Release:** tag `v6.3.1-itg.3` to `v6.3.1-itg.8` when the branch is merged.
+- **Release:** tag `v6.3.1-itg.3` to `v6.3.1-itg.8` when the branch is merged (with `v6.3.1-itg.9`, CHANGE-012).
